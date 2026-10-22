@@ -832,6 +832,33 @@ body[data-scr="setup"] header.top{visibility:hidden}
 body.lowhp::after{content:'';position:fixed;inset:0;z-index:55;pointer-events:none;box-shadow:inset 0 0 120px 30px rgba(200,0,0,.45);animation:lhPulse 1.4s ease-in-out infinite}
 @keyframes lhPulse{50%{opacity:.45}}
 #sndBtn{min-width:44px}
+/* dice in the shot view: lower-right corner, away from the shooter (bottom-left) and target (upper middle) */
+.sintro.w .dicebox{left:46%;right:1%;top:50%;bottom:0}
+@media (max-width:760px){.sintro.w .dicebox{left:30%;right:0;top:58%}}
+/* v27: Siege-style in-game UI — flat dark glass, hairline borders, square corners, uppercase condensed labels, white hover fill */
+html body{--glass:rgba(10,14,18,.86);--hair:rgba(255,255,255,.14);--hair2:rgba(255,255,255,.32)}
+html body button{border-radius:0;border:1px solid var(--hair);background:rgba(255,255,255,.045);transition:background .12s,color .12s,border-color .12s,box-shadow .12s}
+html body button:hover:not(:disabled){border-color:#fff;background:rgba(255,255,255,.12);box-shadow:inset 3px 0 0 #fff}
+html body button.on{background:#eef1f3;color:#0b0f12;border-color:#eef1f3;box-shadow:none}
+html body button.on .sub{color:#3b4650}
+html body button.primary{background:linear-gradient(180deg,#f2b84a,#d99a2b);color:#140f05;border:0;box-shadow:inset 0 -2px 0 rgba(0,0,0,.25);text-transform:uppercase;letter-spacing:.04em}
+html body button.primary:hover:not(:disabled){background:#fff;color:#0b0f12;box-shadow:inset 4px 0 0 var(--accent)}
+html body button:disabled{opacity:.32}
+html body .panel .box{background:var(--glass);border:0;border-top:2px solid var(--hair2);clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+html body.side-A .panel .box:first-child,html body .panel .box.a{border-top-color:var(--atk)}
+html body .box h2{font-family:var(--display);text-transform:uppercase;letter-spacing:.06em}
+html body .box h3{font-family:var(--display);font-size:12.5px;text-transform:uppercase;letter-spacing:.16em;color:#9aa8b5}
+html body .box h3::before{content:'';display:inline-block;width:6px;height:6px;margin:0 8px 1px 0;background:currentColor;vertical-align:middle}
+html body .hud3d button{background:rgba(8,11,14,.72);border-color:rgba(255,255,255,.12);font-family:var(--display);letter-spacing:.05em;text-transform:uppercase;font-size:13px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+html body .hud3d button.on{background:#eef1f3;color:#0b0f12}
+html body .manualbtn{background:rgba(8,11,14,.72);border:1px solid rgba(255,255,255,.28);color:#eef1f3;text-transform:uppercase;letter-spacing:.1em}
+html body .manualbtn:hover:not(:disabled){background:#eef1f3;color:#0b0f12;box-shadow:none}
+html body #acts button{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border-color:rgba(255,255,255,.12)}
+html body #acts button:hover:not(:disabled){background:rgba(255,255,255,.14);border-color:#fff}
+html body #acts button.primary{background:linear-gradient(180deg,#f2b84a,#d99a2b);color:#140f05}
+html body #acts button.on{background:#eef1f3;color:#0b0f12}
+html body .tracker .ph,html body .tracker button{font-family:var(--display)}
+html body .wzBody button,html body .wz button{letter-spacing:.02em}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -4539,7 +4566,7 @@ function diceInit(){
 const DIE_S=.9;
 function diceSize(D){const w=Math.max(50,D.box.clientWidth),h=Math.max(50,D.box.clientHeight);D.renderer.setSize(w,h,false);D.cam.aspect=w/h;
   // keep the rolling area about the same size on screen whatever the frame shape
-  D.cam.fov=(w/h<1?58:38)*(D.big?.6:1);D.cam.updateProjectionMatrix();D.cam.updateMatrixWorld();}
+  D.cam.fov=(w/h<1?58:38)*(D.big?(D.box.closest('.sintro.w')?.36:.6):1);D.cam.updateProjectionMatrix();D.cam.updateMatrixWorld();}
 // ground point under a screen position (ndc)
 function diceGround(D,nx,ny){const r=new THREE.Raycaster();r.setFromCamera({x:nx,y:ny},D.cam);const p=new THREE.Vector3();return r.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),p)?p:new THREE.Vector3();}
 // rigid cube physics: gravity, corner contacts with bounce + friction, dice knocking into each other.
@@ -4551,8 +4578,8 @@ function diceSim(D,n,rnd){
   const B=[];for(let i=0;i<n;i++){
     const x=new V3(R.x+1.2+i*.35+rnd()*.6,1.6+rnd()*1.2,R.z+(i-(n-1)/2)*.9+(rnd()-.5)*.8);
     const aim=L.clone().add(new V3((rnd()-.5)*2.2,0,(rnd()-.5)*2.2)),dir=aim.sub(x).setY(0).normalize();
-    const sp=7.5+rnd()*2.5;
-    B.push({x,v:dir.multiplyScalar(sp).setY(1.5+rnd()*2.5),w:new V3((rnd()-.5)*30,(rnd()-.5)*18,(rnd()-.5)*30),
+    const sw=D.big?.6:1,sp=(7.5+rnd()*2.5)*(D.big?.8:1);
+    B.push({x,v:dir.multiplyScalar(sp).setY((1.5+rnd()*2.5)*sw),w:new V3((rnd()-.5)*30*sw,(rnd()-.5)*18*sw,(rnd()-.5)*30*sw),
       q:new THREE.Quaternion().setFromEuler(new THREE.Euler(rnd()*6.3,rnd()*6.3,rnd()*6.3)),still:0,sleep:false,touch:false});}
   const frames=[],r=new V3(),vp=new V3(),tmp=new V3(),rn=new V3(),dq=new THREE.Quaternion(),up=new V3(0,1,0);
   const imp=(b,J)=>{b.v.addScaledVector(J,invM);b.w.addScaledVector(tmp.copy(r).cross(J),invI);};
