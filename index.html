@@ -859,6 +859,25 @@ html body #acts button.primary{background:linear-gradient(180deg,#f2b84a,#d99a2b
 html body #acts button.on{background:#eef1f3;color:#0b0f12}
 html body .tracker .ph,html body .tracker button{font-family:var(--display)}
 html body .wzBody button,html body .wz button{letter-spacing:.02em}
+/* v28: map photos */
+.wzCard .mph{position:absolute;inset:0;z-index:0;background:center/cover no-repeat;opacity:.5;-webkit-mask-image:linear-gradient(180deg,#000 40%,transparent 72%);mask-image:linear-gradient(180deg,#000 40%,transparent 72%);transition:opacity .2s}
+.wzCard.on .mph,.wzCard:hover .mph{opacity:.8}
+.wzCard .mph~.thumb{background:rgba(8,12,16,.55)}
+.wzCard .mph~*{position:relative;z-index:1}
+.mapintro{position:fixed;inset:0;z-index:330;pointer-events:none;background:#06090c center/cover no-repeat;display:flex;align-items:flex-end;padding:0 6vw 12vh;animation:miIn .5s ease-out both}
+.mapintro::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,6,8,.92) 0%,rgba(4,6,8,.55) 45%,rgba(4,6,8,.1) 80%),linear-gradient(0deg,rgba(4,6,8,.8),transparent 50%)}
+.mapintro.noph{background:radial-gradient(circle at 70% 40%,#1d2a36,#06090c 70%)}
+.miTx{position:relative;display:flex;flex-direction:column;gap:6px;border-left:4px solid var(--accent);padding-left:18px;animation:miTx .6s .15s cubic-bezier(.2,.9,.3,1) both}
+.miTx small{font:600 clamp(12px,1.3vw,16px) 'Saira Condensed',sans-serif;letter-spacing:.3em;color:var(--accent)}
+.miTx b{font:800 clamp(48px,9vw,120px)/1 'Noto Sans TC',sans-serif;letter-spacing:.06em;color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.7)}
+.miTx span{font:500 clamp(14px,1.6vw,20px) 'Noto Sans TC',sans-serif;color:#cfd8df;letter-spacing:.08em}
+.mapintro.out{animation:miOut .6s ease-in forwards}
+@keyframes miIn{from{opacity:0;background-size:110%}to{opacity:1}}
+@keyframes miTx{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+@keyframes miOut{to{opacity:0}}
+/* keep wizard cards dark when selected (the white "on" fill is for small buttons only) */
+html body .wzCard.on{background:rgba(16,23,30,.9);color:var(--fg);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 24px rgba(227,170,62,.25)}
+html body .wzCard.on span,html body .wzCard.on .sub{color:var(--muted)}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -2818,6 +2837,12 @@ function renderTension(){
   const u=G&&(G.active||G.sel);document.body.classList.toggle('lowhp',!!(on&&u&&u.alive&&u.side===G.player&&u.hp===1));}
 function bigNote(t,sub,k,ms){if(!CINE.on||document.hidden)return;const el=document.createElement('div');el.className='bignote '+(k||'');
   el.innerHTML=`<div class="bnBand"><b>${t}</b>${sub?`<span>${sub}</span>`:''}</div>`;document.body.appendChild(el);setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),400);},ms||1900);}
+const MAPPH=new Set(['bank','clubhouse','kafe']);
+function mapPhoto(k){return MAPPH.has(k)?'img/map/'+k+'.webp':'';}
+function mapIntro(k){const m=MAPS[k];if(!m||!CINE.on||document.hidden)return;const ph=mapPhoto(k),el=document.createElement('div');el.className='mapintro'+(ph?'':' noph');
+  if(ph)el.style.backgroundImage=`url(${ph})`;
+  el.innerHTML=`<div class="miTx"><small>行動地點 · LOCATION</small><b>${m.name}</b><span>${G&&G.mission==='hostage'?'任務：人質救援':'任務：炸彈'} · ${cfg.side==='A'?'你是進攻方':'你是防守方'}</span></div>`;
+  document.body.appendChild(el);setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),600);},2300);}
 // ---------- log ----------
 function log(msg,k){G.log.unshift({msg,k:k||'ks'});if(G.log.length>80)G.log.pop();renderLog();}
 
@@ -3308,7 +3333,7 @@ const invUsed=side=>Object.values(cfg.inv[side]).reduce((a,b)=>a+b,0);
 function invHTML(side){const inv=cfg.inv[side],used=invUsed(side);
   return `<h3>戰術裝備（${used}/${INV_CAP[side]} 個方塊${side==='A'?'，另有 3 架無人機':'；任務另給 3 捲鐵絲網與地圖上的攝影機'}）</h3><div class="invrow">${Object.entries(INV[side]).map(([k,[n,max,d]])=>`<div class="inv"><b>${n}</b><span class="hint">${d}</span><div class="invc"><button data-inv="${k}" data-dv="-1" ${inv[k]<=0?'disabled':''} aria-label="減少${n}">−</button><i>${inv[k]}</i><button data-inv="${k}" data-dv="1" ${inv[k]>=max||used>=INV_CAP[side]?'disabled':''} aria-label="增加${n}">＋</button><small>上限 ${max}</small></div></div>`).join('')}</div>`;}
 function newGame(){
-  $('#banner').hidden=true;
+  $('#banner').hidden=true;setTimeout(()=>{try{if(G&&!G.tut&&!G.net)mapIntro(cfg.map);}catch(e){}},60);
   const m=MAPS[cfg.map];
   G={map:m,grid:parseMap(m),W:m.rows[0].length,H:m.rows.length,units:[],gadgets:[],reinf:0,drones:3,wire:3,...invFor('A',cfg.side==='A'?cfg.inv.A:INV_DEF.A),...invFor('D',cfg.side==='D'?cfg.inv.D:INV_DEF.D),decoys:[],mission:cfg.mission||'bomb',hostage:null,round:1,maxRounds:6,phaseIdx:0,phase:'setup',acts:0,active:null,sel:null,mode:'move',defuser:null,over:false,busy:false,ai:false,log:[],moves:[],cur:null,hl:null,player:cfg.side,aiSite:Math.random()<.5?'A':'B',fx:null,spawn:null};
   const enemy=cfg.side==='A'?'D':'A';
@@ -5088,7 +5113,7 @@ function wzStepHTML(){const s=cfg.side,st=WZ.step;
     wzCard('data-wz-mis="bomb"',cfg.mission!=='hostage',`<div class="ic">${WZI.bomb}</div><b>炸彈</b><span>進攻方在 A 或 B 點安裝拆彈器，撐過兩個防守階段</span>`,'big')+
     wzCard('data-wz-mis="hostage"',cfg.mission==='hostage',`<div class="ic">${WZI.hostage}</div><b>人質</b><span>進攻方帶走人質，送到任一出生區撤離</span>`,'big')}</div>`;
   case 2:return `<h3 class="wzQ">選擇地圖</h3><p class="wzHint">背後是目前選中地圖的 3D 預覽。</p><div class="wzGrid two maps">${Object.entries(MAPS).map(([k,m])=>
-    wzCard(`data-wz-map="${k}"`,cfg.map===k,`<img class="thumb" src="${mapThumb(k)}" alt="${m.name}平面圖"><b>${m.name}</b><span>${m.sub}</span>`)).join('')}</div>`;
+    wzCard(`data-wz-map="${k}"`,cfg.map===k,`${mapPhoto(k)?`<i class="mph" style="background-image:url(${mapPhoto(k)})"></i>`:''}<img class="thumb" src="${mapThumb(k)}" alt="${m.name}平面圖"><b>${m.name}</b><span>${m.sub}</span>`)).join('')}</div>`;
   case 3:{const p=cfg.picks[s],pickOf=b=>p.findIndex(k=>OPC[k]&&OPC[k].base===b);
     const cur=OPC[WZ.cur]&&OPC[WZ.cur].side===s?OPC[WZ.cur]:OPC[p[0]||OPBASE.find(b=>OPC[b].side===s)];
     return `<div class="wzOpHead"><div><h3 class="wzQ">組成你的小隊</h3><p class="wzHint">點頭像加入小隊，再點一次移出。滑鼠移過去可以看能力。</p></div>
