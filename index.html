@@ -1185,7 +1185,7 @@ html body .depBox #acts button .sub{white-space:nowrap;overflow:hidden;text-over
         <li>距離：近 1～3 格、中 4～6 格、遠 7 格以上。每名幹員卡上寫著三種距離各擲哪些骰：<i class="die" style="background:#e8574e"></i>紅骰平均 2、<i class="die" style="background:#ef8a3a"></i>橙骰平均 1.5、<i class="die" style="background:#e8c840"></i>黃骰平均 1。點數加總就是命中數。</li>
         <li>掩護：射擊線穿過牆洞、軟牆或路障（只有被標記的目標能隔著打），或目標緊貼著盾牌，就有輕掩護 −2；兩個以上來源算重掩護 −3。卡上有盾牌圖示的幹員永遠算一個來源。目標有掩護時，閃電骰不擲。</li>
         <li>每點命中造成 1 傷，傷害達到耐力就陣亡；沒死的目標會被標記位置到回合結束。被閃光彈震暈的幹員只擲兩顆黃骰。</li>
-        <li>攝影機看得到整個房間，進攻方走進或在裡面行動就被標記。Kapkan 陷阱踏入受 2 傷，Smoke 毒氣受 1 傷。</li>
+        <li><b>攝影機</b>：地圖上頭頂有紅色鏡頭圖示的就是攝影機，牆後也看得到。它涵蓋整個房間（地板淡黃色的範圍），進攻方走進或在裡面行動就被標記。攝影機雙方都看得見，進攻方可以用「破壞」打掉視線內 8 格內的攝影機；防彈攝影機只能從相鄰格破壞，Thatcher 的 EMP 也能摧毀。<li><b>掩護射擊</b>：地板上紅色的格子是敵方掩護射擊會開火的範圍（面向的半圓、14 格內、有視線），自己的是藍色。走進紅色範圍會被搶先射擊。</li><li>Kapkan 陷阱踏入受 2 傷，Smoke 毒氣受 1 傷。</li>
         <li><b>障礙物</b>：地圖上的桌子、沙發、吧台、車輛等家具。爬上去多花 1 點移動點，不能停在上面，不擋視線；目標緊貼著障礙物、而射擊線穿過它時有輕掩護。</li>
         <li><b>重擲</b>：每位玩家整場一次。射擊擲完骰後可以使用：保留點數最高的一顆，其他全部重擲。</li>
         <li>還沒做的部分：探頭（lean）、控制任務、樓上區域與上下樓、部分幹員的專屬裝置。完整原版規則見「原版規則書」。</li></ul></section>
@@ -4248,7 +4248,7 @@ function setupPost(){
   const rt=new THREE.WebGLRenderTarget(sz.x*r.getPixelRatio(),sz.y*r.getPixelRatio(),{type:THREE.HalfFloatType,samples:r.capabilities.isWebGL2?4:0});
   const comp=new THREE.EffectComposer(r,rt);
   comp.addPass(new THREE.RenderPass(R3.scene,R3.camera));
-  const ssao=new THREE.SSAOPass(R3.scene,R3.camera,sz.x,sz.y);ssao.kernelRadius=.45;ssao.minDistance=.00008;ssao.maxDistance=.004;comp.addPass(ssao);
+  const ssao=new THREE.SSAOPass(R3.scene,R3.camera,sz.x,sz.y);{const ro=ssao.renderOverride.bind(ssao);ssao.renderOverride=function(r,mat,...a){const z=mat===this.normalMaterial&&R3.zoneG&&R3.zoneG.visible;if(z)R3.zoneG.visible=false;ro(r,mat,...a);if(z)R3.zoneG.visible=true;};}ssao.kernelRadius=.45;ssao.minDistance=.00008;ssao.maxDistance=.004;comp.addPass(ssao);
   const bloom=new THREE.UnrealBloomPass(new THREE.Vector2(sz.x,sz.y),.28,.55,.9);comp.addPass(bloom);
   const tm=new THREE.ShaderPass(THREE.ACESFilmicToneMappingShader);tm.uniforms.exposure.value=r.toneMappingExposure;comp.addPass(tm);
   const gc=new THREE.ShaderPass(THREE.GammaCorrectionShader);comp.addPass(gc);
@@ -4799,7 +4799,8 @@ function gadget3D(gd){
   const grp=new THREE.Group();grp.position.set(gd.x+.5,0,gd.y+.5);
   const add=(geo,mat,s,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.scale.set(...s);m.position.set(x,y,z);m.castShadow=true;grp.add(m);return m;};
   if(gd.type==='cam'){add(CYL3,gm('pole',()=>std(0x3a4148,{metalness:.6})),[.025,.9,.025],0,.45,0);add(HSPH3,gm('dome',()=>std(0x15191d,{metalness:.4,roughness:.3})),[.14,-.12,.14],0,.92,0);
-    add(SPH3,gm('lens',()=>new THREE.MeshStandardMaterial({color:0xe8574e,emissive:0xe8574e,emissiveIntensity:1.2})),[.04,.04,.04],0,.84,.1);}
+    add(SPH3,gm('lens',()=>new THREE.MeshStandardMaterial({color:0xe8574e,emissive:0xe8574e,emissiveIntensity:1.2})),[.04,.04,.04],0,.84,.1);
+    if(!gd.valk){const sp=new THREE.Sprite(camBadge());sp.scale.set(.7,.7,1);sp.position.y=1.5;sp.renderOrder=11;grp.add(sp);}}
   else if(gd.type==='jammer'){add(BOX3,gm('jam',()=>std(0x1d2a36,{metalness:.4})),[.26,.16,.2],0,.08,0);grp.userData.blink=add(SPH3,gm('jamled',()=>new THREE.MeshStandardMaterial({color:0x4aa8e2,emissive:0x4aa8e2,emissiveIntensity:1.5})),[.04,.04,.04],0,.18,0);
     const sq=new THREE.LineLoop(gm('jsq',()=>new THREE.BufferGeometry().setFromPoints([[-2.5,-2.5],[2.5,-2.5],[2.5,2.5],[-2.5,2.5]].map(([a,b])=>new THREE.Vector3(a,.04,b)))),gm('jline',()=>new THREE.LineDashedMaterial({color:0x4aa8e2,dashSize:.2,gapSize:.15})));sq.computeLineDistances();grp.add(sq);}
   else if(gd.type==='ced'){add(BOX3,gm('ced',()=>std(0x2a2f35,{metalness:.5})),[.22,.12,.16],0,.06,0);grp.userData.blink=add(SPH3,gm('cedled',()=>new THREE.MeshStandardMaterial({color:0xffd84a,emissive:0xffd84a,emissiveIntensity:1.6})),[.04,.04,.04],0,.14,0);}
@@ -5002,6 +5003,28 @@ function hostage3D(h){const grp=new THREE.Group();grp.position.set(h.x+.5,0,h.y+
   const body=new THREE.Mesh(SPH3,gm('hos',()=>std(0xe8e2d4,{roughness:.9})));body.scale.set(.13,h.by?.3:.2,.11);body.position.y=h.by?.42:.2;grp.add(body);
   const head=new THREE.Mesh(SPH3,gm('hosh',()=>std(0xd9a07a,{roughness:.6})));head.scale.setScalar(.075);head.position.y=h.by?.8:.47;grp.add(head);
   const ring=new THREE.Mesh(new THREE.RingGeometry(.3,.36,6),gm('hosr',()=>new THREE.MeshBasicMaterial({color:0xffd84a,transparent:true,opacity:.9,side:THREE.DoubleSide})));ring.rotation.x=-Math.PI/2;ring.position.y=.03;grp.add(ring);return grp;}
+// cells an overwatching operator would fire on: front half, within 14, in line of sight
+function owZone(u){const o=[];for(const [x,y] of within(u.x,u.y,14)){if(x===u.x&&y===u.y)continue;const c=cell(x,y);if(!c||['hard','soft','reinf','bar'].includes(c.t))continue;
+  if((x-u.x)*u.owd[0]+(y-u.y)*u.owd[1]<=0)continue;if(cheb(u.x,u.y,x,y)<=14&&los(u.x,u.y,x,y,false,true))o.push([x,y]);}return o;}
+function wallSig(){let s=0;for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++){const t=cell(x,y).t;if(t!=='floor')s=(s*31+y*G.W+x+t.length)%1e9;}return s;}
+function cellsMesh(cells,col,op){const n=cells.length,pos=new Float32Array(n*18);let i=0;
+  for(const [x,y] of cells){const a=x+.06,b=x+.94,c=y+.06,d=y+.94;for(const [px,pz] of [[a,c],[a,d],[b,c],[b,c],[a,d],[b,d]]){pos[i++]=px;pos[i++]=.035;pos[i++]=pz;}}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.computeVertexNormals();
+  const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:op,side:THREE.DoubleSide,depthWrite:false}));m.renderOrder=3;return m;}
+function zones3D(){const key=[wallSig(),...G.units.filter(u=>u.alive&&u.overwatch&&u.x>=0&&pub(u)).map(u=>u.id+':'+u.x+','+u.y+':'+u.owd),'|',
+    ...G.gadgets.filter(g=>g.alive&&g.type==='cam'&&gadgetVisibleTo(g,G.player)).map(g=>g.x+','+g.y+(jammed(g.x,g.y)?'j':''))].join(' ');
+  if(R3.zoneKey===key&&R3.zoneG)return R3.zoneG;
+  if(R3.zoneG)R3.zoneG.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});
+  const grp=new THREE.Group();
+  for(const u of G.units)if(u.alive&&u.overwatch&&u.x>=0&&pub(u)){const z=owZone(u);if(z.length)grp.add(cellsMesh(z,u.side===G.player?0x4aa8e2:0xe8463a,u.side===G.player?.16:.3));}
+  const seen=new Set(),cc=[];for(const g of G.gadgets)if(g.alive&&g.type==='cam'&&gadgetVisibleTo(g,G.player)&&!jammed(g.x,g.y)&&cell(g.x,g.y).indoor)
+    for(const [x,y] of roomOf(g.x,g.y)){const k=y*G.W+x;if(!seen.has(k)){seen.add(k);cc.push([x,y]);}}
+  if(cc.length)grp.add(cellsMesh(cc,0xe0b040,.15));
+  R3.zoneKey=key;R3.zoneG=grp;return grp;}
+function camBadge(){if(GM.camBadge)return GM.camBadge;const im=gImg('cam'),c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
+  g.fillStyle='#1a0f0e';g.beginPath();g.arc(64,64,58,0,7);g.fill();g.lineWidth=8;g.strokeStyle='#e8574e';g.stroke();
+  if(im)g.drawImage(im,24,24,80,80);else{g.fillStyle='#e8574e';g.beginPath();g.arc(64,64,18,0,7);g.fill();}
+  const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;const m=new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true});if(im)GM.camBadge=m;return m;}
 function owArc(u){const phi=Math.atan2(-u.owd[1],u.owd[0]);const col=u.side==='A'?0xef7f3e:0x4aa8e2;
   const m=new THREE.Mesh(new THREE.RingGeometry(.5,1.1,24,1,phi-Math.PI/2,Math.PI),gm('ow'+col,()=>new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.22,side:THREE.DoubleSide,depthWrite:false})));
   m.rotation.x=-Math.PI/2;m.position.set(u.x+.5,.03,u.y+.5);return m;}
@@ -5076,6 +5099,7 @@ function update3D(){
   if(G.phase==='setup'&&G.player==='A')G.map.spawns.forEach((z,i)=>dg.add(spawn3D(z,i,i===G.spawn||G.spawn==null)));
   if(G.hostage)dg.add(hostage3D(G.hostage));
   for(const u of G.units)if(u.alive&&u.overwatch&&u.x>=0&&pub(u))dg.add(owArc(u));
+  if(G.phase==='play'||G.phase==='setup')dg.add(zones3D());
   if(G.defuser){const grp=new THREE.Group();grp.position.set(G.defuser.x+.5,0,G.defuser.y+.5);
     const b=new THREE.Mesh(BOX3,gm('def',()=>std(0x2a2f35,{metalness:.5})));b.scale.set(.34,.16,.24);b.position.y=.08;b.castShadow=true;grp.add(b);
     const l=new THREE.Mesh(SPH3,new THREE.MeshStandardMaterial({color:0xe3aa3e,emissive:0xe3aa3e,emissiveIntensity:1.5}));l.scale.setScalar(.06);l.position.set(0,.2,0);grp.add(l);grp.userData.pulse=l;
