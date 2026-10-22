@@ -905,10 +905,10 @@ img.emb{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shad
 .wzCard.mapc b{font-size:22px;text-shadow:0 2px 8px #000}.wzCard.mapc span{text-shadow:0 1px 4px #000}
 @media (max-width:760px){.wzGrid.maps .wzCard.mapc{justify-content:flex-end;padding:10px}}
 /* v32: side and mission steps are one big picture cut on a diagonal; each half is a button */
-html body .wzGrid.split{position:relative;display:block;width:100%;max-width:1100px;flex:1 1 auto;min-height:min(58vh,480px);--cut1:62%;--cut2:38%}
+html body .wzGrid.split{position:relative;display:block;width:100%;max-width:1100px;flex:1 1 auto;min-height:min(58vh,480px);--cut1:54%;--cut2:46%}
 html body .wzGrid.split>.wzCard{position:absolute;inset:0;min-height:0;margin:0;border:0;box-shadow:none;background:#0a1016;padding:22px 30px;justify-content:flex-end;gap:4px;transition:filter .2s}
-html body .wzGrid.split>.wzCard:first-child{clip-path:polygon(0 0,var(--cut1) 0,var(--cut2) 100%,0 100%);align-items:flex-start;text-align:left;padding-right:64%}
-html body .wzGrid.split>.wzCard:last-child{clip-path:polygon(var(--cut1) 0,100% 0,100% 100%,var(--cut2) 100%);align-items:flex-end;text-align:right;padding-left:64%}
+html body .wzGrid.split>.wzCard:first-child{clip-path:polygon(0 0,var(--cut1) 0,var(--cut2) 100%,0 100%);align-items:flex-start;text-align:left;padding-right:56%}
+html body .wzGrid.split>.wzCard:last-child{clip-path:polygon(var(--cut1) 0,100% 0,100% 100%,var(--cut2) 100%);align-items:flex-end;text-align:right;padding-left:56%}
 html body .wzGrid.split>.wzCard:not(.on){filter:brightness(.45) saturate(.5)}
 html body .wzGrid.split>.wzCard:not(.on):hover{filter:brightness(.75) saturate(.8)}
 .wzGrid.split::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:#e3aa3e;clip-path:polygon(calc(var(--cut1) - 2px) 0,calc(var(--cut1) + 2px) 0,calc(var(--cut2) + 2px) 100%,calc(var(--cut2) - 2px) 100%)}
@@ -924,21 +924,16 @@ html body .wzGrid.split .side .ic{width:64px!important;height:64px!important;mar
 html body .wzGrid.split .mis .ic{position:absolute;top:7%;height:60%;width:30%;margin:0;aspect-ratio:auto}
 html body .wzGrid.split .mis:first-child .ic{left:8%}html body .wzGrid.split .mis:last-child .ic{right:8%}
 .wzGrid.split .mis .ic svg{width:100%;height:100%}
-/* upright phones: the cut runs across, top half and bottom half each show their own side of the picture */
+/* upright phones: same near-vertical cut; each half shows its own side of the picture */
 @media (orientation:portrait) and (max-width:760px){
- html body .wzGrid.split{min-height:0;--cut1:58%;--cut2:42%}
- html body .wzGrid.split>.wzCard{padding:16px 18px}
- html body .wzGrid.split>.wzCard:first-child{clip-path:polygon(0 0,100% 0,100% var(--cut2),0 var(--cut1));padding:16px 18px;justify-content:flex-start}
- .wzGrid.split>.wzCard:first-child .sideph::after,.wzGrid.split>.wzCard:first-child .misph::after{background:linear-gradient(0deg,rgba(8,12,16,0) 45%,rgba(8,12,16,.9) 100%)}
- html body .wzGrid.split>.wzCard:last-child{clip-path:polygon(0 var(--cut1),100% var(--cut2),100% 100%,0 100%);padding-left:18px;justify-content:flex-end}
- .wzGrid.split::after{clip-path:polygon(0 calc(var(--cut1) - 2px),100% calc(var(--cut2) - 2px),100% calc(var(--cut2) + 2px),0 calc(var(--cut1) + 2px))}
- .wzGrid.split .sideph.l,.wzGrid.split .sideph.r{background-size:cover}
- .wzGrid.split .sideph.l{bottom:42%;background-position:6% 60%}
- .wzGrid.split .sideph.r{top:42%;background-position:94% 60%}
- .wzGrid.split b{font-size:24px}.wzGrid.split span{font-size:13px}
- html body .wzGrid.split .mis .ic{height:34%;width:44%;top:6%}
- html body .wzGrid.split .mis:last-child .ic{top:auto;bottom:22%}
- html body .wzGrid.split .mis:first-child .ic{left:6%}html body .wzGrid.split .mis:last-child .ic{right:6%}
+ html body .wzGrid.split{min-height:0;--cut1:55%;--cut2:45%}
+ html body .wzGrid.split>.wzCard{padding:14px 12px}
+ html body .wzGrid.split>.wzCard:first-child{padding-right:57%}html body .wzGrid.split>.wzCard:last-child{padding-left:57%}
+ .wzGrid.split .sideph.l{right:45%;background-position:16% 60%}
+ .wzGrid.split .sideph.r{left:45%;background-position:84% 60%}
+ .wzGrid.split b{font-size:22px}.wzGrid.split span{font-size:12px}
+ html body .wzGrid.split .mis .ic{top:22%;height:40%;width:40%}
+ html body .wzGrid.split .mis:first-child .ic{left:4%}html body .wzGrid.split .mis:last-child .ic{right:4%}
 }
 /* phones held sideways: every wizard step fits one screen, nothing scrolls */
 @media (orientation:landscape) and (max-height:520px){
@@ -975,20 +970,100 @@ html body .wzGrid.split .mis:first-child .ic{left:8%}html body .wzGrid.split .mi
  .wzOd .nm img{width:22px;height:22px}.wzOd .nm b{font-size:15px}
  .wzOd .osW div{font-size:10px}.wzOd .st{font-size:10px;gap:2px 8px}.wzOd .osVar button{font-size:10px;padding:2px 6px}
  .wzRow{margin-top:3px;gap:6px}.wzRow button{padding:4px 12px;font-size:12px}
- /* gear: one row */
- .wzPips{margin:0 0 4px;gap:4px}.wzPips i{width:11px;height:11px}
- .wzInv{grid-template-columns:repeat(auto-fit,minmax(0,1fr));grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:5px;flex:1 1 auto;min-height:0;width:100%;max-height:none}
- .wzInv .wzCard{min-height:0;padding:4px 3px;gap:2px;justify-content:space-between}
- .wzInv .wzCard .ic{width:auto;height:32%;max-height:56px;aspect-ratio:1;margin:0}
- .wzInv .wzCard b{font-size:12px}.wzInv .wzCard>span{font-size:9.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
- .wzCnt{gap:4px}.wzCnt button{width:28px;height:28px;font-size:16px;padding:0}.wzCnt i{font-size:16px;min-width:14px}
- .wzInv .wzCard.on::after{width:16px;height:16px;top:3px;right:3px;font-size:10px}
  /* summary: two columns of rows */
  .wzSum{grid-template-columns:52px 1fr auto 52px 1fr auto;gap:4px 8px;padding:8px 10px;max-width:none;font-size:12px}
  .wzSum dt{font-size:11px}.wzSum dd{font-size:12px;margin:0}.wzSum dd img{width:16px;height:16px}.wzSum button{padding:3px 8px;font-size:11px}
  .wzBody[data-tight="1"] .wzHint,.wzBody[data-tight="2"] .wzHint,.wzBody[data-tight="3"] .wzHint{display:none}
  .wzBody[data-tight="2"] .wzGrid .wzCard span,.wzBody[data-tight="3"] .wzGrid .wzCard span,.wzBody[data-tight="3"] .wzInv .wzCard>span{display:none}
 }
+
+/* v33: tap once to look, twice to confirm */
+.wzCard.armed{outline:3px solid #e3aa3e;outline-offset:-3px}
+.wzCard.armed::before{content:"再點一次確定";position:absolute;z-index:4;left:50%;top:10px;transform:translateX(-50%);background:#e3aa3e;color:#15110a;font:700 13px var(--display);letter-spacing:.06em;padding:4px 12px;white-space:nowrap;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);animation:armPulse 1.1s ease-in-out infinite}
+@keyframes armPulse{50%{filter:brightness(1.25)}}
+.wzBody .wzCard.armed span{display:block!important}
+html body .wzGrid.split>.wzCard.armed{outline:0}
+html body .wzGrid.split>.wzCard:first-child.armed::before{left:30%}html body .wzGrid.split>.wzCard:last-child.armed::before{left:70%}
+.wzOt.peek,.wzS.peek{outline:2px dashed #e3aa3e;outline-offset:1px;z-index:1}
+/* back button on a dark plate, start button big */
+html body .wzFoot #wzBack{border:0;background:var(--plateDk) center/100% 100% no-repeat;color:#e8edf1;min-height:46px;padding:8px 30px 8px 26px;font:700 16px var(--display);letter-spacing:.08em;box-shadow:none}
+html body .wzFoot #wzBack:hover{background:var(--plateDk) center/100% 100% no-repeat;filter:brightness(1.3) drop-shadow(0 0 8px rgba(255,255,255,.18));box-shadow:none}
+html body .wzFoot button.primary.start{font-size:26px;letter-spacing:.16em;min-height:58px;padding:8px 46px;min-width:220px}
+/* gear: one row per item, picture, then name and rule, then the counter */
+html body .wzInv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:auto;grid-auto-flow:row;gap:8px;width:100%;max-width:1000px;max-height:none;flex:0 0 auto}
+html body .wzInv .wzCard{display:grid;grid-template-columns:72px minmax(0,1fr) auto;align-items:center;gap:12px;min-height:0;padding:10px 14px;text-align:left;justify-content:stretch}
+html body .wzInv .wzCard .ic{width:72px;height:72px;margin:0}
+.wzInv .gTx{display:flex;flex-direction:column;gap:3px;min-width:0}
+.wzInv .gTx b{font-size:17px}.wzInv .gTx span{font-size:12.5px;line-height:1.45;color:var(--muted)}
+html body .wzCnt{display:grid;grid-template-columns:40px 34px 40px;grid-template-rows:auto auto;align-items:center;justify-items:center;gap:2px 0}
+html body .wzCnt small{grid-column:1/4;font-size:11px;color:var(--muted)}
+html body .wzCnt button{width:40px;height:40px;padding:0;border:0;font:700 22px/1 var(--display);color:#e8edf1;background:var(--plateDk) center/240% 100% no-repeat;clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px)}
+html body .wzCnt button[data-dv="1"]:not(:disabled){background-image:var(--plateYl);color:#15110a}
+html body .wzCnt button:disabled{opacity:.3}
+html body .wzCnt i{font:700 24px var(--display);font-style:normal;color:#fff}
+html body .wzInv .wzCard.on::after{top:4px;left:4px;right:auto}
+/* summary: picture tiles */
+.wzSm{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:minmax(0,1.1fr) minmax(0,1fr);gap:10px;width:100%;max-width:1000px;flex:1 1 auto;min-height:min(56vh,440px)}
+html body .smT{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px 8px 26px;min-height:0;overflow:hidden;background:rgba(16,23,30,.88);border:1px solid var(--line);color:#e8edf1;text-align:center}
+html body .smT:hover{border-color:#e3aa3e;background:rgba(24,32,40,.95)}
+.smT em{position:absolute;left:0;right:0;bottom:6px;font:600 11px var(--display);font-style:normal;letter-spacing:.12em;color:var(--muted)}
+.smT em::after{content:" ✎";color:#e3aa3e}
+.smT b{font:700 19px var(--display);text-shadow:0 2px 8px #000;position:relative}
+.smT.side.a b{color:#ef7f3e}.smT.side.d b{color:#4aa8e2}
+.smI{display:block;width:auto;height:56%;max-height:120px;aspect-ratio:1}.smI img,.smI svg{width:100%;height:100%;object-fit:contain}
+.smPh{position:absolute;inset:0;background:center/cover no-repeat}.smPh::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(8,12,16,.92))}
+.smT.map{justify-content:flex-end}
+.smT.ops,.smT.gear{grid-column:span 2}
+.smOps,.smGear{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px}
+.smOps>span{display:flex;flex-direction:column;align-items:center;gap:3px}.smOps img{width:52px;height:52px}.smOps small{font-size:11.5px}
+.smGear>span{position:relative;display:flex;flex-direction:column;align-items:center}.smGear i{display:block;width:58px;height:58px}.smGear i img,.smGear i svg{width:100%;height:100%;object-fit:contain}
+.smGear small{font:700 16px var(--display);color:#e3aa3e}
+@media (orientation:portrait) and (max-width:760px){
+ .wzSm{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));min-height:0;gap:8px}
+ .smI{height:52%}.smT b{font-size:17px}.smOps{gap:6px}.smOps img{width:40px;height:40px}.smOps small{font-size:10px}.smGear i{width:44px;height:44px}
+ html body .wzInv{grid-template-columns:1fr;gap:6px}
+ html body .wzInv .wzCard{grid-template-columns:56px minmax(0,1fr) auto;gap:10px;padding:8px 10px}
+ html body .wzInv .wzCard .ic{width:56px;height:56px}
+ .wzInv .gTx b{font-size:15px}.wzInv .gTx span{font-size:11.5px}
+ html body .wzCnt{grid-template-columns:36px 30px 36px}html body .wzCnt button{width:36px;height:36px}
+ html body .wzFoot button.primary.start{font-size:22px;min-width:0;flex:1;margin-left:10px}
+}
+@media (orientation:landscape) and (max-height:520px){
+ .wzSm{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;min-height:0}
+ html body .smT{padding:6px 6px 18px;gap:3px}.smT b{font-size:14px}.smT em{bottom:3px;font-size:9.5px}
+ .smI{height:50%}.smOps{gap:6px}.smOps img{width:34px;height:34px}.smOps small{font-size:9.5px}.smGear i{width:36px;height:36px}.smGear small{font-size:13px}
+ .wzPips{margin:2px 0 4px;gap:4px}.wzPips i{width:11px;height:11px}
+ html body .wzInv{gap:5px;flex:1 1 auto;min-height:0;grid-auto-rows:minmax(0,1fr)}
+ html body .wzInv .wzCard{grid-template-columns:44px minmax(0,1fr) auto;gap:8px;padding:4px 8px}
+ html body .wzInv .wzCard .ic{width:44px;height:44px}
+ .wzInv .gTx b{font-size:13px}.wzInv .gTx span{font-size:10px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+ html body .wzCnt{grid-template-columns:30px 24px 30px}html body .wzCnt button{width:30px;height:30px;font-size:17px}html body .wzCnt i{font-size:18px}html body .wzCnt small{font-size:9px}
+ html body .wzFoot #wzBack{min-height:36px;padding:4px 22px;font-size:13px}
+ html body .wzFoot button.primary.start{font-size:20px;min-height:42px;padding:4px 34px}
+ .wzCard.armed::before{font-size:11px;top:6px;padding:2px 10px}
+}
+/* deployment: one box */
+.panel.dep .sheetbar{display:none}
+.depBox{display:flex;flex-direction:column;gap:10px}
+.depHd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.depHd h2{margin:0}.depHd span{font-size:12.5px;color:var(--muted)}
+.depSq{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+html body .depSq button{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px 5px;min-width:0;background:#121a22;border:1px solid #2a3a48;color:#e8edf1}
+.depSq img{width:40px;height:40px}.depSq span{font-size:11px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body .depSq button.todo{border-style:dashed;opacity:.75}
+html body .depSq button.ok::after{content:"✓";position:absolute;top:2px;right:3px;width:15px;height:15px;border-radius:50%;background:#3f9a5c;color:#fff;font-size:10px;line-height:15px;text-align:center}
+html body .depSq button.on{border:2px solid #e3aa3e;opacity:1;background:#2a2312}
+.depZ{display:flex;flex-direction:column;gap:4px}.depZ small{font-size:11px;color:var(--muted)}
+.depZ .row,.depBox #acts{display:flex;flex-wrap:wrap;gap:6px}.depZ .row button{flex:1 1 0;min-width:0;padding:8px 6px;font-size:13px}
+@media (orientation:landscape) and (max-height:520px){
+ .depBox{gap:6px}.depHd h2{font-size:16px}.depHd span{font-size:11px}.depSq img{width:30px;height:30px}.depSq span{font-size:9.5px}
+ .depZ .row button{padding:5px 4px;font-size:12px}html body .depBox #go{min-height:44px;font-size:16px;padding:4px 30px}
+ .depBox #acts button{padding:4px 6px;font-size:11px}
+}
+/* view controls: one eye button cycles angled / top / follow */
+html body .hud3d #view-angle,html body .hud3d #view-top,html body .hud3d #view-focus,html body .hud3d #view-in,html body .hud3d #view-out,html body .hud3d #view-cine,html body .hud3d #view-q{display:none}
+html body .hud3d #view-eye{display:inline-flex;align-items:center;gap:6px;padding:6px 12px 6px 9px}
+#view-eye svg{width:22px;height:22px;color:#e3aa3e}
+@media (pointer:coarse){.hint3d{display:none}}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -1007,7 +1082,7 @@ html body .wzGrid.split .mis:first-child .ic{left:8%}html body .wzGrid.split .mi
 
   <div class="layout">
     <section class="boardwrap">
-      <div class="boardframe" id="frame"><canvas id="board" aria-label="戰術地圖平面圖"></canvas><div class="hud3d" id="hud3d" hidden><button id="view-angle">斜角視角</button><button id="view-top">俯視</button><button id="view-wall">牆：全高</button><button id="view-focus">聚焦幹員</button><button id="view-q" hidden>畫質：高</button><button id="view-cine">射擊特寫：肩後</button><button id="view-in" aria-label="放大">＋</button><button id="view-out" aria-label="縮小">－</button><span class="hint3d">拖曳旋轉 · 右鍵或雙指平移 · 滾輪或捏合縮放 · 方向鍵旋轉</span></div><div class="coord" id="coord"></div><div class="tutbox" id="tutbox" hidden></div><div class="title" id="title"><div class="tbg" aria-hidden="true"></div><div class="tplayer" id="tplayer"></div><div class="tlogo"><img class="r6" alt="Tom Clancy's Rainbow Six Siege"><div class="lg"><img class="six" alt="6"><div><small>THE BOARDGAME</small><h1>虹彩六號<br>戰術桌遊</h1></div></div></div><nav class="tmenu" id="tmenu"></nav></div><div id="banner" class="banner" hidden></div></div>
+      <div class="boardframe" id="frame"><canvas id="board" aria-label="戰術地圖平面圖"></canvas><div class="hud3d" id="hud3d" hidden><button id="view-eye" aria-label="切換視角"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1.5 12S5.5 4.5 12 4.5 22.5 12 22.5 12 18.5 19.5 12 19.5 1.5 12 1.5 12Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.6" fill="currentColor"/></svg><span id="eyeLab">斜角</span></button><button id="view-angle">斜角視角</button><button id="view-top">俯視</button><button id="view-wall">牆：全高</button><button id="view-focus">聚焦幹員</button><button id="view-q" hidden>畫質：高</button><button id="view-cine">射擊特寫：肩後</button><button id="view-in" aria-label="放大">＋</button><button id="view-out" aria-label="縮小">－</button><span class="hint3d">拖曳旋轉 · 右鍵或雙指平移 · 滾輪或捏合縮放 · 方向鍵旋轉</span></div><div class="coord" id="coord"></div><div class="tutbox" id="tutbox" hidden></div><div class="title" id="title"><div class="tbg" aria-hidden="true"></div><div class="tplayer" id="tplayer"></div><div class="tlogo"><img class="r6" alt="Tom Clancy's Rainbow Six Siege"><div class="lg"><img class="six" alt="6"><div><small>THE BOARDGAME</small><h1>虹彩六號<br>戰術桌遊</h1></div></div></div><nav class="tmenu" id="tmenu"></nav></div><div id="banner" class="banner" hidden></div></div>
       <div class="legend" id="legend"></div>
     </section>
     <aside class="panel" id="panel"></aside>
@@ -2989,13 +3064,16 @@ function cardBoxes(sh,t){const g=R3.cineGoal;if(!g)return null;
   const cam=R3.camera,tc=new THREE.PerspectiveCamera(cam.fov,cam.aspect,.1,100);tc.position.copy(g.p);tc.lookAt(g.t);tc.updateMatrixWorld();
   const r=R3.renderer.domElement.getBoundingClientRect(),pr=(u,y)=>{const q=new THREE.Vector3(u.x+.5,y,u.y+.5).project(tc);return {x:r.left+(q.x+1)/2*r.width,y:r.top+(1-q.y)/2*r.height,z:q.z};};
   const f=u=>{const a=pr(u,0),b=pr(u,1.35);return {x:a.x,y:a.y,h:Math.abs(a.y-b.y),ok:a.z<1};};return {S:f(sh),T:f(t)};}
+const SHOTIMG={};function shotPre(u,fb){if(!u||SHOTIMG[u])return;const i=new Image();SHOTIMG[u]={i,ok:0};i.onload=()=>{SHOTIMG[u].ok=1;i.decode&&i.decode().catch(()=>{});};i.onerror=()=>{SHOTIMG[u].ok=-1;};i.src=u;if(fb)shotPre(fb);}
+function shotSrc(u,fb){const r=SHOTIMG[u];return r&&r.ok<0?fb:u;}
+function preloadShots(){if(!G)return;for(const u of G.units){shotPre(opFace(u.op),opArt(u.op));const a=opAim(u.op);if(a)shotPre(a,opArt(u.op));shotPre(opArt(u.op));}}
 function shotIntro(sh,t,fast,cine){return new Promise(res=>{
   if(!CINE.on||document.hidden)return res(null);
   const bx=cine?cardBoxes(sh,t):null;
   const el=document.createElement('div'),M=AIMM[artBase(sh.op)],aim=opAim(sh.op),D=window.THREE&&R3?diceInit():null;
   el.className='sintro '+(sh.side==='A'?'a':'d')+(fast?' fast':'')+(bx?' w':'');
-  el.innerHTML=`<div class="siT"><img src="${opFace(t.op)}" alt="" onerror="this.onerror=null;this.src='${opArt(t.op)}'"><b>${OPS[t.op].name}</b></div>
-    <div class="siA${aim?'':' half'}" style="--ar:${M?M[2]:.86}"><img src="${aim||opArt(sh.op)}" alt="" onerror="this.onerror=null;this.src='${opArt(sh.op)}';this.parentNode.classList.add('half')"><i class="siMz" style="left:${(M?M[0]:.98)*100}%;top:${(M?M[1]:.26)*100}%"></i><b>${OPS[sh.op].name}</b></div>`;
+  el.innerHTML=`<div class="siT"><img src="${shotSrc(opFace(t.op),opArt(t.op))}" alt="" onerror="this.onerror=null;this.src='${opArt(t.op)}'"><b>${OPS[t.op].name}</b></div>
+    <div class="siA${aim?'':' half'}" style="--ar:${M?M[2]:.86}"><img src="${aim?shotSrc(aim,opArt(sh.op)):opArt(sh.op)}" alt="" onerror="this.onerror=null;this.src='${opArt(sh.op)}';this.parentNode.classList.add('half')"><i class="siMz" style="left:${(M?M[0]:.98)*100}%;top:${(M?M[1]:.26)*100}%"></i><b>${OPS[sh.op].name}</b></div>`;
   document.body.appendChild(el);if(D){el.appendChild(D.box);D.big=true;}
   if(bx){// the cards stand where the models stood: shooter big (it is close to the camera), target smaller, both kept on screen
     const vw=innerWidth,vh=innerHeight,pn=document.querySelector('.panel'),pq=pn&&!pn.hidden?pn.getBoundingClientRect():null,PB=pq&&pq.width>vw*.6&&pq.top>vh*.4?pq.top+vh*.06:vh,cl=(v,a,b)=>Math.max(a,Math.min(b,v)),A=el.querySelector('.siA'),T=el.querySelector('.siT'),ar=M?M[2]:.86;
@@ -3450,7 +3528,7 @@ const invUsed=side=>Object.values(cfg.inv[side]).reduce((a,b)=>a+b,0);
 function invHTML(side){const inv=cfg.inv[side],used=invUsed(side);
   return `<h3>戰術裝備（${used}/${INV_CAP[side]} 個方塊${side==='A'?'，另有 3 架無人機':'；任務另給 3 捲鐵絲網與地圖上的攝影機'}）</h3><div class="invrow">${Object.entries(INV[side]).map(([k,[n,max,d]])=>`<div class="inv"><b>${n}</b><span class="hint">${d}</span><div class="invc"><button data-inv="${k}" data-dv="-1" ${inv[k]<=0?'disabled':''} aria-label="減少${n}">−</button><i>${inv[k]}</i><button data-inv="${k}" data-dv="1" ${inv[k]>=max||used>=INV_CAP[side]?'disabled':''} aria-label="增加${n}">＋</button><small>上限 ${max}</small></div></div>`).join('')}</div>`;}
 function newGame(){
-  $('#banner').hidden=true;setTimeout(()=>{try{if(G&&!G.tut&&!G.net)mapIntro(cfg.map);}catch(e){}},60);
+  $('#banner').hidden=true;setTimeout(()=>{try{if(G&&!G.tut&&!G.net)mapIntro(cfg.map);}catch(e){}},60);setTimeout(()=>{try{preloadShots();}catch(e){}},400);
   const m=MAPS[cfg.map];
   G={map:m,grid:parseMap(m),W:m.rows[0].length,H:m.rows.length,units:[],gadgets:[],reinf:0,drones:3,wire:3,...invFor('A',cfg.side==='A'?cfg.inv.A:INV_DEF.A),...invFor('D',cfg.side==='D'?cfg.inv.D:INV_DEF.D),decoys:[],mission:cfg.mission||'bomb',hostage:null,round:1,maxRounds:6,phaseIdx:0,phase:'setup',acts:0,active:null,sel:null,mode:'move',defuser:null,over:false,busy:false,ai:false,log:[],moves:[],cur:null,hl:null,player:cfg.side,aiSite:Math.random()<.5?'A':'B',fx:null,spawn:null};
   const enemy=cfg.side==='A'?'D':'A';
@@ -3853,6 +3931,7 @@ const eqIc=k=>GIMG[k]?`<img class="bic" src="${GIMG[k]}" alt="">`:(WZI[k]&&typeo
 function renderPanel(){
   const p=$('#panel');
   if(!G){p.classList.remove('open');if(SCREEN==='setup'){p.innerHTML='';renderWiz();return;}p.innerHTML=menuHTML();bindMenu();return;}
+  p.classList.toggle('dep',G.phase==='setup');if(G.phase==='setup')return renderDeploy(p);
   let h='';
   const s=G.phase==='setup'?null:curSide();
   if(G.phase==='setup'){
@@ -3881,6 +3960,15 @@ function renderPanel(){
   if($('#zones'))$('#zones').innerHTML='',G.map.spawns.forEach((z,i)=>{const b=document.createElement('button');b.textContent=z.name;if(G.spawn===i)b.className='on';b.onclick=()=>{const z=G.map.spawns[i],free=z.cells.filter(([x,y])=>!unitAt(x,y));unplaced().forEach(u=>{const c=free.shift();if(c){u.x=c[0];u.y=c[1];}});G.spawn=i;nextUnplaced();render();};$('#zones').appendChild(b);});
   if($('#acts'))renderActs();
 }
+function renderDeploy(p){const team=G.units.filter(u=>u.side===G.player),left=unplaced().length,A=G.player==='A';
+  p.innerHTML=`<div class="box depBox"><div class="depHd"><h2>部署階段</h2><span>${A?'點幹員，再點橘框格子':'點幹員，再點建築內空格'}</span></div>
+    <div class="depSq">${team.map(u=>`<button data-u="${u.id}" class="${u===G.sel?'on':''} ${u.x<0?'todo':'ok'}"><img src="${opIcon(u.op)}" alt=""><span>${OPS[u.op].name}</span></button>`).join('')}</div>
+    ${A?'<div class="depZ"><small>一次放到</small><div class="row" id="zones"></div></div>':G.sel?'<div class="row" id="acts"></div>':''}
+    <button class="primary" id="go" ${left?'disabled':''}>開始行動<span class="sub">${left?`還有 ${left} 名幹員沒放`:'進攻方先動'}</span></button></div>`;
+  p.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const u=G.units.find(x=>x.id===b.dataset.u);if(u.alive&&u.x>=0)onCell(u.x,u.y);else{G.sel=u;render();}});
+  $('#go').onclick=startPlay;
+  if($('#zones'))G.map.spawns.forEach((z,i)=>{const b=document.createElement('button');b.textContent=z.name;if(G.spawn===i)b.className='on';b.onclick=()=>{const z=G.map.spawns[i],free=z.cells.filter(([x,y])=>!unitAt(x,y));unplaced().forEach(u=>{const c=free.shift();if(c){u.x=c[0];u.y=c[1];}});G.spawn=i;nextUnplaced();render();};$('#zones').appendChild(b);});
+  if($('#acts'))renderActs();}
 function renderActs(){
   const u=G.sel,el=$('#acts'),L=[];
   if(G.phase==='setup'){
@@ -4032,7 +4120,7 @@ function init3D(){
     const hud=$('#coord');if(hud)hud.textContent=c&&G?`${coord(c[0],c[1])}　${cellName(c[0],c[1])}`:'';});
   renderer.domElement.addEventListener('pointerleave',()=>{R3.hoverCell=null;const h=$('#coord');if(h)h.textContent='';});
   renderer.setAnimationLoop(tick3D);
-  controls.addEventListener('start',()=>{R3.camGoal=null;});
+  controls.addEventListener('start',()=>{R3.camGoal=null;R3.intro=null;});
   $('#view-focus').onclick=focusUnit;$('#view-in').onclick=()=>zoom3D(.75);$('#view-out').onclick=()=>zoom3D(1.33);
   const wake=()=>{R3.idleT=performance.now();if(controls.autoRotate){controls.autoRotate=false;}};R3.idleT=performance.now();
   for(const ev of ['pointerdown','wheel','keydown','touchstart'])addEventListener(ev,wake,{passive:true,capture:true});
@@ -4040,7 +4128,9 @@ function init3D(){
     if(k==='ArrowLeft'||k==='ArrowRight'){orbit3D(k==='ArrowLeft'?-.35:.35);e.preventDefault();}
     else if(k==='ArrowUp'||k==='ArrowDown'){zoom3D(k==='ArrowUp'?.8:1.25);e.preventDefault();}
     else if(k==='+'||k==='='){zoom3D(.8);}else if(k==='-'){zoom3D(1.25);}else if(k==='f'||k==='F'){focusUnit();}});
-  $('#view-angle').onclick=()=>setView('angle');$('#view-top').onclick=()=>setView('top');
+  $('#view-angle').onclick=()=>setView('angle');
+  R3.eye=0;$('#view-eye').onclick=()=>{const L=[['斜角',()=>setView('angle')],['俯視',()=>setView('top')],['跟隨',()=>{const u=(G&&(G.active||G.sel))||(G&&G.units.find(u=>u.alive&&u.x>=0&&u.side===G.player));if(u&&u.x>=0)followCam(u,true);else setView('angle');}]];
+    R3.eye=(R3.eye+1)%L.length;$('#eyeLab').textContent=L[R3.eye][0];L[R3.eye][1]();};$('#view-top').onclick=()=>setView('top');
   $('#view-cine').onclick=()=>{const m=CINE.on?(CINE.mode==='tp'?'fp':'off'):'tp';CINE.on=m!=='off';if(m!=='off')CINE.mode=m;$('#view-cine').textContent='射擊特寫：'+{tp:'肩後',fp:'第一人稱',off:'關'}[m];};
   $('#view-wall').onclick=()=>{R3.wall=R3.wall==='full'?'low':'full';$('#view-wall').textContent=R3.wall==='full'?'牆：全高':'牆：矮牆';R3.sig='';render();};
   $('#hud3d').hidden=false;
@@ -4076,7 +4166,11 @@ function setView(kind,snap){
   const p=kind==='top'?new THREE.Vector3(tx,far*1.3,tz+oz+.01):new THREE.Vector3(tx,far*.78,tz+oz+far*.66);
   flyTo(p,new THREE.Vector3(tx,0,tz+oz),snap);
 }
-function flyTo(p,t,snap){const c=R3.controls,cam=R3.camera;if(snap){cam.position.copy(p);c.target.copy(t);c.update();R3.camGoal=null;}else R3.camGoal={p,t};}
+function introCam(){setView('top');const g=R3.camGoal;if(!g)return;R3.camGoal=null;const off=g.p.clone().sub(g.t),R=off.length(),az1=Math.atan2(off.x,off.z),el1=Math.asin(Math.min(1,off.y/R));
+  const wait=document.querySelector('.mapintro')?1900:0;R3.intro={t0:performance.now()+wait,dur:3600,t:g.t.clone(),R,az0:az1-Math.PI*1.25,az1,el0:.17,el1};introStep(0);}
+function introStep(k){const I=R3.intro;if(!I)return;const e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2,az=I.az0+(I.az1-I.az0)*e,el=I.el0+(I.el1-I.el0)*Math.pow(e,1.4),r=I.R*(.5+.5*e);
+  R3.camera.position.set(I.t.x+r*Math.cos(el)*Math.sin(az),I.t.y+r*Math.sin(el),I.t.z+r*Math.cos(el)*Math.cos(az));R3.controls.target.copy(I.t);if(k>=1)R3.intro=null;}
+function flyTo(p,t,snap){R3.intro=null;const c=R3.controls,cam=R3.camera;if(snap){cam.position.copy(p);c.target.copy(t);c.update();R3.camGoal=null;}else R3.camGoal={p,t};}
 // after deployment: angled and close, on the unit that acts first (or the first of ours)
 function playCam(){if(!R3||!G)return;const u=(G.active&&G.active.side===G.player&&G.active)||G.sel||G.units.find(u=>u.alive&&u.x>=0&&u.side===G.player);if(!u||u.x<0)return setView('angle');
   R3.followId=u.id;followCam(u,true);}
@@ -4801,9 +4895,10 @@ function owArc(u){const phi=Math.atan2(-u.owd[1],u.owd[0]);const col=u.side==='A
 function tick3D(){
   if(!R3)return;const t=R3.clock.getElapsedTime(),rdt=Math.min(.5,t-(R3.lastT||t)),dt=Math.min(.05,rdt);R3.lastT=t;
   if(R3.hero&&R3.hero.visible){R3.camGoal=null;const sw=Math.sin(t*.12);const ph=R3.camera.aspect<1;R3.camera.position.set(ph?4.9+sw*.5:6.6+sw*.9,ph?1.9:1.15,ph?23:19.2);R3.controls.target.set(ph?4.3:3.2+sw*.3,ph?.15:1.1,ph?14.2:13.6);}
+  if(R3.intro){R3.camGoal=null;introStep(Math.max(0,Math.min(1,(performance.now()-R3.intro.t0)/R3.intro.dur)));}
   if(R3.camGoal){const g=R3.camGoal,k=1-Math.pow(.002,rdt);R3.camera.position.lerp(g.p,k);R3.controls.target.lerp(g.t,k);if(R3.camera.position.distanceTo(g.p)<.01&&R3.controls.target.distanceTo(g.t)<.01)R3.camGoal=null;}
   {const idle=G&&!G.busy&&!R3.cine&&!R3.camGoal&&G.phase==='play'&&!document.hidden&&performance.now()-(R3.idleT||0)>25000;if(idle!==R3.controls.autoRotate){R3.controls.autoRotate=idle;R3.controls.autoRotateSpeed=.5;}}
-  if(G&&G.phase!==R3.camPhase){const was=R3.camPhase;R3.camPhase=G.phase;if(G.phase==='setup')setTimeout(()=>R3&&setView('top'),60);else if(was==='setup'&&G.phase==='play')setTimeout(playCam,80);}
+  if(G&&G.phase!==R3.camPhase){const was=R3.camPhase;R3.camPhase=G.phase;if(G.phase==='setup')setTimeout(()=>R3&&introCam(),60);else if(was==='setup'&&G.phase==='play')setTimeout(playCam,80);}
   // whoever is acting (our selected unit, or a visible enemy taking its turn) gets the camera
   if(G&&G.phase==='play'&&!G.over&&!R3.cine){const u=G.active||G.sel,k=u&&u.alive&&u.x>=0&&(u.side===G.player||pub(u))?u.id:null;const pk=k&&u.x+','+u.y;if(k!==R3.followId||(k&&pk!==R3.followPos)){R3.followId=k;R3.followPos=pk;if(k&&R3.camPhase==='play')setTimeout(()=>followCam(u),40);}}
   R3.controls.update();
@@ -5228,26 +5323,33 @@ function wzStepHTML(){const s=cfg.side,st=WZ.step;
     wzCard('data-wz-side="D"',s==='D',`<i class="sideph l"></i><div class="ic">${emblem('D')}</div><b>防守方</b><span>佈下陷阱與攝影機，守住炸彈點或人質</span>`,'big d side')+
     wzCard('data-wz-side="A"',s==='A',`<i class="sideph r"></i><div class="ic">${emblem('A')}</div><b>進攻方</b><span>無人機偵查、破牆、安裝拆彈器或救出人質</span>`,'big a side')}</div>`;
   case 1:return `<h3 class="wzQ">選擇任務</h3><p class="wzHint">兩種任務都可以靠殲滅對方全員獲勝。</p><div class="wzGrid two split">${
-    wzCard('data-wz-mis="bomb"',cfg.mission!=='hostage',`<i class="misph"></i><div class="ic">${WZI.bomb}</div><b>炸彈</b><span>進攻方在 A 或 B 點安裝拆彈器，撐過兩個防守階段</span>`,'big mis')+
-    wzCard('data-wz-mis="hostage"',cfg.mission==='hostage',`<i class="misph"></i><div class="ic">${WZI.hostage}</div><b>人質</b><span>進攻方帶走人質，送到任一出生區撤離</span>`,'big mis')}</div>`;
+    wzCard('data-wz-mis="bomb"',cfg.mission!=='hostage',`<i class="misph"></i><div class="ic">${WZI.bomb}</div><b>炸彈</b>`,'big mis')+
+    wzCard('data-wz-mis="hostage"',cfg.mission==='hostage',`<i class="misph"></i><div class="ic">${WZI.hostage}</div><b>人質</b>`,'big mis')}</div>`;
   case 2:return `<h3 class="wzQ">選擇地圖</h3><p class="wzHint">背後是目前選中地圖的 3D 預覽。</p><div class="wzGrid two maps">${Object.entries(MAPS).map(([k,m])=>
     wzCard(`data-wz-map="${k}"`,cfg.map===k,`${mapBig(k)?`<i class="mph big" style="background-image:url(${mapBig(k)})"></i>`:`<img class="thumb" src="${mapThumb(k)}" alt="${m.name}平面圖">`}<b>${m.name}</b><span>${m.sub}</span>`,mapBig(k)?'mapc':'')).join('')}</div>`;
   case 3:{const p=cfg.picks[s],pickOf=b=>p.findIndex(k=>OPC[k]&&OPC[k].base===b);
     const cur=OPC[WZ.cur]&&OPC[WZ.cur].side===s?OPC[WZ.cur]:OPC[p[0]||OPBASE.find(b=>OPC[b].side===s)];
     return `<div class="wzOpHead"><div><h3 class="wzQ">組成你的小隊</h3><p class="wzHint">點頭像加入小隊，再點一次移出。滑鼠移過去可以看能力。</p></div>
-    <div class="wzSlots" aria-label="小隊 ${p.length}/5">${[0,1,2,3,4].map(i=>p[i]&&OPC[p[i]]?`<button class="wzS on" data-wz-un="${i}" title="移出 ${OPC[p[i]].name}"><img src="${opIcon(p[i])}" alt="${OPC[p[i]].name}"></button>`:'<span class="wzS"></span>').join('')}</div></div>
+    <div class="wzSlots" aria-label="小隊 ${p.length}/5">${[0,1,2,3,4].map(i=>p[i]&&OPC[p[i]]?`<button class="wzS on ${WZ.peekSlot===p[i]?'peek':''}" data-wz-un="${i}" title="移出 ${OPC[p[i]].name}"><img src="${opIcon(p[i])}" alt="${OPC[p[i]].name}"></button>`:'<span class="wzS"></span>').join('')}</div></div>
     <div class="wzOps"><div class="wzOg">${OPBASE.filter(b=>OPC[b].side===s).map(b=>{const i=pickOf(b);
-      return `<button class="wzOt ${i>=0?'on':''} ${cur&&cur.base===b?'cur':''} ${opPlayable(b)?'':'na'}" data-wz-op="${b}" aria-pressed="${i>=0}" ${opPlayable(b)?'':'aria-disabled="true"'} title="${OPC[b].name}${opPlayable(b)?'':'（尚未實作，暫時不能選）'}"><img src="${opIcon(b)}" alt=""><span>${OPC[b].name}</span>${i>=0?`<i>${i+1}</i>`:''}</button>`;}).join('')}</div>
+      return `<button class="wzOt ${i>=0?'on':''} ${cur&&cur.base===b?'cur':''} ${WZ.peek===b?'peek':''} ${opPlayable(b)?'':'na'}" data-wz-op="${b}" aria-pressed="${i>=0}" ${opPlayable(b)?'':'aria-disabled="true"'} title="${OPC[b].name}${opPlayable(b)?'':'（尚未實作，暫時不能選）'}"><img src="${opIcon(b)}" alt=""><span>${OPC[b].name}</span>${i>=0?`<i>${i+1}</i>`:''}</button>`;}).join('')}</div>
       <div class="wzOd" id="wzOd">${cur?wzOpDetail(cur):''}</div></div>
     <div class="wzRow"><button id="wzRand">隨機補滿</button>${p.length?'<button id="wzClear">清空</button>':''}</div>`;}
   case 4:{const inv=cfg.inv[s],used=invUsed(s),cap=INV_CAP[s];return `<h3 class="wzQ">分配戰術裝備</h3><p class="wzHint">全隊共用 ${cap} 個方塊，任何幹員都能用。${s==='A'?'另外固定有 3 架無人機。':'任務另給 3 捲鐵絲網，地圖上也有固定攝影機。'}</p>
     <div class="wzPips" aria-label="已用 ${used} / ${cap}">${Array.from({length:cap},(_,i)=>`<i class="${i<used?'on':''}"></i>`).join('')}</div><div class="wzInv">${Object.entries(INV[s]).map(([k,[n,max,d]])=>
-    `<div class="wzCard ${inv[k]?'on':''}"><div class="ic">${WZI[k]||''}</div><b>${n}</b><span>${d}</span><div class="wzCnt"><button data-inv="${k}" data-dv="-1" ${inv[k]<=0?'disabled':''} aria-label="減少${n}">−</button><i>${inv[k]}</i><button data-inv="${k}" data-dv="1" ${inv[k]>=max||used>=cap?'disabled':''} aria-label="增加${n}">＋</button></div><span>上限 ${max}</span></div>`).join('')}</div>`;}
+    `<div class="wzCard ${inv[k]?'on':''}"><div class="ic">${WZI[k]||''}</div><div class="gTx"><b>${n}</b><span>${d}</span></div><div class="wzCnt"><button data-inv="${k}" data-dv="-1" ${inv[k]<=0?'disabled':''} aria-label="減少${n}">−</button><i>${inv[k]}</i><button data-inv="${k}" data-dv="1" ${inv[k]>=max||used>=cap?'disabled':''} aria-label="增加${n}">＋</button><small>上限 ${max}</small></div></div>`).join('')}</div>`;}
   case 5:return `<h3 class="wzQ">計時方式</h3><p class="wzHint">每輪時間 = 在場幹員數 × 秒數，兩個啟動階段共用。第一次玩建議不計時。</p><div class="wzGrid timers">${[[0,'不計時','慢慢想'],[120,'入門','每名幹員 120 秒'],[90,'冷靜','每名幹員 90 秒'],[60,'標準','每名幹員 60 秒'],[45,'極限','每名幹員 45 秒']].map(([t,l,d])=>
     wzCard(`data-tm="${t}"`,(cfg.timer||0)===t,`<div class="ic">${WZI.clock(t)}</div><b>${l}</b><span>${d}</span>`)).join('')}</div>`;
   case 6:{const p=cfg.picks[s],inv=cfg.inv[s],T={0:'不計時',120:'入門 120 秒',90:'冷靜 90 秒',60:'標準 60 秒',45:'極限 45 秒'};
     const row=(k,v,go)=>`<dt>${k}</dt><dd>${v}</dd><button data-wz-go="${go}">修改</button>`;
-    return `<h3 class="wzQ">準備好了嗎？</h3><p class="wzHint">確認設定後開始部署。對手會隨機挑選 5 名幹員。</p><dl class="wzSum">${
+    const tile=(go,cls,inner,lab)=>`<button class="smT ${cls}" data-wz-go="${go}" aria-label="修改${lab}">${inner}<em>${lab}</em></button>`,gear=Object.entries(INV[s]).filter(([k])=>inv[k]);
+    return `<h3 class="wzQ">準備好了嗎？</h3><div class="wzSm">${
+      tile(0,'side '+(s==='A'?'a':'d'),`<i class="smI">${emblem(s)}</i><b>${s==='A'?'進攻方':'防守方'}</b>`,'陣營')+
+      tile(1,'mis',`<i class="smI">${cfg.mission==='hostage'?WZI.hostage:WZI.bomb}</i><b>${cfg.mission==='hostage'?'人質':'炸彈'}</b>`,'任務')+
+      tile(2,'map',`<i class="smPh" style="background-image:url(${mapBig(cfg.map)||mapThumb(cfg.map)})"></i><b>${MAPS[cfg.map].name}</b>`,'地圖')+
+      tile(5,'tm',`<i class="smI">${WZI.clock(cfg.timer||0)}</i><b>${T[cfg.timer||0]}</b>`,'計時')+
+      tile(3,'ops',`<span class="smOps">${p.map(k=>`<span><img src="${opIcon(k)}" alt=""><small>${OPC[k].name}</small></span>`).join('')}</span>`,'幹員')+
+      tile(4,'gear',`<span class="smGear">${gear.length?gear.map(([k,v])=>`<span title="${v[0]}"><i>${WZI[k]||''}</i><small>×${inv[k]}</small></span>`).join(''):'<small>無</small>'}</span>`,'裝備')}</div><dl class="wzSum" hidden>${
       row('陣營',`<b class="${s==='A'?'a':'d'}">${s==='A'?'進攻方':'防守方'}</b>`,0)+row('任務',cfg.mission==='hostage'?'人質':'炸彈',1)+row('地圖',MAPS[cfg.map].name,2)+
       row('幹員',p.map(k=>`<img src="${opIcon(k)}" alt="">${OPC[k].name}`).join(' '),3)+
       row('戰術裝備',Object.entries(INV[s]).filter(([k])=>inv[k]).map(([k,v])=>`${v[0]} ×${inv[k]}`).join('、')||'無',4)+row('計時',T[cfg.timer||0],5)}</dl>`;}
@@ -5258,20 +5360,22 @@ function renderWiz(){let el=$('#wiz');const keep=[...(el?el.querySelectorAll('.w
   const reach=i=>i<=WZ.seen||WZSTEPS.slice(0,i).every(x=>x.ok());
   el.innerHTML=`<div class="wzTop"><h2>對戰電腦</h2><nav class="wzSteps">${WZSTEPS.map((x,i)=>`<button data-wz-go="${i}" class="${i===st?'cur':i<WZ.seen||(i<st)?'done':''}" ${reach(i)&&WZSTEPS.slice(0,i).every(y=>y.ok())?'':'disabled'}><i>${i<st?'✓':i+1}</i><span>${x.t}</span></button>`).join('')}</nav><span id="wzOnline"></span><button id="wzRules">規則</button></div>
     <div class="wzBody">${wzStepHTML()}</div>
-    <div class="wzFoot"><button id="wzBack">${st?'‹ 上一步':'‹ 返回主畫面'}</button><span class="msg">${[0,1,2,5].includes(st)?'點一下就會選定並進入下一步':ok?`第 ${st+1} 步，共 ${WZSTEPS.length} 步`:WZSTEPS[st].why}</span><button class="primary" id="wzNext" ${ok?'':'disabled'} ${[0,1,2].includes(st)?'style="visibility:hidden"':''}>${last?'開始部署':'下一步 ›'}</button></div>`;
+    <div class="wzFoot"><button id="wzBack">${st?'‹ 上一步':'‹ 返回主畫面'}</button><span class="msg">${st===1?'點一下就選定':[0,2,5].includes(st)?(WZ.arm?'再點一次確定':'點一下看說明，再點一次確定'):ok?`第 ${st+1} 步，共 ${WZSTEPS.length} 步`:WZSTEPS[st].why}</span><button class="primary${last?' start':''}" id="wzNext" ${ok?'':'disabled'} >${last?'開始任務':'下一步 ›'}</button></div>`;
   if(keep.length&&WZ.lastStep===st)el.querySelectorAll('.wzBody,.wzOg').forEach((e,i)=>{if(keep[i]!=null)e.scrollTop=keep[i];});WZ.lastStep=st;
-  const go=i=>{WZ.step=i;renderWiz();el.querySelector('.wzBody').scrollTop=0;};
+  const go=i=>{WZ.step=i;WZ.arm=null;WZ.peek=null;WZ.peekSlot=null;renderWiz();el.querySelector('.wzBody').scrollTop=0;};
+  const twice=(key,set,after)=>{if(WZ.arm===key){WZ.arm=null;after();return;}WZ.arm=key;set();renderWiz();};
   const pick=()=>{const r=WZ.ret;WZ.ret=null;go(r!=null?r:st+1);};
   el.querySelectorAll('[data-wz-go]').forEach(b=>b.onclick=()=>{WZ.ret=st===WZSTEPS.length-1&&b.closest('.wzSum')?st:null;go(+b.dataset.wzGo);});
-  el.querySelectorAll('[data-wz-side]').forEach(b=>b.onclick=()=>{if(cfg.side!==b.dataset.wzSide){cfg.side=b.dataset.wzSide;WZ.cur=null;WZ.seen=Math.min(WZ.seen,2);}if(R3)render();pick();});
+  el.querySelectorAll('[data-wz-side]').forEach(b=>b.onclick=()=>twice('side'+b.dataset.wzSide,()=>{if(cfg.side!==b.dataset.wzSide){cfg.side=b.dataset.wzSide;WZ.cur=null;WZ.seen=Math.min(WZ.seen,2);}if(R3)render();},pick));
   el.querySelectorAll('[data-wz-mis]').forEach(b=>b.onclick=()=>{cfg.mission=b.dataset.wzMis;pick();});
-  el.querySelectorAll('[data-wz-map]').forEach(b=>b.onclick=()=>{cfg.map=b.dataset.wzMap;render();pick();});
-  el.querySelectorAll('[data-tm]').forEach(b=>b.onclick=()=>{cfg.timer=+b.dataset.tm;pick();});
+  el.querySelectorAll('[data-wz-map]').forEach(b=>b.onclick=()=>twice('map'+b.dataset.wzMap,()=>{cfg.map=b.dataset.wzMap;render();},pick));
+  el.querySelectorAll('[data-tm]').forEach(b=>b.onclick=()=>twice('tm'+b.dataset.tm,()=>{cfg.timer=+b.dataset.tm;},pick));
+  {const a=WZ.arm&&el.querySelector({side:'[data-wz-side="'+cfg.side+'"]',mis:'[data-wz-mis="'+cfg.mission+'"]',map:'[data-wz-map="'+cfg.map+'"]',tm:'[data-tm="'+(cfg.timer||0)+'"]'}[(WZ.arm.match(/^(side|mis|map|tm)/)||[])[1]]);if(a)a.classList.add('armed');}
   {const p=cfg.picks[cfg.side],od=$('#wzOd');
     el.querySelectorAll('[data-wz-op]').forEach(b=>{const bs=b.dataset.wzOp;
       b.onmouseenter=b.onfocus=()=>{const k=p.find(x=>OPC[x]&&OPC[x].base===bs)||bs;if(WZ.cur===k)return;WZ.cur=k;el.querySelectorAll('.wzOt.cur').forEach(e=>e.classList.remove('cur'));b.classList.add('cur');if(od){od.innerHTML=wzOpDetail(OPC[k]);bindVar();}};
-      b.onclick=()=>{if(!opPlayable(bs)){b.onmouseenter();const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=`${OPC[bs].name} 的能力還沒做進遊戲，暫時不能選`;return;}const i=p.findIndex(x=>OPC[x]&&OPC[x].base===bs);if(i>=0)p.splice(i,1);else if(p.length<5)p.push(WZ.cur&&OPC[WZ.cur]&&OPC[WZ.cur].base===bs?WZ.cur:bs);else{const m=el.querySelector('.wzFoot .msg');if(m)m.textContent='小隊已滿 5 人，先點右上角的頭像移出一位';return;}WZ.cur=p.find(x=>OPC[x].base===bs)||bs;renderWiz();};});
-    el.querySelectorAll('[data-wz-un]').forEach(b=>b.onclick=()=>{p.splice(+b.dataset.wzUn,1);renderWiz();});
+      b.onclick=()=>{if(WZ.peek!==bs){WZ.peek=bs;WZ.peekSlot=null;WZ.cur=null;b.onmouseenter();el.querySelectorAll('.wzOt.peek,.wzS.peek').forEach(e=>e.classList.remove('peek'));b.classList.add('peek');const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=(p.some(x=>OPC[x]&&OPC[x].base===bs)?'再點一次移出 ':'再點一次加入 ')+OPC[bs].name;return;}if(!opPlayable(bs)){b.onmouseenter();const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=`${OPC[bs].name} 的能力還沒做進遊戲，暫時不能選`;return;}const i=p.findIndex(x=>OPC[x]&&OPC[x].base===bs);if(i>=0)p.splice(i,1);else if(p.length<5)p.push(WZ.cur&&OPC[WZ.cur]&&OPC[WZ.cur].base===bs?WZ.cur:bs);else{const m=el.querySelector('.wzFoot .msg');if(m)m.textContent='小隊已滿 5 人，先點右上角的頭像移出一位';return;}WZ.cur=p.find(x=>OPC[x].base===bs)||bs;renderWiz();};});
+    el.querySelectorAll('[data-wz-un]').forEach(b=>b.onclick=()=>{const i=+b.dataset.wzUn;if(WZ.peekSlot!==p[i]){WZ.peekSlot=p[i];WZ.peek=null;WZ.cur=p[i];renderWiz();const m=el.querySelector('.wzFoot .msg');if(m)m.textContent='再點一次把 '+OPC[p[i]].name+' 移出小隊';return;}WZ.peekSlot=null;p.splice(i,1);renderWiz();});
     const bindVar=()=>wzFit()||el.querySelectorAll('[data-wz-var]').forEach(b=>b.onclick=()=>{const v=b.dataset.wzVar,i=p.findIndex(x=>OPC[x]&&OPC[x].base===OPC[v].base);if(i>=0)p[i]=v;WZ.cur=v;renderWiz();});bindVar();}
   el.querySelectorAll('[data-inv]').forEach(b=>b.onclick=()=>{const s=cfg.side,k=b.dataset.inv,v=cfg.inv[s][k]+(+b.dataset.dv);if(v<0||v>INV[s][k][1]||(+b.dataset.dv>0&&invUsed(s)>=INV_CAP[s]))return;cfg.inv[s][k]=v;render();});
   const r=$('#wzRand');if(r)r.onclick=()=>{const p=cfg.picks[cfg.side],bases=new Set(p.map(k=>OPC[k].base));for(const b of shuffle(OPBASE.filter(k=>OPC[k].side===cfg.side&&!bases.has(k)&&opPlayable(k)))){if(p.length>=5)break;p.push(b);}render();};
