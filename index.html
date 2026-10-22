@@ -897,24 +897,97 @@ img.emb{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shad
 .banner.blose{background-image:linear-gradient(180deg,#05080b 0%,rgba(5,8,11,.25) 22%,rgba(5,8,11,.4) 70%,#05080b 86%),url(img/ui/banner_lose.webp)!important}
 .banner.bwin h2,.banner.blose h2{font-size:clamp(44px,8vw,96px);text-shadow:0 4px 24px rgba(0,0,0,.8)}
 
-/* v31: face-off art behind the side cards, full-picture map cards */
-.wzCard.side{justify-content:flex-end}
-.wzCard .sideph{position:absolute;top:0;bottom:0;width:200%;z-index:0;background:url(img/ui/sides.webp) center/cover no-repeat;filter:saturate(.9) brightness(.8);transition:filter .2s}
-.wzCard .sideph.l{left:0;background-position:8% 50%}.wzCard .sideph.r{left:-100%;background-position:92% 50%}
-.wzCard .sideph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,12,16,0) 40%,rgba(8,12,16,.92) 100%)}
-.wzCard.side.on .sideph,.wzCard.side:hover .sideph{filter:none}
-.wzCard.side .ic{width:min(22%,84px)!important;height:auto!important;margin:0}
-.wzCard.side>*:not(.sideph){position:relative;z-index:1}
-.wzCard.side b{font-size:26px;text-shadow:0 2px 8px #000}.wzCard.side span{text-shadow:0 1px 4px #000}
+/* v31: full-picture map cards */
 .wzCard .mph.big{opacity:.9;-webkit-mask-image:none;mask-image:none}
 .wzCard .mph.big::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,12,16,0) 45%,rgba(8,12,16,.9) 100%)}
 .wzCard.on .mph.big,.wzCard:hover .mph.big{opacity:1}
 .wzCard.mapc{justify-content:flex-end;min-height:min(30vh,240px)}
 .wzCard.mapc b{font-size:22px;text-shadow:0 2px 8px #000}.wzCard.mapc span{text-shadow:0 1px 4px #000}
-@media (max-width:760px){
- .wzGrid.two:has(.side){grid-template-columns:1fr 1fr}
- .wzCard.side b{font-size:20px}.wzCard.side span{font-size:12px}
- .wzGrid.maps .wzCard.mapc{justify-content:flex-end;padding:10px}
+@media (max-width:760px){.wzGrid.maps .wzCard.mapc{justify-content:flex-end;padding:10px}}
+/* v32: side and mission steps are one big picture cut on a diagonal; each half is a button */
+html body .wzGrid.split{position:relative;display:block;width:100%;max-width:1100px;flex:1 1 auto;min-height:min(58vh,480px);--cut1:62%;--cut2:38%}
+html body .wzGrid.split>.wzCard{position:absolute;inset:0;min-height:0;margin:0;border:0;box-shadow:none;background:#0a1016;padding:22px 30px;justify-content:flex-end;gap:4px;transition:filter .2s}
+html body .wzGrid.split>.wzCard:first-child{clip-path:polygon(0 0,var(--cut1) 0,var(--cut2) 100%,0 100%);align-items:flex-start;text-align:left;padding-right:64%}
+html body .wzGrid.split>.wzCard:last-child{clip-path:polygon(var(--cut1) 0,100% 0,100% 100%,var(--cut2) 100%);align-items:flex-end;text-align:right;padding-left:64%}
+html body .wzGrid.split>.wzCard:not(.on){filter:brightness(.45) saturate(.5)}
+html body .wzGrid.split>.wzCard:not(.on):hover{filter:brightness(.75) saturate(.8)}
+.wzGrid.split::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:#e3aa3e;clip-path:polygon(calc(var(--cut1) - 2px) 0,calc(var(--cut1) + 2px) 0,calc(var(--cut2) + 2px) 100%,calc(var(--cut2) - 2px) 100%)}
+.wzGrid.split>.wzCard>*{position:relative;z-index:1}
+.wzGrid.split>.wzCard>i{position:absolute;inset:0;z-index:0}
+.wzGrid.split>.wzCard:first-child.on::after{right:auto;left:18px}
+.wzGrid.split b{font-size:30px;text-shadow:0 2px 10px #000}.wzGrid.split span{max-width:340px;text-shadow:0 1px 4px #000}
+.wzGrid.split .sideph{background:url(img/ui/sides.webp) center 65%/cover no-repeat}
+.wzGrid.split .sideph::after,.wzGrid.split .misph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,12,16,0) 45%,rgba(8,12,16,.9) 100%)}
+html body .wzGrid.split .side .ic{width:64px!important;height:64px!important;margin:0 0 4px}
+.wzGrid.split .misph{background:radial-gradient(ellipse at 22% 40%,rgba(227,170,62,.35),transparent 55%),repeating-linear-gradient(135deg,rgba(255,255,255,.03) 0 2px,transparent 2px 14px),#14110b}
+.wzGrid.split .mis:last-child .misph{background:radial-gradient(ellipse at 78% 40%,rgba(74,168,226,.35),transparent 55%),repeating-linear-gradient(45deg,rgba(255,255,255,.03) 0 2px,transparent 2px 14px),#0b1219}
+html body .wzGrid.split .mis .ic{position:absolute;top:7%;height:60%;width:30%;margin:0;aspect-ratio:auto}
+html body .wzGrid.split .mis:first-child .ic{left:8%}html body .wzGrid.split .mis:last-child .ic{right:8%}
+.wzGrid.split .mis .ic svg{width:100%;height:100%}
+/* upright phones: the cut runs across, top half and bottom half each show their own side of the picture */
+@media (orientation:portrait) and (max-width:760px){
+ html body .wzGrid.split{min-height:0;--cut1:58%;--cut2:42%}
+ html body .wzGrid.split>.wzCard{padding:16px 18px}
+ html body .wzGrid.split>.wzCard:first-child{clip-path:polygon(0 0,100% 0,100% var(--cut2),0 var(--cut1));padding:16px 18px;justify-content:flex-start}
+ .wzGrid.split>.wzCard:first-child .sideph::after,.wzGrid.split>.wzCard:first-child .misph::after{background:linear-gradient(0deg,rgba(8,12,16,0) 45%,rgba(8,12,16,.9) 100%)}
+ html body .wzGrid.split>.wzCard:last-child{clip-path:polygon(0 var(--cut1),100% var(--cut2),100% 100%,0 100%);padding-left:18px;justify-content:flex-end}
+ .wzGrid.split::after{clip-path:polygon(0 calc(var(--cut1) - 2px),100% calc(var(--cut2) - 2px),100% calc(var(--cut2) + 2px),0 calc(var(--cut1) + 2px))}
+ .wzGrid.split .sideph.l,.wzGrid.split .sideph.r{background-size:cover}
+ .wzGrid.split .sideph.l{bottom:42%;background-position:6% 60%}
+ .wzGrid.split .sideph.r{top:42%;background-position:94% 60%}
+ .wzGrid.split b{font-size:24px}.wzGrid.split span{font-size:13px}
+ html body .wzGrid.split .mis .ic{height:34%;width:44%;top:6%}
+ html body .wzGrid.split .mis:last-child .ic{top:auto;bottom:22%}
+ html body .wzGrid.split .mis:first-child .ic{left:6%}html body .wzGrid.split .mis:last-child .ic{right:6%}
+}
+/* phones held sideways: every wizard step fits one screen, nothing scrolls */
+@media (orientation:landscape) and (max-height:520px){
+ .wzTop{padding:max(4px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 2px max(12px,env(safe-area-inset-left));gap:8px}
+ .wzTop h2{font-size:15px;white-space:nowrap}
+ .wzSteps button{padding:3px 7px;font-size:12px;gap:4px}.wzSteps button i{width:16px;height:16px;font-size:10px}
+ .wzTop>button,.wzTop .wzOnline{padding:4px 10px;font-size:12px}
+ .wzBody{overflow:hidden;padding:0 max(12px,env(safe-area-inset-right)) 4px max(12px,env(safe-area-inset-left));min-height:0}
+ .wzQ{font-size:16px;margin:2px 0 1px}.wzHint{font-size:11px;margin:0 0 4px;line-height:1.35}
+ .wzFoot{padding:4px max(12px,env(safe-area-inset-right)) max(4px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+ .wzFoot button{min-width:84px;padding:6px 12px;font-size:14px}
+ .wzGrid,.wzGrid.two{flex:1 1 auto;min-height:0;gap:6px;width:100%}
+ .wzCard,.wzCard.big{min-height:0;padding:8px}
+ html body .wzGrid.split{min-height:0}
+ html body .wzGrid.split>.wzCard{padding:10px 16px}
+ .wzGrid.split b{font-size:20px}.wzGrid.split span{font-size:11px}
+ html body .wzGrid.split .side .ic{width:40px!important;height:40px!important}
+ html body .wzGrid.split .mis .ic{top:6%;height:62%;width:26%}
+ .wzGrid.maps{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:1fr;grid-auto-rows:0}
+ .wzCard.mapc{min-height:0}.wzGrid.maps .wzCard.mapc{padding:8px}.wzCard.mapc b{font-size:16px}.wzGrid.maps span{font-size:10px;line-height:1.3}
+ .wzGrid.timers{grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:minmax(0,1fr)}
+ .wzGrid.timers .wzCard{padding:6px;gap:2px}.wzGrid.timers .ic{width:auto;height:44%;aspect-ratio:1;margin:0}
+ .wzGrid.timers b{font-size:15px}.wzGrid.timers span{font-size:10px}
+ /* squad: roster left, card detail right */
+ .wzOpHead{display:flex;flex-direction:row;align-items:center;gap:8px;width:100%}.wzOpHead .wzHint{display:none}.wzOpHead .wzQ{font-size:15px;margin:0;white-space:nowrap}
+ .wzSlots{margin:0;gap:4px}.wzS{flex:0 0 34px;width:34px;height:34px;padding:2px}
+ .wzOps{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:6px;flex:1 1 auto;min-height:0;width:100%;margin-top:4px}
+ .wzOg{grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:3px;max-height:none;overflow:hidden;padding:1px;align-content:start}
+ .wzOt{padding:2px 1px;gap:1px}.wzOt img{width:26px;height:26px}.wzOt span{font-size:8.5px}
+ .wzOt i{width:12px;height:12px;font-size:8px;top:1px;right:1px}
+ .wzOd{min-height:0;max-height:none;overflow:hidden}
+ .wzOd .art{position:static;float:right;width:34%;height:auto;max-width:none;margin:0 0 2px 4px;opacity:1}
+ .wzOdIn{display:block;padding:6px 8px}.wzOdIn>*{margin-bottom:3px}.wzOd .hint{display:none}
+ .wzOd .nm img{width:22px;height:22px}.wzOd .nm b{font-size:15px}
+ .wzOd .osW div{font-size:10px}.wzOd .st{font-size:10px;gap:2px 8px}.wzOd .osVar button{font-size:10px;padding:2px 6px}
+ .wzRow{margin-top:3px;gap:6px}.wzRow button{padding:4px 12px;font-size:12px}
+ /* gear: one row */
+ .wzPips{margin:0 0 4px;gap:4px}.wzPips i{width:11px;height:11px}
+ .wzInv{grid-template-columns:repeat(auto-fit,minmax(0,1fr));grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:5px;flex:1 1 auto;min-height:0;width:100%;max-height:none}
+ .wzInv .wzCard{min-height:0;padding:4px 3px;gap:2px;justify-content:space-between}
+ .wzInv .wzCard .ic{width:auto;height:32%;max-height:56px;aspect-ratio:1;margin:0}
+ .wzInv .wzCard b{font-size:12px}.wzInv .wzCard>span{font-size:9.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+ .wzCnt{gap:4px}.wzCnt button{width:28px;height:28px;font-size:16px;padding:0}.wzCnt i{font-size:16px;min-width:14px}
+ .wzInv .wzCard.on::after{width:16px;height:16px;top:3px;right:3px;font-size:10px}
+ /* summary: two columns of rows */
+ .wzSum{grid-template-columns:52px 1fr auto 52px 1fr auto;gap:4px 8px;padding:8px 10px;max-width:none;font-size:12px}
+ .wzSum dt{font-size:11px}.wzSum dd{font-size:12px;margin:0}.wzSum dd img{width:16px;height:16px}.wzSum button{padding:3px 8px;font-size:11px}
+ .wzBody[data-tight="1"] .wzHint,.wzBody[data-tight="2"] .wzHint,.wzBody[data-tight="3"] .wzHint{display:none}
+ .wzBody[data-tight="2"] .wzGrid .wzCard span,.wzBody[data-tight="3"] .wzGrid .wzCard span,.wzBody[data-tight="3"] .wzInv .wzCard>span{display:none}
 }
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
@@ -4012,7 +4085,7 @@ function followCam(u,reset){if(!R3||!u||u.x<0)return;const c=R3.controls,cam=R3.
   let h=reset?new THREE.Vector3(0,0,1):cam.position.clone().sub(c.target);h.y=0;if(h.lengthSq()<1e-4)h.set(0,0,1);h.normalize();
   const right=new THREE.Vector3(h.z,0,-h.x),t=new THREE.Vector3(u.x+.5,.4,u.y+.5);
   // wider view; the unit sits at the centre of the part of the screen the panel leaves free
-  const e=52*Math.PI/180,d=ph?13:11,tV=Math.tan(cam.fov*Math.PI/360),tH=tV*cam.aspect;
+  const e=54*Math.PI/180,d=ph?17:15,tV=Math.tan(cam.fov*Math.PI/360),tH=tV*cam.aspect;
   const fr=$('#frame').getBoundingClientRect(),pn=document.querySelector('.panel'),pr=pn&&!pn.hidden&&fr.width?pn.getBoundingClientRect():null;
   let cx=0,cy=0;if(pr&&pr.width){if(pr.left>fr.left+fr.width*.5)cx=((pr.left-fr.left)/fr.width*2-1-1)/2;else if(pr.top>fr.top+fr.height*.4)cy=(1-((pr.top-fr.top)/fr.height*2-1))/2;}
   t.addScaledVector(right,-cx*tH*d);t.addScaledVector(h,cy*tV*d/Math.sin(e));
@@ -4732,7 +4805,7 @@ function tick3D(){
   {const idle=G&&!G.busy&&!R3.cine&&!R3.camGoal&&G.phase==='play'&&!document.hidden&&performance.now()-(R3.idleT||0)>25000;if(idle!==R3.controls.autoRotate){R3.controls.autoRotate=idle;R3.controls.autoRotateSpeed=.5;}}
   if(G&&G.phase!==R3.camPhase){const was=R3.camPhase;R3.camPhase=G.phase;if(G.phase==='setup')setTimeout(()=>R3&&setView('top'),60);else if(was==='setup'&&G.phase==='play')setTimeout(playCam,80);}
   // whoever is acting (our selected unit, or a visible enemy taking its turn) gets the camera
-  if(G&&G.phase==='play'&&!G.over&&!R3.cine){const u=G.active||G.sel,k=u&&u.alive&&u.x>=0&&(u.side===G.player||pub(u))?u.id:null;if(k!==R3.followId){R3.followId=k;if(k&&R3.camPhase==='play')setTimeout(()=>followCam(u),40);}}
+  if(G&&G.phase==='play'&&!G.over&&!R3.cine){const u=G.active||G.sel,k=u&&u.alive&&u.x>=0&&(u.side===G.player||pub(u))?u.id:null;const pk=k&&u.x+','+u.y;if(k!==R3.followId||(k&&pk!==R3.followPos)){R3.followId=k;R3.followPos=pk;if(k&&R3.camPhase==='play')setTimeout(()=>followCam(u),40);}}
   R3.controls.update();
   const camD=R3.camera.position.distanceTo(R3.controls.target),bs=Math.max(.32,Math.min(1,camD/15));
   for(const k in R3.figs){const f=R3.figs[k];if(!f.grp.visible)continue;
@@ -5151,12 +5224,12 @@ function wzOpDetail(c){const vars=OPCARDS.filter(v=>v.base===c.base);
 function wzCard(attr,on,inner,cls){return `<button class="wzCard ${cls||''} ${on?'on':''}" ${attr}>${inner}</button>`;}
 function wzStepHTML(){const s=cfg.side,st=WZ.step;
   switch(st){
-  case 0:return `<h3 class="wzQ">你要扮演哪一方？</h3><p class="wzHint">進攻方要突破建築完成任務，防守方要守住目標。</p><div class="wzGrid two">${
+  case 0:return `<h3 class="wzQ">你要扮演哪一方？</h3><p class="wzHint">進攻方要突破建築完成任務，防守方要守住目標。</p><div class="wzGrid two split">${
     wzCard('data-wz-side="D"',s==='D',`<i class="sideph l"></i><div class="ic">${emblem('D')}</div><b>防守方</b><span>佈下陷阱與攝影機，守住炸彈點或人質</span>`,'big d side')+
     wzCard('data-wz-side="A"',s==='A',`<i class="sideph r"></i><div class="ic">${emblem('A')}</div><b>進攻方</b><span>無人機偵查、破牆、安裝拆彈器或救出人質</span>`,'big a side')}</div>`;
-  case 1:return `<h3 class="wzQ">選擇任務</h3><p class="wzHint">兩種任務都可以靠殲滅對方全員獲勝。</p><div class="wzGrid two">${
-    wzCard('data-wz-mis="bomb"',cfg.mission!=='hostage',`<div class="ic">${WZI.bomb}</div><b>炸彈</b><span>進攻方在 A 或 B 點安裝拆彈器，撐過兩個防守階段</span>`,'big')+
-    wzCard('data-wz-mis="hostage"',cfg.mission==='hostage',`<div class="ic">${WZI.hostage}</div><b>人質</b><span>進攻方帶走人質，送到任一出生區撤離</span>`,'big')}</div>`;
+  case 1:return `<h3 class="wzQ">選擇任務</h3><p class="wzHint">兩種任務都可以靠殲滅對方全員獲勝。</p><div class="wzGrid two split">${
+    wzCard('data-wz-mis="bomb"',cfg.mission!=='hostage',`<i class="misph"></i><div class="ic">${WZI.bomb}</div><b>炸彈</b><span>進攻方在 A 或 B 點安裝拆彈器，撐過兩個防守階段</span>`,'big mis')+
+    wzCard('data-wz-mis="hostage"',cfg.mission==='hostage',`<i class="misph"></i><div class="ic">${WZI.hostage}</div><b>人質</b><span>進攻方帶走人質，送到任一出生區撤離</span>`,'big mis')}</div>`;
   case 2:return `<h3 class="wzQ">選擇地圖</h3><p class="wzHint">背後是目前選中地圖的 3D 預覽。</p><div class="wzGrid two maps">${Object.entries(MAPS).map(([k,m])=>
     wzCard(`data-wz-map="${k}"`,cfg.map===k,`${mapBig(k)?`<i class="mph big" style="background-image:url(${mapBig(k)})"></i>`:`<img class="thumb" src="${mapThumb(k)}" alt="${m.name}平面圖">`}<b>${m.name}</b><span>${m.sub}</span>`,mapBig(k)?'mapc':'')).join('')}</div>`;
   case 3:{const p=cfg.picks[s],pickOf=b=>p.findIndex(k=>OPC[k]&&OPC[k].base===b);
@@ -5212,7 +5285,7 @@ function renderWiz(){let el=$('#wiz');const keep=[...(el?el.querySelectorAll('.w
 function wzFit(){const el=$('#wiz');if(!el||el.hidden)return;const b=el.querySelector('.wzBody'),od=el.querySelector('#wzOd');
   if(od){const fit=()=>{let f=13;od.style.setProperty('--odf',f+'px');while(od.scrollHeight>od.clientHeight+1&&f>9){f-=.5;od.style.setProperty('--odf',f+'px');}};
     od.classList.remove('tight');fit();if(od.scrollHeight>od.clientHeight+1){od.classList.add('tight');fit();}}
-  if(!matchMedia('(max-width:700px)').matches){b.dataset.tight='0';return;}
+  if(!matchMedia('(max-width:700px),(orientation:landscape) and (max-height:520px)').matches){b.dataset.tight='0';return;}
   for(let t=0;t<=3;t++){b.dataset.tight=t;if(b.scrollHeight<=b.clientHeight+1)break;}}
 addEventListener('resize',()=>{if($('#wiz')&&!$('#wiz').hidden)wzFit();});
 // phones: the game plays sideways (desktop-like layout); an upright phone gets a prompt, with fullscreen + orientation lock where the browser allows it
