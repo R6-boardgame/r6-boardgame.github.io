@@ -2837,7 +2837,7 @@ function renderTension(){
   const u=G&&(G.active||G.sel);document.body.classList.toggle('lowhp',!!(on&&u&&u.alive&&u.side===G.player&&u.hp===1));}
 function bigNote(t,sub,k,ms){if(!CINE.on||document.hidden)return;const el=document.createElement('div');el.className='bignote '+(k||'');
   el.innerHTML=`<div class="bnBand"><b>${t}</b>${sub?`<span>${sub}</span>`:''}</div>`;document.body.appendChild(el);setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),400);},ms||1900);}
-const MAPPH=new Set(['bank','clubhouse','kafe']);
+const MAPPH=new Set(['bank','clubhouse','kafe','consulate']);
 function mapPhoto(k){return MAPPH.has(k)?'img/map/'+k+'.webp':'';}
 function mapIntro(k){const m=MAPS[k];if(!m||!CINE.on||document.hidden)return;const ph=mapPhoto(k),el=document.createElement('div');el.className='mapintro'+(ph?'':' noph');
   if(ph)el.style.backgroundImage=`url(${ph})`;
