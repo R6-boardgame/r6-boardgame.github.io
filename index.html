@@ -1438,6 +1438,32 @@ html body header.top{padding-top:calc(max(8px,env(safe-area-inset-top)) + var(--
 html body:has(.panel.open) #actsR{display:none}
 /* v43: lobby top keeps only the player card and online count */
 #pach,.ttopr .tlang{display:none!important}
+/* v43b: pop-up move log (portrait) */
+#logPop{position:fixed;left:max(8px,env(safe-area-inset-left));z-index:9;max-height:46dvh;display:flex;flex-direction:column;gap:6px;padding:10px 10px 8px;background:rgba(10,15,20,.62);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(140,170,200,.35);border-top:2px solid #f0b43c;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);box-shadow:0 10px 28px rgba(0,0,0,.45)}
+#logPop[hidden]{display:none}
+#logPop h4{margin:0;font:800 13px/1.2 inherit;color:#e9edf1;letter-spacing:.04em}
+#logPop .lpList{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:4px;max-height:none}
+#logPop .mv{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);text-align:left;padding:5px 8px;font-size:12px}
+#logPop .hint{display:block!important;font-size:12px;color:#b7c3cd;margin:0}
+/* v43b: single action column, size follows the count */
+@media (orientation:portrait) and (max-width:700px){
+ html body.actsR #actsR #acts{grid-auto-columns:var(--ab,56px)}
+ html body.actsR #actsR #acts button{width:var(--ab,56px);height:var(--ab,56px)}
+ html body.actsR #actsR #acts.tight button .sub{display:none}
+ html body.actsR #actsR #acts.tight button b,html body.actsR #actsR #acts.tight button>span:not(.sub):not(.bwrap){font-size:9px;-webkit-line-clamp:1}
+ html body.actsR #actsR #acts.tight button .bic,html body.actsR #actsR #acts.tight button img.bic.act{width:18px;height:18px;flex-basis:18px}
+ html body.actsR #actsR #acts.tiny button .bwrap>span{display:none}
+ html body.actsR #actsR #acts.tiny button:not(.hasic) b,html body.actsR #actsR #acts.tiny button:not(.hasic)>span:not(.sub):not(.bwrap){display:-webkit-box}
+}
+@media (orientation:portrait) and (max-width:700px){
+ html body.actsR #actsR #acts.tight button b,html body.actsR #actsR #acts.tight button>span:not(.sub):not(.bwrap){font-size:8.5px;line-height:1.05;-webkit-line-clamp:2;white-space:normal;word-break:break-all;overflow:hidden;max-width:100%}
+ html body.actsR #actsR #acts.tight button .bic,html body.actsR #actsR #acts.tight button img.bic.act{width:16px;height:16px;flex-basis:16px}
+ html body.actsR #actsR #acts.tight button{padding:2px 1px!important}
+}
+@media (orientation:portrait) and (max-width:700px){
+ html body.actsR #actsR #acts.tight button,html body.actsR #actsR #acts.tight button .bwrap>span{font-size:8.5px;line-height:1.08;white-space:normal;word-break:break-all;text-align:center;font-weight:800}
+ html body.actsR #actsR #acts.tight button .bwrap>span{display:block;max-height:2.2em;overflow:hidden}
+}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -4848,11 +4874,17 @@ var PORTP=()=>matchMedia('(orientation:portrait) and (max-width:700px)').matches
 function portActs(){let r=document.getElementById('actsR');if(!r){r=document.createElement('div');r.id='actsR';document.body.appendChild(r);}
   const a=document.querySelector('#panel #acts'),on=!!(G&&G.phase==='play'&&PORTP()&&a);document.body.classList.toggle('actsR',on);
   {const g=document.querySelector('#panel .ocG');if(g)g.classList.toggle('full',!!window.OCF);}
-  if(on){r.replaceChildren(a);requestAnimationFrame(actsFit);}else if(!document.querySelector('#panel #acts')||!PORTP())r.replaceChildren();}
+
+  if(on){r.replaceChildren(a);requestAnimationFrame(actsFit);}else if(!document.querySelector('#panel #acts')||!PORTP())r.replaceChildren();
+  {let lp=document.getElementById('logPop');const mv=document.querySelector('#panel #moves'),show=!!(window.LOGPOP&&G&&G.phase==='play'&&PORTP()&&mv);
+    if(!lp){lp=document.createElement('div');lp.id='logPop';document.body.appendChild(lp);}
+    lp.hidden=!show;if(show){lp.innerHTML='<h4>本場移動紀錄</h4>';mv.classList.add('lpList');lp.appendChild(mv);const pos=()=>{try{actsFit();}catch(e){}const sb=$('#sheetT'),ar=document.querySelector('#actsR #acts');if(!sb)return;
+      lp.style.bottom=(innerHeight-sb.getBoundingClientRect().top+6)+'px';lp.style.right=(ar&&ar.children.length?innerWidth-Math.min(...[...ar.children].map(c=>c.getBoundingClientRect().left))+6:8)+'px';};pos();requestAnimationFrame(pos);setTimeout(pos,60);}else lp.replaceChildren();}}
 // the column runs from under the top bar down to the bottom panel; a second column opens to its left when it runs out of room
 function actsFit(){const a=document.querySelector('#actsR #acts'),p=$('#panel');if(!a||!p)return;const hb=($('header.top')||{getBoundingClientRect:()=>({bottom:50})}).getBoundingClientRect().bottom;
-  const top=hb+8,bot=p.getBoundingClientRect().top-6,H=Math.max(120,bot-top),n=a.children.length,rows=Math.max(1,Math.min(n,Math.floor((H+4)/60)));
-  a.style.top=top+'px';a.style.gridTemplateRows=`repeat(${rows},56px)`;}
+  // one column only: buttons shrink until they all fit
+  const top=hb+8,bot=p.getBoundingClientRect().top-6,H=Math.max(120,bot-top),n=Math.max(1,a.children.length),sz=Math.max(30,Math.min(56,Math.floor((H+4)/n)-4));
+  a.style.top=top+'px';a.style.setProperty('--ab',sz+'px');a.style.gridTemplateRows=`repeat(${n},${sz}px)`;a.classList.toggle('tight',sz<46);a.classList.toggle('tiny',sz<38);}
 addEventListener('resize',()=>{try{if(G)render();}catch(e){}});
 document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('.ocG');if(!g||!g.querySelector('.gdC'))return;window.OCF=!window.OCF;g.classList.toggle('full',window.OCF);});
 function renderPanel(){{const r=document.getElementById('actsR');if(r)r.replaceChildren();}
@@ -4879,8 +4911,8 @@ function renderPanel(){{const r=document.getElementById('actsR');if(r)r.replaceC
   if(G.phase==='play')h+=`<div class="box opt"><h3>移動紀錄</h3><p class="hint">點一筆可在地圖上看路線。座標對照地圖邊緣的字母與數字。</p><div class="moves" id="moves"></div></div>`;
   h+=`<div class="box opt"><h3>戰況紀錄</h3><div class="log" id="log"></div></div>`;
   const st=$('#moves')?$('#moves').scrollTop:0;
-  {const lm=(G.log[0]&&G.log[0].msg||'').replace(/<[^>]+>/g,'');h=`<div class="sheetbar"><button id="sheetT"><b>${p.classList.contains('open')?'▼ 收起紀錄':'▲ 紀錄'}</b>${lm&&!PORTP()?`<span class="lg">${lm}</span><i>›</i>`:''}</button></div>`+h;}
-  p.innerHTML=h;if($('#sheetT'))$('#sheetT').onclick=()=>{p.classList.toggle('open');renderPanel();};renderLog();renderMoves();portActs();if($('#moves'))$('#moves').scrollTop=st;
+  {const lm=(G.log[0]&&G.log[0].msg||'').replace(/<[^>]+>/g,'');h=`<div class="sheetbar"><button id="sheetT"><b>${(PORTP()?window.LOGPOP:p.classList.contains('open'))?'▼ 收起紀錄':'▲ 紀錄'}</b>${lm&&!PORTP()?`<span class="lg">${lm}</span><i>›</i>`:''}</button></div>`+h;}
+  p.innerHTML=h;if($('#sheetT'))$('#sheetT').onclick=()=>{if(PORTP()){p.classList.remove('open');window.LOGPOP=!window.LOGPOP;renderPanel();return;}p.classList.toggle('open');renderPanel();};renderLog();renderMoves();portActs();if($('#moves'))$('#moves').scrollTop=st;
   p.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const u=G.units.find(x=>x.id===b.dataset.u);if(u.alive&&u.x>=0)onCell(u.x,u.y);else{G.sel=u;render();}});
   if($('#go'))$('#go').onclick=startPlay;
   if($('#endphase'))$('#endphase').onclick=()=>{if(!G.busy)endPhase();};
