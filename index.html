@@ -1316,6 +1316,62 @@ body:not([data-scr="game"]) #opsBar{display:none}
  #anal th:nth-child(4),#anal td:nth-child(4),#anal th:nth-child(7),#anal td:nth-child(7){display:none}
  #anal .anN{padding-left:6px;gap:5px}#anal .anN b{max-width:70px;overflow:hidden;text-overflow:ellipsis}
 }
+/* ===== v40: names + add friend in analysis, achievements/friends page, unlock toast ===== */
+#anal caption{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;white-space:nowrap}
+#anal caption .anSide{letter-spacing:.1em}
+#anal caption .anPN{color:#e9f0f6;font-weight:800;letter-spacing:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;max-width:42vw}
+#anal caption i.me{font-style:normal;font-size:10px;background:rgba(255,255,255,.12);padding:1px 6px;color:#cfd8e0;letter-spacing:0}
+.anFr{display:inline-flex;align-items:center;gap:5px;margin-left:auto;background:var(--hb2);border:1px solid var(--hl);color:#dce8f3;padding:3px 9px 3px 6px;font:700 11px/1 inherit;letter-spacing:0;cursor:pointer;clip-path:var(--cham)}
+.anFr svg{width:18px;height:18px}
+.anFr em{font-style:normal}
+.anFr.arm{background:#f0b43c;color:#1a1206;border-color:#f0b43c}
+.anFr.ok{color:#7fe0a0;border-color:rgba(127,224,160,.5)}
+.anFr.off{opacity:.45}
+#anal .anAch{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;padding:6px 10px;font-size:12px;color:#f3d48a}
+#anal .anAch b{color:#f0b43c;letter-spacing:.08em}
+#anal .anAch span{background:rgba(240,180,60,.12);border:1px solid rgba(240,180,60,.35);padding:2px 8px}
+#achToast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 14px);transform:translate(-50%,-140%);z-index:95;background:linear-gradient(90deg,#2a1d06,#3a2a0a);border:1px solid #f0b43c;color:#f8e4b0;padding:9px 18px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:220px;max-width:92vw;text-align:center;transition:transform .28s ease;clip-path:var(--cham);pointer-events:none}
+#achToast.show{transform:translate(-50%,0)}
+#achToast b{font-size:14px;color:#ffd36b}#achToast span{font-size:12px;color:#d8c69a}
+#achp{position:fixed;inset:0;z-index:90;background:rgba(3,5,8,.76);display:grid;place-items:center;padding:12px}
+.achBox{width:min(640px,100%);max-height:calc(100dvh - 24px);overflow:hidden;background:var(--hb);border:1px solid var(--hl);border-top:3px solid #f0b43c;padding:12px;display:flex;flex-direction:column;gap:10px;color:#e6edf2;clip-path:var(--cham)}
+.achHead{display:flex;align-items:center;gap:10px}
+.achHead .seg{display:flex;flex:1;gap:0}
+.achHead .seg button{flex:1;background:var(--hb2);border:1px solid var(--hl);color:#a9bccd;padding:8px;font:800 13px/1 inherit;cursor:pointer}
+.achHead .seg button.on{background:#f0b43c;color:#1a1206;border-color:#f0b43c}
+.achX{background:none;border:1px solid var(--hl);color:#cfd8e0;width:34px;height:34px;cursor:pointer;font-size:15px}
+.agrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.ab{background:var(--hb2);border:1px solid rgba(98,152,206,.25);color:#7d8e9e;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;clip-path:var(--cham);min-width:0}
+.ab i{font-style:normal;font-size:22px;line-height:1;filter:grayscale(1) brightness(.55)}
+.ab b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ab.got{color:#f6dfa3;border-color:rgba(240,180,60,.55);background:linear-gradient(180deg,rgba(240,180,60,.16),var(--hb2))}
+.ab.got i{filter:none}
+.ab.sel{outline:2px solid #45a6ef;outline-offset:-2px}
+.adet{min-height:54px;background:var(--hb2);border:1px solid var(--hl);padding:8px 12px;display:flex;flex-direction:column;gap:3px;font-size:13px}
+.adet b{color:#ffd36b}.adet span{color:#cfd8e0}.adet em{font-style:normal;font-size:11px;color:#8ea2b4}
+.frl{display:flex;flex-direction:column;gap:6px}
+.fri{display:flex;align-items:center;gap:10px;background:var(--hb2);border:1px solid var(--hl);padding:8px 10px}
+.fri b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fri span{font-size:12px;color:#9fb2c3}
+.frx{background:none;border:1px solid rgba(255,120,110,.45);color:#ff9d93;padding:5px 9px;font:700 12px/1 inherit;cursor:pointer}
+.frx.arm{background:#d9564a;color:#fff}
+.frE{color:#9fb2c3;font-size:13px;line-height:1.5;margin:6px 2px}
+.frpg{display:flex;justify-content:center;align-items:center;gap:14px}.frpg button{background:var(--hb2);border:1px solid var(--hl);color:#dce8f3;width:36px;height:30px;cursor:pointer}.frpg button:disabled{opacity:.35}
+.frrec{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.frrec small{color:#8ea2b4;width:100%}.frrec .anFr{margin-left:0}
+@media (orientation:landscape) and (max-height:500px){
+ .agrid{grid-template-columns:repeat(10,1fr);gap:5px}.ab{padding:5px 1px}.ab i{font-size:19px}.ab b{font-size:10px}
+ .achBox{width:min(820px,100%);padding:10px;gap:8px}.adet{min-height:44px;padding:6px 10px}
+ #anal caption .anPN{max-width:20vw}
+}
+@media (max-width:420px){.agrid{grid-template-columns:repeat(4,1fr)}}
+.tplayer{display:flex;gap:6px;align-items:stretch}
+.pach{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 10px;background:linear-gradient(180deg,rgba(60,42,8,.88),rgba(8,11,14,.7));border:1px solid rgba(240,180,60,.5);color:#ffd36b;cursor:pointer;clip-path:var(--cham);font:800 12px/1 inherit}
+.pach i{font-style:normal;font-size:18px}
+#anal .anBox{}
+@media (min-width:761px) and (min-height:501px){#anal td{padding:3px 8px}#anal .anN img{width:24px;height:24px}#anal td small{display:inline;margin-left:4px}}
+.anFr{margin-left:14px}
+@media (orientation:landscape) and (max-height:500px){#anal .anBox{position:relative}#anal .anAch{position:absolute;top:8px;right:10px;max-width:52%;justify-content:flex-end;padding:0;font-size:11px;gap:4px}#anal .anAch span{padding:1px 6px}}
+@media (orientation:landscape) and (max-height:500px){#anal .anBtns{padding-top:5px;padding-bottom:5px}#anal .anBtns button{padding-top:7px;padding-bottom:7px}}
+@media (orientation:landscape) and (max-height:500px){#anal .anFr{padding:0 7px 0 5px;font-size:10px}#anal .anFr svg{width:14px;height:14px}#anal caption{padding-top:2px;padding-bottom:2px}#anal caption .anPN{font-size:12px}}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -3389,15 +3445,17 @@ function showAnalysis(w,why){if(!G||!G.over||G.tut)return;let o=$('#anal');if(o)
   const head=`<tr><th>幹員</th><th>擊殺</th><th>傷害</th><th>承受</th><th>命中率</th><th>道具</th><th>狀態</th></tr>`;
   const cmp=(l,a,b)=>`<span class="anC"><b class="a">${a}</b><em>${l}</em><b class="d">${b}</b></span>`;
   o.innerHTML=`<div class="anBox"><div class="anTop ${w===G.player?'win':'lose'}"><small>戰鬥分析 · 第 ${G.round}/${G.maxRounds} 輪結束</small><h2>${w===G.player?'任務成功':'任務失敗'}</h2><p>${w==='A'?'進攻方':'防守方'}勝利：${why}</p></div>
-    <div class="anScroll"><table class="anT a"><caption>進攻方</caption>${head}${rows('A')}</table>
+    <div class="anScroll"><table class="anT a">${anCap('A')}${head}${rows('A')}</table>
     <div class="anMid"><b>對戰比較</b>${cmp('擊殺',TA.k,TD.k)}${cmp('總傷害',TA.dmg,TD.dmg)}${cmp('命中率',pct(TA.hits,TA.shots),pct(TD.hits,TD.shots))}${cmp('存活',TA.alive+'/'+TA.n,TD.alive+'/'+TD.n)}</div>
-    <table class="anT d"><caption>防守方</caption>${head}${rows('D')}</table></div>
+    <table class="anT d">${anCap('D')}${head}${rows('D')}</table></div>
     <div class="anFoot"><div class="anS a"><small>進攻方總傷害</small><b>${TA.dmg}</b></div><div class="anS mid"><small>本場 MVP</small><b>${mvp?OPS[mvp.op].name:'–'}</b></div><div class="anS d"><small>防守方總傷害</small><b>${TD.dmg}</b></div></div>
-    <div class="anBtns">${!G.net?'<button id="anAgain">再來一局</button>':''}<button class="primary" id="anHome">結束任務・回大廳</button></div></div>`;
+    ${(G._newAch||[]).length?`<div class="anAch"><b>本場解鎖</b>${G._newAch.map(id=>{const a=ACHM[id];return `<span>${a.ic} ${a.n}</span>`;}).join('')}</div>`:''}<div class="anBtns">${!G.net?'<button id="anAgain">再來一局</button>':''}<button class="primary" id="anHome">結束任務・回大廳</button></div></div>`;
   document.body.appendChild(o);const rk=$('#rkres');if(rk)o.querySelector('.anTop').appendChild(rk);
   $('#anHome').onclick=()=>{o.remove();$('#banner').hidden=true;goTitle();};
+  o.querySelectorAll('.anFr').forEach(b=>b.onclick=()=>frTap(b));
   if($('#anAgain'))$('#anAgain').onclick=()=>{o.remove();$('#banner').hidden=true;newGame();};}
 function finish(w,why){
+  try{achFinish(w);}catch(e){console.warn(e);}
   G.over=true;G.busy=false;G.active=null;G.win=w;G.why=why;SFX.music(-1);SFX.win(w===G.player);
   if(!(NET&&NET.applying))log(`${w==='A'?'進攻方':'防守方'}勝利：${why}`,'ks');
   const b=$('#banner');b.hidden=false;b.classList.toggle('bwin',w===G.player);b.classList.toggle('blose',w!==G.player);
@@ -3567,8 +3625,8 @@ async function deployGadget(u,kind,x,y){
   render();if(G.phase==='play')await afterAct(u);
 }
 async function escort(u){useAct(u,'obj');note(u,'護送人質');G.hostage.by=u.id;G.hostage.x=u.x;G.hostage.y=u.y;SFX.alert();bigNote('人質已被帶走','送到任一出生區就能撤離','a',2200);log(`${nm(u)} 帶上人質，送到任一出生區就能撤離`,'ka');render();await afterAct(u);}
-function plant(u){useAct(u,'obj');note(u,'安裝拆彈器');G.defuser={x:u.x,y:u.y,timer:2};SFX.siren();bigNote('拆彈器已安裝',`${cell(u.x,u.y).site} 點 · 防守方只剩 2 個階段可以拆除`,'bomb',2600);log(`${nm(u)} 在 ${cell(u.x,u.y).site} 點安裝了拆彈器！防守方有兩個階段可以解除。`,'ka');render();}
-function defuse(u){useAct(u,'obj');note(u,'解除拆彈器');G.defuser=null;SFX.round();bigNote('拆彈器已解除',`${OPS[u.op].name} 及時拆除`,'d',2200);log(`${nm(u)} 解除了拆彈器！`,'kd');render();}
+function plant(u){if(u.side===G.player)G._pl=true;useAct(u,'obj');note(u,'安裝拆彈器');G.defuser={x:u.x,y:u.y,timer:2};SFX.siren();bigNote('拆彈器已安裝',`${cell(u.x,u.y).site} 點 · 防守方只剩 2 個階段可以拆除`,'bomb',2600);log(`${nm(u)} 在 ${cell(u.x,u.y).site} 點安裝了拆彈器！防守方有兩個階段可以解除。`,'ka');render();}
+function defuse(u){if(u.side===G.player&&!G.tut)setTimeout(()=>achGive('defuse'),600);useAct(u,'obj');note(u,'解除拆彈器');G.defuser=null;SFX.round();bigNote('拆彈器已解除',`${OPS[u.op].name} 及時拆除`,'d',2200);log(`${nm(u)} 解除了拆彈器！`,'kd');render();}
 function overwatch(u,silent){
   const t=G.units.filter(e=>e.alive&&e.side!==u.side&&e.x>=0&&pub(e)).sort((a,b)=>cheb(u.x,u.y,a.x,a.y)-cheb(u.x,u.y,b.x,b.y))[0];
   const v=t&&cheb(u.x,u.y,t.x,t.y)<=10?[t.x-u.x,t.y-u.y]:u.fd;u.owd=Math.abs(v[0])>=Math.abs(v[1])?[Math.sign(v[0])||1,0]:[0,Math.sign(v[1])];u.overwatch=true;u.ap=0;u.mp=0;
@@ -4177,6 +4235,103 @@ function renderOpsBar(){let b=$('#opsBar');const show=G&&G.phase==='play'&&!G.ov
     const st=!u.alive?'dead':G.active===u?'act':u.activated?'done':'';const mp=G.active===u?u.mp:0;
     return `<button data-ob="${u.id}" class="ob ${u.side==='A'?'a':'d'} ${st} ${G.sel===u?'sel':''}" aria-label="${OPS[u.op].name}"><img src="${opIcon(u.op)}" alt=""><span class="obHp">${[...Array(u.max)].map((_,i)=>`<i class="${i<u.hp?'f':''}"></i>`).join('')}</span>${
       G.active===u?`<span class="obMp" title="剩餘移動點">${[...Array(Math.max(mp,0))].map(()=>'<i></i>').join('')}<b>${mp}</b></span>`:''}${u.activated&&u.alive&&G.active!==u?'<em>✓</em>':''}${!u.alive?'<em class="x">✕</em>':''}</button>`;}).join('');}
+const SVG_FR={add:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20c.6-3.8 3.2-5.8 6.5-5.8s5.9 2 6.5 5.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 7v6M16 10h6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  ok:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20c.6-3.8 3.2-5.8 6.5-5.8s5.9 2 6.5 5.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M15.5 10.5l2.2 2.2 4-4.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'};
+// ---- friends: kept in this browser, mirrored to the player's private store when signed in ----
+const FKEY='r6bg.social';
+const FR=(()=>{let p=null;try{p=JSON.parse(localStorage.getItem(FKEY)||'null');}catch(e){}return Object.assign({list:[],recent:[]},p||{});})();
+function frSave(){try{localStorage.setItem(FKEY,JSON.stringify(FR));}catch(e){}socialPush();}
+const isFriend=id=>FR.list.some(f=>f.id===id);
+function frAdd(o){if(!o||!o.id||isFriend(o.id))return;FR.list.push({id:o.id,name:o.name||'對手',ts:Date.now(),w:0,l:0});frSave();achGive('friend');}
+function frDel(id){FR.list=FR.list.filter(f=>f.id!==id);frSave();}
+function frRecord(o,win){if(!o||!o.id)return;FR.recent=[{id:o.id,name:o.name||'對手',ts:Date.now(),win}].concat(FR.recent.filter(r=>r.id!==o.id)).slice(0,6);
+  const f=FR.list.find(x=>x.id===o.id);if(f){f.name=o.name||f.name;if(win)f.w++;else f.l++;}frSave();}
+function frTap(b){const o=G&&G.net&&NET&&NET.opp;
+  if(!o){achToastMsg('對手是電腦','只有連線對戰的真人玩家可以加好友');return;}
+  if(isFriend(o.id)){achToastMsg('已經是好友',esc(o.name));return;}
+  if(!b.classList.contains('arm')){b.classList.add('arm');b.querySelector('em').textContent='再點一下加好友';clearTimeout(b._t);b._t=setTimeout(()=>{b.classList.remove('arm');b.querySelector('em').textContent='加好友';},6000);return;}
+  frAdd(o);renderPlayer();b.classList.remove('arm');b.classList.add('ok');b.innerHTML=SVG_FR.ok+'<em>已加好友</em>';}
+function anCap(side){const mine=side===G.player,o=G.net&&NET&&NET.opp;
+  const nm=mine?meName():(G.net?(o?o.name:'對手'):'電腦');
+  const fr=mine?'':(o&&isFriend(o.id)?`<button class="anFr ok" aria-label="已是好友">${SVG_FR.ok}<em>已加好友</em></button>`:`<button class="anFr${o?'':' off'}" aria-label="加好友">${SVG_FR.add}<em>加好友</em></button>`);
+  return `<caption><span class="anSide">${side==='A'?'進攻方':'防守方'}</span><b class="anPN">${esc(nm)}</b>${mine?'<i class="me">你</i>':''}${fr}</caption>`;}
+// ---- achievements ----
+const ACH=[
+ {id:'first',ic:'🎖',n:'初次出勤',d:'完成一場對戰'},
+ {id:'win',ic:'🏆',n:'首勝',d:'贏得一場對戰'},
+ {id:'winA',ic:'⚔',n:'破門專家',d:'以進攻方獲勝 3 場',goal:3,k:'winA'},
+ {id:'winD',ic:'🛡',n:'銅牆鐵壁',d:'以防守方獲勝 3 場',goal:3,k:'winD'},
+ {id:'plant',ic:'💣',n:'拆彈完成',d:'安裝拆彈器並贏下該場'},
+ {id:'defuse',ic:'✂',n:'千鈞一髮',d:'以防守方拆除敵人的拆彈器'},
+ {id:'rescue',ic:'🤝',n:'救援行動',d:'以進攻方救出人質獲勝'},
+ {id:'flaw',ic:'💎',n:'零傷亡',d:'獲勝時全員存活'},
+ {id:'clutch',ic:'🔥',n:'最後一人',d:'我方只剩一名幹員時獲勝'},
+ {id:'double',ic:'✌',n:'雙殺',d:'單一幹員在一場擊殺 2 名敵人'},
+ {id:'ace',ic:'👑',n:'王牌',d:'單一幹員在一場擊殺全部 5 名敵人'},
+ {id:'sharp',ic:'🎯',n:'神槍手',d:'一場至少開 6 槍，命中率 80% 以上'},
+ {id:'gadget',ic:'🧰',n:'道具大師',d:'一場使用 8 次道具'},
+ {id:'tank',ic:'🧱',n:'肉盾',d:'一場承受 8 點傷害並獲勝'},
+ {id:'tut',ic:'📘',n:'新兵畢業',d:'完成新手教學'},
+ {id:'online',ic:'🌐',n:'真人對決',d:'完成一場連線對戰'},
+ {id:'ranked',ic:'📈',n:'排名初陣',d:'完成一場排名戰'},
+ {id:'friend',ic:'👥',n:'戰友',d:'加入第一位好友'},
+ {id:'vet',ic:'⭐',n:'老兵',d:'完成 10 場對戰',goal:10,k:'games'},
+ {id:'wins10',ic:'🌟',n:'常勝軍',d:'贏得 10 場對戰',goal:10,k:'wins'}];
+const ACHM=Object.fromEntries(ACH.map(a=>[a.id,a]));
+const AKEY='r6bg.ach';
+const AS=(()=>{let p=null;try{p=JSON.parse(localStorage.getItem(AKEY)||'null');}catch(e){}return Object.assign({got:{},n:{games:0,wins:0,winA:0,winD:0}},p||{});})();
+const achCount=()=>ACH.filter(a=>AS.got[a.id]).length;
+function achSave(){try{localStorage.setItem(AKEY,JSON.stringify(AS));}catch(e){}socialPush();}
+function achGive(id){if(!ACHM[id]||AS.got[id])return false;AS.got[id]=Date.now();achSave();const a=ACHM[id];achToastMsg(`${a.ic} 成就解鎖：${a.n}`,a.d);if(G&&G.over)(G._newAch=G._newAch||[]).push(id);return true;}
+function achFinish(w){if(!G||G._achDone)return;G._achDone=true;G._newAch=[];
+  if(G.tut){if(w==='A')achGive('tut');return;}
+  const win=w===G.player,P=G.player,mine=G.units.filter(u=>u.side===P),en=G.units.filter(u=>u.side!==P),c=AS.n,got=[];
+  c.games++;if(win){c.wins++;c[P==='A'?'winA':'winD']++;}
+  const t={k:0,shots:0,hits:0,gad:0,taken:0};mine.forEach(u=>{const q=ST(u);for(const k in t)t[k]+=q[k]||0;});
+  const maxK=Math.max(0,...mine.map(u=>ST(u).k)),alive=mine.filter(u=>u.alive).length;
+  got.push('first');if(win)got.push('win');
+  if(c.winA>=3)got.push('winA');if(c.winD>=3)got.push('winD');if(c.games>=10)got.push('vet');if(c.wins>=10)got.push('wins10');
+  if(win&&G._pl)got.push('plant');
+  if(win&&P==='A'&&G.mission==='hostage')got.push('rescue');
+  if(win&&alive===mine.length)got.push('flaw');
+  if(win&&alive===1&&mine.length>1)got.push('clutch');
+  if(maxK>=2)got.push('double');if(maxK>=Math.max(5,en.length))got.push('ace');
+  if(t.shots>=6&&t.hits/t.shots>=.8)got.push('sharp');
+  if(t.gad>=8)got.push('gadget');if(win&&t.taken>=8)got.push('tank');
+  if(G.net){got.push('online');if(NET&&NET.ranked)got.push('ranked');if(NET&&NET.opp)frRecord(NET.opp,win);}
+  achSave();G.over=true;got.forEach(id=>achGive(id));try{renderPlayer();}catch(e){}}
+// toasts queue so several unlocks show one after another
+const ATQ=[];let atBusy=false;
+function achToastMsg(t,sub){ATQ.push([t,sub]);if(!atBusy)atNext();}
+function atNext(){const it=ATQ.shift();if(!it){atBusy=false;return;}atBusy=true;let el=$('#achToast');if(!el){el=document.createElement('div');el.id='achToast';el.setAttribute('role','status');document.body.appendChild(el);}
+  el.innerHTML=`<b>${it[0]}</b><span>${it[1]||''}</span>`;el.classList.remove('show');void el.offsetWidth;el.classList.add('show');try{SFX.ui&&SFX.ui();}catch(e){}
+  setTimeout(()=>{el.classList.remove('show');setTimeout(atNext,280);},2300);}
+// ---- achievements & friends page (no scrolling: grid sized to fit, friends paged) ----
+let ACHV={tab:'ach',sel:null,pg:0};
+function openAch(tab){ACHV.tab=tab||'ach';ACHV.sel=null;ACHV.pg=0;let el=$('#achp');if(!el){el=document.createElement('div');el.id='achp';el.setAttribute('role','dialog');el.setAttribute('aria-label','成就與好友');document.body.appendChild(el);el.addEventListener('click',e=>{if(e.target===el)el.remove();});}renderAch();}
+function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body='';
+  if(T==='ach'){const a=ACHM[ACHV.sel];
+    body=`<div class="agrid">${ACH.map(x=>`<button class="ab ${AS.got[x.id]?'got':''} ${ACHV.sel===x.id?'sel':''}" data-a="${x.id}"><i>${x.ic}</i><b>${x.n}</b></button>`).join('')}</div>
+    <div class="adet">${a?`<b>${a.ic} ${a.n}</b><span>${a.d}${a.goal?`（${Math.min(AS.n[a.k]||0,a.goal)}/${a.goal}）`:''}</span><em>${AS.got[a.id]?'已解鎖 · '+new Date(AS.got[a.id]).toLocaleDateString('zh-TW'):'尚未解鎖'}</em>`:'<span>點一下成就看條件</span>'}</div>`;}
+  else{const per=matchMedia('(orientation:landscape) and (max-height:500px)').matches?4:6,L=FR.list.slice().sort((a,b)=>b.ts-a.ts),pages=Math.max(1,Math.ceil(L.length/per));ACHV.pg=Math.min(ACHV.pg,pages-1);
+    const rec=FR.recent.filter(r=>!isFriend(r.id)).slice(0,3);
+    body=`<div class="frl">${L.length?L.slice(ACHV.pg*per,ACHV.pg*per+per).map(f=>`<div class="fri"><b>${esc(f.name)}</b><span>對戰 ${f.w} 勝 ${f.l} 敗</span><button class="frx ${ACHV.sel===f.id?'arm':''}" data-del="${f.id}">${ACHV.sel===f.id?'再點一下移除':'移除'}</button></div>`).join(''):'<p class="frE">還沒有好友。連線對戰結束後，在戰鬥分析按對手名字旁的加好友圖示。</p>'}</div>
+    ${pages>1?`<div class="frpg"><button data-pg="-1" ${ACHV.pg?'':'disabled'}>‹</button><span>${ACHV.pg+1}/${pages}</span><button data-pg="1" ${ACHV.pg<pages-1?'':'disabled'}>›</button></div>`:''}
+    ${rec.length?`<div class="frrec"><small>最近對手</small>${rec.map(r=>`<button class="anFr" data-addr="${r.id}">${SVG_FR.add}<em>${esc(r.name)}</em></button>`).join('')}</div>`:''}`;}
+  el.innerHTML=`<div class="achBox"><div class="achHead"><div class="seg"><button class="${T==='ach'?'on':''}" data-t="ach">成就 ${achCount()}/${ACH.length}</button><button class="${T==='fr'?'on':''}" data-t="fr">好友 ${FR.list.length}</button></div><button class="achX" aria-label="關閉">✕</button></div>${body}</div>`;
+  el.querySelector('.achX').onclick=()=>{el.remove();renderPlayer();};
+  el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ACHV.tab=b.dataset.t;ACHV.sel=null;renderAch();});
+  el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{ACHV.sel=b.dataset.a;renderAch();});
+  el.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{ACHV.pg+=+b.dataset.pg;ACHV.sel=null;renderAch();});
+  el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const id=b.dataset.del;if(ACHV.sel!==id){ACHV.sel=id;renderAch();return;}frDel(id);ACHV.sel=null;renderAch();});
+  el.querySelectorAll('[data-addr]').forEach(b=>b.onclick=()=>{const r=FR.recent.find(x=>x.id===b.dataset.addr);if(!b.classList.contains('arm')){b.classList.add('arm');b.querySelector('em').textContent='再點一下加 '+(r?r.name:'');return;}frAdd(r);renderAch();});}
+// ---- mirror to the signed-in player's private store ----
+let SOC_ID=null;
+async function socialLoad(id){SOC_ID=id;try{const db=await claude.use('db');if(!db)return;const s=await db.collection('data/users/'+id).doc('social').get();const d=s.exists&&s.data();if(!d)return socialPush();
+  (d.list||[]).forEach(f=>{if(!isFriend(f.id))FR.list.push(f);});(d.recent||[]).forEach(r=>{if(!FR.recent.some(x=>x.id===r.id))FR.recent.push(r);});FR.recent=FR.recent.sort((a,b)=>b.ts-a.ts).slice(0,6);
+  for(const k in d.got||{})if(!AS.got[k])AS.got[k]=d.got[k];for(const k in d.n||{})AS.n[k]=Math.max(AS.n[k]||0,d.n[k]|0);
+  try{localStorage.setItem(FKEY,JSON.stringify(FR));localStorage.setItem(AKEY,JSON.stringify(AS));}catch(e){}renderPlayer();}catch(e){}}
+let socT=0;function socialPush(){if(!SOC_ID||ME.mode!=='account')return;clearTimeout(socT);socT=setTimeout(async()=>{try{const db=await claude.use('db');if(db)await db.collection('data/users/'+SOC_ID).doc('social').set({list:FR.list.slice(0,200),recent:FR.recent,got:AS.got,n:AS.n,ts:Date.now()});}catch(e){}},800);}
 function render(){try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{renderTension();}catch(e){}
   const scr=G?'game':(SCREEN==='setup'?'setup':'title');document.body.dataset.scr=scr;{const wz=$('#wiz');if(wz&&(G||SCREEN!=='setup'))wz.hidden=true;}
   const tt=$('#title');if(tt){const show=scr==='title';if(tt.hidden===show)tt.hidden=!show;if(show&&tt.dataset.s!==SCREEN){tt.dataset.s=SCREEN;renderTitle();}}
@@ -5457,7 +5612,7 @@ function netWrite(path,data,merge){NET.q=NET.q.then(()=>merge?NET.db.doc(path).u
 async function netCreate(){
   const n=await netInit();if(!n)return;fillPicks(cfg.side);
   const code=randCode();Object.assign(n,{code,role:'host',side:cfg.side,map:null,seq:0,started:false});
-  try{await n.db.doc('games/'+code).set({code,seq:0,by:n.me,guest:'',guestPicks:[],state:'',ts:Date.now()});
+  try{await n.db.doc('games/'+code).set({code,seq:0,by:n.me,hostId:n.me,hostName:meName(),guest:'',guestName:'',guestPicks:[],state:'',ts:Date.now()});
     await n.db.doc('rooms/'+code).set({code,map:'random',hostSide:cfg.side,status:'open',ts:Date.now(),host:n.me});}
   catch(e){NETMSG=NETFAIL;renderTitle();return;}
   SCREEN='wait';renderTitle();netSubscribe(code);
@@ -5476,7 +5631,7 @@ async function netJoin(code,ranked){
   if(!d||d.status!==(ranked?'ranked':'open')){NETMSG=`找不到開著的房間 ${code}。`;renderTitle();return;}
   fillPicks(d.hostSide==='A'?'D':'A');
   const side=d.hostSide==='A'?'D':'A';Object.assign(n,{code,role:'guest',side,map:d.map,seq:0});
-  try{await n.db.doc('games/'+code).update({guest:n.me,guestPicks:cfg.picks[side].slice()});await n.db.doc('rooms/'+code).update({status:'playing'});}
+  try{await n.db.doc('games/'+code).update({guest:n.me,guestName:meName(),guestPicks:cfg.picks[side].slice()});await n.db.doc('rooms/'+code).update({status:'playing'});}
   catch(e){NETMSG='加入失敗：'+NETFAIL;renderTitle();return;}
   SCREEN='wait';renderTitle();netSubscribe(code);
 }
@@ -5486,6 +5641,7 @@ function netSubscribe(code){
 }
 function netOnGame(d){
   if(!NET||d.code!==NET.code)return;
+  {const o=NET.role==='host'?{id:d.guest,name:d.guestName}:{id:d.hostId,name:d.hostName};if(o.id)NET.opp={id:o.id,name:o.name||'對手'};}
   if(NET.role==='host'&&!NET.started&&d.guest&&!d.state){NET.started=true;netStartGame(d.guestPicks);return;}
   if(d.state&&d.seq>NET.seq&&d.by!==NET.me)netApply(d);
 }
@@ -5824,7 +5980,7 @@ const tierName=t=>t[{zh:1,en:2,ja:3}[ME.lang]||1];
 const rankBadge=(r,sz)=>{const t=r==null?null:tierOf(r),c=t?t[4]:'#5a6875';return `<svg class="rbadge" width="${sz||22}" height="${sz||22}" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l10 5.5v11L12 23 2 17.5v-11z" fill="${c}" opacity=".25" stroke="${c}" stroke-width="1.6"/><path d="M12 6l5 2.8v6.4L12 18l-5-2.8V8.8z" fill="${c}"/></svg>`;};
 async function acctLoad(){
   try{if(!window.claude||!claude.use)return false;const u=await claude.use('user');if(!u)return false;const v=await u.me();if(!v||!v.id)return false;
-    ME.acct={id:v.id,name:v.name||'',photo:v.avatarUrl||''};
+    ME.acct={id:v.id,name:v.name||'',photo:v.avatarUrl||''};socialLoad(v.id);
     const db=await claude.use('db');if(db){try{const s=await db.doc('players/'+v.id).get();const d=s.exists&&s.data();ME.rating=d&&typeof d.rating==='number'?d.rating:1000;ME.w=(d&&d.w)|0;ME.l=(d&&d.l)|0;}catch(e){ME.rating=ME.rating??1000;}}
     return true;}catch(e){return false;}}
 async function acctLogin(){const ok=await acctLoad();if(!ok){PMSG='連不上對戰伺服器，暫時無法建立線上身分，請稍後再試。';renderPlayer();renderSettings();return;}
@@ -5833,6 +5989,7 @@ function acctLogout(){ME.mode='guest';saveMe();renderPlayer();renderSettings();i
 let PMSG='';
 function renderPlayer(){const el=$('#tplayer');if(!el)return;const acct=ME.mode==='account';
   el.innerHTML=`<button class="pcard" id="pcard" aria-label="玩家資料與設定"><img class="pav" src="${meAvatar()}" alt=""><span class="pinfo"><b>${esc(meName())}</b><span class="prank">${acct?`${rankBadge(ME.rating)}${ME.rating==null?'讀取中…':`${tierName(tierOf(ME.rating))} · ${ME.rating}`}`:`${rankBadge(null)}訪客 · 未排名`}</span></span><i class="pgear" aria-hidden="true">⚙</i></button>`;
+  el.insertAdjacentHTML('beforeend',`<button class="pach" id="pach" aria-label="成就與好友"><i>🏆</i><b>${achCount()}/${ACH.length}</b></button>`);$('#pach').onclick=()=>openAch();
   $('#pcard').onclick=openSettings;}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function openSettings(){let el=$('#psettings');if(!el){el=document.createElement('div');el.id='psettings';el.className='psettings';el.setAttribute('role','dialog');el.setAttribute('aria-label','玩家設定');document.body.appendChild(el);
@@ -5844,6 +6001,7 @@ function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;cons
   el.innerHTML=`<div class="psbox"><div class="pshead"><img class="pav" src="${meAvatar()}" alt=""><div><b>${esc(meName())}</b><span>${acct?'線上身分':'訪客'}</span></div><button id="psClose" aria-label="關閉">✕</button></div>
   <section><h4>名稱</h4><div class="psrow"><input id="psNick" maxlength="16" value="${esc(ME.nick)}" placeholder="${esc(acct&&ME.acct.name?ME.acct.name:ME.guest)}"><button id="psNickOk">儲存</button></div></section>
   <section><h4>頭貼</h4><div class="avgrid">${acct&&ME.acct.photo?`<button class="avb ${ME.usePhoto?'on':''}" data-av="__photo" title="帳號照片"><img src="${ME.acct.photo}" alt="帳號照片"></button>`:''}${avs}</div></section>
+  <section><h4>成就與好友</h4><div class="psrow"><button id="psAch">🏆 成就 ${achCount()}/${ACH.length}</button><button id="psFr">好友 ${FR.list.length} 人</button></div></section>
   <section><h4>登入資料</h4>${acct?`<p class="pshint">已啟用線上身分（綁定這台裝置的瀏覽器）。段位與戰績會存在遊戲伺服器上。</p><div class="psstat">${rankBadge(ME.rating,30)}<span><b>${ME.rating==null?'—':tierName(tierOf(ME.rating))}</b> ${ME.rating??''} 分 · ${ME.w} 勝 ${ME.l} 敗</span></div><div class="psrow"><button id="psLogout">改用訪客身分</button></div>`:
     `<p class="pshint">目前是訪客，可以玩對戰電腦、自訂房間和教學。排名戰需要登入帳號，段位才能保存。</p><div class="pslogin"><button class="primary" id="psLogin"><span class="lgico">C</span>啟用線上身分</button><button disabled title="Google 登入目前還沒開放"><span class="lgico g">G</span>Google 登入（此頁面不支援）</button><button class="on" disabled><span class="lgico">訪</span>訪客（目前）</button></div>`}${PMSG?`<p class="terr">${PMSG}</p>`:''}</section>
   <section><h4>設定</h4><div class="psrow"><span>語言</span>${langSelect('psLang')}</div><div class="psrow"><span>射擊特寫</span><button id="psCine">${CINE.on?'開':'關'}</button></div></section></div>`;
@@ -5851,7 +6009,7 @@ function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;cons
   $('#psNickOk').onclick=()=>{ME.nick=$('#psNick').value.trim().slice(0,16);saveMe();renderPlayer();renderSettings();};
   el.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{if(b.dataset.av==='__photo')ME.usePhoto=true;else{ME.usePhoto=false;ME.avatar=b.dataset.av;}saveMe();renderPlayer();renderSettings();});
   const li=$('#psLogin');if(li)li.onclick=acctLogin;const lo=$('#psLogout');if(lo)lo.onclick=acctLogout;
-  bindLang('psLang');
+  bindLang('psLang');$('#psAch').onclick=()=>{closeSettings();openAch('ach');};$('#psFr').onclick=()=>{closeSettings();openAch('fr');};
   $('#psCine').onclick=()=>{CINE.on=!CINE.on;const v=$('#view-cine');if(v)v.textContent='射擊特寫：'+(CINE.on?{tp:'肩後',fp:'第一人稱'}[CINE.mode]:'關');renderSettings();};
 }
 // ---------- language: the interface text is swapped in place; rules and card texts stay in Chinese ----------
@@ -5990,7 +6148,7 @@ function rankMatch(peers){
 async function rankHost(peer){
   const n=NET;const side=Math.random()<.5?'A':'D';const code=randCode();
   Object.assign(n,{code,role:'host',side,map:null,seq:0,started:false,ranked:true});cfg.side=side;
-  try{await n.db.doc('games/'+code).set({code,seq:0,by:n.me,guest:'',guestPicks:[],state:'',ts:Date.now(),ranked:true});
+  try{await n.db.doc('games/'+code).set({code,seq:0,by:n.me,hostId:n.me,hostName:meName(),guest:'',guestName:'',guestPicks:[],state:'',ts:Date.now(),ranked:true});
     await n.db.doc('rooms/'+code).set({code,map:'random',hostSide:side,status:'ranked',ts:Date.now(),host:n.me});}
   catch(e){RQ.busy=false;return;}
   netSubscribe(code);RQ.q.presence({code,for:peer}).catch(()=>{});
@@ -6021,10 +6179,10 @@ $('#manualBtn').onclick=()=>openManual();
 {const sb=$('#sndBtn'),f=()=>{sb.textContent=SFX.on?'🔊':'🔇';sb.title=SFX.on?'關閉音效':'開啟音效';};f();sb.onclick=()=>{SFX.toggle();f();try{musicLevel();}catch(e){}};}
 {const hb=$('#homeBtn');hb.innerHTML=SVGI.more;hb.setAttribute('aria-label','選單');hb.title='選單';}
 function hMenu(){let m=$('#hmenu');if(m){m.remove();return;}m=document.createElement('div');m.id='hmenu';
-  m.innerHTML=`<button data-k="snd">${SFX.on?'🔊 音效：開':'🔇 音效：關'}</button><button data-k="set">⚙ 設定</button><button data-k="home">⏏ 離開對戰</button>`;document.body.appendChild(m);
+  m.innerHTML=`<button data-k="snd">${SFX.on?'🔊 音效：開':'🔇 音效：關'}</button><button data-k="set">⚙ 設定</button><button data-k="ach">🏆 成就</button><button data-k="home">⏏ 離開對戰</button>`;document.body.appendChild(m);
   const r=$('#homeBtn').getBoundingClientRect();m.style.top=Math.round(r.bottom+6)+'px';m.style.right=Math.round(innerWidth-r.right)+'px';
   m.onclick=e=>{const k=e.target.closest('button')&&e.target.closest('button').dataset.k;if(!k)return;m.remove();
-    if(k==='snd')$('#sndBtn').click();else if(k==='set')openSettings();else homeGo();};
+    if(k==='snd')$('#sndBtn').click();else if(k==='set')openSettings();else if(k==='ach')openAch();else homeGo();};
   setTimeout(()=>addEventListener('pointerdown',function f(e){if(!m.contains(e.target)&&e.target.closest('#homeBtn')==null){m.remove();removeEventListener('pointerdown',f,true);}},true),0);}
 $('#homeBtn').onclick=()=>{if(!G){goTitle();return;}hMenu();};
 function homeGo(){if(!G){goTitle();return;}if(G.over||confirm(G.net?'離開連線對戰？對手會留在房間裡。':'離開這場對戰，回到主畫面？'))goTitle();};
