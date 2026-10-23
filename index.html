@@ -1374,6 +1374,27 @@ body:not([data-scr="game"]) #opsBar{display:none}
 @media (orientation:landscape) and (max-height:500px){#anal .anFr{padding:0 7px 0 5px;font-size:10px}#anal .anFr svg{width:14px;height:14px}#anal caption{padding-top:2px;padding-bottom:2px}#anal caption .anPN{font-size:12px}}
 .osGd{display:block;margin-top:4px;font-size:12px;line-height:1.45;color:#cfe3f3;font-weight:400}
 .oc .ocG b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:100%}
+/* v42 achievement badges */
+.bgrid{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:8px 6px;justify-items:center}
+.bd{position:relative;background:none;border:0;padding:4px 2px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;min-width:0;width:100%;color:#8c99a5}
+.bd .bdS{filter:grayscale(1) brightness(.62) contrast(.9);transition:filter .2s,transform .2s}
+.bd.got .bdS{filter:drop-shadow(0 0 6px rgba(255,211,107,.35));}
+.bd.got{color:#ffe6a8}
+.bd.sel .bdS{transform:scale(1.07)}
+.bd.sel b{color:#7cc4ff}
+.bdL{position:absolute;top:2px;right:calc(50% - 46px);width:20px;height:20px}
+.bdL svg{width:100%;height:100%}
+.bd b{font-size:12px;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bdP{display:flex;align-items:center;gap:5px;font:700 11px/1 ui-monospace,monospace;color:#c3ccd4}
+.bdP i{display:block;width:44px;height:7px;border-radius:4px;background:#26313b;border:1px solid #4a5865;overflow:hidden}
+.bdP u{display:block;height:100%;background:linear-gradient(90deg,#f0b43c,#ffd36b)}
+.bd:not(.got) .bdP u{background:#7c8a97}
+.bdots{display:flex;justify-content:center;gap:10px;padding:2px 0}
+.bdots button{width:10px;height:10px;transform:rotate(45deg);background:#5b6873;border:0;padding:0;cursor:pointer}
+.bdots button.on{background:#f0b43c}
+@media (orientation:landscape) and (max-height:520px){.bgrid{gap:2px 4px}.bd b{font-size:11px}.bdL{width:16px;height:16px;right:calc(50% - 38px)}}
+.pstg{flex-wrap:wrap;gap:6px 8px}.pstg button{min-width:44px}
+@media (orientation:landscape) and (max-height:520px){#title[data-s="lib"] #tmenu{gap:4px}#title[data-s="lib"] .tbtn{min-height:62px!important;padding-top:6px!important;padding-bottom:6px!important}#title[data-s="lib"] .tbtn b{font-size:20px}#title[data-s="lib"] .tsec{margin:0 0 2px}}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -3290,11 +3311,11 @@ const nm=u=>pub(u)?`<b class="${u.side==='A'?'a':'d'}">${OPS[u.op].name}</b>`:`<
 // ---------- sound: everything is synthesised with Web Audio, so no files to load ----------
 const SFX=(()=>{
   let ac=null,out=null,fxBus=null,muBus=null,noiseBuf=null,mus=null,last={};
-  let on=true;try{on=localStorage.getItem('r6snd')!=='0';}catch(e){}
+  let on=true,mOn=true;try{on=localStorage.getItem('r6snd')!=='0';mOn=localStorage.getItem('r6mus')!=='0';}catch(e){}
   function init(){if(ac)return ac.state==='suspended'?ac.resume():null;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
     try{ac=new AC();}catch(e){ac=null;return;}
     out=ac.createDynamicsCompressor();out.threshold.value=-14;out.ratio.value=4;out.connect(ac.destination);
-    fxBus=ac.createGain();fxBus.gain.value=on?.9:0;fxBus.connect(out);muBus=ac.createGain();muBus.gain.value=on?.32:0;muBus.connect(out);
+    fxBus=ac.createGain();fxBus.gain.value=on?.9:0;fxBus.connect(out);muBus=ac.createGain();muBus.gain.value=mOn?.32:0;muBus.connect(out);
     noiseBuf=ac.createBuffer(1,ac.sampleRate*1.5,ac.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
   const ok=()=>ac&&on&&ac.state==='running';
   // throttle so a burst of identical events (e.g. a breach destroying several cells) plays once
@@ -3318,19 +3339,24 @@ const SFX=(()=>{
     siren(){if(!ok())return;const t=ac.currentTime;for(let i=0;i<4;i++){tone(t+i*.42,.38,740,0,.2,'square');tone(t+i*.42+.2,.2,560,0,.2,'square');}tone(t,1.2,60,30,.8,'sine');},
     tick(){if(!ok()||!gate('tick',700))return;const t=ac.currentTime;tone(t,.05,1600,0,.12,'square');},
     win(w){if(!ok())return;const t=ac.currentTime;(w?[262,330,392,523]:[392,330,262,196]).forEach((f,i)=>tone(t+i*.16,.5,f,0,.22,'triangle'));},
-    // tension bed: a low drone with a slow filter sweep and a muffled heartbeat that speeds up when fighting is near
-    music(level){if(!ac||!on)return;if(level<0){if(mus){mus.g.gain.setTargetAtTime(0,ac.currentTime,.6);}return;}
-      if(!mus){const g=ac.createGain();g.gain.value=0;g.connect(muBus);const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=380;lp.Q.value=3;lp.connect(g);
-        const oscs=[55,55.4,82.4,110.3].map((f,i)=>{const o=ac.createOscillator();o.type=i<2?'sawtooth':'triangle';o.frequency.value=f;const og=ac.createGain();og.gain.value=i<2?.22:.12;o.connect(og);og.connect(lp);o.start();return o;});
-        const lfo=ac.createOscillator(),lg=ac.createGain();lfo.frequency.value=.07;lg.gain.value=220;lfo.connect(lg);lg.connect(lp.frequency);lfo.start();
-        mus={g,lp,oscs,lvl:0,next:ac.currentTime+.5};
-        setInterval(()=>{if(!mus||!ok()||mus.lvl<=0)return;const t=ac.currentTime;if(t<mus.next-.05)return;const bpm=mus.lvl>1?112:72;
-          const k=ac.createOscillator(),kg=ac.createGain();k.frequency.setValueAtTime(70,t);k.frequency.exponentialRampToValueAtTime(38,t+.18);kg.gain.setValueAtTime(.55,t);kg.gain.exponentialRampToValueAtTime(.001,t+.25);k.connect(kg);kg.connect(muBus);k.start(t);k.stop(t+.3);
-          const k2=ac.createOscillator(),kg2=ac.createGain();k2.frequency.setValueAtTime(60,t+.2);k2.frequency.exponentialRampToValueAtTime(34,t+.36);kg2.gain.setValueAtTime(.32,t+.2);kg2.gain.exponentialRampToValueAtTime(.001,t+.42);k2.connect(kg2);kg2.connect(muBus);k2.start(t+.2);k2.stop(t+.5);
-          mus.next=t+60/bpm;},100);}
-      if(level!==mus.lvl){mus.lvl=level;mus.g.gain.setTargetAtTime(level?(level>1?1:.75):0,ac.currentTime,.8);mus.lp.frequency.setTargetAtTime(level>1?700:380,ac.currentTime,.8);}},
+    // tension bed: slow, quiet minor chords; a muffled heartbeat joins once fighting is near
+    music(level){if(!ac||!mOn)return;if(level<0){if(mus){mus.lvl=0;mus.g.gain.setTargetAtTime(0,ac.currentTime,.6);}return;}
+      if(!mus){const g=ac.createGain();g.gain.value=0;g.connect(muBus);const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;lp.connect(g);
+        mus={g,lp,lvl:0,next:ac.currentTime+.5,bar:0,beat:0};
+        const CH=[[110,164.8,261.6],[87.3,130.8,220],[98,146.8,233.1],[82.4,123.5,207.7]];
+        setInterval(()=>{if(!mus||!ac||!mOn||ac.state!=='running'||mus.lvl<=0)return;const t=ac.currentTime;
+          if(t>=mus.next-.05){const len=mus.lvl>1?3.2:4.8,ch=CH[mus.bar++%CH.length];
+            ch.forEach((f,i)=>{const o=ac.createOscillator(),og=ac.createGain();o.type=i?'sine':'triangle';o.frequency.value=f;
+              og.gain.setValueAtTime(0,t);og.gain.linearRampToValueAtTime(i?.07:.11,t+1.1);og.gain.setTargetAtTime(0,t+len*.6,len*.18);o.connect(og);og.connect(lp);o.start(t);o.stop(t+len+1.5);});
+            mus.next=t+len;}
+          if(mus.lvl>1&&t>=mus.beat-.05){const k=ac.createOscillator(),kg=ac.createGain();k.frequency.setValueAtTime(64,t);k.frequency.exponentialRampToValueAtTime(36,t+.18);kg.gain.setValueAtTime(.4,t);kg.gain.exponentialRampToValueAtTime(.001,t+.25);k.connect(kg);kg.connect(muBus);k.start(t);k.stop(t+.3);
+            const k2=ac.createOscillator(),kg2=ac.createGain();k2.frequency.setValueAtTime(56,t+.2);k2.frequency.exponentialRampToValueAtTime(32,t+.36);kg2.gain.setValueAtTime(.24,t+.2);kg2.gain.exponentialRampToValueAtTime(.001,t+.42);k2.connect(kg2);kg2.connect(muBus);k2.start(t+.2);k2.stop(t+.5);
+            mus.beat=t+60/96;}},100);}
+      if(level!==mus.lvl){mus.lvl=level;mus.g.gain.setTargetAtTime(level?(level>1?1:.8):0,ac.currentTime,.8);}},
     get on(){return on;},
-    toggle(){on=!on;try{localStorage.setItem('r6snd',on?'1':'0');}catch(e){}init();if(ac){fxBus.gain.value=on?.9:0;muBus.gain.value=on?.32:0;}return on;},
+    get mOn(){return mOn;},
+    toggle(){on=!on;try{localStorage.setItem('r6snd',on?'1':'0');}catch(e){}init();if(ac)fxBus.gain.value=on?.9:0;return on;},
+    toggleMusic(){mOn=!mOn;try{localStorage.setItem('r6mus',mOn?'1':'0');}catch(e){}init();if(ac){muBus.gain.value=mOn?.32:0;if(!mOn&&mus){mus.lvl=0;mus.g.gain.value=0;}}return mOn;},
     init};
   // browsers only allow sound after a tap or key press
   ['pointerdown','keydown','touchstart'].forEach(e=>addEventListener(e,()=>init(),{capture:true,passive:true}));
@@ -3512,7 +3538,7 @@ function destroyCell(x,y){G._wv=(G._wv||0)+1;G.gadgets.forEach(g=>{if(g.type==='
 function shootables(u){
   const o=[];LOSW=u.op==='warden';LOSD=u.side==='D';try{return shootables0(u,o);}finally{LOSW=false;LOSD=false;}}
 function shootables0(u,o){
-  for(const e of G.units)if(e.alive&&e.side!==u.side&&e.x>=0&&(!e.hidden||e.spotted>0)&&(inSight(u,e)||(e.spotted>0&&cheb(u.x,u.y,e.x,e.y)<=14&&los(u.x,u.y,e.x,e.y,true))))o.push({kind:'unit',t:e,x:e.x,y:e.y});
+  for(const e of G.units)if(e.alive&&e.side!==u.side&&e.x>=0&&(!e.hidden||e.spotted>0)&&inSight(u,e))o.push({kind:'unit',t:e,x:e.x,y:e.y});
   return o;
 }
 async function doShoot(u,tg){
@@ -3529,7 +3555,10 @@ async function blastDestroy(x,y,d){ // free Destroy from a gadget with rating d 
   if(c.t==='bar'||(d>=2&&c.t==='soft')||(d>=3&&c.t==='reinf'))destroyCell(x,y);
   for(const g of G.gadgets)if(g.alive&&g.x===x&&g.y===y&&GSTR[g.type]&&GSTR[g.type]<=d){g.alive=false;if(g.type==='clay')await clayBoom(g);if(g.volcan)await ignite(g.x,g.y);}}
 const blastArea=(x,y)=>[[x,y],...adj8(x,y)];
-async function clayBoom(g){SFX.boom();g.alive=false;G.fx={x0:g.x,y0:g.y,x1:g.x,y1:g.y,until:performance.now()+500,c:COL.danger};
+function hostHarm(area,side,why){const h=G&&G.hostage;if(!h||G.over||G.mission!=='hostage'||!side||!area.some(([i,j])=>i===h.x&&j===h.y))return false;
+  SFX.siren();log(`${why}波及人質，人質死亡`,'kd');bigNote('人質死亡',`${side==='A'?'進攻方':'防守方'}的${why}傷到了人質`,side==='A'?'d':'a',2600);
+  finish(side==='A'?'D':'A',`${side==='A'?'進攻方':'防守方'}的${why}害死了人質`);return true;}
+async function clayBoom(g){SFX.boom();g.alive=false;if(hostHarm(blastArea(g.x,g.y),g.side||'A','闊刀地雷'))return;G.fx={x0:g.x,y0:g.y,x1:g.x,y1:g.y,until:performance.now()+500,c:COL.danger};
   for(const a of G.units.filter(a=>a.alive&&a.x>=0&&blastArea(g.x,g.y).some(([i,j])=>i===a.x&&j===a.y))){const r=DIE.R[Math.floor(Math.random()*6)]+DIE.R[Math.floor(Math.random()*6)];if(r)await damage(a,r,'闊刀地雷');}}
 // Destroy: adjacent barricades, or enemy gadgets in line of sight (low strength)
 function destroyTargets(u){const lv=PROF[u.op].dz||1,o=within(u.x,u.y,14).filter(([x,y])=>{const c=cell(x,y);if(!(c.t==='bar'||(c.t==='soft'&&lv>=2)))return false;return cheb(u.x,u.y,x,y)<=1||los(u.x,u.y,x,y,false,true);});
@@ -3577,14 +3606,14 @@ async function useGadget(u,x,y){ST(u).gad++;DMGBY=u;if(x!=null)aimCam(u,[[x,y]])
     case 'thatcher':{let n=0;for(const g of G.gadgets)if(g.alive&&!['gas','fire','mat','gu','trap'].includes(g.type)&&g.side==='D'&&cheb(g.x,g.y,x,y)<=2){g.alive=false;n++;}
       for(const [i,j] of within(x,y,2))if(cell(i,j).elec){cell(i,j).elec=false;n++;}
       log(`${nm(u)} 的 EMP 癱瘓了 ${n} 個防守道具`,side);break;}
-    case 'fuze':{log(`${nm(u)} 引爆集束炸彈`,side);const hit=G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,x,y)<=1);
+    case 'fuze':{log(`${nm(u)} 引爆集束炸彈`,side);if(hostHarm(within(x,y,1),u.side,'集束炸彈'))break;const hit=G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,x,y)<=1);
       for(const a of hit){a.spotted=1;await damage(a,1,'集束炸彈');}break;}
     case 'lion':alive('D').filter(d=>!NOLOC.has(d.op)).forEach(d=>{d.spotted=1;d.hidden=false;});(G.decoys||[]).forEach(k=>k.alive=false);log(`${nm(u)} 啟動 EE-ONE-D，所有防守方被標記到回合結束！`,side);break;
     case 'mute':G.gadgets.push({type:'jammer',x,y,side:'D',alive:true});if(pub(u))log(`${nm(u)} 放置了訊號干擾器`,side);break;
     case 'bandit':G.gadgets.push({type:'ced',x,y,side:'D',alive:true});if(pub(u)||G.player==='D')log(`${nm(u)} 佈下 CED-1 電擊線（該格與相鄰格通電）`,side);break;
     case 'kapkan':G.gadgets.push({type:'trap',x,y,side:'D',alive:true});if(G.player==='D')log(`${nm(u)} 設置了陷阱`,side);break;
     case 'valkyrie':G.gadgets.push({type:'cam',valk:true,x,y,side:'D',alive:true});if(pub(u))log(`${nm(u)} 丟出黑眼攝影機`,side);break;
-    case 'smoke':{G.gadgets.push({type:'gas',x,y,side:'D',alive:true,life:2});log(`${nm(u)} 引爆毒氣罐`,side);
+    case 'smoke':{G.gadgets.push({type:'gas',x,y,side:'D',alive:true,life:2});log(`${nm(u)} 引爆毒氣罐`,side);if(hostHarm(within(x,y,1),'D','毒氣'))break;
       for(const a of alive('A'))if(cheb(a.x,a.y,x,y)<=1)await damage(a,1,'毒氣');break;}
     case 'doc':{const a=unitAt(x,y);a.hp=Math.min(a.max,a.hp+2);log(`${nm(u)} 治療了 ${nm(a)}`,side);break;}
   }
@@ -3615,6 +3644,7 @@ async function throwGadget(u,kind,x,y){ST(u).gad++;DMGBY=u;aimCam(u,[[x,y]]);
   const area=blastArea(x,y),inA=a=>a.alive&&a.x>=0&&area.some(([i,j])=>i===a.x&&j===a.y);
   const roll=(c,n)=>{let t=0;for(let i=0;i<n;i++)t+=DIE[c][Math.floor(Math.random()*6)];return t;};
   if(kind==='frag'||kind==='nitro'){const fr=kind==='frag';SFX.boom();G[kind]--;note(u,fr?'破片手榴彈':'C4 遙控炸藥');log(`${nm(u)} ${fr?'丟出破片手榴彈':'引爆 C4 遙控炸藥'}`,side);
+    if(hostHarm(area,u.side,fr?'破片手榴彈':'C4'))return;
     const hit=G.units.filter(inA);if(fr)for(const [i,j] of area)await blastDestroy(i,j,1);
     for(const a of hit){if(!a.alive)continue;const ctr=a.x===x&&a.y===y,r=fr?roll('Y',ctr?2:1):roll('O',ctr?2:1);if(r)await damage(a,r,fr?'破片':'C4');}}
   else if(kind==='impact'){G.impact--;note(u,'衝擊手榴彈');const c=cell(x,y),w=c.t==='soft'?'軟牆':c.t==='bar'?(c.kind==='window'?'窗戶路障':'門路障'):'道具';await blastDestroy(x,y,2);log(`${nm(u)} 的衝擊手榴彈炸掉了${w}`,side);}
@@ -4256,7 +4286,7 @@ const FKEY='r6bg.social';
 const FR=(()=>{let p=null;try{p=JSON.parse(localStorage.getItem(FKEY)||'null');}catch(e){}return Object.assign({list:[],recent:[]},p||{});})();
 function frSave(){try{localStorage.setItem(FKEY,JSON.stringify(FR));}catch(e){}socialPush();}
 const isFriend=id=>FR.list.some(f=>f.id===id);
-function frAdd(o){if(!o||!o.id||isFriend(o.id))return;FR.list.push({id:o.id,name:o.name||'對手',ts:Date.now(),w:0,l:0});frSave();achGive('friend');}
+function frAdd(o){if(!o||!o.id||isFriend(o.id))return;FR.list.push({id:o.id,name:o.name||'對手',ts:Date.now(),w:0,l:0});frSave();achGive('friend');if(FR.list.length>=5)achGive('friend5');}
 function frDel(id){FR.list=FR.list.filter(f=>f.id!==id);frSave();}
 function frRecord(o,win){if(!o||!o.id)return;FR.recent=[{id:o.id,name:o.name||'對手',ts:Date.now(),win}].concat(FR.recent.filter(r=>r.id!==o.id)).slice(0,6);
   const f=FR.list.find(x=>x.id===o.id);if(f){f.name=o.name||f.name;if(win)f.w++;else f.l++;}frSave();}
@@ -4270,42 +4300,57 @@ function anCap(side){const mine=side===G.player,o=G.net&&NET&&NET.opp;
   const fr=mine?'':(o&&isFriend(o.id)?`<button class="anFr ok" aria-label="已是好友">${SVG_FR.ok}<em>已加好友</em></button>`:`<button class="anFr${o?'':' off'}" aria-label="加好友">${SVG_FR.add}<em>加好友</em></button>`);
   return `<caption><span class="anSide">${side==='A'?'進攻方':'防守方'}</span><b class="anPN">${esc(nm)}</b>${mine?'<i class="me">你</i>':''}${fr}</caption>`;}
 // ---- achievements ----
+// c: badge colour, sh: badge outline (0 shield, 1 hexagon, 2 round, 3 star); conditions (d) are never shown on the page
 const ACH=[
- {id:'first',ic:'🎖',n:'初次出勤',d:'完成一場對戰'},
- {id:'win',ic:'🏆',n:'首勝',d:'贏得一場對戰'},
- {id:'winA',ic:'⚔',n:'破門專家',d:'以進攻方獲勝 3 場',goal:3,k:'winA'},
- {id:'winD',ic:'🛡',n:'銅牆鐵壁',d:'以防守方獲勝 3 場',goal:3,k:'winD'},
- {id:'plant',ic:'💣',n:'拆彈完成',d:'安裝拆彈器並贏下該場'},
- {id:'defuse',ic:'✂',n:'千鈞一髮',d:'以防守方拆除敵人的拆彈器'},
- {id:'rescue',ic:'🤝',n:'救援行動',d:'以進攻方救出人質獲勝'},
- {id:'flaw',ic:'💎',n:'零傷亡',d:'獲勝時全員存活'},
- {id:'clutch',ic:'🔥',n:'最後一人',d:'我方只剩一名幹員時獲勝'},
- {id:'double',ic:'✌',n:'雙殺',d:'單一幹員在一場擊殺 2 名敵人'},
- {id:'ace',ic:'👑',n:'王牌',d:'單一幹員在一場擊殺全部 5 名敵人'},
- {id:'sharp',ic:'🎯',n:'神槍手',d:'一場至少開 6 槍，命中率 80% 以上'},
- {id:'gadget',ic:'🧰',n:'道具大師',d:'一場使用 8 次道具'},
- {id:'tank',ic:'🧱',n:'肉盾',d:'一場承受 8 點傷害並獲勝'},
- {id:'tut',ic:'📘',n:'新兵畢業',d:'完成新手教學'},
- {id:'online',ic:'🌐',n:'真人對決',d:'完成一場連線對戰'},
- {id:'ranked',ic:'📈',n:'排名初陣',d:'完成一場排名戰'},
- {id:'friend',ic:'👥',n:'戰友',d:'加入第一位好友'},
- {id:'vet',ic:'⭐',n:'老兵',d:'完成 10 場對戰',goal:10,k:'games'},
- {id:'wins10',ic:'🌟',n:'常勝軍',d:'贏得 10 場對戰',goal:10,k:'wins'}];
+ {id:'first',ic:'🎖',c:'#7fb0d8',sh:0,n:'我只是來看看的',d:'完成一場對戰'},
+ {id:'win',ic:'🏆',c:'#f0b43c',sh:2,n:'新手運也是實力',d:'贏得一場對戰'},
+ {id:'winA',ic:'💥',c:'#e8743b',sh:1,n:'門是拿來炸的',d:'以進攻方獲勝 3 場',goal:3,k:'winA'},
+ {id:'winD',ic:'🛡',c:'#4aa8e2',sh:0,n:'此路不通',d:'以防守方獲勝 3 場',goal:3,k:'winD'},
+ {id:'plant',ic:'💣',c:'#e05b4b',sh:3,n:'快遞已送達',d:'安裝拆彈器並贏下該場'},
+ {id:'defuse',ic:'✂',c:'#5cc48a',sh:1,n:'紅線還是藍線',d:'以防守方拆除敵人的拆彈器'},
+ {id:'rescue',ic:'🤝',c:'#62c1d6',sh:2,n:'接你回家',d:'以進攻方救出人質獲勝'},
+ {id:'flaw',ic:'💎',c:'#9f8cf0',sh:1,n:'一根頭髮都沒少',d:'獲勝時全員存活'},
+ {id:'clutch',ic:'🐺',c:'#c9a26b',sh:0,n:'孤狼也會贏',d:'我方只剩一名幹員時獲勝'},
+ {id:'double',ic:'✌',c:'#e86fa0',sh:3,n:'買一送一',d:'單一幹員在一場擊殺 2 名敵人'},
+ {id:'ace',ic:'👑',c:'#ffd36b',sh:3,n:'全場我包了',d:'單一幹員在一場擊殺全部敵人'},
+ {id:'sharp',ic:'🎯',c:'#e05b4b',sh:2,n:'槍比嘴還快',d:'一場至少開 6 槍，命中率 80% 以上'},
+ {id:'gadget',ic:'🧰',c:'#8fc45c',sh:1,n:'口袋比人還大',d:'一場使用 8 次道具'},
+ {id:'tank',ic:'🧱',c:'#b08a6a',sh:0,n:'皮粗肉厚',d:'一場承受 8 點傷害並獲勝'},
+ {id:'tut',ic:'📘',c:'#7fb0d8',sh:2,n:'看說明書的好孩子',d:'完成新手教學'},
+ {id:'online',ic:'🌐',c:'#4aa8e2',sh:2,n:'對面是真人耶',d:'完成一場連線對戰'},
+ {id:'ranked',ic:'📈',c:'#f0b43c',sh:1,n:'段位焦慮症',d:'完成一場排名戰'},
+ {id:'friend',ic:'👥',c:'#5cc48a',sh:2,n:'交個朋友吧',d:'加入第一位好友'},
+ {id:'vet',ic:'⭐',c:'#c9a26b',sh:3,n:'打卡上班',d:'完成 10 場對戰',goal:10,k:'games'},
+ {id:'wins10',ic:'🌟',c:'#ffd36b',sh:3,n:'贏到有點膩',d:'贏得 10 場對戰',goal:10,k:'wins'},
+ {id:'kills50',ic:'💀',c:'#c7ced6',sh:0,n:'人頭收藏家',d:'累計擊殺 50 名敵人',goal:50,k:'kills'},
+ {id:'kills200',ic:'☠',c:'#e05b4b',sh:1,n:'戰場清潔工',d:'累計擊殺 200 名敵人',goal:200,k:'kills'},
+ {id:'gad100',ic:'🔧',c:'#8fc45c',sh:0,n:'專業工具人',d:'累計使用 100 次道具',goal:100,k:'gadT'},
+ {id:'games50',ic:'🕹',c:'#9f8cf0',sh:2,n:'這遊戲有毒',d:'完成 50 場對戰',goal:50,k:'games'},
+ {id:'wins25',ic:'🥇',c:'#f0b43c',sh:3,n:'常勝將軍',d:'贏得 25 場對戰',goal:25,k:'wins'},
+ {id:'rescue5',ic:'🍼',c:'#62c1d6',sh:2,n:'職業保母',d:'救出人質 5 次',goal:5,k:'rescue'},
+ {id:'plant5',ic:'📦',c:'#e8743b',sh:1,n:'拆彈器推銷員',d:'安裝拆彈器並獲勝 5 次',goal:5,k:'plant'},
+ {id:'ops10',ic:'🎭',c:'#e86fa0',sh:0,n:'換個人玩玩',d:'用過 10 名不同幹員',goal:10,k:'ops'},
+ {id:'lose5',ic:'🩹',c:'#b08a6a',sh:2,n:'越挫越勇',d:'輸掉 5 場對戰',goal:5,k:'losses'},
+ {id:'friend5',ic:'🎉',c:'#5cc48a',sh:3,n:'朋友滿天下',d:'有 5 位好友',goal:5,k:'friends'}];
+function achProg(a){const n=AS.n,g=a.goal||1;if(!a.goal)return[AS.got[a.id]?1:0,1];
+  const v=a.k==='ops'?(n.ops||[]).length:a.k==='friends'?FR.list.length:(n[a.k]||0);return[Math.min(AS.got[a.id]?g:v,g),g];}
 const ACHM=Object.fromEntries(ACH.map(a=>[a.id,a]));
 const AKEY='r6bg.ach';
 const AS=(()=>{let p=null;try{p=JSON.parse(localStorage.getItem(AKEY)||'null');}catch(e){}return Object.assign({got:{},n:{games:0,wins:0,winA:0,winD:0}},p||{});})();
 const achCount=()=>ACH.filter(a=>AS.got[a.id]).length;
 function achSave(){try{localStorage.setItem(AKEY,JSON.stringify(AS));}catch(e){}socialPush();}
-function achGive(id){if(!ACHM[id]||AS.got[id])return false;AS.got[id]=Date.now();achSave();const a=ACHM[id];achToastMsg(`${a.ic} 成就解鎖：${a.n}`,a.d);if(G&&G.over)(G._newAch=G._newAch||[]).push(id);return true;}
+function achGive(id){if(!ACHM[id]||AS.got[id])return false;AS.got[id]=Date.now();achSave();const a=ACHM[id];achToastMsg(`${a.ic} 成就解鎖：${a.n}`,'到作戰檔案的成就頁看看');if(G&&G.over)(G._newAch=G._newAch||[]).push(id);return true;}
 function achFinish(w){if(!G||G._achDone)return;G._achDone=true;G._newAch=[];
   if(G.tut){if(w==='A')achGive('tut');return;}
   const win=w===G.player,P=G.player,mine=G.units.filter(u=>u.side===P),en=G.units.filter(u=>u.side!==P),c=AS.n,got=[];
-  c.games++;if(win){c.wins++;c[P==='A'?'winA':'winD']++;}
+  c.games++;if(win){c.wins++;c[P==='A'?'winA':'winD']++;}else c.losses=(c.losses||0)+1;
   const t={k:0,shots:0,hits:0,gad:0,taken:0};mine.forEach(u=>{const q=ST(u);for(const k in t)t[k]+=q[k]||0;});
   const maxK=Math.max(0,...mine.map(u=>ST(u).k)),alive=mine.filter(u=>u.alive).length;
   got.push('first');if(win)got.push('win');
   if(c.winA>=3)got.push('winA');if(c.winD>=3)got.push('winD');if(c.games>=10)got.push('vet');if(c.wins>=10)got.push('wins10');
-  if(win&&G._pl)got.push('plant');
+  c.kills=(c.kills||0)+t.k;c.gadT=(c.gadT||0)+t.gad;c.ops=[...new Set([...(c.ops||[]),...mine.map(u=>OPC[u.op]&&OPC[u.op].base||u.op)])];
+  if(win&&G._pl){got.push('plant');c.plant=(c.plant||0)+1;}if(win&&P==='A'&&G.mission==='hostage')c.rescue=(c.rescue||0)+1;
+  for(const a of ACH)if(a.goal&&a.k!=='friends'&&achProg(a)[0]>=a.goal)got.push(a.id);
   if(win&&P==='A'&&G.mission==='hostage')got.push('rescue');
   if(win&&alive===mine.length)got.push('flaw');
   if(win&&alive===1&&mine.length>1)got.push('clutch');
@@ -4322,10 +4367,26 @@ function atNext(){const it=ATQ.shift();if(!it){atBusy=false;return;}atBusy=true;
   setTimeout(()=>{el.classList.remove('show');setTimeout(atNext,280);},2300);}
 // ---- achievements & friends page (no scrolling: grid sized to fit, friends paged) ----
 let ACHV={tab:'ach',sel:null,pg:0};
+const SVG_LOCK='<svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2" fill="#e9edf1" stroke="#2a3540" stroke-width="1.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="#e9edf1" stroke-width="2.4"/><circle cx="12" cy="15.5" r="1.6" fill="#2a3540"/></svg>';
+// how many badges fit on one page without scrolling, for this screen
+function achPer(){const W=Math.min(innerWidth-24,640),H=innerHeight,land=innerWidth>innerHeight&&H<520,cols=land?6:W<480?3:4;let bw=Math.min(84,(W-24)/cols-18);
+  const avail=H-24-24-46-(land?44:58)-26-(land?16:30),rows=land?2:Math.max(1,Math.min(4,Math.floor(avail/(bw+50))));if(land)bw=Math.max(44,Math.min(bw,avail/2-46));ACHV.cols=cols;ACHV.bw=Math.round(bw);return cols*rows;}
+function achBadge(a){const c=a.c||'#f0b43c',id='bg'+a.id,S=[
+  'M40 5 L70 15 V40 C70 57 57 69 40 76 C23 69 10 57 10 40 V15 Z',
+  'M40 4 L71 22 V58 L40 76 L9 58 V22 Z',
+  'M40 4 A36 36 0 1 1 39.9 4 Z',
+  'M40 3 L49 27 L75 28 L54 44 L62 70 L40 55 L18 70 L26 44 L5 28 L31 27 Z'][a.sh||0];
+  return `<svg class="bdS" viewBox="0 0 80 80" style="width:${ACHV.bw}px;height:${ACHV.bw}px"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}"/><stop offset="1" stop-color="#1b2530"/></linearGradient></defs>
+    <path d="${S}" fill="url(#${id})" stroke="#e9d9a6" stroke-width="3" stroke-linejoin="round"/><path d="${S}" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="1" transform="translate(40 40) scale(.8) translate(-40 -40)"/>
+    <text x="40" y="${a.sh===3?50:51}" text-anchor="middle" font-size="${a.sh===3?24:30}">${a.ic}</text></svg>`;}
 function openAch(tab){ACHV.tab=tab||'ach';ACHV.sel=null;ACHV.pg=0;let el=$('#achp');if(!el){el=document.createElement('div');el.id='achp';el.setAttribute('role','dialog');el.setAttribute('aria-label','成就與好友');document.body.appendChild(el);el.addEventListener('click',e=>{if(e.target===el)el.remove();});}renderAch();}
 function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body='';
-  if(T==='ach'){const a=ACHM[ACHV.sel];
-    body=`<div class="agrid">${ACH.map(x=>`<button class="ab ${AS.got[x.id]?'got':''} ${ACHV.sel===x.id?'sel':''}" data-a="${x.id}"><i>${x.ic}</i><b>${x.n}</b></button>`).join('')}</div>
+  if(T==='ach'){const a=ACHM[ACHV.sel],per=achPer(),pages=Math.ceil(ACH.length/per);ACHV.pg=Math.max(0,Math.min(ACHV.pg,pages-1));
+    body=`<div class="bgrid" style="--cols:${ACHV.cols}">${ACH.slice(ACHV.pg*per,ACHV.pg*per+per).map(x=>{const [v,g]=achProg(x),got=!!AS.got[x.id];
+      return `<button class="bd ${got?'got':''} ${ACHV.sel===x.id?'sel':''}" data-a="${x.id}">${achBadge(x)}${got?'':`<i class="bdL">${SVG_LOCK}</i>`}<b>${x.n}</b><span class="bdP"><i><u style="width:${Math.round(v/g*100)}%"></u></i>${v}/${g}</span></button>`;}).join('')}</div>
+    <div class="adet">${a?`<b>${a.ic} ${a.n}</b><em>${AS.got[a.id]?'已解鎖 · '+new Date(AS.got[a.id]).toLocaleDateString('zh-TW'):'尚未解鎖 · 條件保密，繼續玩就會知道'}</em>`:'<span>點徽章看名稱與解鎖日期</span>'}</div>
+    <div class="bdots">${Array.from({length:pages},(_,k)=>`<button class="${k===ACHV.pg?'on':''}" data-dot="${k}" aria-label="第 ${k+1} 頁"></button>`).join('')}</div>`;
+    if(0)body=`<div class="agrid">${ACH.map(x=>`<button class="ab ${AS.got[x.id]?'got':''} ${ACHV.sel===x.id?'sel':''}" data-a="${x.id}"><i>${x.ic}</i><b>${x.n}</b></button>`).join('')}</div>
     <div class="adet">${a?`<b>${a.ic} ${a.n}</b><span>${a.d}${a.goal?`（${Math.min(AS.n[a.k]||0,a.goal)}/${a.goal}）`:''}</span><em>${AS.got[a.id]?'已解鎖 · '+new Date(AS.got[a.id]).toLocaleDateString('zh-TW'):'尚未解鎖'}</em>`:'<span>點一下成就看條件</span>'}</div>`;}
   else{const per=matchMedia('(orientation:landscape) and (max-height:500px)').matches?4:6,L=FR.list.slice().sort((a,b)=>b.ts-a.ts),pages=Math.max(1,Math.ceil(L.length/per));ACHV.pg=Math.min(ACHV.pg,pages-1);
     const rec=FR.recent.filter(r=>!isFriend(r.id)).slice(0,3);
@@ -4337,6 +4398,8 @@ function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body
   el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ACHV.tab=b.dataset.t;ACHV.sel=null;renderAch();});
   el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{ACHV.sel=b.dataset.a;renderAch();});
   el.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{ACHV.pg+=+b.dataset.pg;ACHV.sel=null;renderAch();});
+  el.querySelectorAll('[data-dot]').forEach(b=>b.onclick=()=>{ACHV.pg=+b.dataset.dot;ACHV.sel=null;renderAch();});
+  const gr=el.querySelector('.bgrid');if(gr){let x0=null;gr.addEventListener('pointerdown',e=>{x0=e.clientX;});gr.addEventListener('pointerup',e=>{if(x0==null)return;const dx=e.clientX-x0;x0=null;if(Math.abs(dx)>50){const pages=Math.ceil(ACH.length/achPer());const p=Math.max(0,Math.min(pages-1,ACHV.pg+(dx<0?1:-1)));if(p!==ACHV.pg){ACHV.pg=p;ACHV.sel=null;renderAch();}}});}
   el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const id=b.dataset.del;if(ACHV.sel!==id){ACHV.sel=id;renderAch();return;}frDel(id);ACHV.sel=null;renderAch();});
   el.querySelectorAll('[data-addr]').forEach(b=>b.onclick=()=>{const r=FR.recent.find(x=>x.id===b.dataset.addr);if(!b.classList.contains('arm')){b.classList.add('arm');b.querySelector('em').textContent='再點一下加 '+(r?r.name:'');return;}frAdd(r);renderAch();});}
 // ---- mirror to the signed-in player's private store ----
@@ -4433,7 +4496,7 @@ function playStartHooks(){if(G._psh)return;G._psh=true;
   const m=G.units.find(a=>a.op==='mozzie');if(m&&G.drones>0){G.drones--;m.ch=1;}
   const al=G.units.find(a=>a.op==='alibi'&&a.x>=0);if(al&&G.decoys){const ind=shuffle(allCells().filter(([x,y])=>setupIndoor(x,y)&&!unitAt(x,y)&&!G.decoys.some(k=>k.alive&&k.x===x&&k.y===y)));
     for(let i=0;i<2&&ind[i];i++)G.decoys.push({x:ind[i][0],y:ind[i][1],alive:true,owner:al.id});}}
-async function ignite(x,y){G.gadgets.push({type:'fire',x,y,side:'D',alive:true,life:2});SFX.boom();log(`${coord(x,y)} 一帶起火了`,'ks');
+async function ignite(x,y,by){G.gadgets.push({type:'fire',x,y,side:'D',alive:true,life:2});SFX.boom();log(`${coord(x,y)} 一帶起火了`,'ks');if(hostHarm(within(x,y,1),by||'D','火焰'))return;
   for(const a of G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,x,y)<=1)){a.burned=true;const r=die1('O');if(r)await damage(a,r,'火焰');}}
 var objRoom=(x,y)=>{if(!G._obj||G._obj.wv!==(G._wv||0)){const s=new Set();for(const [i,j] of allCells()){const c=cell(i,j);if(c.site)roomCells(i,j).forEach(k=>s.add(k));}
   if(G.hostage)roomCells(G.hostage.x,G.hostage.y).forEach(k=>s.add(k));G._obj={s,wv:G._wv||0};}return G._obj.s.has(y*G.W+x);};
@@ -4513,7 +4576,7 @@ var UG={
  twitch:(u,x,y,s)=>droneLike(u,x,y,async room=>{const R=new Set(room.map(([a,b])=>b*G.W+a));for(const d of alive('D'))if(R.has(d.y*G.W+d.x))locU(d);
    const el=G.gadgets.filter(g=>g.alive&&g.side==='D'&&['cam','jammer','ced','eye','kona','claw','magnet','banshee','grz'].includes(g.type)&&R.has(g.y*G.W+g.x));const r=die1('R');let n=0;
    for(const g of el.slice(0,r)){g.alive=false;n++;}log(`${nm(u)} 的電擊無人機擲出 ${r}，摧毀了 ${n} 個電子道具`,s);}),
- flores:(u,x,y,s)=>droneLike(u,x,y,async()=>{SFX.boom();const area=[[x,y],...adj4(x,y)];for(const [i,j] of area)await blastDestroy(i,j,2);
+ flores:(u,x,y,s)=>droneLike(u,x,y,async()=>{SFX.boom();const area=[[x,y],...adj4(x,y)];if(hostHarm(area,'A','Ratero 炸藥無人機'))return;for(const [i,j] of area)await blastDestroy(i,j,2);
    for(const a of G.units.filter(a=>a.alive&&a.x>=0&&area.some(([i,j])=>i===a.x&&j===a.y))){const r=die1('O');if(r)await damage(a,r,'Ratero');}
    const d=G.gadgets.find(g=>g.alive&&g.type==='drone'&&g.x===x&&g.y===y&&g.own==='flores');if(d)d.alive=false;log(`${nm(u)} 的 Ratero 無人機在 ${coord(x,y)} 引爆`,s);}),
  echo:(u,x,y,s)=>droneLike(u,x,y,async room=>{const R=new Set(room.map(([a,b])=>b*G.W+a));let n=0;for(const a of alive('A'))if(R.has(a.y*G.W+a.x)){locU(a);if(stunU(a))n++;}log(`${nm(u)} 的妖怪無人機震暈了 ${n} 名進攻方`,s);}),
@@ -4532,7 +4595,7 @@ var UG={
  ace:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;destroyCell(x,y);await blastDestroy(x,y,3);log(`${nm(u)} 的 S.E.L.M.A. 炸開了牆面`,s);},
  maverick:async(u,x,y,s)=>{destroyCell(x,y);log(`${nm(u)} 用噴槍燒穿了一面牆`,s);},
  oryx:async(u,x,y,s)=>{u.rnd=G.round;destroyCell(x,y);u.x=x;u.y=y;log(`${nm(u)} 撞穿牆面衝了進來`,s);},
- capitao:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;log(`${nm(u)} 射出燃燒箭`,s);await ignite(x,y);},
+ capitao:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;log(`${nm(u)} 射出燃燒箭`,s);await ignite(x,y,'A');},
  gridlock:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;G.gadgets.push({type:'trax',x,y,side:'A',alive:true});log(`${nm(u)} 在 ${coord(x,y)} 撒下 Trax 尖刺`,s);},
  zero:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;G.gadgets.push({type:'argus',x,y,side:'A',alive:true});log(`${nm(u)} 射出 Argus 攝影機`,s);},
  kali:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;SFX.boom();const R=new Set([...roomCells(x,y)].filter(k=>cheb(k%G.W,(k/G.W)|0,x,y)<=3));let n=0;
@@ -5602,7 +5665,7 @@ function cineClear(P,tc,near,pts){
     box.setFromObject(o);if(box.max.y<.12)continue;
     let hide=box.clone().expandByScalar(.3).containsPoint(P)||(box.distanceToPoint(P)<near&&fru.intersectsBox(box));
     for(const q of pts){if(hide)break;const d=q.clone().sub(P),L=d.length();ray.set(P,d.divideScalar(L));if(ray.intersectBox(box,hit)&&hit.distanceTo(P)<L-.3)hide=true;}
-    if(hide){o.visible=false;hid.push(o);}}
+    if(hide){const ms=[];o.traverse(m=>{if(m.material&&!m.userData.ghost){const a=m.material;m.material=(Array.isArray(a)?a:[a]).map(x=>{const c=x.clone();c.transparent=true;c.opacity=Math.min(c.opacity??1,.32);c.depthWrite=false;return c;});if(!Array.isArray(a))m.material=m.material[0];m.userData.ghost=a;ms.push(m);}});hid.push({o,ms});}}
 }
 // the shooter switches to a shouldered-rifle stance, facing the target
 function aimPose(sh,S,T){
@@ -5613,7 +5676,7 @@ function aimPose(sh,S,T){
   F.body.rotation.y=Math.atan2(T.x-S.x,T.z-S.z)-(POSE[pose].twist||0);f.body.visible=false;f.aimBody=F.body;
 }
 function shotCamEnd(){if(!R3||!R3.cineSave)return;const s=R3.cineSave;R3.cineSave=null;R3.cine=false;
-  (R3.cineHid||[]).forEach(o=>o.visible=true);R3.cineHid=[];
+  (R3.cineHid||[]).forEach(h=>{if(h.ms)h.ms.forEach(m=>{(Array.isArray(m.material)?m.material:[m.material]).forEach(x=>x.dispose());m.material=m.userData.ghost;delete m.userData.ghost;});else h.visible=true;});R3.cineHid=[];
   for(const k in R3.figs){const f=R3.figs[k];if(f.aimBody){f.grp.remove(f.aimBody);f.aimBody=null;f.body.visible=true;}}
   flyTo(s.p,s.t);}
 
@@ -5913,8 +5976,8 @@ function renderTitle(){
   const el=$('#tmenu');if(!el)return;{const tt=$('#title');if(tt)tt.dataset.s=SCREEN;}const B=(id,label,sub,cls)=>`<button id="${id}" class="tbtn ${cls||''}"><b>${label}</b>${sub?`<span>${sub}</span>`:''}</button>`;
   let h='';
   const ops=k=>cfg.picks[k].map(x=>`<img src="${opIcon(x)}" alt="${(OPC[x]||OPS[x]).name}" title="${(OPC[x]||OPS[x]).name}">`).join('');
-  if(SCREEN==='title')h=B('t-rank','排名戰','PVP RANK · 配對對手，累積段位','primary')+B('t-pve','對戰電腦','PVE · 選陣營、地圖與幹員')+B('t-pvp','自訂房間','建立或尋找房間')+B('t-tut','新手教學','第一次玩從這裡開始')+B('t-lib','規則與圖鑑',`規則全文與 ${OPBASE.length} 名幹員卡片`);
-  else if(SCREEN==='lib')h=`<h2 class="tsec">規則與圖鑑</h2>`+B('t-man','規則','本遊戲玩法與原版規則全文','primary')+B('t-ops','幹員圖鑑',`共 ${OPBASE.length} 名幹員`)+B('t-back','返回','',' ghost');
+  if(SCREEN==='title')h=B('t-rank','排名戰','PVP RANK · 配對對手，累積段位','primary')+B('t-pve','對戰電腦','PVE · 選陣營、地圖與幹員')+B('t-pvp','自訂房間','建立或尋找房間')+B('t-tut','新手教學','第一次玩從這裡開始')+B('t-lib','作戰檔案',`規則 · ${OPBASE.length} 名幹員圖鑑 · 成就`);
+  else if(SCREEN==='lib')h=`<h2 class="tsec">作戰檔案</h2>`+B('t-man','規則','本遊戲玩法與原版規則全文','primary')+B('t-ops','幹員圖鑑',`共 ${OPBASE.length} 名幹員`)+B('t-ach','成就',`已解鎖 ${achCount()}/${ACH.length}`)+B('t-back','返回','',' ghost');
   else if(SCREEN==='rank'){if(ME.mode!=='account')h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(null,40)}<div><b>排名戰需要登入帳號</b><br><span>登入後，段位與戰績會存在這個遊戲的共用資料裡。訪客可以玩其他所有模式。</span></div></div></div>`+B('t-login','登入帳號','啟用線上身分','primary')+B('t-back','返回','',' ghost');
     else{fillPicks('A');fillPicks('D');h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(ME.rating,44)}<div><span>你的段位</span><br><b>${ME.rating==null?'—':tierName(tierOf(ME.rating))}</b> <span>${ME.rating??''} 分 · ${ME.w} 勝 ${ME.l} 敗</span></div></div>
       <div class="sq"><em>進攻小隊</em>${ops('A')}<button data-edit="A">更換</button></div><div class="sq"><em>防守小隊</em>${ops('D')}<button data-edit="D">更換</button></div><span class="hint">陣營隨機分配，地圖配對後揭曉。勝利 +25 分，落敗 −20 分。</span></div>`+B('t-queue','開始配對','PVP RANK','primary')+B('t-back','返回','',' ghost');}}
@@ -5931,7 +5994,7 @@ function renderTitle(){
   const on=(id,fn)=>{const b=$('#'+id);if(b)b.onclick=e=>{if(b._sh)return;if(b.classList.contains('tbtn')){b._sh=1;shatter(b,e).then(()=>{b._sh=0;fn(e);});}else fn(e);};};
   on('t-pve',()=>{SCREEN='setup';WZ.step=0;WZ.seen=0;render();});on('t-pvp',()=>{SCREEN='pvp';NETMSG='';renderTitle();});on('t-rank',()=>{SCREEN='rank';NETMSG='';renderTitle();if(ME.mode==='account'&&ME.rating==null)acctLoad().then(()=>{renderPlayer();if(SCREEN==='rank')renderTitle();});});on('t-lib',()=>{SCREEN='lib';NETMSG='';renderTitle();});
   on('t-login',acctLogin);on('t-queue',rankQueue);on('t-qcancel',()=>{rankCancel();SCREEN='rank';renderTitle();});
-  el.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openOpSelect(b.dataset.edit,renderTitle));on('t-tut',startTutorial);on('t-man',()=>openManual());on('t-ops',()=>openOpSelect(cfg.side,null,true));
+  el.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openOpSelect(b.dataset.edit,renderTitle));on('t-tut',startTutorial);on('t-man',()=>openManual());on('t-ach',()=>openAch('ach'));on('t-ops',()=>openOpSelect(cfg.side,null,true));
   on('t-back',()=>{SCREEN='title';NETMSG='';renderTitle();});on('t-back2',()=>{SCREEN='pvp';NETMSG='';renderTitle();});on('t-back3',()=>{SCREEN='pvp';NETMSG='';renderTitle();});
   on('t-create',()=>{SCREEN='create';NETMSG='';renderTitle();});on('t-find',()=>{SCREEN='find';NETMSG='';if(NET)NET.list=null;renderTitle();netList();});
   on('t-go',netCreate);on('t-cancel',()=>{netLeave();SCREEN='pvp';renderTitle();});on('t-refresh',()=>{if(NET)NET.list=null;renderTitle();netList();});
@@ -6348,12 +6411,13 @@ function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;cons
   <section><h4>成就與好友</h4><div class="psrow"><button id="psAch">🏆 成就 ${achCount()}/${ACH.length}</button><button id="psFr">好友 ${FR.list.length} 人</button></div></section>
   <section><h4>登入資料</h4>${acct?`<p class="pshint">已啟用線上身分（綁定這台裝置的瀏覽器）。段位與戰績會存在遊戲伺服器上。</p><div class="psstat">${rankBadge(ME.rating,30)}<span><b>${ME.rating==null?'—':tierName(tierOf(ME.rating))}</b> ${ME.rating??''} 分 · ${ME.w} 勝 ${ME.l} 敗</span></div><div class="psrow"><button id="psLogout">改用訪客身分</button></div>`:
     `<p class="pshint">目前是訪客，可以玩對戰電腦、自訂房間和教學。排名戰需要登入帳號，段位才能保存。</p><div class="pslogin"><button class="primary" id="psLogin"><span class="lgico">C</span>啟用線上身分</button><button disabled title="Google 登入目前還沒開放"><span class="lgico g">G</span>Google 登入（此頁面不支援）</button><button class="on" disabled><span class="lgico">訪</span>訪客（目前）</button></div>`}${PMSG?`<p class="terr">${PMSG}</p>`:''}</section>
-  <section><h4>設定</h4><div class="psrow"><span>語言</span>${langSelect('psLang')}</div><div class="psrow"><span>射擊特寫</span><button id="psCine">${CINE.on?'開':'關'}</button></div></section></div>`;
+  <section><h4>設定</h4><div class="psrow"><span>語言</span>${langSelect('psLang')}</div><div class="psrow pstg"><span>射擊特寫</span><button id="psCine">${CINE.on?'開':'關'}</button><span>音樂</span><button id="psMus">${SFX.mOn?'開':'關'}</button><span>音效</span><button id="psSfx">${SFX.on?'開':'關'}</button></div></section></div>`;
   $('#psClose').onclick=closeSettings;
   $('#psNickOk').onclick=()=>{ME.nick=$('#psNick').value.trim().slice(0,16);saveMe();renderPlayer();renderSettings();};
   el.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{if(b.dataset.av==='__photo')ME.usePhoto=true;else{ME.usePhoto=false;ME.avatar=b.dataset.av;}saveMe();renderPlayer();renderSettings();});
   const li=$('#psLogin');if(li)li.onclick=acctLogin;const lo=$('#psLogout');if(lo)lo.onclick=acctLogout;
   bindLang('psLang');$('#psAch').onclick=()=>{closeSettings();openAch('ach');};$('#psFr').onclick=()=>{closeSettings();openAch('fr');};
+  $('#psMus').onclick=()=>{SFX.toggleMusic();try{musicLevel();}catch(e){}renderSettings();};$('#psSfx').onclick=()=>{$('#sndBtn').click();renderSettings();};
   $('#psCine').onclick=()=>{CINE.on=!CINE.on;const v=$('#view-cine');if(v)v.textContent='射擊特寫：'+(CINE.on?{tp:'肩後',fp:'第一人稱'}[CINE.mode]:'關');renderSettings();};
 }
 // ---------- language: the interface text is swapped in place; rules and card texts stay in Chinese ----------
@@ -6370,7 +6434,7 @@ const I18N={
 '對戰電腦':['Versus AI','AI対戦'],'PVE · 選陣營、地圖與幹員':['PVE · Pick side, map and operators','PVE · 陣営・マップ・オペレーターを選択'],
 '自訂房間':['Custom Room','カスタムルーム'],'建立或尋找房間':['Create or find a room','ルームを作成・検索'],
 '新手教學':['Tutorial','チュートリアル'],'第一次玩從這裡開始':['Start here if you are new','初めての方はここから'],
-'規則與圖鑑':['Rules & Operators','ルールと図鑑'],'規則':['Rules','ルール'],'幹員圖鑑':['Operator Index','オペレーター図鑑'],'本遊戲玩法與原版規則全文':['How this game plays, plus the full original rules','本ゲームの遊び方と原作ルール全文'],
+'規則與圖鑑':['Rules & Operators','ルールと図鑑'],'作戰檔案':['Field Files','作戦ファイル'],'規則':['Rules','ルール'],'幹員圖鑑':['Operator Index','オペレーター図鑑'],'本遊戲玩法與原版規則全文':['How this game plays, plus the full original rules','本ゲームの遊び方と原作ルール全文'],
 '返回':['Back','戻る'],'建立房間':['Create Room','ルーム作成'],'尋找房間':['Find Room','ルーム検索'],'加入其他人開的房間':['Join a room someone opened','他の人のルームに参加'],
 '你當房主，選陣營；地圖配對後隨機揭曉':['You host and pick a side; the map is revealed after matching','ホストとして陣営を選択。マップはマッチ後に公開'],
 '你的陣營':['Your side','あなたの陣営'],'地圖':['Map','マップ'],'幹員':['Operators','オペレーター'],'隨機抽選，配對成功後揭曉。':['Drawn at random and revealed once matched.','ランダムに抽選、マッチ成立後に公開。'],
@@ -6523,10 +6587,10 @@ $('#manualBtn').onclick=()=>openManual();
 {const sb=$('#sndBtn'),f=()=>{sb.textContent=SFX.on?'🔊':'🔇';sb.title=SFX.on?'關閉音效':'開啟音效';};f();sb.onclick=()=>{SFX.toggle();f();try{musicLevel();}catch(e){}};}
 {const hb=$('#homeBtn');hb.innerHTML=SVGI.more;hb.setAttribute('aria-label','選單');hb.title='選單';}
 function hMenu(){let m=$('#hmenu');if(m){m.remove();return;}m=document.createElement('div');m.id='hmenu';
-  m.innerHTML=`<button data-k="snd">${SFX.on?'🔊 音效：開':'🔇 音效：關'}</button><button data-k="set">⚙ 設定</button><button data-k="ach">🏆 成就</button><button data-k="home">⏏ 離開對戰</button>`;document.body.appendChild(m);
+  m.innerHTML=`<button data-k="mus">${SFX.mOn?'🎵 音樂：開':'🎵 音樂：關'}</button><button data-k="snd">${SFX.on?'🔊 音效：開':'🔇 音效：關'}</button><button data-k="set">⚙ 設定</button><button data-k="ach">🏆 成就</button><button data-k="home">⏏ 離開對戰</button>`;document.body.appendChild(m);
   const r=$('#homeBtn').getBoundingClientRect();m.style.top=Math.round(r.bottom+6)+'px';m.style.right=Math.round(innerWidth-r.right)+'px';
   m.onclick=e=>{const k=e.target.closest('button')&&e.target.closest('button').dataset.k;if(!k)return;m.remove();
-    if(k==='snd')$('#sndBtn').click();else if(k==='set')openSettings();else if(k==='ach')openAch();else homeGo();};
+    if(k==='mus'){SFX.toggleMusic();try{musicLevel();}catch(e){}}else if(k==='snd')$('#sndBtn').click();else if(k==='set')openSettings();else if(k==='ach')openAch();else homeGo();};
   setTimeout(()=>addEventListener('pointerdown',function f(e){if(!m.contains(e.target)&&e.target.closest('#homeBtn')==null){m.remove();removeEventListener('pointerdown',f,true);}},true),0);}
 $('#homeBtn').onclick=()=>{if(!G){goTitle();return;}hMenu();};
 function homeGo(){if(!G){goTitle();return;}if(G.over||confirm(G.net?'離開連線對戰？對手會留在房間裡。':'離開這場對戰，回到主畫面？'))goTitle();};
