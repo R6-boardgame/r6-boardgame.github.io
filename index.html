@@ -58,15 +58,15 @@ async function readRetained(pat,ms){const c=await main(),R=router(c),out=new Map
     const fin=()=>{off();res(out);};t=setTimeout(fin,ms||1500);});}
 const dbT=p=>PFX+'db/'+p;
 function docRef(path){return{
-  async get(){const m=await readRetained(dbT(path),1500);return snap(m.get(dbT(path))||null);},
+  async get(){const m=await readRetained(dbT(path),4000);return snap(m.get(dbT(path))||null);},
   async set(data){await pub(await main(),dbT(path),data);},
-  async update(data){const cur=(await readRetained(dbT(path),1200)).get(dbT(path));if(!cur)throw {code:'not_found'};await pub(await main(),dbT(path),Object.assign({},cur,data));},
+  async update(data){const cur=(await readRetained(dbT(path),4000)).get(dbT(path));if(!cur)throw {code:'not_found'};await pub(await main(),dbT(path),Object.assign({},cur,data));},
   async delete(){await pub(await main(),dbT(path),null);},
   onSnapshot(cb,err){let off=null,dead=false;main().then(c=>{if(dead)return;off=router(c).on(dbT(path),(t,s)=>{cb(snap(parse(s)));});}).catch(e=>err&&err(e));
     return ()=>{dead=true;if(off)off();};}};}
 function query(coll,filters,lim){return{
   where(f,op,v){return query(coll,[...filters,[f,op,v]],lim);},orderBy(){return this;},limit(n){return query(coll,filters,n);},
-  async get(){const m=await readRetained(dbT(coll)+'/+',1800);let docs=[...m.entries()].map(([t,d])=>({id:t.slice(dbT(coll).length+1),d}));
+  async get(){const m=await readRetained(dbT(coll)+'/+',3000);let docs=[...m.entries()].map(([t,d])=>({id:t.slice(dbT(coll).length+1),d}));
     docs=docs.filter(x=>filters.every(([f,op,v])=>op==='=='?x.d[f]===v:true));if(lim)docs=docs.slice(0,lim);
     return {docs:docs.map(x=>({id:x.id,exists:true,data:()=>x.d}))};}};}
 const db={doc:docRef,collection:c=>Object.assign(query(c,[],0),{doc:id=>docRef(c+'/'+id)})};
@@ -1474,6 +1474,67 @@ html body:has(.panel.open) #actsR{display:none}
 #gHint b{font-size:14px;color:#ffd36b}
 #gHint span{font-size:12px;line-height:1.3;color:#cfd8e0}
 @media (orientation:portrait) and (max-width:700px){#gHint{max-width:calc(100vw - 150px);left:calc(50% - 30px)}}
+.tqueue .qnote{font-size:11.5px;opacity:.7;max-width:280px;text-align:center;line-height:1.4}
+/* v45 renown / tasks / unlocks / mastery */
+.rni{width:1.15em;height:1.15em;object-fit:contain;vertical-align:-.2em;margin-right:3px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+.ptag{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#ffd84a}
+.ptag b{font-family:var(--mono);color:#ffd84a}
+.ptag em{font-style:normal;color:#cfe3ef;font-size:11px;padding:1px 6px;border:1px solid rgba(160,200,230,.35);white-space:nowrap}
+.ptask{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 10px;background:linear-gradient(180deg,rgba(60,42,8,.88),rgba(8,11,14,.7));border:1px solid rgba(240,180,60,.5);color:#ffd36b;cursor:pointer;clip-path:var(--cham);font:800 12px/1 inherit}
+.ptask i{font-style:normal;font-size:18px}
+.ptask em{position:absolute;top:2px;right:3px;min-width:16px;height:16px;border-radius:8px;background:#e5483b;color:#fff;font:800 10.5px/16px var(--mono);font-style:normal;text-align:center;padding:0 3px}
+.tkBal{display:flex;align-items:center;gap:6px;font-size:13px;color:#cfd8e0;margin:-2px 0 4px}
+.tkBal b{font:800 20px var(--mono);color:#ffd84a}
+.tkBal .rni{width:24px;height:24px}
+.tkWrap{display:flex;flex-direction:column;gap:6px}
+.tkSec h4{margin:0 0 3px;font-size:13px;color:#fff;letter-spacing:.08em;display:flex;align-items:baseline;gap:8px}
+.tkSec h4 small{font-size:10.5px;color:#9fb0bd;letter-spacing:0;font-weight:400}
+.tk{display:grid;grid-template-columns:1fr 64px 48px 62px;align-items:center;gap:8px;width:100%;min-height:30px;padding:4px 8px;margin:0 0 3px;background:rgba(10,15,20,.72);border:1px solid rgba(255,255,255,.12);color:#dbe4ea;font:inherit;font-size:12.5px;text-align:left;cursor:default}
+.tk .tkT{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tkBar{display:block;height:5px;background:rgba(255,255,255,.12);overflow:hidden}
+.tkBar i{display:block;height:100%;background:linear-gradient(90deg,#d99a1c,#ffd84a)}
+.tk .tkN{font:700 11.5px var(--mono);text-align:center;color:#9fb0bd}
+.tk .tkR{font:700 12px var(--mono);color:#ffd84a;text-align:right;white-space:nowrap}
+.tk.done{border-color:#ffd84a;box-shadow:0 0 12px rgba(255,200,60,.3);cursor:pointer}
+.tk.done .tkN{color:#111;background:#ffd84a;padding:2px 0;font-weight:800}
+.tk.got{opacity:.5}.tk.got .tkN{color:#7fd08a}
+.tkFoot{margin:2px 0 0;font-size:10.5px;color:#93a3af;line-height:1.4}
+
+.wzOt.lk img{filter:grayscale(1) brightness(.55)}
+.wzOt .lkp{position:absolute;left:50%;top:2px;transform:translateX(-50%);font:800 10px var(--mono);font-style:normal;color:#ffd84a;background:rgba(0,0,0,.75);padding:1px 4px;white-space:nowrap;display:flex;align-items:center}
+.wzOt{position:relative}
+.osT{position:relative}.osT.lk img{filter:grayscale(1) brightness(.5)}
+.osT .lki{position:absolute;right:2px;bottom:2px;font-style:normal;font-size:12px}
+.osEco{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0}
+.osEco #osBuy{display:flex;align-items:center;gap:2px;padding:6px 12px;font-weight:800}
+.osMx{display:grid;grid-template-columns:auto 90px;gap:2px 8px;align-items:center;font-size:12px;color:#dbe4ea}
+.osMx small{grid-column:1/-1;font-size:10.5px;color:#9fb0bd}
+.buyDlg{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55)}
+.buyDlg[hidden]{display:none}
+.bdBox{display:flex;flex-direction:column;align-items:center;gap:8px;width:min(320px,88vw);padding:18px;background:#0e151c;border:1px solid rgba(255,216,74,.45);box-shadow:0 10px 40px #000;color:#e6edf2;text-align:center}
+.bdIc{width:72px;height:72px}
+.bdBox>b{font-size:18px}
+.bdP{font:800 22px var(--mono);color:#ffd84a;display:flex;align-items:center}
+.bdH{font-size:12.5px;color:#a9b8c4;line-height:1.5}
+.bdRow{display:flex;gap:10px;margin-top:4px}.bdRow button{min-width:96px;padding:8px 12px}
+.ecoRes{display:flex;flex-direction:column;align-items:center;gap:3px;margin:6px 0 10px;font-size:13px;color:#dbe4ea}
+.ecoRes .ecoE{font:800 22px var(--mono);color:#ffd84a;display:flex;align-items:center}
+.ecoRes i{font-style:normal;color:#ffd84a;font-family:var(--mono)}
+.psrow.wrap{flex-wrap:wrap}
+.ttl{font-size:12px;padding:5px 9px}.ttl.on{border-color:var(--accent);color:var(--accent)}
+.pav,.avb img{object-position:50% 12%}
+#title[data-s="task"]{grid-template-columns:1fr!important;align-content:center!important}
+#title[data-s="task"] .tlogo{display:none}
+#title[data-s="task"] #tmenu{width:min(880px,100%);max-width:none!important;justify-self:center;margin-top:64px;padding:12px 14px;background:rgba(6,9,12,.86);border:1px solid rgba(255,255,255,.1);box-shadow:0 10px 40px rgba(0,0,0,.6)}
+@media (orientation:landscape){.tkWrap{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
+@media (orientation:landscape) and (max-height:520px){#title[data-s="task"]{padding-top:8px!important;padding-bottom:8px!important}
+ #title[data-s="task"] #tmenu{margin-top:56px;padding:8px 12px;gap:4px!important}#title[data-s="task"] .tsec{display:none}
+ .tk{min-height:27px;padding:2px 8px;margin-bottom:2px;grid-template-columns:1fr 48px 44px 56px;gap:6px}
+ #title[data-s="task"] .tbtn{min-height:44px!important;padding-top:4px!important;padding-bottom:4px!important}#title[data-s="task"] .tbtn b{font-size:18px}
+ #title[data-s="title"] #tmenu{gap:4px!important}#title[data-s="title"] .tbtn{min-height:58px!important;padding-top:5px!important;padding-bottom:5px!important}#title[data-s="title"] .tbtn b{font-size:20px}}
+.anEco{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;justify-content:center;padding:6px 10px;font-size:12px;color:#dbe4ea;border-top:1px solid rgba(255,216,74,.2)}
+.anEco>b{display:flex;align-items:center;font:800 17px var(--mono);color:#ffd84a}
+.anEco i{font-style:normal;color:#ffd84a;font-family:var(--mono)}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -3565,7 +3626,7 @@ function showAnalysis(w,why){if(!G||!G.over||G.tut)return;let o=$('#anal');if(o)
     <div class="anMid"><b>對戰比較</b>${cmp('擊殺',TA.k,TD.k)}${cmp('總傷害',TA.dmg,TD.dmg)}${cmp('命中率',pct(TA.hits,TA.shots),pct(TD.hits,TD.shots))}${cmp('存活',TA.alive+'/'+TA.n,TD.alive+'/'+TD.n)}</div>
     <table class="anT d">${anCap('D')}${head}${rows('D')}</table></div>
     <div class="anFoot"><div class="anS a"><small>進攻方總傷害</small><b>${TA.dmg}</b></div><div class="anS mid"><small>本場 MVP</small><b>${mvp?OPS[mvp.op].name:'–'}</b></div><div class="anS d"><small>防守方總傷害</small><b>${TD.dmg}</b></div></div>
-    ${(G._newAch||[]).length?`<div class="anAch"><b>本場解鎖</b>${G._newAch.map(id=>{const a=ACHM[id];return `<span>${a.ic} ${a.n}</span>`;}).join('')}</div>`:''}<div class="anBtns">${!G.net?'<button id="anAgain">再來一局</button>':''}<button class="primary" id="anHome">結束任務・回大廳</button></div></div>`;
+    ${G._eco&&G._eco.lines.length?`<div class="anEco"><b>${RNI}+${fmtN(G._eco.earn)}</b>${G._eco.lines.map(([t,v])=>`<span>${esc(t)}${v?` <i>+${fmtN(v)}</i>`:''}</span>`).join('')}</div>`:''}${(G._newAch||[]).length?`<div class="anAch"><b>本場解鎖</b>${G._newAch.map(id=>{const a=ACHM[id];return `<span>${a.ic} ${a.n}</span>`;}).join('')}</div>`:''}<div class="anBtns">${!G.net?'<button id="anAgain">再來一局</button>':''}<button class="primary" id="anHome">結束任務・回大廳</button></div></div>`;
   document.body.appendChild(o);const rk=$('#rkres');if(rk)o.querySelector('.anTop').appendChild(rk);
   $('#anHome').onclick=()=>{o.remove();$('#banner').hidden=true;goTitle();};
   o.querySelectorAll('.anFr').forEach(b=>b.onclick=()=>frTap(b));
@@ -3650,7 +3711,7 @@ function chargePlant3D(u,x,y,ms){return new Promise(res=>{if(!R3||!R3.fxG||docum
   const t0=performance.now(),fin=()=>{if(done)return;done=true;R3.fxG.remove(g);pl.geometry.dispose();pl.material.dispose();tex.dispose();res();};setTimeout(fin,ms+120);
   R3.fx2.push(()=>{age=(performance.now()-t0)/1000;pl.scale.setScalar(Math.min(1,.2+age*5));led.visible=Math.sin(age*(10+age*30))>0;if(age*1000>=ms)fin();return !done;});
   try{SFX.tick();setTimeout(()=>SFX.tick(),ms*.45);setTimeout(()=>SFX.alert(),ms*.8);}catch(e){}});}
-function destroyCell(x,y){try{const t0=cell(x,y).t;if(['soft','reinf','bar','hard'].includes(t0))wallBlast3D(x,y,t0);}catch(e){}G._wv=(G._wv||0)+1;G.gadgets.forEach(g=>{if(g.type==='mirror'&&g.x===x&&g.y===y)g.alive=false;});SFX.boom();const c=cell(x,y);if(c.t!=='bar')c.breach=true;if(c.t==='bar')c.wasBar=true;c.t='floor';c.rubble=c.breach;c.opened=true;c.elec=false;c.indoor=true;if(c.pair&&!c.breach){const q=cell(c.pair[0],c.pair[1]);if(q&&q.t==='bar')destroyCell(c.pair[0],c.pair[1]);}
+function destroyCell(x,y){try{const t0=cell(x,y).t;if(['soft','reinf','bar','hard'].includes(t0)){wallBlast3D(x,y,t0);if(G&&!G.over&&curSide()===G.player)G._wb=(G._wb||0)+1;}}catch(e){}G._wv=(G._wv||0)+1;G.gadgets.forEach(g=>{if(g.type==='mirror'&&g.x===x&&g.y===y)g.alive=false;});SFX.boom();const c=cell(x,y);if(c.t!=='bar')c.breach=true;if(c.t==='bar')c.wasBar=true;c.t='floor';c.rubble=c.breach;c.opened=true;c.elec=false;c.indoor=true;if(c.pair&&!c.breach){const q=cell(c.pair[0],c.pair[1]);if(q&&q.t==='bar')destroyCell(c.pair[0],c.pair[1]);}
   const tr=gadgetAt(x,y,'trap'); /* trap stays in doorway */ void tr;}
 
 function shootables(u){
@@ -6193,15 +6254,15 @@ function showMenu(){goTitle();}
 let SCREEN='title',NET=null,NETMSG='';
 function goTitle(){{const a=$('#anal');if(a)a.remove();}if(NET)netLeave();G=null;SCREEN='title';$('#banner').hidden=true;if(R3){R3.sig='';}render();}
 function renderTitle(){
-  const el=$('#tmenu');if(!el)return;{const tt=$('#title');if(tt)tt.dataset.s=SCREEN;}const B=(id,label,sub,cls)=>`<button id="${id}" class="tbtn ${cls||''}"><b>${label}</b>${sub?`<span>${sub}</span>`:''}</button>`;
-  let h='';
+  const el=$('#tmenu');if(!el)return;if(SCREEN==='rank')SCREEN='title';{const tt=$('#title');if(tt)tt.dataset.s=SCREEN;}const B=(id,label,sub,cls)=>`<button id="${id}" class="tbtn ${cls||''}"><b>${label}</b>${sub?`<span>${sub}</span>`:''}</button>`;
+  let h='';if(SCREEN==='task')h=taskHTML()+B('t-back','返回','',' ghost');
   const ops=k=>cfg.picks[k].map(x=>`<img src="${opIcon(x)}" alt="${(OPC[x]||OPS[x]).name}" title="${(OPC[x]||OPS[x]).name}">`).join('');
-  if(SCREEN==='title')h=B('t-rank','排名戰','PVP RANK · 配對對手，累積段位','primary')+B('t-pve','對戰電腦','PVE · 選陣營、地圖與幹員')+B('t-pvp','自訂房間','建立或尋找房間')+B('t-tut','新手教學','第一次玩從這裡開始')+B('t-lib','作戰檔案',`規則 · ${OPBASE.length} 名幹員圖鑑 · 成就`);
+  if(SCREEN==='title')h=B('t-rank','線上對戰','PVP · 自動配對對手','primary')+B('t-pve','對戰電腦','PVE · 選陣營、地圖與幹員')+B('t-pvp','自訂房間','建立或尋找房間')+B('t-tut','新手教學','第一次玩從這裡開始')+B('t-lib','作戰檔案',`規則 · ${OPBASE.length} 名幹員圖鑑 · 成就`);
   else if(SCREEN==='lib')h=`<h2 class="tsec">作戰檔案</h2>`+B('t-man','規則','本遊戲玩法與原版規則全文','primary')+B('t-ops','幹員圖鑑',`共 ${OPBASE.length} 名幹員`)+B('t-ach','成就',`已解鎖 ${achCount()}/${ACH.length}`)+B('t-back','返回','',' ghost');
   else if(SCREEN==='rank'){if(ME.mode!=='account')h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(null,40)}<div><b>排名戰需要登入帳號</b><br><span>登入後，段位與戰績會存在這個遊戲的共用資料裡。訪客可以玩其他所有模式。</span></div></div></div>`+B('t-login','登入帳號','啟用線上身分','primary')+B('t-back','返回','',' ghost');
     else{fillPicks('A');fillPicks('D');h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(ME.rating,44)}<div><span>你的段位</span><br><b>${ME.rating==null?'—':tierName(tierOf(ME.rating))}</b> <span>${ME.rating??''} 分 · ${ME.w} 勝 ${ME.l} 敗</span></div></div>
       <div class="sq"><em>進攻小隊</em>${ops('A')}<button data-edit="A">更換</button></div><div class="sq"><em>防守小隊</em>${ops('D')}<button data-edit="D">更換</button></div><span class="hint">陣營隨機分配，地圖配對後揭曉。勝利 +25 分，落敗 −20 分。</span></div>`+B('t-queue','開始配對','PVP RANK','primary')+B('t-back','返回','',' ghost');}}
-  else if(SCREEN==='queue')h=`<h2 class="tsec">排名戰</h2><div class="tqueue"><div class="ring"></div><span>搜尋對手中</span><b id="qclock">${fmtClock(Date.now()-RQ.t0)}</b><span>排隊中的玩家 <b id="qcount" style="font-size:14px">1</b></span><span>找到對手後會自動進入對戰。</span></div>`+B('t-qcancel','取消配對','',' ghost');
+  else if(SCREEN==='queue')h=`<h2 class="tsec">線上對戰</h2><div class="tqueue"><div class="ring"></div><span>搜尋對手中</span><b id="qclock">${fmtClock(Date.now()-RQ.t0)}</b><span>排隊中的玩家 <b id="qcount" style="font-size:14px">1</b></span><span>找到對手後會自動進入對戰。</span><span class="qnote">需要另一位玩家同時排隊；同一個帳號或同一個瀏覽器不會跟自己配對。</span></div>`+B('t-qcancel','取消配對','',' ghost');
   else if(SCREEN==='pvp')h=`<h2 class="tsec">自訂房間</h2>`+B('t-create','建立房間','你當房主，選陣營；地圖配對後隨機揭曉','primary')+B('t-find','尋找房間','加入其他人開的房間')+B('t-back','返回','',' ghost');
   else if(SCREEN==='create'){const s=cfg.side;fillPicks(s);h=`<h2 class="tsec">建立房間</h2><div class="tpick"><span>你的陣營</span><div class="row">${['A','D'].map(k=>`<button data-cs="${k}" class="${s===k?'on':''}"><b class="${k==='A'?'a':'d'}">${k==='A'?'進攻方':'防守方'}</b></button>`).join('')}</div>
     <span>地圖</span><p class="tnote">隨機抽選，配對成功後揭曉。</p>
@@ -6212,8 +6273,8 @@ function renderTitle(){
   if(NETMSG)h+=`<p class="terr">${NETMSG}</p>`;
   el.innerHTML=h;
   const on=(id,fn)=>{const b=$('#'+id);if(b)b.onclick=e=>{if(b._sh)return;if(b.classList.contains('tbtn')){b._sh=1;shatter(b,e).then(()=>{b._sh=0;fn(e);});}else fn(e);};};
-  on('t-pve',()=>{SCREEN='setup';WZ.step=0;WZ.seen=0;render();});on('t-pvp',()=>{SCREEN='pvp';NETMSG='';renderTitle();});on('t-rank',()=>{SCREEN='rank';NETMSG='';renderTitle();if(ME.mode==='account'&&ME.rating==null)acctLoad().then(()=>{renderPlayer();if(SCREEN==='rank')renderTitle();});});on('t-lib',()=>{SCREEN='lib';NETMSG='';renderTitle();});
-  on('t-login',acctLogin);on('t-queue',rankQueue);on('t-qcancel',()=>{rankCancel();SCREEN='rank';renderTitle();});
+  on('t-pve',()=>{['A','D'].forEach(s=>{cfg.picks[s]=cfg.picks[s].filter(owned);});SCREEN='setup';WZ.step=0;WZ.seen=0;render();});on('t-pvp',()=>{SCREEN='pvp';NETMSG='';renderTitle();});on('t-rank',()=>{NETMSG='';rankQueue();});on('t-lib',()=>{SCREEN='lib';NETMSG='';renderTitle();});
+  on('t-login',acctLogin);on('t-queue',rankQueue);on('t-qcancel',()=>{rankCancel();SCREEN='title';renderTitle();});if(SCREEN==='task')bindTask();
   el.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openOpSelect(b.dataset.edit,renderTitle));on('t-tut',startTutorial);on('t-man',()=>openManual());on('t-ach',()=>openAch('ach'));on('t-ops',()=>openOpSelect(cfg.side,null,true));
   on('t-back',()=>{SCREEN='title';NETMSG='';renderTitle();});on('t-back2',()=>{SCREEN='pvp';NETMSG='';renderTitle();});on('t-back3',()=>{SCREEN='pvp';NETMSG='';renderTitle();});
   on('t-create',()=>{SCREEN='create';NETMSG='';renderTitle();});on('t-find',()=>{SCREEN='find';NETMSG='';if(NET)NET.list=null;renderTitle();netList();});
@@ -6272,7 +6333,7 @@ function netOnGame(d){
   if(NET.role==='host'&&!NET.started&&d.guest&&!d.state){NET.started=true;netStartGame(d.guestPicks);return;}
   if(d.state&&d.seq>NET.seq&&d.by!==NET.me)netApply(d);
 }
-function netStartGame(guestPicks){if(RQ.q)rankLeaveQueue();
+function netStartGame(guestPicks){if(RQ.q)rankLeaveQueue();SCREEN='game';
   const ks=Object.keys(MAPS);NET.map=ks[Math.floor(Math.random()*ks.length)];const m=MAPS[NET.map];cfg.map=NET.map;showMapReveal(NET.map,NET.side);
   G={map:m,grid:parseMap(m),W:m.rows[0].length,H:m.rows.length,units:[],gadgets:[],reinf:0,round:1,maxRounds:6,phaseIdx:0,phase:'setup',acts:0,active:null,sel:null,mode:'move',defuser:null,over:false,busy:false,ai:false,log:[],moves:[],cur:null,hl:null,player:NET.side,aiSite:'A',fx:null,spawn:null,net:true};
   const mine=cfg.picks[NET.side].slice(),theirs=(guestPicks&&guestPicks.length===5)?guestPicks:cfg.picks[NET.side==='A'?'D':'A'].slice();
@@ -6311,7 +6372,7 @@ function netPush(){
 }
 function netApply(d){
   NET.applying=true;NET.seq=d.seq;const was=G&&G.over;
-  G=netDes(d.state);G.player=NET.side;G.busy=false;G.ai=false;G.mode='move';
+  G=netDes(d.state);(G.units||[]).forEach(u=>{try{if(!OPS[u.op])ensureOp(u.op);}catch(e){}});G.player=NET.side;G.busy=false;G.ai=false;G.mode='move';
   if(curSide()===G.player&&!G.over){if(G.sel&&(G.sel.side!==G.player||!G.sel.alive))G.sel=null;}else if(!G.over)G.sel=null;
   if(SCREEN!=='game'){if(RQ.q)rankLeaveQueue();SCREEN='game';showMapReveal(Object.keys(MAPS).find(k=>MAPS[k]===G.map),NET.side);if(R3){R3.sig='';setTimeout(()=>G&&G.phase==='setup'?setView('top'):playCam(),50);}}
   if(G.over&&!was){G.over=false;finish(G.win,G.why);}else render();
@@ -6485,7 +6546,7 @@ const mapThumb=(()=>{const c={};return k=>{if(c[k])return c[k];const m=MAPS[k],H
   return c[k]=cv.toDataURL();};})();
 const WZSTEPS=[
   {t:'陣營',ok:()=>true},{t:'任務',ok:()=>true},{t:'地圖',ok:()=>true},
-  {t:'幹員',ok:()=>cfg.picks[cfg.side].length===5,why:'請選滿 5 名幹員'},
+  {t:'幹員',ok:()=>cfg.picks[cfg.side].length===5&&cfg.picks[cfg.side].every(owned),why:'請選滿 5 名已解鎖的幹員'},
   {t:'裝備',ok:()=>true},{t:'計時',ok:()=>true},{t:'確認',ok:()=>true}];
 function wzOpDetail(c){const vars=OPCARDS.filter(v=>v.base===c.base);
   return `${opArt(c.id)?`<img class="art" src="${opArt(c.id)}" alt="">`:''}<div class="wzOdIn"><div class="nm"><img src="${opIcon(c.id)}" alt=""><b>${c.name}</b></div>
@@ -6510,7 +6571,7 @@ function wzStepHTML(){const s=cfg.side,st=WZ.step;
     return `<div class="wzOpHead"><div><h3 class="wzQ">組成你的小隊</h3><p class="wzHint">點頭像加入小隊，再點一次移出。滑鼠移過去可以看能力。</p></div>
     <div class="wzSlots" aria-label="小隊 ${p.length}/5">${[0,1,2,3,4].map(i=>p[i]&&OPC[p[i]]?`<button class="wzS on ${WZ.peekSlot===p[i]?'peek':''}" data-wz-un="${i}" title="移出 ${OPC[p[i]].name}"><img src="${opIcon(p[i])}" alt="${OPC[p[i]].name}"></button>`:'<span class="wzS"></span>').join('')}</div></div>
     <div class="wzOps"><div class="wzOg">${OPBASE.filter(b=>OPC[b].side===s).map(b=>{const i=pickOf(b);
-      return `<button class="wzOt ${i>=0?'on':''} ${cur&&cur.base===b?'cur':''} ${WZ.peek===b?'peek':''} ${opPlayable(b)?'':'na'}" data-wz-op="${b}" aria-pressed="${i>=0}" ${opPlayable(b)?'':'aria-disabled="true"'} title="${OPC[b].name}${opPlayable(b)?'':'（尚未實作，暫時不能選）'}"><img src="${opIcon(b)}" alt=""><span>${OPC[b].name}</span>${i>=0?`<i>${i+1}</i>`:''}</button>`;}).join('')}</div>
+      return `<button class="wzOt ${i>=0?'on':''} ${cur&&cur.base===b?'cur':''} ${WZ.peek===b?'peek':''} ${opPlayable(b)?'':'na'}${owned(b)?'':' lk'}" data-wz-op="${b}" aria-pressed="${i>=0}" ${opPlayable(b)?'':'aria-disabled="true"'} title="${OPC[b].name}${opPlayable(b)?'':'（尚未實作，暫時不能選）'}"><img src="${opIcon(b)}" alt=""><span>${OPC[b].name}</span>${i>=0?`<i>${i+1}</i>`:''}${owned(b)?'':`<em class="lkp">${RNI}12K</em>`}</button>`;}).join('')}</div>
       <div class="wzOd" id="wzOd">${cur?wzOpDetail(cur):''}</div></div>
     <div class="wzRow"><button id="wzRand">隨機補滿</button>${p.length?'<button id="wzClear">清空</button>':''}</div>`;}
   case 4:{const inv=cfg.inv[s],used=invUsed(s),cap=INV_CAP[s];return `<h3 class="wzQ">分配戰術裝備</h3><p class="wzHint">全隊共用 ${cap} 個方塊，任何幹員都能用。${s==='A'?'另外固定有 3 架無人機。':'任務另給 3 捲鐵絲網，地圖上也有固定攝影機。'}</p>
@@ -6552,11 +6613,11 @@ function renderWiz(){let el=$('#wiz');const keep=[...(el?el.querySelectorAll('.w
   {const p=cfg.picks[cfg.side],od=$('#wzOd');
     el.querySelectorAll('[data-wz-op]').forEach(b=>{const bs=b.dataset.wzOp;
       b.onmouseenter=b.onfocus=()=>{const k=p.find(x=>OPC[x]&&OPC[x].base===bs)||bs;if(WZ.cur===k)return;WZ.cur=k;el.querySelectorAll('.wzOt.cur').forEach(e=>e.classList.remove('cur'));b.classList.add('cur');if(od){od.innerHTML=wzOpDetail(OPC[k]);bindVar();}};
-      b.onclick=()=>{if(WZ.peek!==bs){WZ.peek=bs;WZ.peekSlot=null;WZ.cur=null;b.onmouseenter();el.querySelectorAll('.wzOt.peek,.wzS.peek').forEach(e=>e.classList.remove('peek'));b.classList.add('peek');const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=(p.some(x=>OPC[x]&&OPC[x].base===bs)?'再點一次移出 ':'再點一次加入 ')+OPC[bs].name;return;}if(!opPlayable(bs)){b.onmouseenter();const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=`${OPC[bs].name} 的能力還沒做進遊戲，暫時不能選`;return;}const i=p.findIndex(x=>OPC[x]&&OPC[x].base===bs);if(i>=0)p.splice(i,1);else if(p.length<5)p.push(WZ.cur&&OPC[WZ.cur]&&OPC[WZ.cur].base===bs?WZ.cur:bs);else{const m=el.querySelector('.wzFoot .msg');if(m)m.textContent='小隊已滿 5 人，先點右上角的頭像移出一位';return;}WZ.cur=p.find(x=>OPC[x].base===bs)||bs;renderWiz();};});
+      b.onclick=()=>{if(WZ.peek!==bs){WZ.peek=bs;WZ.peekSlot=null;WZ.cur=null;b.onmouseenter();el.querySelectorAll('.wzOt.peek,.wzS.peek').forEach(e=>e.classList.remove('peek'));b.classList.add('peek');const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=(p.some(x=>OPC[x]&&OPC[x].base===bs)?'再點一次移出 ':owned(bs)?'再點一次加入 ':'再點一次解鎖 ')+OPC[bs].name;return;}if(!opPlayable(bs)){b.onmouseenter();const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=`${OPC[bs].name} 的能力還沒做進遊戲，暫時不能選`;return;}if(!owned(bs)){buyOp(bs,()=>renderWiz());return;}const i=p.findIndex(x=>OPC[x]&&OPC[x].base===bs);if(i>=0)p.splice(i,1);else if(p.length<5)p.push(WZ.cur&&OPC[WZ.cur]&&OPC[WZ.cur].base===bs?WZ.cur:bs);else{const m=el.querySelector('.wzFoot .msg');if(m)m.textContent='小隊已滿 5 人，先點右上角的頭像移出一位';return;}WZ.cur=p.find(x=>OPC[x].base===bs)||bs;renderWiz();};});
     el.querySelectorAll('[data-wz-un]').forEach(b=>b.onclick=()=>{const i=+b.dataset.wzUn;if(WZ.peekSlot!==p[i]){WZ.peekSlot=p[i];WZ.peek=null;WZ.cur=p[i];renderWiz();const m=el.querySelector('.wzFoot .msg');if(m)m.textContent='再點一次把 '+OPC[p[i]].name+' 移出小隊';return;}WZ.peekSlot=null;p.splice(i,1);renderWiz();});
     const bindVar=()=>wzFit()||el.querySelectorAll('[data-wz-var]').forEach(b=>b.onclick=()=>{const v=b.dataset.wzVar,i=p.findIndex(x=>OPC[x]&&OPC[x].base===OPC[v].base);if(i>=0)p[i]=v;WZ.cur=v;renderWiz();});bindVar();}
   el.querySelectorAll('[data-inv]').forEach(b=>b.onclick=()=>{const s=cfg.side,k=b.dataset.inv,v=cfg.inv[s][k]+(+b.dataset.dv);if(v<0||v>INV[s][k][1]||(+b.dataset.dv>0&&invUsed(s)>=INV_CAP[s]))return;cfg.inv[s][k]=v;render();});
-  const r=$('#wzRand');if(r)r.onclick=()=>{const p=cfg.picks[cfg.side],bases=new Set(p.map(k=>OPC[k].base));for(const b of shuffle(OPBASE.filter(k=>OPC[k].side===cfg.side&&!bases.has(k)&&opPlayable(k)))){if(p.length>=5)break;p.push(b);}render();};
+  const r=$('#wzRand');if(r)r.onclick=()=>{const p=cfg.picks[cfg.side],bases=new Set(p.map(k=>OPC[k].base));for(const b of shuffle(OPBASE.filter(k=>OPC[k].side===cfg.side&&!bases.has(k)&&opPlayable(k)&&owned(k)))){if(p.length>=5)break;p.push(b);}render();};
   const c=$('#wzClear');if(c)c.onclick=()=>{cfg.picks[cfg.side]=[];render();};
   $('#wzRules').onclick=openRules;
   $('#wzBack').onclick=()=>{if(st)go(st-1);else{el.hidden=true;goTitle();}};
@@ -6600,7 +6661,7 @@ const ME=(()=>{let p=null;try{p=JSON.parse(localStorage.getItem(PKEY)||'null');}
   p.acct=null;p.rating=null;p.w=0;p.l=0;return p;})();
 function saveMe(){try{const {mode,guest,nick,avatar,usePhoto,lang}=ME;localStorage.setItem(PKEY,JSON.stringify({mode,guest,nick,avatar,usePhoto,lang}));}catch(e){}}
 const meName=()=>ME.nick||(ME.mode==='account'&&ME.acct&&ME.acct.name)||ME.guest;
-const meAvatar=()=>ME.usePhoto&&ME.acct&&ME.acct.photo?ME.acct.photo:opIcon(ME.avatar);
+const meAvatar=()=>ME.usePhoto&&ME.acct&&ME.acct.photo?ME.acct.photo:/^art:/.test(ME.avatar||'')?(opArt(ME.avatar.slice(4))||opIcon(ME.avatar.slice(4))):opIcon(ME.avatar);
 const TIERS=[[0,'紅銅','Copper','カッパー','#b5653a'],[1100,'青銅','Bronze','ブロンズ','#a8794a'],[1200,'白銀','Silver','シルバー','#b8c4cc'],[1350,'黃金','Gold','ゴールド','#e3aa3e'],[1500,'白金','Platinum','プラチナ','#5fc7c2'],[1700,'翡翠','Emerald','エメラルド','#3fbf75'],[1900,'鑽石','Diamond','ダイヤモンド','#9c7cf2'],[2100,'冠軍','Champion','チャンピオン','#e8574e']];
 const tierOf=r=>{let t=TIERS[0];for(const x of TIERS)if(r>=x[0])t=x;return t;};
 const tierName=t=>t[{zh:1,en:2,ja:3}[ME.lang]||1];
@@ -6615,8 +6676,8 @@ async function acctLogin(){const ok=await acctLoad();if(!ok){PMSG='連不上對�
 function acctLogout(){ME.mode='guest';saveMe();renderPlayer();renderSettings();if(SCREEN==='rank'||SCREEN==='queue'){rankCancel();SCREEN='rank';renderTitle();}}
 let PMSG='';
 function renderPlayer(){const el=$('#tplayer');if(!el)return;const acct=ME.mode==='account';
-  el.innerHTML=`<button class="pcard" id="pcard" aria-label="玩家資料與設定"><img class="pav" src="${meAvatar()}" alt=""><span class="pinfo"><b>${esc(meName())}</b><span class="prank">${acct?`${rankBadge(ME.rating)}${ME.rating==null?'讀取中…':`${tierName(tierOf(ME.rating))} · ${ME.rating}`}`:`${rankBadge(null)}訪客 · 未排名`}</span></span><i class="pgear" aria-hidden="true">⚙</i></button>`;
-  el.insertAdjacentHTML('beforeend',`<button class="pach" id="pach" aria-label="成就與好友"><i>🏆</i><b>${achCount()}/${ACH.length}</b></button>`);$('#pach').onclick=()=>openAch();
+  el.innerHTML=`<button class="pcard" id="pcard" aria-label="玩家資料與設定"><img class="pav" src="${meAvatar()}" alt=""><span class="pinfo"><b>${esc(meName())}</b><span class="prank">${ecoTag()}</span></span><i class="pgear" aria-hidden="true">⚙</i></button>`;
+  el.insertAdjacentHTML('beforeend',`<button class="pach" id="pach" aria-label="成就與好友"><i>🏆</i><b>${achCount()}/${ACH.length}</b></button>`);$('#pach').onclick=()=>openAch();{const n=tkClaimable();el.insertAdjacentHTML('beforeend',`<button class="ptask" id="ptask" aria-label="任務"><i>📋</i><b>任務</b>${n?`<em>${n}</em>`:''}</button>`);$('#ptask').onclick=()=>{if(typeof G!=='undefined'&&G&&!G.over&&SCREEN!=='title'&&SCREEN!=='task')return;SCREEN='task';NETMSG='';renderTitle();};}
   $('#pcard').onclick=openSettings;}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function openSettings(){let el=$('#psettings');if(!el){el=document.createElement('div');el.id='psettings';el.className='psettings';el.setAttribute('role','dialog');el.setAttribute('aria-label','玩家設定');document.body.appendChild(el);
@@ -6624,17 +6685,19 @@ function openSettings(){let el=$('#psettings');if(!el){el=document.createElement
   el.hidden=false;renderSettings();}
 function closeSettings(){const el=$('#psettings');if(el)el.hidden=true;}
 function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;const acct=ME.mode==='account'&&ME.acct;
-  const avs=OPBASE.map(b=>`<button class="avb ${!ME.usePhoto&&ME.avatar===b?'on':''}" data-av="${b}" title="${OPC[b].name}"><img src="${opIcon(b)}" alt="${OPC[b].name}"></button>`).join('');
+  const avl=[];OPBASE.forEach(b=>{const lv=mxLv(ECO.mx[b]||0);if(b.startsWith('recruit_')||lv>=1||ME.avatar===b)avl.push([b,opIcon(b),OPC[b].name]);if(lv>=3||ME.avatar==='art:'+b)avl.push(['art:'+b,opArt(b)||opIcon(b),OPC[b].name+' 半身像']);});
+  const avs=avl.map(([k,src,n])=>`<button class="avb ${!ME.usePhoto&&ME.avatar===k?'on':''} ${k.startsWith('art:')?'art':''}" data-av="${k}" title="${n}"><img src="${src}" alt="${n}"></button>`).join('');
+  const ttls=OPBASE.filter(b=>mxLv(ECO.mx[b]||0)>=5);
   el.innerHTML=`<div class="psbox"><div class="pshead"><img class="pav" src="${meAvatar()}" alt=""><div><b>${esc(meName())}</b><span>${acct?'線上身分':'訪客'}</span></div><button id="psClose" aria-label="關閉">✕</button></div>
   <section><h4>名稱</h4><div class="psrow"><input id="psNick" maxlength="16" value="${esc(ME.nick)}" placeholder="${esc(acct&&ME.acct.name?ME.acct.name:ME.guest)}"><button id="psNickOk">儲存</button></div></section>
-  <section><h4>頭貼</h4><div class="avgrid">${acct&&ME.acct.photo?`<button class="avb ${ME.usePhoto?'on':''}" data-av="__photo" title="帳號照片"><img src="${ME.acct.photo}" alt="帳號照片"></button>`:''}${avs}</div></section>
+  <section><h4>頭貼</h4><div class="avgrid">${acct&&ME.acct.photo?`<button class="avb ${ME.usePhoto?'on':''}" data-av="__photo" title="帳號照片"><img src="${ME.acct.photo}" alt="帳號照片"></button>`:''}${avs}</div><p class="pshint">幹員熟練度 Lv1 解鎖頭像、Lv3 解鎖半身像、Lv5 解鎖稱號。</p></section><section><h4>稱號</h4>${ttls.length?`<div class="psrow wrap"><button class="ttl ${!ECO.title?'on':''}" data-ttl="">不顯示</button>${ttls.map(b=>`<button class="ttl ${ECO.title===b?'on':''}" data-ttl="${b}">${esc(mxTitle(b))}</button>`).join('')}</div>`:'<p class="pshint">把任一名幹員練到熟練度 Lv5，就能拿到他的專屬稱號。</p>'}</section>
   <section><h4>成就與好友</h4><div class="psrow"><button id="psAch">🏆 成就 ${achCount()}/${ACH.length}</button><button id="psFr">好友 ${FR.list.length} 人</button></div></section>
-  <section><h4>登入資料</h4>${acct?`<p class="pshint">已啟用線上身分（綁定這台裝置的瀏覽器）。段位與戰績會存在遊戲伺服器上。</p><div class="psstat">${rankBadge(ME.rating,30)}<span><b>${ME.rating==null?'—':tierName(tierOf(ME.rating))}</b> ${ME.rating??''} 分 · ${ME.w} 勝 ${ME.l} 敗</span></div><div class="psrow"><button id="psLogout">改用訪客身分</button></div>`:
-    `<p class="pshint">目前是訪客，可以玩對戰電腦、自訂房間和教學。排名戰需要登入帳號，段位才能保存。</p><div class="pslogin"><button class="primary" id="psLogin"><span class="lgico">C</span>啟用線上身分</button><button disabled title="Google 登入目前還沒開放"><span class="lgico g">G</span>Google 登入（此頁面不支援）</button><button class="on" disabled><span class="lgico">訪</span>訪客（目前）</button></div>`}${PMSG?`<p class="terr">${PMSG}</p>`:''}</section>
+  <section><h4>登入資料</h4>${acct?`<p class="pshint">已用 線上身分登入。</p><div class="psrow"><button id="psLogout">改用訪客身分</button></div>`:
+    `<p class="pshint">目前是訪客，所有模式都能玩。聲望、解鎖的幹員和熟練度存在這台裝置上。</p><div class="pslogin"><button class="primary" id="psLogin"><span class="lgico">C</span>啟用線上身分</button><button disabled title="Google 登入目前還沒開放"><span class="lgico g">G</span>Google 登入（此頁面不支援）</button><button class="on" disabled><span class="lgico">訪</span>訪客（目前）</button></div>`}${PMSG?`<p class="terr">${PMSG}</p>`:''}</section>
   <section><h4>設定</h4><div class="psrow"><span>🌐 語言</span>${langSelect('psLang')}</div><div class="psrow pstg"><span>射擊特寫</span><button id="psCine">${CINE.on?'開':'關'}</button><span>音樂</span><button id="psMus">${SFX.mOn?'開':'關'}</button><span>音效</span><button id="psSfx">${SFX.on?'開':'關'}</button></div></section></div>`;
   $('#psClose').onclick=closeSettings;
   $('#psNickOk').onclick=()=>{ME.nick=$('#psNick').value.trim().slice(0,16);saveMe();renderPlayer();renderSettings();};
-  el.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{if(b.dataset.av==='__photo')ME.usePhoto=true;else{ME.usePhoto=false;ME.avatar=b.dataset.av;}saveMe();renderPlayer();renderSettings();});
+  el.querySelectorAll('[data-ttl]').forEach(b=>b.onclick=()=>{ECO.title=b.dataset.ttl;ecoSave();renderPlayer();renderSettings();});el.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{if(b.dataset.av==='__photo')ME.usePhoto=true;else{ME.usePhoto=false;ME.avatar=b.dataset.av;}saveMe();renderPlayer();renderSettings();});
   const li=$('#psLogin');if(li)li.onclick=acctLogin;const lo=$('#psLogout');if(lo)lo.onclick=acctLogout;
   bindLang('psLang');$('#psAch').onclick=()=>{closeSettings();openAch('ach');};$('#psFr').onclick=()=>{closeSettings();openAch('fr');};
   $('#psMus').onclick=()=>{SFX.toggleMusic();try{musicLevel();}catch(e){}renderSettings();};$('#psSfx').onclick=()=>{$('#sndBtn').click();renderSettings();};
@@ -6750,28 +6813,27 @@ function shatter(btn,ev){return new Promise(res=>{
   setTimeout(()=>{flash.remove();btn.style.visibility='';res();},430);});}
 // ---------- ranked: matchmaking through the live room, results in the shared store ----------
 const RQ={q:null,un:null,t:null,t0:0,busy:false,hostT:null};
-function fillPicks(side){const p=cfg.picks[side];const bases=new Set(p.map(k=>OPC[k].base));for(const b of shuffle(OPBASE.filter(k=>OPC[k].side===side&&!bases.has(k)&&opPlayable(k)))){if(p.length>=5)break;p.push(b);}}
+function fillPicks(side){cfg.picks[side]=cfg.picks[side].filter(owned);const p=cfg.picks[side];const bases=new Set(p.map(k=>OPC[k].base));for(const b of shuffle(OPBASE.filter(k=>OPC[k].side===side&&!bases.has(k)&&opPlayable(k)&&owned(k)))){if(p.length>=5)break;p.push(b);}}
 async function rankQueue(){
-  if(ME.mode!=='account'){SCREEN='rank';renderTitle();return;}
   const n=await netInit();if(!n)return;fillPicks('A');fillPicks('D');
   const lobby=ONLINE.room||(window.claude&&claude.use?await claude.use('room'):null);
-  if(!lobby||!lobby.join){NETMSG='排名配對需要即時連線，這個檢視目前連不上。';renderTitle();return;}
-  try{RQ.q=await lobby.join('rank');}catch(e){NETMSG='排名配對需要即時連線，這個檢視目前連不上。';renderTitle();return;}
+  if(!lobby||!lobby.join){NETMSG='線上對戰需要即時連線，這個檢視目前連不上。';renderTitle();return;}
+  try{RQ.q=await lobby.join('rank');}catch(e){NETMSG='線上對戰需要即時連線，這個檢視目前連不上。';renderTitle();return;}
   RQ.t0=Date.now();RQ.busy=false;SCREEN='queue';NETMSG='';renderTitle();
   RQ.q.presence({q:RQ.t0,code:null,for:null}).catch(()=>{});
   RQ.un=RQ.q.onPeers(ch=>rankMatch(ch.peers),()=>{NETMSG='配對連線中斷，請再試一次。';rankCancel();SCREEN='rank';renderTitle();});
-  RQ.t=setInterval(()=>{const c=$('#qclock');if(c)c.textContent=fmtClock(Date.now()-RQ.t0);},1000);
+  RQ.t=setInterval(()=>{const c=$('#qclock');if(c)c.textContent=fmtClock(Date.now()-RQ.t0);if(RQ.busy&&RQ.bt&&Date.now()-RQ.bt>70000&&!(G&&G.net))rankRequeue();},1000);
 }
 function rankMatch(peers){
   const el=$('#qcount');if(el)el.textContent=peers.filter(p=>p.kind==='viewer'&&p.presence&&p.presence.q).length;
   if(RQ.busy||SCREEN!=='queue')return;
   const mine=peers.find(p=>p.sameTab);if(!mine)return;
   const host=peers.find(p=>!p.sameTab&&p.presence&&p.presence.code&&p.presence.for===mine.peer);
-  if(host){RQ.busy=true;RQ.q.presence({matched:1}).catch(()=>{});rankJoin(String(host.presence.code));return;}
+  if(host){RQ.busy=true;RQ.bt=Date.now();RQ.q.presence({matched:1}).catch(()=>{});rankJoin(String(host.presence.code));return;}
   const wait=peers.filter(p=>p.kind==='viewer'&&p.presence&&p.presence.q&&!p.presence.code&&!p.presence.matched).sort((a,b)=>(a.presence.q-b.presence.q)||(a.peer<b.peer?-1:1));
   const i=wait.findIndex(p=>p.sameTab);if(i<0||i%2)return;const mate=wait[i+1];
   if(!mate||(mate.by&&mine.by&&mate.by===mine.by))return;
-  RQ.busy=true;rankHost(mate.peer);
+  RQ.busy=true;RQ.bt=Date.now();rankHost(mate.peer);
 }
 async function rankHost(peer){
   const n=NET;const side=Math.random()<.5?'A':'D';const code=randCode();
@@ -6780,12 +6842,16 @@ async function rankHost(peer){
     await n.db.doc('rooms/'+code).set({code,map:'random',hostSide:side,status:'ranked',ts:Date.now(),host:n.me});}
   catch(e){RQ.busy=false;return;}
   netSubscribe(code);RQ.q.presence({code,for:peer}).catch(()=>{});
-  clearTimeout(RQ.hostT);RQ.hostT=setTimeout(()=>{if(NET&&NET.code===code&&!NET.started){netLeave();RQ.busy=false;if(RQ.q)RQ.q.presence({code:null,for:null}).catch(()=>{});}},40000);
+  clearTimeout(RQ.hostT);RQ.hostT=setTimeout(()=>{if(NET&&NET.code===code&&!NET.started){netLeave();RQ.busy=false;if(RQ.q)RQ.q.presence({code:null,for:null}).catch(()=>{});}},60000);
 }
-async function rankJoin(code){await netJoin(code,true);if(NET&&NET.code===code){NET.ranked=true;}else{RQ.busy=false;if(RQ.q)RQ.q.presence({matched:null}).catch(()=>{});}}
+async function rankJoin(code){await netJoin(code,true);if(NET&&NET.code===code&&SCREEN==='wait'){NET.ranked=true;return;}
+  rankRequeue();}
+// a match that didn't come together puts the player straight back in line
+function rankRequeue(){if(NET&&NET.code&&!(G&&G.net)){try{netLeave();}catch(e){}}RQ.busy=false;RQ.bt=0;NETMSG='';
+  if(RQ.q){SCREEN='queue';renderTitle();RQ.q.presence({code:null,for:null,matched:null}).catch(()=>{});}}
 function rankLeaveQueue(){clearInterval(RQ.t);clearTimeout(RQ.hostT);try{if(RQ.un)RQ.un();}catch(e){}try{if(RQ.q)RQ.q.leave();}catch(e){}RQ.q=null;RQ.un=null;}
 function rankCancel(){rankLeaveQueue();if(NET&&NET.ranked&&!(G&&G.net))netLeave();RQ.busy=false;}
-async function rankResult(win){
+async function rankResult(win){return '';
   if(!NET||!NET.ranked||ME.mode!=='account'||!ME.acct)return '';
   const old=ME.rating??1000,d=win?25:-20;ME.rating=Math.max(0,old+d);if(win)ME.w++;else ME.l++;
   try{const db=NET.db;await db.doc('players/'+ME.acct.id).set({rating:ME.rating,w:ME.w,l:ME.l,ts:Date.now()});}catch(e){}
@@ -6794,6 +6860,80 @@ async function rankResult(win){
 }
 
 setTimeout(()=>{renderPlayer();renderTopRight();placeOnline();if(SCREEN==='title'){const t=$('#title');if(t)t.dataset.s='';render();}},0);if(ME.mode==='account')acctLoad().then(ok=>{if(!ok)ME.mode='guest';renderPlayer();});if(ME.lang!=='zh')setTimeout(()=>setLang(ME.lang),0);
+// ---------- renown, operator unlocks, daily/weekly tasks, operator mastery ----------
+var RNIC='data:image/webp;base64,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';const RNI=`<img class="rni" src="${RNIC}" alt="聲望">`,OPPRICE=12000;
+const fmtN=n=>Math.round(n).toLocaleString('en-US');
+const EKEY='r6bg.eco';
+const ECO=(()=>{let e=null;try{e=JSON.parse(localStorage.getItem(EKEY)||'null');}catch(x){}
+  return Object.assign({rn:0,own:[],mx:{},day:'',dt:[],dp:{},dc:[],wk:'',wp:{},wc:[],wops:[],pveDay:'',pveEarn:0,tut:0,title:'',seen:0},e||{});})();
+function ecoSave(){try{localStorage.setItem(EKEY,JSON.stringify(ECO));}catch(e){}}
+// the launch roster (core box, recruits included) is free; every later operator costs renown
+const owned=b=>{const c=OPC[b];const k=c?c.base:b;return !OPC[k]||OPC[k].batch==='core'||ECO.own.includes(k);};
+const dayKey=d=>{d=d||new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();};
+const weekKey=()=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return dayKey(d);};
+const TK_D=[['d_play','完成 2 場對局','games',2,500],['d_win','贏得 1 場對局','wins',1,700],['d_kill','擊倒 6 名敵人','kills',6,600],['d_gad','使用道具 8 次','gad',8,600],
+  ['d_wall','破壞 3 面牆或路障','walls',3,600],['d_winA','以進攻方獲勝 1 次','winA',1,800],['d_winD','以防守方獲勝 1 次','winD',1,800],['d_plant','安裝拆彈器 1 次','plant',1,700],['d_online','完成 1 場線上對戰','online',1,1000]];
+const TK_W=[['w_play','完成 12 場對局','games',12,4000],['w_win','贏得 6 場對局','wins',6,5000],['w_kill','擊倒 40 名敵人','kills',40,4000],['w_ops','用 8 名不同幹員出戰','ops',8,3000],['w_online','完成 3 場線上對戰','online',3,5000]];
+const TKALL=Object.fromEntries([...TK_D,...TK_W].map(t=>[t[0],t]));
+function ecoRoll(){const d=dayKey(),w=weekKey();let ch=false;
+  if(ECO.day!==d){let h=0;for(const ch2 of d)h=(h*31+ch2.charCodeAt(0))>>>0;const pool=TK_D.map(t=>t[0]);const pick=[];
+    while(pick.length<3&&pool.length){h=(h*1103515245+12345)>>>0;pick.push(pool.splice(h%pool.length,1)[0]);}
+    Object.assign(ECO,{day:d,dt:pick,dp:{},dc:[]});ch=true;}
+  if(ECO.wk!==w){Object.assign(ECO,{wk:w,wp:{},wc:[],wops:[]});ch=true;}
+  if(ch)ecoSave();}
+ecoRoll();
+const tkProg=(id,daily)=>{const t=TKALL[id];return Math.min(t[3],(daily?ECO.dp:ECO.wp)[t[2]]||0);};
+const tkClaimable=()=>{ecoRoll();return ECO.dt.filter(id=>!ECO.dc.includes(id)&&tkProg(id,1)>=TKALL[id][3]).length+TK_W.filter(t=>!ECO.wc.includes(t[0])&&tkProg(t[0],0)>=t[3]).length;};
+// mastery: every match with an operator earns that operator experience
+const MXT=[100,600,1500,3000,5000];
+const mxLv=xp=>MXT.filter(v=>xp>=v).length;
+const mxTitle=b=>`${OPC[b].name} 專家`;
+function mxInfo(b){const xp=ECO.mx[b]||0,lv=mxLv(xp),nx=MXT[lv];return {xp,lv,nx,pct:nx?Math.round(100*(xp-(MXT[lv-1]||0))/(nx-(MXT[lv-1]||0))):100};}
+const MXREW=['','解鎖頭像','','解鎖半身像頭像','','解鎖稱號'];
+function ecoAdd(n){ECO.rn=Math.max(0,(ECO.rn|0)+n);}
+// called once per finished match; returns the lines shown on the result banner
+function ecoGame(w){if(!G||G._eco)return G&&G._eco;ecoRoll();const P=G.player,win=w===P,lines=[];let earn=0;
+  if(G.tut){if(w==='A'&&!ECO.tut){ECO.tut=1;earn+=2000;lines.push(['完成新手教學',2000]);}}
+  else{const mine=G.units.filter(u=>u.side===P),t={k:0,gad:0};mine.forEach(u=>{const q=ST(u);t.k+=q.k||0;t.gad+=q.gad||0;});
+    const quick=G.net&&NET&&NET.ranked,custom=G.net&&!quick;
+    if(quick){const v=win?300:120;earn+=v;lines.push([win?'線上對戰勝利':'線上對戰',v]);}
+    else if(custom){const v=win?30:10;earn+=v;lines.push([win?'自訂房間勝利':'自訂房間',v]);}
+    else{const d=dayKey();if(ECO.pveDay!==d){ECO.pveDay=d;ECO.pveEarn=0;}const room=Math.max(0,1500-ECO.pveEarn),v=Math.min(room,win?150:50);ECO.pveEarn+=v;earn+=v;
+      lines.push([v?(win?'電腦練習勝利':'電腦練習'):'電腦練習（今日獎勵已達上限）',v]);}
+    const m={games:1,wins:win?1:0,winA:win&&P==='A'?1:0,winD:win&&P==='D'?1:0,kills:t.k,gad:t.gad,walls:G._wb||0,plant:G._pl?1:0,online:quick?1:0};
+    const before=tkClaimable();
+    for(const k in m){ECO.dp[k]=(ECO.dp[k]||0)+m[k];if(k!=='ops')ECO.wp[k]=(ECO.wp[k]||0)+m[k];}
+    ECO.wops=[...new Set([...ECO.wops,...mine.map(u=>OPC[u.op]?OPC[u.op].base:u.op)])];ECO.wp.ops=ECO.wops.length;
+    const after=tkClaimable();if(after>before)lines.push([`${after-before} 個任務完成，到「任務」領取`,0]);
+    const ups=[];mine.forEach(u=>{const b=OPC[u.op]?OPC[u.op].base:u.op;if(!OPC[b])return;const q=ST(u),l0=mxLv(ECO.mx[b]||0);
+      ECO.mx[b]=(ECO.mx[b]||0)+100+(win?60:0)+(q.k||0)*25+(q.gad||0)*10;const l1=mxLv(ECO.mx[b]);
+      if(l1>l0)ups.push([OPC[b].name,l1]);});
+    if(ups.length){lines.push([`熟練度升級：${ups.map(([n,l])=>n+' Lv'+l).join('、')}`,0]);const rw=[...new Set(ups.map(u=>MXREW[u[1]]).filter(Boolean))];try{achToastMsg(ups.length>1?`${ups.length} 名幹員熟練度升級`:`${ups[0][0]} 熟練度 Lv${ups[0][1]}`,rw.length?rw.join('、')+'（到設定查看）':'繼續使用這些幹員來升級');}catch(e){}}}
+  ecoAdd(earn);ecoSave();G._eco={earn,lines};try{renderPlayer();}catch(e){}return G._eco;}
+function ecoBanner(){const b=$('#banner');if(!b||b.hidden||!G||!G._eco||b.querySelector('.ecoRes'))return;const e=G._eco;if(!e.lines.length)return;
+  const d=document.createElement('div');d.className='ecoRes';
+  d.innerHTML=`${e.earn?`<b class="ecoE">${RNI}+${fmtN(e.earn)}</b>`:''}${e.lines.map(([t,v])=>`<span>${esc(t)}${v?` <i>+${fmtN(v)}</i>`:''}</span>`).join('')}`;
+  const row=b.querySelector('.row');row?b.insertBefore(d,row):b.appendChild(d);}
+{const _fin=finish;finish=function(w,why){try{ecoGame(w);}catch(e){console.warn(e);}_fin(w,why);try{ecoBanner();}catch(e){}};}
+// unlock dialog: one tap on a locked operator explains, the dialog's button confirms
+function buyOp(b,after){const c=OPC[b];if(!c||owned(b))return after&&after();let el=$('#buyDlg');if(!el){el=document.createElement('div');el.id='buyDlg';el.className='buyDlg';document.body.appendChild(el);}
+  const ok=ECO.rn>=OPPRICE;el.hidden=false;
+  el.innerHTML=`<div class="bdBox" role="dialog" aria-label="解鎖幹員"><img class="bdIc" src="${opIcon(b)}" alt=""><b>解鎖 ${c.name}</b><span class="bdP">${RNI}${fmtN(OPPRICE)}</span>
+    <span class="bdH">你有 ${RNI}${fmtN(ECO.rn)}${ok?'':`，還差 ${fmtN(OPPRICE-ECO.rn)}。完成每日、每週任務最快。`}</span>
+    <div class="bdRow"><button id="bdNo">取消</button><button class="primary" id="bdYes" ${ok?'':'disabled'}>解鎖</button></div></div>`;
+  el.onclick=e=>{if(e.target===el)el.hidden=true;};$('#bdNo').onclick=()=>{el.hidden=true;};
+  $('#bdYes').onclick=()=>{if(ECO.rn<OPPRICE)return;ECO.rn-=OPPRICE;if(!ECO.own.includes(c.base))ECO.own.push(c.base);ecoSave();el.hidden=true;try{SFX.alert();}catch(e){}
+    try{achToastMsg(`已解鎖 ${c.name}`,'現在可以帶他出戰了');}catch(e){}try{renderPlayer();}catch(e){}if(after)after();};}
+function ecoTag(){const t=ECO.title&&OPC[ECO.title]&&mxLv(ECO.mx[ECO.title]||0)>=5?mxTitle(ECO.title):'';return `<span class="ptag">${RNI}<b>${fmtN(ECO.rn)}</b>${t?`<em>${esc(t)}</em>`:''}</span>`;}
+function taskHTML(){ecoRoll();const row=(id,daily)=>{const t=TKALL[id],p=tkProg(id,daily),done=p>=t[3],got=(daily?ECO.dc:ECO.wc).includes(id);
+    return `<button class="tk ${got?'got':done?'done':''}" data-tk="${id}" ${done&&!got?'':'tabindex="-1"'}><span class="tkT">${t[1]}</span><span class="tkBar"><i style="width:${Math.round(100*p/t[3])}%"></i></span><span class="tkN">${got?'已領取':done?'領取':p+'/'+t[3]}</span><span class="tkR">${RNI}${fmtN(t[4])}</span></button>`;};
+  const left=()=>{const n=new Date(),m=new Date(n);m.setHours(24,0,0,0);const s=Math.max(0,m-n)/1000|0;return `${Math.floor(s/3600)} 小時 ${Math.floor(s%3600/60)} 分`;};
+  return `<h2 class="tsec">任務</h2><div class="tkBal">${RNI}<b>${fmtN(ECO.rn)}</b><span>聲望 · 每 ${fmtN(OPPRICE)} 可解鎖一名幹員</span></div>
+  <div class="tkWrap"><div class="tkSec"><h4>每日任務<small>${left()}後更新</small></h4>${ECO.dt.map(id=>row(id,1)).join('')}</div>
+  <div class="tkSec"><h4>每週任務<small>每週一更新</small></h4>${TK_W.map(t=>row(t[0],0)).join('')}</div></div>
+  <p class="tkFoot">對局獎勵：線上對戰 勝 300／敗 120 · 電腦練習 勝 150／敗 50（每日上限 1,500）· 自訂房間 勝 30／敗 10</p>`;}
+function bindTask(){document.querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{const id=b.dataset.tk,daily=id[0]==='d',t=TKALL[id],L=daily?ECO.dc:ECO.wc;
+  if(L.includes(id)||tkProg(id,daily)<t[3])return;L.push(id);ecoAdd(t[4]);ecoSave();try{SFX.alert();}catch(e){}renderTitle();renderPlayer();});}
 // ---------- PvP: the map is drawn at random and revealed once both players are in ----------
 function showMapReveal(key,side,done){const m=MAPS[key];let el=$('#mreveal');if(el)el.remove();el=document.createElement('div');el.id='mreveal';el.className='mreveal';el.setAttribute('role','dialog');el.setAttribute('aria-label','地圖揭曉');
   el.innerHTML=`<small>配對成功 · 地圖抽選中</small><div class="roll"></div><img alt="${m.name}平面圖" src="${mapThumb(key)}"><div class="meta"><span>任務 <b>炸彈</b></span><span>你是 <b class="${side==='A'?'a':'d'}">${side==='A'?'進攻方':'防守方'}</b></span></div><small style="margin-top:14px">點一下繼續</small>`;
@@ -6841,6 +6981,7 @@ const BOLT='<svg viewBox="0 0 10 14"><path d="M6 0L0 8h4l-1 6 7-9H6z"/></svg>';
 const hexDice=list=>list.length?list.map(d=>`<i class="hexd ${d[0]}">${d.includes('*')?BOLT:''}</i>`).join(''):'<span class="hint">—</span>';
 const DZN={Y:'輕',O:'中',R:'重'};
 const OSEL={side:'A',cur:null,en:false};
+function osEco(c){const b=c.base,m=mxInfo(b);return `<div class="osEco">${owned(b)?'':`<button class="primary" id="osBuy">${RNI}${fmtN(OPPRICE)} 解鎖</button>`}<span class="osMx"><b>熟練度 Lv${m.lv}</b><span class="tkBar"><i style="width:${m.pct}%"></i></span><small>${m.nx?`${fmtN(m.xp)}/${fmtN(m.nx)}${MXREW[m.lv+1]?' · 下一級'+MXREW[m.lv+1]:MXREW[m.lv+2]?' · Lv'+(m.lv+2)+MXREW[m.lv+2]:''}`:'已滿級'}</small></span></div>`;}
 function cardText(c){const zh=c.zh.x||'';return zh.replace(/〔([^〕]+)〕/g,'<em>〔$1〕</em>');}
 function openOpSelect(side,onDone,browse){OSEL.side=side;OSEL.done=onDone;OSEL.browse=!!browse;OSEL.cur=cfg.picks[side][0]||OPBASE.find(b=>OPC[b].side===side);let el=$('#opsel');
   if(!el){el=document.createElement('div');el.id='opsel';el.className='opsel';document.body.appendChild(el);}el.hidden=false;renderOpSelect(true);}
@@ -6849,12 +6990,12 @@ function renderOpSelect(anim){
   const el=$('#opsel'),side=OSEL.side,picks=cfg.picks[side],cur=OPC[OSEL.cur]||OPCARDS[0];
   const pickOf=b=>picks.findIndex(p=>OPC[p]&&OPC[p].base===b);
   const col=s=>`<div class="osCol ${s!==side&&!OSEL.browse?'dim':''}"><h3>${s==='A'?'攻擊方':'防守方'}</h3><div class="osGrid">${OPBASE.filter(b=>OPC[b].side===s).map(b=>{const i=s===side&&!OSEL.browse?pickOf(b):-1;
-    return `<button class="osT ${cur.base===b?'cur':''} ${i>=0?'on':''} ${opPlayable(b)?'':'na'}" data-ob="${b}" title="${OPC[b].name}"><img src="${opIcon(b)}" alt="${OPC[b].name}">${i>=0?`<span class="n">${i+1}</span>`:''}</button>`;}).join('')}</div></div>`;
+    return `<button class="osT ${cur.base===b?'cur':''} ${i>=0?'on':''} ${opPlayable(b)?'':'na'}${owned(b)?'':' lk'}" data-ob="${b}" title="${OPC[b].name}"><img src="${opIcon(b)}" alt="${OPC[b].name}">${owned(b)?'':'<i class="lki">🔒</i>'}${i>=0?`<span class="n">${i+1}</span>`:''}</button>`;}).join('')}</div></div>`;
   const vars=OPCARDS.filter(c=>c.base===cur.base);const mine=cur.side===side;const pi=pickOf(cur.base);
   const sideIc=emblem(cur.side);
   const abEn=cur.g.ab.map(a=>`${a.k==='PASSIVE'?'':a.k+(a.t?' → '+a.t:'')+' — '}${a.x}`).join('<br>');
   const det=`<div class="osD" ${anim?'':'style="animation:none"'}>${opArt(cur.id)?`<img class="osArt" src="${opArt(cur.id)}" alt="">`:''}<button class="osX" id="osX">‹ 返回</button>
-    <div class="osInfo"><div class="osName"><b>${cur.name}</b><img src="${opIcon(cur.id)}" alt=""></div><div class="osOrg">${cur.org||''}${cur.real?' · '+cur.real:''}</div>
+    <div class="osInfo"><div class="osName"><b>${cur.name}</b><img src="${opIcon(cur.id)}" alt=""></div>${osEco(cur)}<div class="osOrg">${cur.org||''}${cur.real?' · '+cur.real:''}</div>
     <div class="osSide">${sideIc}<span>${cur.side==='A'?'攻擊方':'防守方'}</span>${cur.zh.role?`<span class="hint">· ${cur.zh.role}</span>`:''}<span class="osBatch">${cur.batchZh}</span></div>
     ${vars.length>1?`<div class="osVar">${vars.map((v,i)=>`<button data-ov="${v.id}" class="${v.id===cur.id?'on':''}">卡片版本 ${i+1}</button>`).join('')}</div>`:''}
     <div class="osG"><div class="gi"><img src="${opIcon(cur.id)}" alt=""></div><div class="gt"><b>${cur.zh.g||'（無特殊裝置）'}</b>${SCRIPTED.has(cur.id)?'<span class="osImp ok">遊戲內已實作</span>'+(typeof GDX!=='undefined'&&GDX[cur.id]?`<small class="osGd">遊戲版效果：${GDX[cur.id][0]}</small>`:''):cur.g.ab&&cur.g.ab.some(a=>a.k!=='PASSIVE')?'<span class="osImp">尚未實作，目前只有卡片數值</span>':''}<i>${cur.g.name||''}${cur.g.charges?` · 使用次數 ${cur.g.charges}`:''}</i><p>${cardText(cur)}</p>${OSEL.en&&abEn?`<p class="en">${abEn}</p>`:''}</div></div>
@@ -6867,13 +7008,13 @@ function renderOpSelect(anim){
   el.innerHTML=`<div class="osL"><div class="osBar"><button id="osBack">‹ 返回</button><h2>${OSEL.browse?'幹員圖鑑':'選擇幹員'}</h2><span class="hint">${OSEL.browse?`共 ${OPBASE.length} 名幹員`:side==='A'?'你是進攻方':'你是防守方'}</span></div>
     <div class="osCols">${col('A')}${col('D')}</div></div><div class="osR">${det}</div>
     ${OSEL.browse?'':`<div class="osFoot"><div class="osSlots">${[0,1,2,3,4].map(i=>`<div class="osSlot">${picks[i]?`<img src="${opIcon(picks[i])}" alt="">`:''}</div>`).join('')}</div>
-      ${mine?`<button class="pick" id="osPick" ${opPlayable(cur.base)?'':'disabled'}>${!opPlayable(cur.base)?'尚未實作，不能選':pi>=0?'移出小隊':picks.length>=5?'小隊已滿':'加入小隊'}</button>`:`<span class="hint">敵方幹員，只能查看</span>`}
+      ${mine?`<button class="pick" id="osPick" ${opPlayable(cur.base)&&owned(cur.base)?'':'disabled'}>${!owned(cur.base)?'尚未解鎖':!opPlayable(cur.base)?'尚未實作，不能選':pi>=0?'移出小隊':picks.length>=5?'小隊已滿':'加入小隊'}</button>`:`<span class="hint">敵方幹員，只能查看</span>`}
       <button class="primary pick" id="osDone" ${picks.length!==5?'disabled':''}>完成（${picks.length}/5）</button></div>`}`;
   el.querySelectorAll('[data-ob]').forEach(b=>b.onclick=()=>{const bs=b.dataset.ob;const p=picks.find(x=>OPC[x]&&OPC[x].base===bs);OSEL.cur=p||bs;el.classList.add('showD');renderOpSelect(true);});
   el.querySelectorAll('[data-ov]').forEach(b=>b.onclick=()=>{const v=b.dataset.ov;const i=pickOf(cur.base);if(i>=0)picks[i]=v;OSEL.cur=v;renderOpSelect(false);});
-  const pk=$('#osPick');if(pk)pk.onclick=()=>{if(!opPlayable(cur.base))return;const i=pickOf(cur.base);if(i>=0)picks.splice(i,1);else if(picks.length<5)picks.push(cur.id);renderOpSelect(false);};
+  const pk=$('#osPick');if(pk)pk.onclick=()=>{if(!opPlayable(cur.base)||!owned(cur.base))return;const i=pickOf(cur.base);if(i>=0)picks.splice(i,1);else if(picks.length<5)picks.push(cur.id);renderOpSelect(false);};
   el.classList.toggle('browse',OSEL.browse);const dn=$('#osDone');if(dn)dn.onclick=closeOpSelect;$('#osBack').onclick=closeOpSelect;$('#osEn').onclick=()=>{OSEL.en=!OSEL.en;renderOpSelect(false);};
-  const x=$('#osX');if(x)x.onclick=()=>el.classList.remove('showD');
+  const x=$('#osX');if(x)x.onclick=()=>el.classList.remove('showD');{const ob=$('#osBuy');if(ob)ob.onclick=()=>buyOp(cur.base,()=>renderOpSelect(false));}
 }
 
 // ---------- round clocks: each squad gets (time per Operator x Operators in play) per round, shared by its two activation phases ----------
