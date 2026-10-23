@@ -1372,6 +1372,8 @@ body:not([data-scr="game"]) #opsBar{display:none}
 @media (orientation:landscape) and (max-height:500px){#anal .anBox{position:relative}#anal .anAch{position:absolute;top:8px;right:10px;max-width:52%;justify-content:flex-end;padding:0;font-size:11px;gap:4px}#anal .anAch span{padding:1px 6px}}
 @media (orientation:landscape) and (max-height:500px){#anal .anBtns{padding-top:5px;padding-bottom:5px}#anal .anBtns button{padding-top:7px;padding-bottom:7px}}
 @media (orientation:landscape) and (max-height:500px){#anal .anFr{padding:0 7px 0 5px;font-size:10px}#anal .anFr svg{width:14px;height:14px}#anal caption{padding-top:2px;padding-bottom:2px}#anal caption .anPN{font-size:12px}}
+.osGd{display:block;margin-top:4px;font-size:12px;line-height:1.45;color:#cfe3f3;font-weight:400}
+.oc .ocG b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:100%}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -3183,7 +3185,7 @@ const adj4=(x,y)=>[[x+1,y],[x-1,y],[x,y+1],[x,y-1]].filter(([a,b])=>inB(a,b));
 // 8-way movement: diagonals may not squeeze between walls
 const adj8=(x,y)=>[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]].map(([dx,dy])=>[x+dx,y+dy,dx,dy]).filter(([a,b,dx,dy])=>inB(a,b)&&(!dx||!dy||(!moveBlock(cell(x+dx,y))&&!moveBlock(cell(x,y+dy))))).map(([a,b])=>[a,b]);
 const moveBlock=c=>blocks(c);
-const enterCost=(x,y,fx,fy)=>{const c=cell(x,y);return 1+((c.kind==='window'||c.breach)&&!blocks(c)?1:0)+(c.obst&&!(fx!=null&&cell(fx,fy).obst)?1:0);};
+let ECU=null;const enterCost=(x,y,fx,fy)=>{const c=cell(x,y);return bansheeCost(x,y)+1+((c.kind==='window'||c.breach)&&!blocks(c)?1:0)+(c.obst&&!(fx!=null&&cell(fx,fy).obst)?1:0);};
 const within=(x,y,r)=>{const o=[];for(let j=y-r;j<=y+r;j++)for(let i=x-r;i<=x+r;i++)if(inB(i,j))o.push([i,j]);return o;};
 const allCells=()=>within(0,0,99);
 const jammed=(x,y)=>G.gadgets.some(g=>g.alive&&g.type==='jammer'&&cheb(g.x,g.y,x,y)<=2);
@@ -3210,13 +3212,13 @@ function lineCells(x0,y0,x1,y1){const dx=x1-x0,dy=y1-y0,n=Math.ceil(Math.max(Mat
 function los(x0,y0,x1,y1,located,noOps){
   for(const [x,y] of lineCells(x0,y0,x1,y1)){const c=cell(x,y);
     if(located){if(c.t==='hard'||c.t==='reinf')return false;if(!noOps&&G.units.some(u=>u.alive&&u.x===x&&u.y===y&&!u.hidden))return false;continue;}
-    if(blocks(c)||smokeAt(x,y))return false;
+    if((blocks(c)&&!(LOSD&&c.mirror))||(smokeAt(x,y)&&!LOSW))return false;
     if(!noOps&&G.units.some(u=>u.alive&&u.x===x&&u.y===y&&!u.hidden))return false;}
   return true;
 }
 // light protection: holed walls, light walls / barricades shot through, deployable shields on the line
 function protection(sh,t){let n=PROF[t.op]&&PROF[t.op].shield?1:0,ob=0;for(const [x,y] of lineCells(sh.x,sh.y,t.x,t.y)){const c=cell(x,y);
-    if(c.breach||c.t==='soft'||c.t==='bar')n++;else if(shieldAt(x,y)&&cheb(x,y,t.x,t.y)<=1)n++;else if(c.obst&&!ob&&cheb(x,y,t.x,t.y)<=1){ob=1;n++;}}return n>=2?3:n?2:0;}
+    if(c.breach||c.t==='soft'||c.t==='bar')n++;else if(shieldAt(x,y)&&cheb(x,y,t.x,t.y)<=1)n++;else if(c.obst&&!ob&&cheb(x,y,t.x,t.y)<=1){ob=1;n++;}}if(t.op==='montagne'&&t.rnd===G.round)n=Math.max(n,2);return n>=2?((t.op==='montagne'||t.op==='clash')?4:3):n?2:0;}
 
 const OBSTK=new Set(['desk','sofa','table','bar','pool','bench','pew','car','crate','counter','shelf','bed']);
 function markObst(g,m){const sp=new Set((m.spawns||[]).flatMap(z=>z.cells.map(([x,y])=>y*999+x)));
@@ -3238,13 +3240,14 @@ function parseMap(m){
 }
 
 // gadgets scripted in this version; every other card is playable with its real stats, its gadget is marked unimplemented
-const SCRIPTED=new Set(['sledge','thermite','ash','thatcher','iq','glaz','lion','fuze','mute','bandit','kapkan','valkyrie','smoke','rook','doc','tachanka']);
+const SCRIPTED=new Set(['sledge','thermite','ash','thatcher','iq','glaz','lion','fuze','mute','bandit','kapkan','valkyrie','smoke','rook','doc','tachanka','blitz','twitch','montagne','flores','castle','pulse','jager','thunderbird','buck','blackbeard','capitao','hibana','frost','caveira','echo','jackal','ying','zofia','dokkaebi','mira','lesion','ela','vigil','finka','maverick','nomad','maestro','alibi','clash','kaid','gridlock','nokk','amaru','kali','mozzie','warden','goyo','wamai','iana','ace','zero','oryx','melusi','aruni']);
 function ensureOp(id){
   const c=OPC[id];if(!c||(PROF[id]&&PROF[id].card))return;
   const sc=SCRIPTED.has(id);
   if(!OPS[id]||!sc)OPS[id]={...(OPS[id]||{}),name:c.name,side:c.side,armor:2,role:c.zh.role||(OPS[id]||{}).role||'幹員',g:c.zh.g||'',gd:(c.g.ab&&c.g.ab.some(a=>a.k!=='PASSIVE')?'【尚未實作】':'')+(c.zh.x||''),ch:c.g.charges||0,card:true};
   else if(c.g.charges)OPS[id].ch=c.g.charges;
   PROF[id]={run:c.run||0,st:c.st||4,d:c.w.map(l=>l.map(d=>d.includes('*')?d[0].toLowerCase():d[0]).join('')||'Y'),dr:{Y:'低',O:'中',R:'高'}[c.dz],dz:c.dz==='O'?2:1,shield:!!c.shield,card:true};
+  if(typeof GDX!=='undefined'&&GDX[id]){OPS[id].gd=GDX[id][0];if(GDX[id][1]!=null)OPS[id].ch=GDX[id][1];}
   if(!LOOK[id])LOOK[id]={...LOOK[c.side==='A'?'thermite':'smoke']};}
 function mkUnit(op,side,i){
   ensureOp(op);const o=OPS[op],P=PROF[op],hp=P.st;
@@ -3271,10 +3274,10 @@ function visCells(side){
   return s;
 }
 function gadgetVisibleTo(g,side){
-  if(g.side===side||['gas','smk','drone','wire','shield','cam'].includes(g.type))return true;
+  if(g.side===side||['gas','smk','drone','wire','shield','cam','fire','trax','argus'].includes(g.type))return true;
   const atk=alive('A').filter(u=>u.x>=0);
   if(atk.some(u=>u.op==='iq'&&cheb(u.x,u.y,g.x,g.y)<=5))return true;
-  if(g.type==='trap')return false;
+  if(g.type==='trap'||g.type==='gu'||g.type==='mat')return false;
   return atk.some(u=>cheb(u.x,u.y,g.x,g.y)<=10&&los(u.x,u.y,g.x,g.y));
 }
 function elecVisible(x,y){
@@ -3361,7 +3364,7 @@ document.documentElement.style.setProperty('--plateDk',`url(${uiImg('btn_dark')}
 function log(msg,k){G.log.unshift({msg,k:k||'ks'});if(G.log.length>80)G.log.pop();renderLog();}
 
 // ---------- core actions ----------
-function shotPool(sh,t){const d=cheb(sh.x,sh.y,t.x,t.y),b=band(d),p=protection(sh,t);let pool=sh.stun?'YY':PROF[sh.op].d[b];if(p)pool=pool.replace(/[a-z]/g,'');return {d,b,p,pool};}
+function shotPool(sh,t){const d=cheb(sh.x,sh.y,t.x,t.y),b=band(d),p=SHOTP??protection(sh,t);let pool=sh.stun?'YY':PROF[sh.op].d[b];if(p)pool=pool.replace(/[a-z]/g,'');if((t.op==='vigil'||t.op==='iana')&&pool.length>1)pool=pool.slice(0,-1);return {d,b,p,pool};}
 function askReroll(hits){return new Promise(res=>{const el=document.createElement('div');el.className='rerollAsk';
   el.innerHTML=`<b>${hits?`這一槍 ${hits} 傷`:'沒打中'}</b><span>要用掉唯一一次重擲嗎？會保留點數最高的一顆，其他重擲</span><div><button class="primary" data-r="1">重擲</button><button data-r="0">不用</button></div>`;
   document.body.appendChild(el);let done=false;const fin=v=>{if(done)return;done=true;el.remove();res(v);};el.querySelectorAll('button').forEach(b=>b.onclick=()=>fin(b.dataset.r==='1'));setTimeout(()=>fin(false),9000);});}
@@ -3387,6 +3390,7 @@ async function shootUnit(sh,t,ow){
   log(`${nm(sh)}${ow?' 還擊':' 射擊'} ${nm(t)}（${BAND[b]}距離 ${d} 格${sh.stun?'，被閃光彈震暈':''}）${dice} 共 ${sum}${p?`，掩護 −${p}`:''}，造成 ${hits} 傷`,sh.side==='A'?'ka':'kd');
   render(); await sleep(G.ai?320:160);
   ST(sh).shots++;if(hits)ST(sh).hits++;
+  if(hits&&t.op==='blackbeard'&&t.ch>0){const c=Math.min(2,hits);hits-=c;t.ch--;log(`${nm(t)} 的步槍護盾擋下 ${c} 傷（剩 ${t.ch}）`,t.side==='A'?'ka':'kd');}
   DMGBY=sh;if(hits)await damage(t,hits);DMGBY=null;
   if(hits&&!t.alive){sh._k=(sh._k||0)+1;if(sh._k>=2)bigNote(['','','雙殺','三殺','四殺','王牌'][Math.min(5,sh._k)]+'！',`${OPS[sh.op].name}`,sh.side==='A'?'a':'d',1700);}
   if(t.alive){if(!t.spotted)log(`${nm(t)} 被標記位置（到回合結束）`,'ks');t.spotted=1;if(t.hidden)reveal(t,'中彈後');}
@@ -3426,9 +3430,9 @@ function shotFX(hits,cine){return new Promise(res=>{
 let DMGBY=null;const ST=u=>u.st||(u.st={k:0,dmg:0,taken:0,shots:0,hits:0,gad:0});
 const SRCOP={'毒氣':'smoke','電擊':'bandit','闊刀地雷':null,'集束炸彈':null};
 async function damage(u,n,src){
-  if(!u.alive)return;{let by=DMGBY;if(!by&&src&&SRCOP[src])by=G.units.find(x=>x.op===SRCOP[src]&&x.side!==u.side);if(!by&&!src)by=null;
+  if(!u.alive)return;n=dmgMod(u,n);if(n<=0)return;{let by=DMGBY;if(!by&&src&&SRCOP[src])by=G.units.find(x=>x.op===SRCOP[src]&&x.side!==u.side);if(!by&&!src)by=null;
     const real=Math.min(n,u.hp);ST(u).taken+=real;if(by&&by.side!==u.side){ST(by).dmg+=real;if(u.hp-n<=0)ST(by).k++;}}if(u.hidden)reveal(u,'受傷後');u.hp-=n; if(src)log(`${nm(u)} 受到${src} ${n} 點傷害`,'ks');
-  if(u.hp<=0){SFX.kill();u.alive=false;u.hp=0;u.overwatch=false;if(G.hostage&&G.hostage.by===u.id){G.hostage.by=null;G.hostage.x=u.x;G.hostage.y=u.y;log('人質留在原地','ks');}log(`${nm(u)} 陣亡`,u.side==='A'?'kd':'ka');}
+  if(u.hp<=0&&finkaSave(u))return render();if(u.hp<=0){SFX.kill();onKill(u);u.alive=false;u.hp=0;u.overwatch=false;if(G.hostage&&G.hostage.by===u.id){G.hostage.by=null;G.hostage.x=u.x;G.hostage.y=u.y;log('人質留在原地','ks');}log(`${nm(u)} 陣亡`,u.side==='A'?'kd':'ka');}
   render(); checkWin();
 }
 function checkWin(){
@@ -3469,21 +3473,22 @@ function finish(w,why){
   render();
 }
 async function step(u,x,y){DMGBY=null;
-  const occ=unitAt(x,y),cost=enterCost(x,y,u.x,u.y);
+  ECU=u;const occ=unitAt(x,y),cost=enterCost(x,y,u.x,u.y);
   if(occ&&occ.side===u.side&&u.mp>cost){u.fd=[Math.sign(x-u.x),Math.sign(y-u.y)];u.x=x;u.y=y;u.mp-=cost;if(G.cur&&G.cur.u===u)G.cur.path.push([x,y,pubNow(u)]);render();await sleep(70);return true;} // pass through teammates
   if(occ){ if(occ.side!==u.side){occ.spotted=1;if(occ.hidden)reveal(occ,'被撞見，');log(`${nm(u)} 撞見了 ${nm(occ)}！`,'ks');} u.mp=Math.max(0,u.mp-1);return false; }
-  u.fd=[Math.sign(x-u.x),Math.sign(y-u.y)];u.x=x;u.y=y;u.mp=Math.max(0,u.mp-cost);
+  const px=u.x,py=u.y;u.fd=[Math.sign(x-u.x),Math.sign(y-u.y)];u.x=x;u.y=y;u.mp=Math.max(0,u.mp-cost);
   if(G.hostage&&G.hostage.by===u.id){G.hostage.x=x;G.hostage.y=y;}
   if(G.cur&&G.cur.u===u)G.cur.path.push([x,y,pubNow(u)]); if(pub(u))SFX.step(); render(); await sleep(G.ai?(pub(u)?85:10):70);
   if(u.side==='A'){
     const tr=gadgetAt(x,y,'trap');
     if(tr){tr.alive=false;log(`${nm(u)} 觸發了 Kapkan 的陷阱！`,'kd');await damage(u,2);if(!u.alive)return false;}
     if(inGas(x,y)&&!u.gassed){u.gassed=true;await damage(u,1,'毒氣');if(!u.alive)return false;}
-    if(cedAt(x,y)&&!u.shocked){u.shocked=true;u.stun=true;log(`${nm(u)} 踩到 Bandit 的電擊線，被震暈`,'kd');await damage(u,1,'電擊');if(!u.alive)return false;}
+    if(cedAt(x,y)&&!u.shocked){u.shocked=true;stunU(u);log(`${nm(u)} 踩到 Bandit 的電擊線，被震暈`,'kd');await damage(u,1,'電擊');if(!u.alive)return false;}
     if(gadgetAt(x,y,'wire')){log(`${nm(u)} 被鐵絲網纏住，啟動結束`,'kd');u.mp=0;u.ap=0;}
   }
   if(u.side==='D'){const cl=G.gadgets.find(g=>g.alive&&g.type==='clay'&&((g.x===x&&g.y===y)||(g.x+g.dx===x&&g.y+g.dy===y)));
     if(cl){log(`${nm(u)} 觸發了闊刀地雷！`,'ka');await clayBoom(cl);if(!u.alive)return false;}}
+  if(!(await stepHooks(u,x,y,px,py)))return false;
   camCheck(u);revealCheck();
   if(!(await riposte(u)))return false;
   if(G.hostage&&G.hostage.by===u.id&&cell(x,y).t==='out'&&G.map.spawns.some(z=>z.cells.some(([a,b])=>a===x&&b===y))){render();finish('A','人質已安全撤離');return false;}
@@ -3493,20 +3498,21 @@ async function step(u,x,y){DMGBY=null;
 async function riposte(u){
   for(const e of G.units){
     if(!u.alive||G.over)return false;
-    if(e.alive&&e.side!==u.side&&e.overwatch&&e.x>=0&&(u.x-e.x)*e.owd[0]+(u.y-e.y)*e.owd[1]>0&&inSight(e,u)&&(!u.hidden||u.spotted>0||los(e.x,e.y,u.x,u.y)))
+    if(e.alive&&e.side!==u.side&&e.overwatch&&e.x>=0&&(u.x-e.x)*e.owd[0]+(u.y-e.y)*e.owd[1]>0&&losAs(e,()=>inSight(e,u))&&(!u.hidden||u.spotted>0||los(e.x,e.y,u.x,u.y)))
       await shootUnit(e,u,true);
   }
   return u.alive&&!G.over;
 }
 function camRooms(){const o=[];for(const g of G.gadgets)if(g.alive&&g.type==='cam'&&!jammed(g.x,g.y)&&cell(g.x,g.y).indoor){const r=new Set(roomOf(g.x,g.y).map(([x,y])=>y*G.W+x));o.push(r);}return o;}
-function camCheck(u){if(u.side!=='A'||!u.alive||u.spotted)return;if(camRooms().some(r=>r.has(u.y*G.W+u.x))){u.spotted=1;SFX.alert();if(u.side===G.player)bigNote('被攝影機發現！',`${OPS[u.op].name} 的位置已暴露`,'warn',1500);log(`${nm(u)} 被攝影機拍到，位置被標記`,'kd');}}
+function camCheck(u){if(u.side!=='A'||!u.alive||u.spotted||NOLOC.has(u.op))return;if(camRooms().some(r=>r.has(u.y*G.W+u.x))){u.spotted=1;SFX.alert();if(u.side===G.player)bigNote('被攝影機發現！',`${OPS[u.op].name} 的位置已暴露`,'warn',1500);log(`${nm(u)} 被攝影機拍到，位置被標記`,'kd');}}
 async function afterAct(u){if(!u||!u.alive||G.over)return;camCheck(u);await riposte(u);revealCheck();}
-function destroyCell(x,y){SFX.boom();const c=cell(x,y);if(c.t!=='bar')c.breach=true;c.t='floor';c.rubble=c.breach;c.opened=true;c.elec=false;c.indoor=true;
+function destroyCell(x,y){G._wv=(G._wv||0)+1;G.gadgets.forEach(g=>{if(g.type==='mirror'&&g.x===x&&g.y===y)g.alive=false;});SFX.boom();const c=cell(x,y);if(c.t!=='bar')c.breach=true;c.t='floor';c.rubble=c.breach;c.opened=true;c.elec=false;c.indoor=true;
   const tr=gadgetAt(x,y,'trap'); /* trap stays in doorway */ void tr;}
 
 function shootables(u){
-  const o=[];
-  for(const e of G.units)if(e.alive&&e.side!==u.side&&e.x>=0&&(!e.hidden||e.spotted>0)&&inSight(u,e))o.push({kind:'unit',t:e,x:e.x,y:e.y});
+  const o=[];LOSW=u.op==='warden';LOSD=u.side==='D';try{return shootables0(u,o);}finally{LOSW=false;LOSD=false;}}
+function shootables0(u,o){
+  for(const e of G.units)if(e.alive&&e.side!==u.side&&e.x>=0&&(!e.hidden||e.spotted>0)&&(inSight(u,e)||(e.spotted>0&&cheb(u.x,u.y,e.x,e.y)<=14&&los(u.x,u.y,e.x,e.y,true))))o.push({kind:'unit',t:e,x:e.x,y:e.y});
   return o;
 }
 async function doShoot(u,tg){
@@ -3514,14 +3520,14 @@ async function doShoot(u,tg){
   useAct(u,'shoot');note(u,`射擊 ${OPS[tg.t.op].name}`);
   await shootUnit(u,tg.t);await afterAct(u);
 }
-const GNAME={cam:'攝影機',jammer:'訊號干擾器',drone:'無人機',wire:'鐵絲網',shield:'可部署盾牌',trap:'陷阱',ced:'電擊線',clay:'闊刀地雷'};
+const GNAME={trax:'Trax 尖刺',argus:'Argus 攝影機',eye:'邪眼攝影機',kona:'Kóna 治療站',mat:'捕獸夾',gu:'蠱毒地雷',grz:'震盪地雷',claw:'Rtila 電爪',magnet:'Mag-NET',banshee:'Banshee',cam:'攝影機',jammer:'訊號干擾器',drone:'無人機',wire:'鐵絲網',shield:'可部署盾牌',trap:'陷阱',ced:'電擊線',clay:'闊刀地雷'};
 // strength of each gadget (S1 light, S2 medium); bulletproof ones only fall to an adjacent operator or a gadget
-const GSTR={cam:1,jammer:1,drone:1,wire:1,shield:2,trap:1,ced:1,clay:1};
-const isBP=g=>g.type==='wire'||g.type==='shield'||(g.type==='cam'&&g.bp);
+const GSTR={trax:1,argus:1,eye:2,kona:1,mat:1,gu:1,grz:1,claw:1,magnet:1,banshee:2,cam:1,jammer:1,drone:1,wire:1,shield:2,trap:1,ced:1,clay:1};
+const isBP=g=>g.type==='wire'||g.type==='shield'||g.type==='eye'||g.type==='banshee'||(g.type==='cam'&&g.bp);
 async function blastDestroy(x,y,d){ // free Destroy from a gadget with rating d at one space
   const c=cell(x,y);if(!c)return;
   if(c.t==='bar'||(d>=2&&c.t==='soft')||(d>=3&&c.t==='reinf'))destroyCell(x,y);
-  for(const g of G.gadgets)if(g.alive&&g.x===x&&g.y===y&&GSTR[g.type]&&GSTR[g.type]<=d){g.alive=false;if(g.type==='clay')await clayBoom(g);}}
+  for(const g of G.gadgets)if(g.alive&&g.x===x&&g.y===y&&GSTR[g.type]&&GSTR[g.type]<=d){g.alive=false;if(g.type==='clay')await clayBoom(g);if(g.volcan)await ignite(g.x,g.y);}}
 const blastArea=(x,y)=>[[x,y],...adj8(x,y)];
 async function clayBoom(g){SFX.boom();g.alive=false;G.fx={x0:g.x,y0:g.y,x1:g.x,y1:g.y,until:performance.now()+500,c:COL.danger};
   for(const a of G.units.filter(a=>a.alive&&a.x>=0&&blastArea(g.x,g.y).some(([i,j])=>i===a.x&&j===a.y))){const r=DIE.R[Math.floor(Math.random()*6)]+DIE.R[Math.floor(Math.random()*6)];if(r)await damage(a,r,'闊刀地雷');}}
@@ -3530,7 +3536,7 @@ function destroyTargets(u){const lv=PROF[u.op].dz||1,o=within(u.x,u.y,14).filter
   for(const g of G.gadgets)if(g.alive&&g.side!==u.side&&GNAME[g.type]&&g.type!=='trap'&&gadgetVisibleTo(g,u.side)&&(GSTR[g.type]||1)<=(PROF[u.op].dz||1)&&(cheb(u.x,u.y,g.x,g.y)<=1||(!isBP(g)&&cheb(u.x,u.y,g.x,g.y)<=8&&los(u.x,u.y,g.x,g.y,false,true))))o.push([g.x,g.y]);
   return o;}
 async function doDestroy(u,x,y){useAct(u,'destroy');const g=G.gadgets.find(g=>g.alive&&g.x===x&&g.y===y&&g.side!==u.side&&GNAME[g.type]&&g.type!=='trap');
-  if(g){g.alive=false;if(g.type==='clay')await clayBoom(g);note(u,'摧毀'+GNAME[g.type]);G.fx={x0:u.x,y0:u.y,x1:x,y1:y,until:performance.now()+400,c:u.side==='A'?COL.atk:COL.def};log(`${nm(u)} 摧毀了${GNAME[g.type]}`,u.side==='A'?'ka':'kd');}
+  if(g){g.alive=false;if(g.type==='clay')await clayBoom(g);if(g.volcan)await ignite(g.x,g.y);note(u,'摧毀'+GNAME[g.type]);G.fx={x0:u.x,y0:u.y,x1:x,y1:y,until:performance.now()+400,c:u.side==='A'?COL.atk:COL.def};log(`${nm(u)} 摧毀了${GNAME[g.type]}`,u.side==='A'?'ka':'kd');}
   else{const c=cell(x,y),wall=c.t==='soft';note(u,wall?'打穿軟牆':'破壞路障');destroyCell(x,y);log(wall?`${nm(u)} 打穿了一面軟牆`:`${nm(u)} 破壞了${c.kind==='window'?'窗戶':'門'}路障`,u.side==='A'?'ka':'kd');}
   render();await sleep(G.ai?150:60);await afterAct(u);}
 const chargeTargets=u=>G.charges>0?adj4(u.x,u.y).filter(([x,y])=>['soft','bar','reinf'].includes(cell(x,y).t)&&!jammed(x,y)):[];
@@ -3540,7 +3546,8 @@ function plantOK(u){return G.mission!=='hostage'&&!G.defuser&&cell(u.x,u.y).site
 function escortOK(u){return G.hostage&&!G.hostage.by&&u.side==='A'&&cheb(u.x,u.y,G.hostage.x,G.hostage.y)<=1;}
 
 function setupIndoor(x,y){const c=cell(x,y);return c.indoor&&!blocks(c)&&!c.obst;}
-function gTargets(u){
+var GSH={"blitz": "閃光盾", "twitch": "電擊無人機", "montagne": "展開護盾", "flores": "Ratero", "castle": "裝甲板", "pulse": "心跳感測", "thunderbird": "Kóna 站", "buck": "萬能鑰匙", "capitao": "十字弩", "hibana": "X-KAIROS", "frost": "捕獸夾", "caveira": "無聲步", "echo": "妖怪無人機", "jackal": "Eyenox", "ying": "坎德拉", "zofia": "震盪彈", "dokkaebi": "邏輯炸彈", "mira": "黑鏡", "lesion": "蠱毒地雷", "ela": "震盪地雷", "finka": "腎上腺素", "maverick": "噴槍", "nomad": "Airjab", "maestro": "邪眼", "kaid": "電爪", "clash": "電擊盾", "gridlock": "Trax", "amaru": "鉤爪", "kali": "LV 長矛", "mozzie": "害蟲無人機", "goyo": "燃燒盾", "wamai": "Mag-NET", "ace": "S.E.L.M.A.", "zero": "Argus", "oryx": "衝刺", "melusi": "Banshee"};
+function gTargets(u){if(GT[u.op])return GT[u.op](u,G.phase==='setup');
   const s=G.phase==='setup',me=[u.x,u.y];
   const free=([x,y])=>!blocks(cell(x,y));
   switch(u.op){
@@ -3559,20 +3566,20 @@ function gTargets(u){
   }
   return [];
 }
-const setupGadget=op=>['mute','bandit','kapkan','valkyrie'].includes(op);
+const setupGadget=op=>['mute','bandit','kapkan','valkyrie',...SETUPOPS].includes(op);
 async function useGadget(u,x,y){ST(u).gad++;DMGBY=u;if(x!=null)aimCam(u,[[x,y]]);
   u.ch--; if(G.phase!=='setup')useAct(u,'special');
   const o=OPS[u.op],side=u.side==='A'?'ka':'kd';note(u,o.g);
-  switch(u.op){
+  if(UG[u.op])await UG[u.op](u,x,y,side);else switch(u.op){
     case 'sledge':destroyCell(x,y);log(`${nm(u)} 用大錘砸開了牆面`,side);break;
     case 'thermite':destroyCell(x,y);log(`${nm(u)} 燒穿了${'加固牆'}`,side);break;
     case 'ash':destroyCell(x,y);G.fx={x0:u.x,y0:u.y,x1:x,y1:y,until:performance.now()+400,c:COL.atk};log(`${nm(u)} 的破牆彈炸開了缺口`,side);break;
-    case 'thatcher':{let n=0;for(const g of G.gadgets)if(g.alive&&g.type!=='gas'&&g.side==='D'&&cheb(g.x,g.y,x,y)<=2){g.alive=false;n++;}
+    case 'thatcher':{let n=0;for(const g of G.gadgets)if(g.alive&&!['gas','fire','mat','gu','trap'].includes(g.type)&&g.side==='D'&&cheb(g.x,g.y,x,y)<=2){g.alive=false;n++;}
       for(const [i,j] of within(x,y,2))if(cell(i,j).elec){cell(i,j).elec=false;n++;}
       log(`${nm(u)} 的 EMP 癱瘓了 ${n} 個防守道具`,side);break;}
     case 'fuze':{log(`${nm(u)} 引爆集束炸彈`,side);const hit=G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,x,y)<=1);
       for(const a of hit){a.spotted=1;await damage(a,1,'集束炸彈');}break;}
-    case 'lion':alive('D').forEach(d=>{d.spotted=1;d.hidden=false;});(G.decoys||[]).forEach(k=>k.alive=false);log(`${nm(u)} 啟動 EE-ONE-D，所有防守方被標記到回合結束！`,side);break;
+    case 'lion':alive('D').filter(d=>!NOLOC.has(d.op)).forEach(d=>{d.spotted=1;d.hidden=false;});(G.decoys||[]).forEach(k=>k.alive=false);log(`${nm(u)} 啟動 EE-ONE-D，所有防守方被標記到回合結束！`,side);break;
     case 'mute':G.gadgets.push({type:'jammer',x,y,side:'D',alive:true});if(pub(u))log(`${nm(u)} 放置了訊號干擾器`,side);break;
     case 'bandit':G.gadgets.push({type:'ced',x,y,side:'D',alive:true});if(pub(u)||G.player==='D')log(`${nm(u)} 佈下 CED-1 電擊線（該格與相鄰格通電）`,side);break;
     case 'kapkan':G.gadgets.push({type:'trap',x,y,side:'D',alive:true});if(G.player==='D')log(`${nm(u)} 設置了陷阱`,side);break;
@@ -3584,8 +3591,8 @@ async function useGadget(u,x,y){ST(u).gad++;DMGBY=u;if(x!=null)aimCam(u,[[x,y]])
   render();if(G.phase==='play')await afterAct(u);
 }
 // drones: deploy next to the operator, roll up to 5 spaces (under doors, not through windows or wire), then locate every defender in that room
-function droneTargets(u){if(G.drones<=0)return [];const W=G.W,d=new Map(),q=[];
-  const ok=(x,y)=>{const c=cell(x,y);return c&&(!blocks(c)||(c.t==='bar'&&c.kind==='door'))&&!gadgetAt(x,y,'wire')&&!shieldAt(x,y);};
+function droneTargets(u){if(G.drones<=0&&!DRONEANY)return [];const W=G.W,d=new Map(),q=[];
+  const ok=(x,y)=>{const c=cell(x,y);return c&&(!blocks(c)||(c.t==='bar'&&c.kind==='door'))&&!gadgetAt(x,y,'wire')&&!shieldAt(x,y)&&!(u.side==='A'&&gadgetAt(x,y,'claw'));};
   for(const [x,y] of adj4(u.x,u.y))if(ok(x,y)){d.set(y*W+x,0);q.push([x,y,0]);}
   while(q.length){const [x,y,k]=q.shift();if(k>=5)continue;for(const [a,b] of adj4(x,y)){const i=b*W+a;if(d.has(i)||!ok(a,b))continue;d.set(i,k+1);q.push([a,b,k+1]);}}
   return [...d.keys()].map(i=>[i%W,(i/W)|0]).filter(([x,y])=>!blocks(cell(x,y))&&!unitAt(x,y));}
@@ -3594,7 +3601,8 @@ async function droneScan(u,x,y){
   G.gadgets.push({type:'drone',x,y,side:'A',alive:true});
   const room=cell(x,y).indoor?new Set(roomOf(x,y).map(([a,b])=>b*G.W+a)):new Set(within(x,y,2).map(([a,b])=>b*G.W+a));
   let n=0;
-  for(const d of alive('D'))if(room.has(d.y*G.W+d.x)&&!jammed(x,y)){d.spotted=1;d.hidden=false;n++;}
+  for(const d of alive('D'))if(room.has(d.y*G.W+d.x)&&!jammed(x,y)&&!NOLOC.has(d.op)){d.spotted=1;d.hidden=false;n++;}
+  mozzieFeed();
   for(const k of G.decoys||[])if(k.alive&&room.has(k.y*G.W+k.x)){k.alive=false;}
   log(jammed(x,y)?`${nm(u)} 的無人機被訊號干擾器癱瘓`:`${nm(u)} 的無人機開進 ${coord(x,y)}，標記了這個房間裡的 ${n} 名防守方`,'ka');render();await afterAct(u);
 }
@@ -3603,13 +3611,14 @@ const throwTargets=u=>within(u.x,u.y,6).filter(([x,y])=>!blocks(cell(x,y))&&los(
 const impactTargets=u=>within(u.x,u.y,6).filter(([x,y])=>{const c=cell(x,y);return c.t!=='hard'&&c.t!=='reinf'&&!(x===u.x&&y===u.y)&&los(u.x,u.y,x,y,false,true)&&(['soft','bar'].includes(c.t)||G.gadgets.some(g=>g.alive&&g.side!==u.side&&g.x===x&&g.y===y&&GSTR[g.type]));});
 async function throwGadget(u,kind,x,y){ST(u).gad++;DMGBY=u;aimCam(u,[[x,y]]);
   useAct(u,'tactical');const side=u.side==='A'?'ka':'kd';
+  if(catchThrow(u,x,y)){G[kind]--;render();await afterAct(u);return;}
   const area=blastArea(x,y),inA=a=>a.alive&&a.x>=0&&area.some(([i,j])=>i===a.x&&j===a.y);
   const roll=(c,n)=>{let t=0;for(let i=0;i<n;i++)t+=DIE[c][Math.floor(Math.random()*6)];return t;};
   if(kind==='frag'||kind==='nitro'){const fr=kind==='frag';SFX.boom();G[kind]--;note(u,fr?'破片手榴彈':'C4 遙控炸藥');log(`${nm(u)} ${fr?'丟出破片手榴彈':'引爆 C4 遙控炸藥'}`,side);
     const hit=G.units.filter(inA);if(fr)for(const [i,j] of area)await blastDestroy(i,j,1);
     for(const a of hit){if(!a.alive)continue;const ctr=a.x===x&&a.y===y,r=fr?roll('Y',ctr?2:1):roll('O',ctr?2:1);if(r)await damage(a,r,fr?'破片':'C4');}}
   else if(kind==='impact'){G.impact--;note(u,'衝擊手榴彈');const c=cell(x,y),w=c.t==='soft'?'軟牆':c.t==='bar'?(c.kind==='window'?'窗戶路障':'門路障'):'道具';await blastDestroy(x,y,2);log(`${nm(u)} 的衝擊手榴彈炸掉了${w}`,side);}
-  else if(kind==='flash'){SFX.flash();G.flash--;note(u,'閃光彈');let n=0;for(const a of G.units)if(inA(a)){a.stun=true;if(a.hidden)reveal(a,'被閃光彈');n++;}
+  else if(kind==='flash'){SFX.flash();G.flash--;note(u,'閃光彈');let n=0;for(const a of G.units)if(inA(a)){stunU(a);if(a.hidden)reveal(a,'被閃光彈');n++;}
     log(`${nm(u)} 丟出閃光彈，${n} 名幹員被震暈（射擊只擲兩顆黃骰，到回合結束）`,side);}
   else if(kind==='smk'){G.smk--;note(u,'煙霧彈');G.gadgets.push({type:'smk',x:Math.min(x,G.W-2),y:Math.min(y,G.H-2),side:u.side,alive:true});log(`${nm(u)} 丟出煙霧彈，煙霧擋住視線到回合結束`,side);}
   G.fx={x0:u.x,y0:u.y,x1:x,y1:y,until:performance.now()+400,c:COL.accent};render();await sleep(150);await afterAct(u);
@@ -3637,7 +3646,7 @@ function sprint(u){note(u,'奔跑');useAct(u,'run');u.mp+=u.run;}
 // ---------- phases ----------
 const pubNow=u=>pub(u);
 function note(u,t){if(G.cur&&G.cur.u===u)G.cur.acts.push(t);}
-function beginAct(u){u.activated=true;u.mp=u.speed;u.ap=2;u.used=new Set();u.overwatch=false;u.gassed=false;u.shocked=false;G.acts++;G.active=u;G.tEnd=0;
+function beginAct(u){u.activated=true;u.mp=u.speed;u.ap=2;u.used=new Set();u.overwatch=false;u.gassed=false;u.shocked=false;u.burned=false;u._eye=0;u._trax=0;G.acts++;G.active=u;G.tEnd=0;
   G.cur={u,side:u.side,round:G.round,ph:G.phaseIdx,path:[[u.x,u.y,pubNow(u)]],acts:[]};}
 function recordAct(){const r=G.cur;G.cur=null;if(!r||(r.path.length<2&&!r.acts.length))return;G.moves.push(r);
   if(r.side===G.player||r.path.some(p=>p[2]))G.hl=G.moves.length-1;}
@@ -3653,7 +3662,7 @@ function endPhase(){
   if(G.net&&curSide()===G.player)G._handoff=true;
   const s=curSide();
   if(G.active)endAct(G.active);
-  G.gadgets.forEach(g=>{if(g.type==='gas'&&g.alive&&--g.life<=0)g.alive=false;});
+  G.gadgets.forEach(g=>{if((g.type==='gas'||g.type==='fire')&&g.alive&&--g.life<=0)g.alive=false;});
   if(s==='D'&&G.defuser){G.defuser.timer--;if(G.defuser.timer<=0){render();return finish('A','拆彈器運作完成');}}
   G.phaseIdx++;
   if(G.phaseIdx>=4){
@@ -3682,15 +3691,15 @@ function pathCost(u,x,y){
   if(o&&o!==u){if(o.side!==u.side&&vis&&vis.has(o.id))return Infinity; if(o.side===u.side)return 4;}
   if(shieldAt(x,y))return Infinity;
   const dz=u.side==='A'&&G._danger?G._danger[y*G.W+x]:0;
-  if(c.t==='out'||c.t==='floor')return enterCost(x,y)+dz+(u.side==='A'&&(inGas(x,y)||gadgetAt(x,y,'wire'))?4:0);
+  if(c.t==='out'||c.t==='floor')return enterCost(x,y)+dz+(u.side==='A'&&(inGas(x,y)||gadgetAt(x,y,'wire')||inFire(x,y))?4:0)+(u.side==='D'&&(inFire(x,y)||traxNear(x,y))?4:0);
   if(c.t==='bar')return 3;
   if(u.side==='D')return Infinity;
   const jam=jammed(x,y);
-  if(c.t==='soft'){if(u.op==='sledge'||(u.op==='ash'&&u.ch>0)||(u.op==='thermite'&&u.ch>0&&!jam)||(G.charges>0&&!jam))return 5;return Infinity;}
-  if(c.t==='reinf'){if(u.op==='thermite'&&u.ch>0&&!c.elec&&!jam)return 6;return Infinity;}
+  if(c.t==='soft'){if((BRK[u.op]&&u.ch>0)||u.op==='sledge'||(u.op==='ash'&&u.ch>0)||(u.op==='thermite'&&u.ch>0&&!jam)||(G.charges>0&&!jam))return 5;return Infinity;}
+  if(c.t==='reinf'){if(u.op==='thermite'&&u.ch>0&&!c.elec&&!jam)return 6;if(BRKR[u.op]&&u.ch>0&&!c.elec&&!jam)return 6;return Infinity;}
   return Infinity;
 }
-function findPath(u,goal){
+function findPath(u,goal){ECU=u;
   const W=G.W,N=W*G.H,dist=new Array(N).fill(Infinity),prev=new Array(N).fill(-1),done=new Uint8Array(N);
   const s=u.y*W+u.x;dist[s]=0;
   for(;;){let b=-1,bd=Infinity;for(let i=0;i<N;i++)if(!done[i]&&dist[i]<bd){bd=dist[i];b=i;}
@@ -3699,7 +3708,7 @@ function findPath(u,goal){
     for(const [nx,ny] of (blocks(cell(bx,by))?adj4(bx,by):adj8(bx,by))){const i=ny*W+nx;if(done[i])continue;const c=pathCost(u,nx,ny);if(dist[b]+c<dist[i]){dist[i]=dist[b]+c;prev[i]=b;}}
   }
 }
-function reach(u){ // cheapest walkable spaces within the remaining movement points (8-way)
+function reach(u){ECU=u; // cheapest walkable spaces within the remaining movement points (8-way)
   const W=G.W,vis=sees(u.side),m=new Map();const q=[[u.x,u.y,0]];m.set(u.y*W+u.x,{d:0,p:-1});
   while(q.length){q.sort((a,b)=>a[2]-b[2]);const [x,y,d]=q.shift();if(d>m.get(y*W+x).d)continue;
     for(const [nx,ny] of adj8(x,y)){const k=ny*W+nx;const c=cell(nx,ny);if(blocks(c)||shieldAt(nx,ny))continue;
@@ -3723,6 +3732,7 @@ async function aiBreach(u,x,y){
     if(u.op==='thermite'&&u.ch>0&&!jam&&canDo(u,'special')){await useGadget(u,x,y);return true;}
   }
   if(c.t==='reinf'&&u.op==='thermite'&&u.ch>0&&!c.elec&&!jam&&canDo(u,'special')){await useGadget(u,x,y);return true;}
+  if((BRK[u.op]||BRKR[u.op])&&u.ch>0&&canDo(u,'special')){const t=gTargets(u);if(t!=='self'&&t.some(([a,b])=>a===x&&b===y)){await useGadget(u,x,y);return true;}}
   return false;
 }
 async function aiAttacker(u){
@@ -3741,6 +3751,7 @@ async function aiAttacker(u){
     if(canDo(u,'special')&&u.op==='fuze'&&u.ch>0){const d=alive('D').find(d=>G._vis.has(d.id)&&cheb(u.x,u.y,d.x,d.y)<=3);if(d){await useGadget(u,d.x,d.y);continue;}}
     if(canDo(u,'special')&&u.op==='thatcher'&&u.ch>0){const g=G.gadgets.find(g=>g.alive&&g.side==='D'&&g.type!=='trap'&&g.type!=='gas'&&gadgetVisibleTo(g,'A')&&cheb(u.x,u.y,g.x,g.y)<=4);
       if(g){const t=within(u.x,u.y,3).sort((a,b)=>cheb(a[0],a[1],g.x,g.y)-cheb(b[0],b[1],g.x,g.y))[0];await useGadget(u,t[0],t[1]);continue;}}
+    if(canDo(u,'special')&&u.ch>0&&AIG[u.op]){const t=AIG[u.op](u);if(t){await useGadget(u,...(t==='self'?[]:t));continue;}}
     if(canDo(u,'obj')&&plantOK(u)){plant(u);continue;}
     if(canDo(u,'obj')&&escortOK(u)){await escort(u);continue;}
     if(G.defuser&&man(u.x,u.y,G.defuser.x,G.defuser.y)<=3)break;
@@ -3792,6 +3803,7 @@ async function aiDefender(u){
       break;
     }
     if(canDo(u,'special')&&u.op==='doc'&&u.ch>0){const t=gTargets(u).find(([x,y])=>{const a=unitAt(x,y);return a.max-a.hp>=2;});if(t){await useGadget(u,...t);continue;}}
+    if(canDo(u,'special')&&u.ch>0&&AIG[u.op]){const t=AIG[u.op](u);if(t){await useGadget(u,...(t==='self'?[]:t));continue;}}
     if(canDo(u,'special')&&u.op==='smoke'&&u.ch>0){const t=alive('A').find(a=>cheb(u.x,u.y,a.x,a.y)<=4&&los(u.x,u.y,a.x,a.y));if(t){await useGadget(u,t.x,t.y);continue;}}
     const seen=alive('A').filter(a=>G._vis.has(a.id)&&cheb(a.x,a.y,u.x,u.y)<=(u.hidden?5:8));
     if(seen.length&&u.mp>0&&canDo(u,'shoot')&&!u.peeked&&Math.random()<.6){
@@ -3862,12 +3874,14 @@ function autoDefSetup(withGadgets){
       else if(u.op==='bandit'){const c=rooms.flat().filter(([x,y])=>!blocks(cell(x,y))&&!unitAt(x,y)&&!gadgetAt(x,y)&&!cedAt(x,y)&&adj4(x,y).some(([a,b])=>['soft','bar'].includes(cell(a,b).t)));t=shuffle(c)[0];}
       else if(u.op==='kapkan'){const c=allCells().filter(([x,y])=>cell(x,y).t==='bar'&&!gadgetAt(x,y)&&adj4(x,y).some(([a,b])=>roomSet.has(b*G.W+a)));t=shuffle(c)[0]||shuffle(allCells().filter(([x,y])=>cell(x,y).t==='bar'&&!gadgetAt(x,y)))[0];}
       else if(u.op==='valkyrie'){const c=indoor.filter(([x,y])=>!roomSet.has(y*G.W+x)&&!gadgetAt(x,y)&&G.gadgets.every(g=>g.type!=='cam'||cheb(g.x,g.y,x,y)>4));t=shuffle(c)[0];}
+      else if(SAI[u.op])t=SAI[u.op](u,rooms,roomSet,indoor);
       else break;
       if(!t)break; const svp=G.phase;G.phase='setup';const ch=u.ch;
       if(u.op==='mute')G.gadgets.push({type:'jammer',x:t[0],y:t[1],side:'D',alive:true});
       if(u.op==='bandit')G.gadgets.push({type:'ced',x:t[0],y:t[1],side:'D',alive:true});
       if(u.op==='kapkan')G.gadgets.push({type:'trap',x:t[0],y:t[1],side:'D',alive:true});
       if(u.op==='valkyrie')G.gadgets.push({type:'cam',valk:true,x:t[0],y:t[1],side:'D',alive:true});
+      if(PLACE[u.op])PLACE[u.op](u,t[0],t[1]);
       u.ch=ch-1;G.phase=svp;
     }
   }
@@ -3903,7 +3917,7 @@ function newGame(){
 }
 const unplaced=()=>G?alive(G.player).filter(u=>u.x<0):[];
 function nextUnplaced(){const n=unplaced()[0];if(n){G.sel=n;G.mode='move';}}
-function startPlay(){if(G&&!G.reroll)G.reroll={A:0,D:0};
+function startPlay(){if(G&&!G.reroll)G.reroll={A:0,D:0};try{playStartHooks();}catch(e){console.warn(e);}
   if(!G.net&&G.phase==='setup'&&unplaced().length)return;
   if(!G.net&&G.player==='D'&&!G.decoys.length)seedDecoys();
   G.phase='play';G.sel=null;G.mode='move';clockReset();
@@ -4332,6 +4346,247 @@ async function socialLoad(id){SOC_ID=id;try{const db=await claude.use('db');if(!
   for(const k in d.got||{})if(!AS.got[k])AS.got[k]=d.got[k];for(const k in d.n||{})AS.n[k]=Math.max(AS.n[k]||0,d.n[k]|0);
   try{localStorage.setItem(FKEY,JSON.stringify(FR));localStorage.setItem(AKEY,JSON.stringify(AS));}catch(e){}renderPlayer();}catch(e){}}
 let socT=0;function socialPush(){if(!SOC_ID||ME.mode!=='account')return;clearTimeout(socT);socT=setTimeout(async()=>{try{const db=await claude.use('db');if(db)await db.collection('data/users/'+SOC_ID).doc('social').set({list:FR.list.slice(0,200),recent:FR.recent,got:AS.got,n:AS.n,ts:Date.now()});}catch(e){}},800);}
+// ===== remaining operators: gadgets in the simplified digital rules =====
+var LOSW=false,LOSD=false,SHOTP=null,DRONEANY=false;
+var NOLOC=new Set(['nokk','iana','vigil']);
+var NOBTN=new Set(['blackbeard','jager','vigil','nokk','iana','warden','alibi','aruni','castle','thunderbird','maestro','kaid','goyo','wamai','melusi']);
+var SETUPOPS=['castle','thunderbird','frost','lesion','ela','mira','maestro','kaid','goyo','wamai','melusi'];
+var BRK={buck:1,hibana:1,ace:1,maverick:1,oryx:1},BRKR={hibana:1,ace:1,maverick:1};
+var GDX={
+ blitz:['〔行動〕閃光盾：選相鄰一格，該房間內除了 Blitz 以外的所有幹員都被震暈（擲骰只剩兩顆黃骰，到這一輪結束）。',2],
+ twitch:['〔行動〕電擊無人機：像無人機一樣開出去偵查房間，再擲一顆紅骰，擲出幾點就摧毀那個房間裡幾個電子道具。',2],
+ montagne:['〔行動〕展開磐石盾：到這一輪結束都算重型掩護，而且最多抵銷 4 傷。每輪一次。',99],
+ flores:['〔行動〕RCE-Ratero 無人機：開到 5 格內，在落點和相鄰四格做中型破壞，站在這些格子的幹員各受一顆橙骰傷害。',2],
+ castle:['〔佈防〕裝甲板：把一道門或窗的路障換成加固牆。',2],
+ pulse:['〔行動〕心跳感測器：標記 6 格內一名進攻方；如果他已被標記且在 3 格內，改成隔牆射擊他（算輕型掩護）。',3],
+ jager:['〔反應〕主動防禦系統：進攻方把投擲道具丟到 Jäger 3 格內時自動攔截，道具作廢。',2],
+ thunderbird:['〔佈防〕Kóna 治療站：放在室內；同一房間裡的任何幹員每次受傷少 1 點。',3],
+ buck:['〔行動〕萬能鑰匙：打穿 4 格內看得到的一面軟牆或路障。',3],
+ blackbeard:['〔反應〕步槍護盾：被射中時自動擋下最多 2 傷。',2],
+ capitao:['〔行動〕戰術十字弩：在 6 格內射出燃燒彈，3×3 範圍起火兩個階段，裡面的幹員立刻受一顆橙骰傷害，之後走進火裡的也會。',3],
+ hibana:['〔行動〕X-KAIROS：在 6 格內炸開一面軟牆、路障或加固牆（通電或被干擾時不行）。',2],
+ frost:['〔佈防／行動〕捕獸夾：佈防時放在室內，對戰中放在相鄰格。進攻方看不到，踩到受 2 傷並立刻結束啟動。',2],
+ caveira:['〔被動〕審訊：Caveira 擊殺敵人時，其他進攻方全被標記。〔行動〕無聲步：隔牆射擊 3 格內一名被標記的進攻方（算輕型掩護）。',99],
+ echo:['〔行動〕妖怪無人機：開到附近房間，標記並震暈裡面的所有進攻方。',2],
+ jackal:['〔行動〕Eyenox：有被標記的防守方在 3 格內時隔牆射擊他（算輕型掩護）；否則追蹤並標記最近一名防守方。',3],
+ ying:['〔行動〕坎德拉：丟到 6 格內（可越過一面輕牆），該房間內除了 Ying 以外的所有幹員都被震暈。',2],
+ zofia:['〔行動〕KS79 震盪彈：看得到的一名敵人被震暈，並受一顆橙骰傷害。',2],
+ dokkaebi:['〔行動〕邏輯炸彈：讓最近一名還沒被標記的防守方手機響起，他被標記並現身。',2],
+ mira:['〔佈防／行動〕黑鏡：把相鄰的一面軟牆或加固牆變成單向窗：會變成加固牆，防守方可以隔著它看見並射擊，進攻方看不穿。',2],
+ lesion:['〔佈防／行動〕蠱毒地雷：佈防時放在室內，對戰中丟在 3 格內。進攻方看不到，踩到被標記並受 1 傷。',3],
+ ela:['〔佈防／行動〕Grzmot 地雷：佈防時放在室內，對戰中丟在 3 格內。進攻方走到地雷或旁邊一格就被震暈。',3],
+ vigil:['〔被動〕ERC-7：永遠不會被標記（無人機、Lion 都抓不到）；射擊他的人少擲一顆骰。',0],
+ finka:['〔行動〕腎上腺素：替自己或 4 格內看得到的隊友回復 3 點生命。〔反應〕隊友陣亡時，如果 Finka 還有充能，會自動把他救回 1 點生命並震暈。',2],
+ maverick:['〔行動〕突破噴槍：安靜燒穿相鄰的一面軟牆或加固牆（通電或被干擾時不行）。',2],
+ nomad:['〔行動〕Airjab：把 6 格內看得到的一名敵人推到旁邊離 Nomad 最遠的空格。',3],
+ maestro:['〔佈防〕邪眼攝影機：放在室內（防彈）；進攻方每次啟動第一次走進或停在該房間，會被標記並受一顆黃骰傷害。',2],
+ alibi:['〔被動〕Prisma：對戰開始時多放 2 個假的隱藏標記。',0],
+ clash:['〔行動〕CCE 電擊盾：3 格內看得到的一名進攻方被震暈並受一顆黃骰傷害。〔被動〕重型掩護時最多抵銷 4 傷。',2],
+ kaid:['〔佈防〕Rtila 電爪：放在門窗內側；進攻方走進那格會被震暈並受 1 傷，無人機也開不過去。',2],
+ gridlock:['〔行動〕Trax 尖刺：丟到 6 格內；防守方走進尖刺或旁邊一格受 1 傷，並立刻結束啟動。',2],
+ nokk:['〔被動〕HEL：永遠不會被攝影機或道具標記。',0],
+ amaru:['〔行動〕Garra 鉤爪：飛到 10 格內任一扇窗（有路障就直接撞破）。每輪一次，護送人質時不能用。',99],
+ kali:['〔行動〕LV 長矛：丟進 6 格內的房間（可越過一面牆），摧毀那個房間的所有防守道具和門窗路障。',2],
+ mozzie:['〔被動〕害蟲：開場偷走進攻方一台無人機；之後進攻方每用一台無人機，Mozzie 就多一次。〔行動〕用偷來的無人機偵查房間，標記裡面的進攻方。',1],
+ warden:['〔被動〕智慧眼鏡：永遠不會被震暈，而且可以看穿煙霧。',0],
+ goyo:['〔佈防〕Volcán 燃燒盾：可部署盾牌；進攻方走到旁邊或盾被摧毀時爆燃，3×3 起火兩個階段，裡面的幹員受一顆橙骰傷害。',2],
+ wamai:['〔佈防〕Mag-NET：放在室內；進攻方丟進同一房間的投擲道具都會被吸走作廢。',2],
+ iana:['〔被動〕Gemini：永遠不會被攝影機標記；射擊 Iana 的人少擲一顆骰。',0],
+ ace:['〔行動〕S.E.L.M.A.：在 6 格內炸開一面軟牆、路障或加固牆（通電或被干擾時不行）。',2],
+ zero:['〔行動〕Argus 攝影機：射進 6 格內的房間；防守方每次啟動第一次走進或停在那個房間，會被標記並受一顆黃骰傷害。',2],
+ oryx:['〔行動〕Remah 衝刺：撞穿相鄰的一面軟牆並站進去。每輪一次。',99],
+ melusi:['〔佈防〕Banshee：放在室內（防彈）；進攻方在那個房間裡每移動一格多花 1 點。',2],
+ aruni:['〔反應〕Surya 雷射門：進攻方第一次從外面走進目標房間時被震暈，並受一顆橙骰傷害。',2],
+};
+var die1=c=>DIE[c][Math.floor(Math.random()*6)];
+function stunU(a){if(!a||a.op==='warden')return false;a.stun=true;return true;}
+function locU(a){if(!a||NOLOC.has(a.op))return false;a.spotted=1;if(a.hidden)a.hidden=false;return true;}
+function losAs(e,f){const w=LOSW,d=LOSD;LOSW=e.op==='warden';LOSD=e.side==='D';try{return f();}finally{LOSW=w;LOSD=d;}}
+var RS={};
+function roomCells(x,y){const k=`${x},${y},${G._wv||0}`;if(RS.g!==G){for(const i in RS)delete RS[i];RS.g=G;}
+  if(!RS[k]){const c=cell(x,y);RS[k]=new Set((c&&c.indoor&&!blocks(c)?roomOf(x,y):within(x,y,1)).map(([a,b])=>b*G.W+a));}return RS[k];}
+var inRoomOf=(g,x,y,r=4)=>cheb(g.x,g.y,x,y)<=r&&roomCells(g.x,g.y).has(y*G.W+x);
+var inFire=(x,y)=>G.gadgets.some(g=>g.alive&&g.type==='fire'&&cheb(g.x,g.y,x,y)<=1);
+var traxNear=(x,y)=>G.gadgets.some(g=>g.alive&&g.type==='trax'&&cheb(g.x,g.y,x,y)<=1);
+function bansheeCost(x,y){if(!G||!ECU||ECU.side!=='A')return 0;for(const g of G.gadgets)if(g.alive&&g.type==='banshee'&&inRoomOf(g,x,y))return 1;return 0;}
+var opAlive=op=>G.units.find(a=>a.alive&&a.op===op&&a.x>=0);
+var losTo=(u,x,y)=>los(u.x,u.y,x,y,false,true);
+var wallsBetween=(u,x,y)=>lineCells(u.x,u.y,x,y).filter(([a,b])=>blocks(cell(a,b))).length;
+var enemies=u=>G.units.filter(e=>e.alive&&e.side!==u.side&&e.x>=0);
+var seenEnemies=u=>enemies(u).filter(e=>(!e.hidden||e.spotted>0)&&inSight(u,e));
+var thrown=(u,r=6)=>within(u.x,u.y,r).filter(([x,y])=>!blocks(cell(x,y))&&!(x===u.x&&y===u.y)&&losTo(u,x,y));
+var wallT=(u,r,kinds)=>within(u.x,u.y,r).filter(([x,y])=>{const c=cell(x,y);return kinds.includes(c.t)&&!c.elec&&!jammed(x,y)&&(cheb(u.x,u.y,x,y)<=1||losTo(u,x,y));});
+var roomOrArea=(x,y)=>[...roomCells(x,y)].map(k=>[k%G.W,(k/G.W)|0]);
+var entryCells=()=>allCells().filter(([x,y])=>{const c=cell(x,y);return c.t==='floor'&&c.indoor&&!gadgetAt(x,y)&&!unitAt(x,y)&&adj4(x,y).some(([a,b])=>{const d=cell(a,b);return d.kind&&(d.t==='bar'||!d.indoor);});});
+function catchThrow(u,x,y){if(u.side!=='A')return false;
+  const mg=G.gadgets.find(g=>g.alive&&g.type==='magnet'&&inRoomOf(g,x,y,3));
+  if(mg){log(`${nm(u)} 丟出的道具被 Wamai 的 Mag-NET 吸走了`,'kd');G.fx={x0:u.x,y0:u.y,x1:mg.x,y1:mg.y,until:performance.now()+400,c:COL.def};return true;}
+  const j=G.units.find(a=>a.alive&&a.op==='jager'&&a.ch>0&&a.x>=0&&cheb(a.x,a.y,x,y)<=3);
+  if(j){j.ch--;log(`Jäger 的主動防禦系統攔截了 ${nm(u)} 丟出的道具（剩 ${j.ch}）`,'kd');G.fx={x0:j.x,y0:j.y,x1:x,y1:y,until:performance.now()+400,c:COL.def};return true;}
+  return false;}
+function dmgMod(u,n){if(n>0&&G.gadgets.some(g=>g.alive&&g.type==='kona'&&inRoomOf(g,u.x,u.y,3))){log(`Kóna 治療站讓 ${nm(u)} 少受 1 傷`,'ks');n--;}return n;}
+function onKill(u){const by=DMGBY;if(by&&by.op==='caveira'&&u.side==='A'){alive('A').filter(a=>a!==u).forEach(locU);log('Caveira 審訊完畢，所有進攻方的位置都被標記','kd');}}
+function finkaSave(u){if(u.side!=='A')return false;const f=G.units.find(a=>a.alive&&a.op==='finka'&&a!==u&&a.ch>0);if(!f)return false;
+  f.ch--;u.hp=1;stunU(u);log(`Finka 的腎上腺素把 ${nm(u)} 救了回來（1 點生命、被震暈）`,'ka');return true;}
+function mozzieFeed(){const m=G.units.find(a=>a.alive&&a.op==='mozzie');if(m&&m.ch<3){m.ch++;log('Mozzie 劫持了一台無人機','kd');}}
+function playStartHooks(){if(G._psh)return;G._psh=true;
+  const m=G.units.find(a=>a.op==='mozzie');if(m&&G.drones>0){G.drones--;m.ch=1;}
+  const al=G.units.find(a=>a.op==='alibi'&&a.x>=0);if(al&&G.decoys){const ind=shuffle(allCells().filter(([x,y])=>setupIndoor(x,y)&&!unitAt(x,y)&&!G.decoys.some(k=>k.alive&&k.x===x&&k.y===y)));
+    for(let i=0;i<2&&ind[i];i++)G.decoys.push({x:ind[i][0],y:ind[i][1],alive:true,owner:al.id});}}
+async function ignite(x,y){G.gadgets.push({type:'fire',x,y,side:'D',alive:true,life:2});SFX.boom();log(`${coord(x,y)} 一帶起火了`,'ks');
+  for(const a of G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,x,y)<=1)){a.burned=true;const r=die1('O');if(r)await damage(a,r,'火焰');}}
+var objRoom=(x,y)=>{if(!G._obj||G._obj.wv!==(G._wv||0)){const s=new Set();for(const [i,j] of allCells()){const c=cell(i,j);if(c.site)roomCells(i,j).forEach(k=>s.add(k));}
+  if(G.hostage)roomCells(G.hostage.x,G.hostage.y).forEach(k=>s.add(k));G._obj={s,wv:G._wv||0};}return G._obj.s.has(y*G.W+x);};
+async function stepHooks(u,x,y,px,py){
+  const hurt=async(n,why)=>{if(n>0)await damage(u,n,why);return u.alive&&!G.over;};
+  if(u.side==='A'){
+    const mat=gadgetAt(x,y,'mat');if(mat){mat.alive=false;log(`${nm(u)} 踩到 Frost 的捕獸夾！`,'kd');u.mp=0;u.ap=0;if(!(await hurt(2,'捕獸夾')))return false;}
+    const gu=gadgetAt(x,y,'gu');if(gu){gu.alive=false;locU(u);log(`${nm(u)} 踩到 Lesion 的蠱毒地雷，被標記`,'kd');if(!(await hurt(1,'蠱毒')))return false;}
+    const gz=G.gadgets.find(g=>g.alive&&g.type==='grz'&&cheb(g.x,g.y,x,y)<=1);if(gz){gz.alive=false;stunU(u);log(`${nm(u)} 觸發 Ela 的震盪地雷，被震暈`,'kd');}
+    const cl=gadgetAt(x,y,'claw');if(cl){stunU(u);log(`${nm(u)} 踩到 Kaid 的電爪`,'kd');if(!(await hurt(1,'電爪')))return false;}
+    for(const v of G.gadgets.filter(g=>g.alive&&g.volcan&&cheb(g.x,g.y,x,y)<=1)){v.alive=false;log('Goyo 的燃燒盾爆燃！','kd');await ignite(v.x,v.y);if(!u.alive||G.over)return false;}
+    if(!u._eye){const e=G.gadgets.find(g=>g.alive&&g.type==='eye'&&!jammed(g.x,g.y)&&inRoomOf(g,x,y));if(e){u._eye=1;locU(u);log(`${nm(u)} 被邪眼攝影機盯上`,'kd');if(!(await hurt(die1('Y'),'邪眼')))return false;}}
+    const ar=G.units.find(a=>a.alive&&a.op==='aruni'&&a.ch>0);
+    if(ar&&objRoom(x,y)&&!objRoom(px,py)){ar.ch--;stunU(u);log(`${nm(u)} 穿過 Aruni 的雷射門（剩 ${ar.ch}）`,'kd');if(!(await hurt(die1('O'),'雷射門')))return false;}
+  } else {
+    if(!u._trax&&traxNear(x,y)){u._trax=1;log(`${nm(u)} 踩到 Gridlock 的 Trax 尖刺，啟動結束`,'ka');u.mp=0;u.ap=0;if(!(await hurt(1,'尖刺')))return false;}
+    if(!u._eye){const e=G.gadgets.find(g=>g.alive&&g.type==='argus'&&inRoomOf(g,x,y));if(e){u._eye=1;locU(u);log(`${nm(u)} 被 Zero 的 Argus 攝影機拍到`,'ka');if(!(await hurt(die1('Y'),'Argus')))return false;}}
+  }
+  if(!u.burned&&inFire(x,y)){u.burned=true;if(!(await hurt(die1('O'),'火焰')))return false;}
+  return true;}
+// ---- targets ----
+var GT={
+ blitz:u=>adj8(u.x,u.y).filter(([x,y])=>!blocks(cell(x,y))),
+ ying:u=>within(u.x,u.y,6).filter(([x,y])=>!blocks(cell(x,y))&&!(x===u.x&&y===u.y)&&(losTo(u,x,y)||wallsBetween(u,x,y)<=1)),
+ twitch:u=>{DRONEANY=true;try{return droneTargets(u);}finally{DRONEANY=false;}},
+ flores:u=>{DRONEANY=true;try{return droneTargets(u);}finally{DRONEANY=false;}},
+ echo:u=>{DRONEANY=true;try{return droneTargets(u);}finally{DRONEANY=false;}},
+ mozzie:u=>{DRONEANY=true;try{return droneTargets(u);}finally{DRONEANY=false;}},
+ montagne:u=>u.rnd===G.round?[]:'self',
+ castle:(u,s)=>s?allCells().filter(([x,y])=>{const c=cell(x,y);return c.t==='bar'&&adj4(x,y).some(([a,b])=>cell(a,b).indoor&&!blocks(cell(a,b)));}):[],
+ pulse:u=>alive('A').filter(a=>a.x>=0&&cheb(u.x,u.y,a.x,a.y)<=6&&!NOLOC.has(a.op)&&!(a.spotted&&inSight(u,a))).map(a=>[a.x,a.y]),
+ thunderbird:(u,s)=>s?allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y)):[],
+ buck:u=>wallT(u,4,['soft','bar']),
+ capitao:u=>thrown(u),
+ hibana:u=>wallT(u,6,['soft','bar','reinf']),
+ ace:u=>wallT(u,6,['soft','bar','reinf']),
+ frost:(u,s)=>(s?allCells().filter(([x,y])=>setupIndoor(x,y)):adj8(u.x,u.y)).filter(([x,y])=>cell(x,y).t==='floor'&&!gadgetAt(x,y)&&!unitAt(x,y)),
+ lesion:(u,s)=>(s?allCells().filter(([x,y])=>setupIndoor(x,y)):thrown(u,3)).filter(([x,y])=>!gadgetAt(x,y)&&!unitAt(x,y)),
+ ela:(u,s)=>(s?allCells().filter(([x,y])=>setupIndoor(x,y)):thrown(u,3)).filter(([x,y])=>!gadgetAt(x,y)&&!unitAt(x,y)),
+ caveira:u=>alive('A').filter(a=>a.x>=0&&a.spotted>0&&cheb(u.x,u.y,a.x,a.y)<=3&&!inSight(u,a)&&wallsBetween(u,a.x,a.y)<=2).map(a=>[a.x,a.y]),
+ jackal:u=>'self',dokkaebi:u=>'self',
+ zofia:u=>seenEnemies(u).map(e=>[e.x,e.y]),
+ nomad:u=>seenEnemies(u).filter(e=>cheb(u.x,u.y,e.x,e.y)<=6).map(e=>[e.x,e.y]),
+ mira:(u,s)=>(s?allCells().filter(([x,y])=>adj4(x,y).some(([a,b])=>setupIndoor(a,b))):adj4(u.x,u.y)).filter(([x,y])=>{const c=cell(x,y);return (c.t==='soft'||c.t==='reinf')&&!c.mirror;}),
+ finka:u=>alive('A').filter(a=>a.x>=0&&a.hp<a.max&&(a===u||(cheb(u.x,u.y,a.x,a.y)<=4&&losTo(u,a.x,a.y)))).map(a=>[a.x,a.y]),
+ maverick:u=>adj4(u.x,u.y).filter(([x,y])=>{const c=cell(x,y);return (c.t==='soft'||c.t==='reinf')&&!c.elec&&!jammed(x,y);}),
+ maestro:(u,s)=>s?allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y)):[],
+ clash:u=>seenEnemies(u).filter(e=>cheb(u.x,u.y,e.x,e.y)<=3).map(e=>[e.x,e.y]),
+ kaid:(u,s)=>s?entryCells():[],
+ gridlock:u=>thrown(u).filter(([x,y])=>!gadgetAt(x,y)&&!unitAt(x,y)),
+ amaru:u=>(u.rnd===G.round||(G.hostage&&G.hostage.by===u.id))?[]:allCells().filter(([x,y])=>{const c=cell(x,y);return c.kind==='window'&&cheb(u.x,u.y,x,y)<=10&&!unitAt(x,y)&&!gadgetAt(x,y);}),
+ kali:u=>within(u.x,u.y,6).filter(([x,y])=>{const c=cell(x,y);return c.indoor&&!blocks(c)&&(losTo(u,x,y)||wallsBetween(u,x,y)<=1);}),
+ goyo:(u,s)=>s?allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y)):[],
+ wamai:(u,s)=>s?allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y)):[],
+ melusi:(u,s)=>s?allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y)):[],
+ zero:u=>thrown(u).filter(([x,y])=>cell(x,y).indoor&&!gadgetAt(x,y)),
+ oryx:u=>u.rnd===G.round?[]:adj4(u.x,u.y).filter(([x,y])=>cell(x,y).t==='soft'&&!unitAt(x,y)),
+ blackbeard:()=>[],jager:()=>[],vigil:()=>[],nokk:()=>[],iana:()=>[],warden:()=>[],alibi:()=>[],aruni:()=>[],
+};
+var PLACE={
+ castle:(u,x,y)=>{const c=cell(x,y);c.t='reinf';c.panel=true;G._wv=(G._wv||0)+1;if(R3)R3.sig='';},
+ thunderbird:(u,x,y)=>G.gadgets.push({type:'kona',x,y,side:'D',alive:true}),
+ frost:(u,x,y)=>G.gadgets.push({type:'mat',x,y,side:'D',alive:true}),
+ lesion:(u,x,y)=>G.gadgets.push({type:'gu',x,y,side:'D',alive:true}),
+ ela:(u,x,y)=>G.gadgets.push({type:'grz',x,y,side:'D',alive:true}),
+ mira:(u,x,y)=>{const c=cell(x,y);c.t='reinf';c.mirror=true;G._wv=(G._wv||0)+1;G.gadgets.push({type:'mirror',x,y,side:'D',alive:true});if(R3)R3.sig='';},
+ maestro:(u,x,y)=>G.gadgets.push({type:'eye',x,y,side:'D',alive:true}),
+ kaid:(u,x,y)=>G.gadgets.push({type:'claw',x,y,side:'D',alive:true}),
+ goyo:(u,x,y)=>G.gadgets.push({type:'shield',volcan:true,x,y,side:'D',alive:true}),
+ wamai:(u,x,y)=>G.gadgets.push({type:'magnet',x,y,side:'D',alive:true}),
+ melusi:(u,x,y)=>G.gadgets.push({type:'banshee',x,y,side:'D',alive:true}),
+};
+async function droneLike(u,x,y,f){G.gadgets.push({type:'drone',x,y,side:u.side,alive:true,own:u.op});const room=roomOrArea(x,y).filter(([a,b])=>cheb(a,b,x,y)<=4);await f(room);render();}
+var UG={
+ blitz:async(u,x,y,s)=>{SFX.flash();let n=0;for(const a of G.units)if(a.alive&&a!==u&&cheb(a.x,a.y,x,y)<=2&&roomCells(x,y).has(a.y*G.W+a.x)&&stunU(a)){if(a.hidden)reveal(a,'被閃光盾');n++;}log(`${nm(u)} 的閃光盾震暈了 ${n} 名幹員`,s);},
+ ying:async(u,x,y,s)=>{SFX.flash();let n=0;for(const a of G.units)if(a.alive&&a!==u&&cheb(a.x,a.y,x,y)<=2&&roomCells(x,y).has(a.y*G.W+a.x)&&stunU(a)){if(a.hidden)reveal(a,'被坎德拉');n++;}log(`${nm(u)} 的坎德拉閃光彈震暈了 ${n} 名幹員`,s);},
+ twitch:(u,x,y,s)=>droneLike(u,x,y,async room=>{const R=new Set(room.map(([a,b])=>b*G.W+a));for(const d of alive('D'))if(R.has(d.y*G.W+d.x))locU(d);
+   const el=G.gadgets.filter(g=>g.alive&&g.side==='D'&&['cam','jammer','ced','eye','kona','claw','magnet','banshee','grz'].includes(g.type)&&R.has(g.y*G.W+g.x));const r=die1('R');let n=0;
+   for(const g of el.slice(0,r)){g.alive=false;n++;}log(`${nm(u)} 的電擊無人機擲出 ${r}，摧毀了 ${n} 個電子道具`,s);}),
+ flores:(u,x,y,s)=>droneLike(u,x,y,async()=>{SFX.boom();const area=[[x,y],...adj4(x,y)];for(const [i,j] of area)await blastDestroy(i,j,2);
+   for(const a of G.units.filter(a=>a.alive&&a.x>=0&&area.some(([i,j])=>i===a.x&&j===a.y))){const r=die1('O');if(r)await damage(a,r,'Ratero');}
+   const d=G.gadgets.find(g=>g.alive&&g.type==='drone'&&g.x===x&&g.y===y&&g.own==='flores');if(d)d.alive=false;log(`${nm(u)} 的 Ratero 無人機在 ${coord(x,y)} 引爆`,s);}),
+ echo:(u,x,y,s)=>droneLike(u,x,y,async room=>{const R=new Set(room.map(([a,b])=>b*G.W+a));let n=0;for(const a of alive('A'))if(R.has(a.y*G.W+a.x)){locU(a);if(stunU(a))n++;}log(`${nm(u)} 的妖怪無人機震暈了 ${n} 名進攻方`,s);}),
+ mozzie:(u,x,y,s)=>droneLike(u,x,y,async room=>{const R=new Set(room.map(([a,b])=>b*G.W+a));let n=0;for(const a of alive('A'))if(R.has(a.y*G.W+a.x)&&locU(a))n++;log(`${nm(u)} 用劫持的無人機標記了 ${n} 名進攻方`,s);}),
+ montagne:async(u,x,y,s)=>{u.rnd=G.round;log(`${nm(u)} 展開磐石盾，這一輪算重型掩護`,s);},
+ pulse:async(u,x,y,s)=>{const a=unitAt(x,y);if(!a)return;if(a.spotted&&cheb(u.x,u.y,x,y)<=3){SHOTP=2;try{await shootUnit(u,a);}finally{SHOTP=null;}}else{locU(a);log(`${nm(u)} 的心跳感測器鎖定了 ${nm(a)}`,s);}},
+ caveira:async(u,x,y,s)=>{const a=unitAt(x,y);if(!a)return;log(`${nm(u)} 無聲接近，隔牆開火`,s);SHOTP=2;try{await shootUnit(u,a);}finally{SHOTP=null;}},
+ jackal:async(u,x,y,s)=>{const near=alive('D').filter(d=>d.x>=0&&d.spotted>0&&cheb(u.x,u.y,d.x,d.y)<=3&&!inSight(u,d))[0];
+   if(near){log(`${nm(u)} 順著腳印隔牆開火`,s);SHOTP=2;try{await shootUnit(u,near);}finally{SHOTP=null;}return;}
+   const t=alive('D').filter(d=>d.x>=0&&!d.spotted&&!NOLOC.has(d.op)).sort((a,b)=>cheb(u.x,u.y,a.x,a.y)-cheb(u.x,u.y,b.x,b.y))[0];
+   if(t){locU(t);log(`${nm(u)} 追蹤腳印，標記了 ${nm(t)}`,s);}else log(`${nm(u)} 沒有找到新的腳印`,s);},
+ dokkaebi:async(u,x,y,s)=>{const t=alive('D').filter(d=>d.x>=0&&!d.spotted&&!NOLOC.has(d.op)).sort((a,b)=>cheb(u.x,u.y,a.x,a.y)-cheb(u.x,u.y,b.x,b.y))[0];
+   if(t){locU(t);SFX.alert();log(`${nm(u)} 的邏輯炸彈讓 ${nm(t)} 的手機響了`,s);}else log(`${nm(u)} 的邏輯炸彈沒有找到新目標`,s);},
+ buck:async(u,x,y,s)=>{destroyCell(x,y);log(`${nm(u)} 用萬能鑰匙轟開了缺口`,s);},
+ hibana:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;destroyCell(x,y);await blastDestroy(x,y,3);log(`${nm(u)} 的 X-KAIROS 炸開了牆面`,s);},
+ ace:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;destroyCell(x,y);await blastDestroy(x,y,3);log(`${nm(u)} 的 S.E.L.M.A. 炸開了牆面`,s);},
+ maverick:async(u,x,y,s)=>{destroyCell(x,y);log(`${nm(u)} 用噴槍燒穿了一面牆`,s);},
+ oryx:async(u,x,y,s)=>{u.rnd=G.round;destroyCell(x,y);u.x=x;u.y=y;log(`${nm(u)} 撞穿牆面衝了進來`,s);},
+ capitao:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;log(`${nm(u)} 射出燃燒箭`,s);await ignite(x,y);},
+ gridlock:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;G.gadgets.push({type:'trax',x,y,side:'A',alive:true});log(`${nm(u)} 在 ${coord(x,y)} 撒下 Trax 尖刺`,s);},
+ zero:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;G.gadgets.push({type:'argus',x,y,side:'A',alive:true});log(`${nm(u)} 射出 Argus 攝影機`,s);},
+ kali:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;SFX.boom();const R=new Set([...roomCells(x,y)].filter(k=>cheb(k%G.W,(k/G.W)|0,x,y)<=3));let n=0;
+   for(const g of G.gadgets)if(g.alive&&g.side==='D'&&!['gas','fire','trap','mat','gu','mirror'].includes(g.type)&&R.has(g.y*G.W+g.x)){g.alive=false;n++;if(g.volcan)await ignite(g.x,g.y);}
+   for(const k of [...R]){const i=k%G.W,j=(k/G.W)|0;for(const [a,b] of adj4(i,j))if(cell(a,b).t==='bar'){destroyCell(a,b);n++;}}
+   log(`${nm(u)} 的 LV 長矛清掉了 ${n} 個道具和路障`,s);},
+ zofia:async(u,x,y,s)=>{const a=unitAt(x,y);if(!a)return;SFX.flash();stunU(a);log(`${nm(u)} 的震盪彈擊中 ${nm(a)}`,s);const r=die1('O');if(r)await damage(a,r,'震盪彈');},
+ clash:async(u,x,y,s)=>{const a=unitAt(x,y);if(!a)return;stunU(a);log(`${nm(u)} 的電擊盾電到了 ${nm(a)}`,s);const r=die1('Y');if(r)await damage(a,r,'電擊盾');},
+ nomad:async(u,x,y,s)=>{const a=unitAt(x,y);if(!a)return;const to=adj8(x,y).filter(([i,j])=>!blocks(cell(i,j))&&!unitAt(i,j)).sort((p,q)=>cheb(u.x,u.y,q[0],q[1])-cheb(u.x,u.y,p[0],p[1]))[0];
+   if(to){a.x=to[0];a.y=to[1];a.overwatch=false;log(`${nm(u)} 的 Airjab 把 ${nm(a)} 炸飛到 ${coord(...to)}`,s);}else log(`${nm(a)} 旁邊沒有空位，Airjab 沒有推動他`,s);},
+ finka:async(u,x,y,s)=>{const a=unitAt(x,y);if(!a)return;const h=Math.min(3,a.max-a.hp);a.hp+=h;log(`${nm(u)} 替 ${nm(a)} 注射腎上腺素，回復 ${h} 點`,s);},
+ amaru:async(u,x,y,s)=>{u.rnd=G.round;const c=cell(x,y);if(c.t==='bar')destroyCell(x,y);u.x=x;u.y=y;log(`${nm(u)} 用鉤爪飛進 ${coord(x,y)} 的窗戶`,s);},
+};
+for(const k of Object.keys(PLACE))if(!UG[k])UG[k]=async(u,x,y,s)=>{PLACE[k](u,x,y);if(pub(u)||G.player==='D')log(`${nm(u)} 佈下了${OPS[u.op].g}`,s);};
+// ---- AI: placement during setup, and when to use a gadget in play ----
+var pickC=l=>shuffle(l)[0]||null;
+var SAI={
+ castle:(u,rooms,rs)=>pickC(GT.castle(u,true).filter(([x,y])=>adj4(x,y).some(([a,b])=>rs.has(b*G.W+a)))),
+ thunderbird:(u,rooms,rs)=>pickC(GT.thunderbird(u,true).filter(([x,y])=>rs.has(y*G.W+x)&&!G.gadgets.some(g=>g.alive&&g.type==='kona'&&inRoomOf(g,x,y)))),
+ frost:(u,rooms,rs)=>pickC(GT.frost(u,true).filter(([x,y])=>adj4(x,y).some(([a,b])=>cell(a,b).t==='bar'))),
+ lesion:(u,rooms,rs)=>pickC(GT.lesion(u,true).filter(([x,y])=>adj4(x,y).some(([a,b])=>cell(a,b).t==='bar'||cell(a,b).t==='soft'))),
+ ela:(u,rooms,rs)=>pickC(GT.ela(u,true).filter(([x,y])=>adj4(x,y).some(([a,b])=>cell(a,b).t==='bar'))),
+ mira:(u,rooms,rs)=>pickC(GT.mira(u,true).filter(([x,y])=>adj4(x,y).some(([a,b])=>rs.has(b*G.W+a)))),
+ maestro:(u,rooms,rs)=>pickC(GT.maestro(u,true).filter(([x,y])=>!rs.has(y*G.W+x)&&!G.gadgets.some(g=>g.alive&&g.type==='eye'&&inRoomOf(g,x,y)))),
+ kaid:(u,rooms,rs)=>pickC(GT.kaid(u,true).filter(([x,y])=>rs.has(y*G.W+x)))||pickC(GT.kaid(u,true)),
+ goyo:(u,rooms,rs)=>pickC(GT.goyo(u,true).filter(([x,y])=>rs.has(y*G.W+x)&&adj4(x,y).some(([a,b])=>cell(a,b).t==='bar'))),
+ wamai:(u,rooms,rs)=>pickC(GT.wamai(u,true).filter(([x,y])=>rs.has(y*G.W+x)&&!G.gadgets.some(g=>g.alive&&g.type==='magnet'&&inRoomOf(g,x,y)))),
+ melusi:(u,rooms,rs)=>pickC(GT.melusi(u,true).filter(([x,y])=>!rs.has(y*G.W+x)&&!G.gadgets.some(g=>g.alive&&g.type==='banshee'&&inRoomOf(g,x,y)))),
+};
+var nearest=(u,list)=>list.slice().sort((a,b)=>cheb(u.x,u.y,a[0],a[1])-cheb(u.x,u.y,b[0],b[1]))[0];
+var AIG={
+ blitz:u=>{const t=GT.blitz(u).find(([x,y])=>alive('D').some(d=>pub(d)&&!d.stun&&roomCells(x,y).has(d.y*G.W+d.x)));return t||null;},
+ ying:u=>{const t=GT.ying(u).find(([x,y])=>{const R=roomCells(x,y);return alive('D').some(d=>pub(d)&&!d.stun&&R.has(d.y*G.W+d.x))&&!alive('A').some(a=>a!==u&&R.has(a.y*G.W+a.x));});return t||null;},
+ zofia:u=>{const t=seenEnemies(u).filter(e=>!e.stun).sort((a,b)=>a.hp-b.hp)[0];return t?[t.x,t.y]:null;},
+ clash:u=>{const t=seenEnemies(u).filter(e=>!e.stun&&cheb(u.x,u.y,e.x,e.y)<=3)[0];return t?[t.x,t.y]:null;},
+ nomad:u=>{const t=seenEnemies(u).filter(e=>cheb(u.x,u.y,e.x,e.y)<=6&&e.overwatch)[0];return t?[t.x,t.y]:null;},
+ finka:u=>{const t=GT.finka(u).map(([x,y])=>unitAt(x,y)).filter(a=>a.max-a.hp>=2)[0];return t?[t.x,t.y]:null;},
+ montagne:u=>u.rnd!==G.round&&seenEnemies(u).length?'self':null,
+ dokkaebi:u=>G.round>=2&&alive('D').some(d=>!d.spotted&&!NOLOC.has(d.op))?'self':null,
+ jackal:u=>alive('D').some(d=>!d.spotted&&!NOLOC.has(d.op)&&cheb(u.x,u.y,d.x,d.y)<=12)||alive('D').some(d=>d.spotted&&cheb(u.x,u.y,d.x,d.y)<=3&&!inSight(u,d))?'self':null,
+ twitch:u=>{const g=G.gadgets.find(g=>g.alive&&g.side==='D'&&['cam','jammer','ced','eye','kona','claw','magnet','banshee'].includes(g.type)&&gadgetVisibleTo(g,'A')&&cheb(u.x,u.y,g.x,g.y)<=7);if(!g)return null;const R=roomCells(g.x,g.y);return GT.twitch(u).find(([x,y])=>R.has(y*G.W+x))||null;},
+ flores:u=>{const t=GT.flores(u);for(const d of alive('D'))if(pub(d)){const p=t.find(([x,y])=>cheb(x,y,d.x,d.y)<=1&&!alive('A').some(a=>cheb(a.x,a.y,x,y)<=1));if(p)return p;}return null;},
+ capitao:u=>{const t=GT.capitao(u);for(const d of alive('D'))if(pub(d)){const p=t.find(([x,y])=>x===d.x&&y===d.y&&!alive('A').some(a=>cheb(a.x,a.y,x,y)<=1));if(p)return p;}return null;},
+ gridlock:u=>{if(!G.defuser&&!(G.hostage&&G.hostage.by))return null;const c=G.defuser||G.hostage;return nearest(c,GT.gridlock(u).filter(([x,y])=>cheb(x,y,c.x,c.y)>=2&&cheb(x,y,c.x,c.y)<=4))||null;},
+ zero:u=>{const t=GT.zero(u).filter(([x,y])=>objRoom(x,y)&&!G.gadgets.some(g=>g.alive&&g.type==='argus'&&inRoomOf(g,x,y)));return t[0]||null;},
+ kali:u=>{const t=GT.kali(u).find(([x,y])=>{const R=roomCells(x,y);return G.gadgets.filter(g=>g.alive&&g.side==='D'&&gadgetVisibleTo(g,'A')&&R.has(g.y*G.W+g.x)).length>=2;});return t||null;},
+ amaru:u=>{if(G.round<2)return null;const t=GT.amaru(u).filter(([x,y])=>adj4(x,y).some(([a,b])=>objRoom(a,b)));return t.length?nearest(u,t):null;},
+ pulse:u=>{const a=alive('A').find(a=>a.spotted&&cheb(u.x,u.y,a.x,a.y)<=3&&!inSight(u,a)&&!NOLOC.has(a.op));if(a)return [a.x,a.y];const b=alive('A').find(a=>!a.spotted&&cheb(u.x,u.y,a.x,a.y)<=6&&!NOLOC.has(a.op));return b?[b.x,b.y]:null;},
+ caveira:u=>{const t=GT.caveira(u)[0];return t||null;},
+ echo:u=>{const t=GT.echo(u);for(const a of alive('A')){const R=roomCells(a.x,a.y);const p=t.find(([x,y])=>R.has(y*G.W+x)&&cell(x,y).indoor);if(p&&!a.stun)return p;}return null;},
+ mozzie:u=>{const t=GT.mozzie(u);for(const a of alive('A')){if(a.spotted)continue;const R=roomCells(a.x,a.y);const p=t.find(([x,y])=>R.has(y*G.W+x)&&cell(x,y).indoor);if(p)return p;}return null;},
+ lesion:u=>{const a=alive('A').filter(a=>cheb(u.x,u.y,a.x,a.y)<=6)[0];if(!a)return null;return nearest(a,GT.lesion(u,false).filter(([x,y])=>cheb(x,y,a.x,a.y)>=1&&cheb(x,y,a.x,a.y)<=2))||null;},
+ ela:u=>{const a=alive('A').filter(a=>cheb(u.x,u.y,a.x,a.y)<=6)[0];if(!a)return null;return nearest(a,GT.ela(u,false).filter(([x,y])=>cheb(x,y,a.x,a.y)===2))||null;},
+};
 function render(){try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{renderTension();}catch(e){}
   const scr=G?'game':(SCREEN==='setup'?'setup':'title');document.body.dataset.scr=scr;{const wz=$('#wiz');if(wz&&(G||SCREEN!=='setup'))wz.hidden=true;}
   const tt=$('#title');if(tt){const show=scr==='title';if(tt.hidden===show)tt.hidden=!show;if(show&&tt.dataset.s!==SCREEN){tt.dataset.s=SCREEN;renderTitle();}}
@@ -4400,7 +4655,7 @@ function opCard(u){
   const oc=`<div class="oc ${u.side==='A'?'a':'d'}"><div class="ocL"><img class="ocP" src="${portraitURL(u.op)}" alt="${o.name} 頭像"><img class="ocI" src="${opIcon(u.op)}" alt=""></div>
     <div class="ocM"><b class="ocN">${o.name}</b><span class="ocR">${u.side==='A'?'進攻':'防守'} · ${o.role}</span><span class="ocH"><small>HP ${u.hp} / ${u.max}</small>${hpBar(u)}</span></div>
     <div class="ocS"><div class="ocAp"><small>行動點</small><span>${[0,1].map(i=>`<i class="${i<apN?'f':''}"></i>`).join('')}</span><small class="ocMp">移動 ${mpN}</small></div>
-    <div class="ocG"><img src="${opIcon(u.op)}" alt=""><div><b>${o.g||o.passive}${o.g&&own?` <em>剩 ${u.ch>50?'∞':u.ch}</em>`:''}</b><span>${o.g?o.gd:o.pd}</span></div></div></div></div>`;
+    <div class="ocG"><img src="${opIcon(u.op)}" alt=""><div><b>${(o.g&&GSH[u.op])||o.g||o.passive}${o.g&&own?` <em>剩 ${u.ch>50?'∞':u.ch}</em>`:''}</b><span>${o.g?o.gd:o.pd}</span></div></div></div></div>`;
   return `<div class="card">${oc}<div class="nm"><img class="port" src="${portraitURL(u.op)}" alt="${o.name} 頭像"><b class="${u.side==='A'?'a':'d'}">${o.name}</b><span class="hint">${u.side==='A'?'進攻':'防守'} · ${o.role}</span></div>
   <dt>耐力</dt><dd>${hpBar(u)} ${u.hp}/${u.max}</dd>
   <dt>移動／奔跑</dt><dd>5 點 · ${u.run?`奔跑 +${u.run}`:'不能奔跑'} · 破壞力${PROF[u.op].dr}</dd>
@@ -4461,7 +4716,7 @@ function renderActs(){setTimeout(hudTop,0);
     L.push(btn('移動幹員','點建築內空格',G.mode==='move',false,()=>setMode('move')));
     if(decoyOf(u))L.push(btn('移動誘餌','點空格放這名幹員的誘餌',G.mode==='decoy',false,()=>setMode('decoy')));
     L.push(btn('調整場景',`攝影機或路障 · 剩 ${G.rearr??5} 次`,G.mode==='rearr',(G.rearr??5)<=0&&!G.rearrCam,()=>{G.rearrCam=null;setMode('rearr');}));
-    if(setupGadget(u.op))L.push(btn(OPS[u.op].g,`剩 ${u.ch}`,G.mode==='gadget',u.ch<=0,()=>setMode('gadget'),'',u.op==='valkyrie'?eqIc('valk'):''));
+    if(setupGadget(u.op))L.push(btn(GSH[u.op]||OPS[u.op].g,`剩 ${u.ch}`,G.mode==='gadget',u.ch<=0,()=>setMode('gadget'),'',u.op==='valkyrie'?eqIc('valk'):''));
     L.push(btn('鐵絲網',`剩 ${G.wire}`,G.mode==='wire',G.wire<=0,()=>setMode('wire')));L.push(btn('可部署盾牌',`剩 ${G.shield}`,G.mode==='shield',G.shield<=0,()=>setMode('shield'),'',eqIc('shield')));L.push(btn('防彈攝影機',`剩 ${G.bpcam}`,G.mode==='bpcam',G.bpcam<=0,()=>setMode('bpcam'),'',eqIc('bpcam')));
   } else if(u.side===G.player&&u.alive){
     const ok=canAct(u),isA=G.active===u,can=k=>ok&&(!isA||canDo(u,k)),sub=(k,t)=>isA&&u.used.has(k)?'已用過':t;
@@ -4472,8 +4727,8 @@ function renderActs(){setTimeout(hudTop,0);
     L.push(btn('奔跑',u.run?sub('run',`1 行動 · +${u.run} 移動點`):'這名幹員不能奔跑',false,!can('run')||!u.run,wrap(async()=>{if(G.active!==u)return;sprint(u);})));
     const dt=destroyTargets(u);L.push(btn('破壞',sub('destroy',(PROF[u.op].dz||1)>=2?'路障、軟牆或道具':'路障或道具'),G.mode==='destroy',!can('destroy')||!dt.length,tmode('destroy',dt)));
     const o=OPS[u.op];
-    if(o.g){const t=gTargets(u);const none=t!=='self'&&!t.length;
-      L.push(btn(o.g,sub('special',`專屬 · 剩 ${u.ch>50?'∞':u.ch}`),G.mode==='gadget',!can('special')||u.ch<=0||none,t==='self'?wrap(()=>useGadget(u)):tmode('gadget',t),'',u.op==='thatcher'?eqIc('emp'):u.op==='valkyrie'?eqIc('valk'):''));}
+    if(o.g&&!NOBTN.has(u.op)){const t=gTargets(u);const none=t!=='self'&&!t.length;
+      L.push(btn(GSH[u.op]||o.g,sub('special',`專屬 · 剩 ${u.ch>50?'∞':u.ch}`),G.mode==='gadget',!can('special')||u.ch<=0||none,t==='self'?wrap(()=>useGadget(u)):tmode('gadget',t),'',u.op==='thatcher'?eqIc('emp'):u.op==='valkyrie'?eqIc('valk'):''));}
     const tac=(m,label,n,list)=>L.push(btn(label,sub('tactical',`戰術 · 剩 ${n}`),G.mode===m,!can('tactical')||n<=0||!list.length,tmode(m,list),'',eqIc(m)));
     if(u.side==='A'){
       tac('drone','無人機',G.drones,G.drones>0?droneTargets(u):[]);
@@ -4519,6 +4774,54 @@ const LOOK={
   rook:{pose:'shield',uni:'#2a3240',vest:'#212835',skin:'#e8bc9c',gear:'helmet',gearC:'#253041',mask:'goggles',maskC:'#9ad0ff',heavy:true},
   doc:{pose:'advance',uni:'#2c3442',vest:'#232a36',skin:'#e8bc9c',gear:'helmet',gearC:'#d8d8d2',mask:'none',cross:true,heavy:true},
   tachanka:{pose:'lmg',uni:'#3a3c33',vest:'#2e3029',skin:'#e0aa84',gear:'helmet',gearC:'#363830',mask:'beard',maskC:'#6a4a2a',heavy:true},
+  blitz:{pose:'shield',shieldK:'flash',uni:'#3c4148',vest:'#2c3036',skin:'#e6b896',gear:'helmet',gearC:'#3a3f45',mask:'goggles',maskC:'#ffd060',heavy:true},
+  twitch:{pose:'aim',uni:'#3a3d4a',vest:'#2a2d38',skin:'#efc6a6',gear:'hair',gearC:'#4a2a18',mask:'glasses',maskC:'#111111',acc:'drone'},
+  montagne:{pose:'shield',shieldK:'tall',uni:'#2e3640',vest:'#242a31',skin:'#e2b292',gear:'helmet',gearC:'#2d333b',mask:'visor',maskC:'#9ad0ff',heavy:true},
+  flores:{pose:'aim',uni:'#4a4038',vest:'#3a322a',skin:'#c98c66',gear:'cap',gearC:'#262626',mask:'scarf',maskC:'#7a5a3a',acc:'drone'},
+  buck:{pose:'aim',uni:'#4a5040',vest:'#3a3f33',skin:'#e0aa84',gear:'helmet',gearC:'#4b5240',mask:'none',beard:true,acc:'ubs'},
+  blackbeard:{pose:'aim',uni:'#3a3f48',vest:'#2d3138',skin:'#d8a882',gear:'cap',gearC:'#2a2e33',mask:'glasses',maskC:'#111111',beard:true,acc:'rshield'},
+  capitao:{pose:'aim',uni:'#3a4a36',vest:'#2e3b2b',skin:'#a8724e',gear:'beret',gearC:'#1d2a1b',mask:'none',acc:'xbow'},
+  hibana:{pose:'aim',uni:'#3a3a42',vest:'#2b2b33',skin:'#f0c8a8',gear:'hair',gearC:'#1a1414',mask:'visor',maskC:'#ff5a7a',acc:'launcher'},
+  jackal:{pose:'aim',uni:'#3e3a33',vest:'#2f2c27',skin:'#d8a882',gear:'cap',gearC:'#222222',mask:'goggles',maskC:'#40ff90',beard:true},
+  ying:{pose:'aim',uni:'#3a3436',vest:'#2b2628',skin:'#f0c8a8',gear:'hair',gearC:'#151010',mask:'none',acc:'pack'},
+  zofia:{pose:'aim',uni:'#45473f',vest:'#34362f',skin:'#e8bc9c',gear:'hair',gearC:'#7a3a22',mask:'none',acc:'launcher'},
+  dokkaebi:{pose:'aim',uni:'#2c2a30',vest:'#221f26',skin:'#efc6a6',gear:'beanie',gearC:'#dcdcdc',mask:'none',hair:'#151010',acc:'tablet'},
+  finka:{pose:'aim',uni:'#3f3a33',vest:'#2f2b26',skin:'#ecc3a3',gear:'hair',gearC:'#c8a060',mask:'none',acc:'pack'},
+  maverick:{pose:'aim',uni:'#46413a',vest:'#36322c',skin:'#e0aa84',gear:'cap',gearC:'#3a3a3a',mask:'glasses',maskC:'#111111',beard:true,acc:'torch'},
+  nomad:{pose:'aim',uni:'#6a5a44',vest:'#4a3f30',skin:'#c98c66',gear:'hood',gearC:'#7a6a52',mask:'scarf',maskC:'#8a7a5e',acc:'launcher'},
+  gridlock:{pose:'advance',uni:'#4a4a3e',vest:'#3a3a30',skin:'#e6b896',gear:'helmet',gearC:'#5a5a48',mask:'none',hair:'#c87a3a',heavy:true,acc:'pack'},
+  nokk:{pose:'aim',uni:'#1e2024',vest:'#16181b',skin:'#e8bc9c',gear:'hood',gearC:'#18191c',mask:'balaclava',maskC:'#d8d8d0'},
+  amaru:{pose:'advance',uni:'#5a4a3a',vest:'#45392c',skin:'#a8724e',gear:'hair',gearC:'#1a1212',mask:'none',acc:'hook'},
+  kali:{pose:'sniper',uni:'#2a2c30',vest:'#1f2124',skin:'#b07a58',gear:'hair',gearC:'#151010',mask:'glasses',maskC:'#111111'},
+  iana:{pose:'aim',uni:'#3a4048',vest:'#2c3138',skin:'#efc6a6',gear:'hair',gearC:'#d8b85e',mask:'visor',maskC:'#80c8ff'},
+  ace:{pose:'aim',uni:'#3a3f45',vest:'#2d3136',skin:'#c48a62',gear:'cap',gearC:'#222222',mask:'none',beard:true,acc:'launcher'},
+  zero:{pose:'aim',uni:'#2e3236',vest:'#23262a',skin:'#e6b896',gear:'cap',gearC:'#2a2a2a',mask:'goggles',maskC:'#40ff90',acc:'pack'},
+  castle:{pose:'advance',uni:'#2a3240',vest:'#212835',skin:'#7a4a30',gear:'helmet',gearC:'#253041',mask:'none',heavy:true,acc:'pack'},
+  pulse:{pose:'aim',uni:'#30363e',vest:'#252a31',skin:'#6e4430',gear:'cap',gearC:'#20242a',mask:'glasses',maskC:'#111111',acc:'tablet'},
+  jager:{pose:'aim',uni:'#3e4238',vest:'#30332b',skin:'#e8bc9c',gear:'cap',gearC:'#2d3029',mask:'glasses',maskC:'#d8a030'},
+  thunderbird:{pose:'aim',uni:'#4a3a34',vest:'#3a2c27',skin:'#b07a58',gear:'hair',gearC:'#151010',mask:'none',acc:'pack'},
+  frost:{pose:'aim',uni:'#4a2a2a',vest:'#3a2020',skin:'#e8bc9c',gear:'beanie',gearC:'#2a2a2a',mask:'none',hair:'#7a3a22'},
+  caveira:{pose:'aim',uni:'#2a3326',vest:'#20281d',skin:'#a8724e',gear:'hair',gearC:'#151010',mask:'none'},
+  echo:{pose:'aim',uni:'#2c3038',vest:'#22262d',skin:'#efc6a6',gear:'cap',gearC:'#1a1c20',mask:'glasses',maskC:'#111111',acc:'tablet'},
+  mira:{pose:'aim',uni:'#2a2c30',vest:'#1f2124',skin:'#e6b896',gear:'hair',gearC:'#151010',mask:'gasmask',maskC:'#d8d8d0'},
+  lesion:{pose:'aim',uni:'#3a3a3a',vest:'#2c2c2c',skin:'#efc6a6',gear:'cap',gearC:'#1a1a1a',mask:'gasmask',maskC:'#2a2a2a'},
+  ela:{pose:'aim',uni:'#2a3a3a',vest:'#203030',skin:'#efc6a6',gear:'hair',gearC:'#40c8a0',mask:'none'},
+  vigil:{pose:'aim',uni:'#2e2e34',vest:'#222228',skin:'#efc6a6',gear:'hood',gearC:'#1e1e24',mask:'balaclava',maskC:'#d8d8d0'},
+  maestro:{pose:'lmg',uni:'#3a3a33',vest:'#2e2e29',skin:'#e0aa84',gear:'hair',gearC:'#8a8a8a',mask:'none',beard:true,heavy:true},
+  alibi:{pose:'aim',uni:'#30343a',vest:'#25292e',skin:'#e2b292',gear:'hair',gearC:'#151010',mask:'none'},
+  clash:{pose:'shield',shieldK:'tall',uni:'#2a2a2e',vest:'#202024',skin:'#6e4430',gear:'helmet',gearC:'#2a2a2e',mask:'visor',maskC:'#ffd060',heavy:true},
+  kaid:{pose:'advance',uni:'#4a4038',vest:'#3a322a',skin:'#a8724e',gear:'hair',gearC:'#c8c8c8',mask:'none',beard:true,heavy:true},
+  mozzie:{pose:'aim',uni:'#4a4a3e',vest:'#3a3a30',skin:'#e6b896',gear:'cap',gearC:'#3a2a1e',mask:'none',beard:true,acc:'tablet'},
+  warden:{pose:'aim',uni:'#2a2c34',vest:'#20222a',skin:'#7a4a30',gear:'none',gearC:'#20222a',mask:'glasses',maskC:'#80c8ff'},
+  goyo:{pose:'aim',uni:'#3a3a33',vest:'#2e2e29',skin:'#c48a62',gear:'cap',gearC:'#222222',mask:'scarf',maskC:'#4a4a40'},
+  wamai:{pose:'aim',uni:'#4a4038',vest:'#3a322a',skin:'#5e3a24',gear:'cap',gearC:'#2a2a2a',mask:'none',acc:'pack'},
+  oryx:{pose:'advance',uni:'#3a3630',vest:'#2e2b26',skin:'#c48a62',gear:'hair',gearC:'#151010',mask:'none',beard:true,heavy:true},
+  melusi:{pose:'aim',uni:'#3a3a33',vest:'#2e2e29',skin:'#5e3a24',gear:'cap',gearC:'#2a2a2a',mask:'none',acc:'pack'},
+  aruni:{pose:'advance',uni:'#4a3a2e',vest:'#3a2c22',skin:'#b07a58',gear:'hair',gearC:'#151010',mask:'none',acc:'arm'},
+  recruit_a_rifle:{pose:'advance',uni:'#4a4a44',vest:'#38382f',skin:'#e0aa84',gear:'helmet',gearC:'#4a4a40',mask:'balaclava',maskC:'#3a3a35'},
+  recruit_a_shotgun:{pose:'aim',uni:'#4a4a44',vest:'#38382f',skin:'#c98c66',gear:'helmet',gearC:'#4a4a40',mask:'goggles',maskC:'#e0a040'},
+  recruit_d_rifle:{pose:'aim',uni:'#2c3440',vest:'#222a35',skin:'#e0aa84',gear:'helmet',gearC:'#2a3240',mask:'balaclava',maskC:'#22262c'},
+  recruit_d_shotgun:{pose:'advance',uni:'#2c3440',vest:'#222a35',skin:'#c98c66',gear:'cap',gearC:'#1d232c',mask:'glasses',maskC:'#111111'},
 };
 function shade(hex,a){const n=parseInt(hex.slice(1),16);const f=v=>Math.max(0,Math.min(255,v+a));return `rgb(${f(n>>16)},${f(n>>8&255)},${f(n&255)})`;}
 const PORT={};
@@ -4978,6 +5281,7 @@ function makeFigure(op,side){
     case 'visor':add(cylG(.098,.098,.055,true,-1,2),new THREE.MeshStandardMaterial({color:L.maskC,emissive:L.maskC,emissiveIntensity:.55,transparent:true,opacity:.82,roughness:.1,side:THREE.DoubleSide}),0,.9,0);break;
     case 'glasses':for(const s of [-1,1])add(rboxG(.04,.022,.008,.006),glass(0x111111),s*.031,.902,.085);add(rboxG(.02,.005,.005,.002),metal,0,.906,.087);break;
     case 'beard':add(sphG(.07),miniMat(L.maskC,{roughness:.95}),0,.84,.035).scale.set(1.05,.85,.85);break;
+    case 'scarf':{const s=add(sphG(.082),maskM,0,.855,.012);s.scale.set(1.08,.62,1.08);add(cylG(.07,.08,.06),maskM,0,.8,0);break;}
   }
   if(L.beard)add(sphG(.066),miniMat('#5e4028',{roughness:.95}),0,.842,.035).scale.set(1.05,.8,.85);
   switch(L.gear){
@@ -4995,6 +5299,7 @@ function makeFigure(op,side){
       for(const s of [-1,1])add(rboxG(.035,.11,.09,.02),fur,s*.1,.865,-.005);add(rboxG(.2,.05,.04,.018),fur,0,.955,.085);break;}
     case 'beret':{const b=add(sphG(.1),gearM,.015,.965,-.005);b.scale.set(1.12,.32,1.08);b.rotation.z=.18;
       for(const s of [-1,1])add(cylG(.033,.033,.03),black,s*.09,.88,0).rotation.z=Math.PI/2;break;}
+    case 'hood':{const h=add(sphG(.112,0,Math.PI*.62),gearM,0,.892,-.012);h.scale.set(1.05,1.08,1.12);add(rboxG(.2,.06,.08,.02),gearM,0,.79,-.06);break;}
     case 'hair':{const h=add(sphG(.093,0,Math.PI*.6),gearM,0,.892,-.006);h.scale.set(1.02,1.05,1.06);
       limb(tgt,[0,.88,-.085],[0,.74,-.1],.03,gearM);for(const s of [-1,1])add(cylG(.035,.035,.03),black,s*.09,.88,0).rotation.z=Math.PI/2;break;}
   }
@@ -5021,6 +5326,8 @@ function makeFigure(op,side){
     add(rboxG(.34,.62,.035,.03),plate,0,0,0,sh);add(rboxG(.22,.075,.02,.01),glass(0x2a4050),0,.2,.02,sh);
     add(rboxG(.36,.03,.05,.01),black,0,.315,0,sh);add(rboxG(.36,.03,.05,.01),black,0,-.315,0,sh);
     add(rboxG(.12,.04,.012,.004),miniMat('#e8e8e0',{roughness:.6,rim:0}),0,-.05,.022,sh);
+    if(L.shieldK==='tall')sh.scale.set(1.18,1.32,1);
+    if(L.shieldK==='flash'){const fl=new THREE.MeshStandardMaterial({color:0xfff4c0,emissive:0xfff0a0,emissiveIntensity:1.1});for(const [fx,fy] of [[-.1,-.16],[0,-.16],[.1,-.16],[-.05,-.24],[.05,-.24]])add(cylG(.024,.024,.012),fl,fx,fy,.025,sh).rotation.x=Math.PI/2;}
     add(rboxG(.032,.11,.03,.008),polymer,.13,.66,.25,gun).rotation.x=.3;add(rboxG(.03,.035,.12,.008),polymer,.13,.705,.29,gun);
   }else if(L.pose==='lmg'){placeGun();
     G1(rboxG(.065,.085,.36,.012),metal,0,0,.2);G1(cylG(.017,.017,.34),metal,0,.012,.52).rotation.x=Math.PI/2;
@@ -5028,6 +5335,19 @@ function makeFigure(op,side){
     G1(rboxG(.03,.07,.035,.008),polymer,0,-.06,.08).rotation.x=-.25;
     for(const s of [-1,1])G1(cylG(.006,.006,.13),metal,s*.03,-.06,.58).rotation.z=s*.4;
   }else{placeGun();rifle(L.pose==='sniper'?2.2:1,L.pose==='sniper');}
+  {const A=L.acc,dk=miniMat('#202326',{roughness:.5}),acc=miniMat('#3a3f45',{metalness:.5,roughness:.4,rim:.2});
+   if(A==='pack'||A==='drone'||A==='launcher'){add(rboxG(.2,.24,.09,.03),pouch,0,.66,-.16*hv,U);}
+   if(A==='drone'){add(rboxG(.16,.05,.11,.02),dk,0,.8,-.2*hv,U);for(const s of [-1,1])add(cylG(.05,.05,.03),dk,s*.1,.8,-.2*hv,U).rotation.z=Math.PI/2;
+     add(sphG(.014),new THREE.MeshStandardMaterial({color:0xef7f3e,emissive:0xef7f3e,emissiveIntensity:1.4}),0,.81,-.14*hv,U);}
+   if(A==='launcher'){const l=add(cylG(.045,.045,.36),dk,.11,.7,-.18*hv,U);l.rotation.z=.25;add(cylG(.05,.05,.04),acc,.15,.86,-.18*hv,U).rotation.z=.25;}
+   if(A==='tablet'){const t=add(rboxG(.13,.09,.012,.006),dk,-.02,.66,.13*hv,U);t.rotation.x=-.5;add(rboxG(.11,.07,.004,.002),new THREE.MeshStandardMaterial({color:0x2a8ad8,emissive:0x2a8ad8,emissiveIntensity:.9}),-.02,.665,.137*hv,U).rotation.x=-.5;}
+   if(A==='torch'){add(cylG(.028,.028,.18),acc,-.15*hv,.56,.04,U);add(cylG(.012,.02,.05),miniMat('#c08a2a',{metalness:.6}),-.15*hv,.67,.04,U);}
+   if(A==='hook'){const h=add(cylG(.05,.05,.12),acc,.16*hv,.56,0,U);h.rotation.z=Math.PI/2;add(new THREE.TorusGeometry(.035,.008,6,16),miniMat('#9aa3aa',{metalness:.8}),.23*hv,.56,0,U);}
+   if(A==='arm'){limb(U,[-.135*hv,.775,0],[-.2*hv,.56,.12],.045,acc);}
+   if(A==='rshield'){G1(rboxG(.17,.12,.012,.004),miniMat('#3a3f44',{roughness:.45,metalness:.35}),0,.08,.33);G1(rboxG(.1,.035,.006,.002),glass(0x2a4050),0,.1,.337);}
+   if(A==='ubs'){G1(cylG(.014,.014,.2),acc,0,-.035,.42).rotation.x=Math.PI/2;}
+   if(A==='xbow'){G1(rboxG(.42,.018,.03,.006),acc,0,.02,.52);}
+  }
   // ---- arms (IK shoulder -> hand) ----
   const shR=[.135*hv,.775,0],shL=[-.135*hv,.775,0];
   let hR=P.hR,hL=P.hL;
@@ -5192,6 +5512,29 @@ function preview3D(){
 }
 const GM={};
 function gm(k,make){return GM[k]||(GM[k]=make());}
+function g3x(gd,add,grp){const em=(k,c,i=1.4)=>gm(k,()=>new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:i}));
+  switch(gd.type){
+  case 'fire':{const mat=gm('firem',()=>new THREE.MeshBasicMaterial({color:0xff5a14,transparent:true,opacity:.62,depthWrite:false,blending:THREE.AdditiveBlending}));
+    const r=rng(gd.x*13+gd.y*7);for(let k=0;k<14;k++){const s=.18+r()*.28;const m=add(SPH3,mat,[s,s*1.6,s],(r()-.5)*2.4,.15+r()*.35,(r()-.5)*2.4);m.castShadow=false;m.userData.ph=r()*6;}
+    add(BOX3,gm('fireb',()=>new THREE.MeshBasicMaterial({color:0xff5a1a,transparent:true,opacity:.22,depthWrite:false})),[2.9,.01,2.9],0,.02,0).castShadow=false;grp.userData.gas=true;return true;}
+  case 'trax':{const m=gm('trax',()=>std(0x4a4f55,{metalness:.6,roughness:.4}));add(CYL3,m,[.28,.02,.28],0,.02,0);for(let k=0;k<8;k++){const a=k/8*Math.PI*2;const s=add(CYL3,m,[.012,.08,.012],Math.cos(a)*.2,.06,Math.sin(a)*.2);s.rotation.set(Math.sin(a)*.5,0,-Math.cos(a)*.5);}
+    const ring=new THREE.LineLoop(gm('traxr',()=>new THREE.BufferGeometry().setFromPoints([[-1.5,-1.5],[1.5,-1.5],[1.5,1.5],[-1.5,1.5]].map(([a,b])=>new THREE.Vector3(a,.04,b)))),gm('traxl',()=>new THREE.LineDashedMaterial({color:0xef7f3e,dashSize:.2,gapSize:.15})));ring.computeLineDistances();grp.add(ring);return true;}
+  case 'argus':case 'eye':{const big=gd.type==='eye';add(CYL3,gm('agp',()=>std(0x2a2f35,{metalness:.5})),[.03,big?1.1:.6,.03],0,big?.55:.3,0);
+    add(SPH3,gm(big?'eyeb':'argb',()=>std(big?0x111316:0x30353a,{metalness:.4,roughness:.3})),big?[.16,.16,.16]:[.1,.1,.1],0,big?1.15:.64,0);
+    grp.userData.blink=add(SPH3,em(big?'eyel':'argl',big?0xff3030:0xef7f3e),[.05,.05,.05],0,big?1.15:.64,big?.14:.09);return true;}
+  case 'kona':{add(BOX3,gm('kona',()=>std(0xe8e8e0,{roughness:.5})),[.3,.36,.14],0,.18,0);const g=em('konal',0x40e080,1.2);add(BOX3,g,[.14,.04,.01],0,.22,.075);add(BOX3,g,[.04,.14,.01],0,.22,.075);grp.userData.blink=add(SPH3,g,[.03,.03,.03],0,.4,0);return true;}
+  case 'mat':{add(CYL3,gm('mat',()=>std(0x2a2a2a,{roughness:.8})),[.3,.015,.3],0,.01,0);const j=gm('matj',()=>std(0x8a8f95,{metalness:.8,roughness:.3}));for(const s of [-1,1]){const b=add(BOX3,j,[.4,.02,.02],0,.03,s*.12);b.rotation.x=s*.4;}return true;}
+  case 'gu':{add(SPH3,gm('gu',()=>std(0x2f3a2a,{roughness:.6})),[.07,.07,.07],0,.07,0);grp.userData.blink=add(SPH3,em('gul',0x6aff6a),[.02,.02,.02],0,.14,0);return true;}
+  case 'grz':{add(CYL3,gm('grz',()=>std(0x2a2f35,{metalness:.5})),[.11,.05,.11],0,.03,0);grp.userData.blink=add(SPH3,em('grzl',0xff3b30),[.025,.025,.025],0,.07,0);return true;}
+  case 'claw':{add(CYL3,gm('claw',()=>std(0x2a2f35,{metalness:.5})),[.16,.04,.16],0,.02,0);grp.userData.blink=add(SPH3,em('clawl',0xffd84a,1.6),[.035,.035,.035],0,.07,0);
+    const m=gm('clawp',()=>std(0x9aa3aa,{metalness:.8,roughness:.3}));for(let k=0;k<4;k++){const a=k/4*Math.PI*2;add(BOX3,m,[.02,.02,.16],Math.cos(a)*.12,.03,Math.sin(a)*.12).rotation.y=-a;}return true;}
+  case 'magnet':{add(CYL3,gm('mag',()=>std(0x3a3f45,{metalness:.6})),[.16,.06,.16],0,.04,0);const r=add(new THREE.TorusGeometry(.17,.012,6,24),em('magl',0x4aa8e2,1.2),[1,1,1],0,.08,0);r.rotation.x=Math.PI/2;return true;}
+  case 'banshee':{add(BOX3,gm('ban',()=>std(0x1d2026,{metalness:.4})),[.24,.24,.12],0,.12,0);add(CYL3,gm('banh',()=>std(0x30353c,{metalness:.5})),[.08,.08,.08],0,.14,.08).rotation.x=Math.PI/2;
+    grp.userData.blink=add(SPH3,em('banl',0x4aa8e2),[.03,.03,.03],0,.27,0);return true;}
+  case 'mirror':{const c=cell(gd.x,gd.y),vert=cell(gd.x-1,gd.y)&&cell(gd.x+1,gd.y)&&!blocks(cell(gd.x-1,gd.y))&&!blocks(cell(gd.x+1,gd.y));
+    const p=add(BOX3,gm('mirr',()=>new THREE.MeshStandardMaterial({color:0x1a2a3a,metalness:.9,roughness:.05,emissive:0x0a1a2a,emissiveIntensity:.5})),vert?[.08,.5,.7]:[.7,.5,.08],0,1.05,0);void c;void p;return true;}
+  }
+  return false;}
 function gadget3D(gd){
   const grp=new THREE.Group();grp.position.set(gd.x+.5,0,gd.y+.5);
   const add=(geo,mat,s,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.scale.set(...s);m.position.set(x,y,z);m.castShadow=true;grp.add(m);return m;};
@@ -5209,9 +5552,10 @@ function gadget3D(gd){
     add(SPH3,gm('dled',()=>new THREE.MeshStandardMaterial({color:0xef7f3e,emissive:0xef7f3e,emissiveIntensity:1.4})),[.025,.025,.025],0,.13,.07);void d;}
   else if(gd.type==='wire'){const m=gm('wirem',()=>std(0x9aa3aa,{metalness:.8,roughness:.35}));for(let k=-2;k<=2;k++){const t=add(new THREE.TorusGeometry(.14,.008,4,18),m,[1,1,1],k*.17,.13,0);t.rotation.y=Math.PI/2;}
     add(BOX3,m,[.85,.01,.01],0,.13,0);}
-  else if(gd.type==='shield'){add(BOX3,gm('shd',()=>std(0x3a4148,{metalness:.55,roughness:.4})),[.8,.7,.06],0,.35,0);add(BOX3,gm('shdg',()=>new THREE.MeshStandardMaterial({color:0x9fd2f0,transparent:true,opacity:.5,roughness:.05})),[.3,.1,.07],0,.55,0);}
+  else if(gd.type==='shield'){add(BOX3,gm('shd',()=>std(0x3a4148,{metalness:.55,roughness:.4})),[.8,.7,.06],0,.35,0);add(BOX3,gm('shdg',()=>new THREE.MeshStandardMaterial({color:0x9fd2f0,transparent:true,opacity:.5,roughness:.05})),[.3,.1,.07],0,.55,0);if(gd.volcan){add(CYL3,gm('volc',()=>std(0xc0302a,{metalness:.3,roughness:.5})),[.08,.24,.08],0,.12,.13);add(SPH3,gm('volcl',()=>new THREE.MeshStandardMaterial({color:0xff6a2a,emissive:0xff5a1a,emissiveIntensity:1.4})),[.03,.03,.03],0,.26,.13);}}
   else if(gd.type==='smk'){grp.position.set(gd.x+1,0,gd.y+1);const mat=gm('smkm',()=>new THREE.MeshStandardMaterial({color:0xc8ccd0,transparent:true,opacity:.42,depthWrite:false,roughness:1}));
     const r=rng(gd.x*17+gd.y);for(let k=0;k<12;k++){const s=.45+r()*.5;const m=add(SPH3,mat,[s,s*.8,s],(r()-.5)*1.6,.35+r()*.7,(r()-.5)*1.6);m.castShadow=false;}grp.userData.gas=true;}
+  else if(g3x(gd,add,grp)){}
   else if(gd.type==='gas'){const mat=gm('gas',()=>new THREE.MeshStandardMaterial({color:0x8fdc5a,transparent:true,opacity:.28,depthWrite:false,emissive:0x2a5a10,emissiveIntensity:.4}));
     const r=rng(gd.x*31+gd.y);for(let k=0;k<9;k++){const s=.5+r()*.5;const m=add(SPH3,mat,[s,s*.7,s],(r()-.5)*2.2,.4+r()*.5,(r()-.5)*2.2);m.castShadow=false;m.userData.ph=r()*6;}grp.userData.gas=true;}
   return grp;
@@ -6226,7 +6570,7 @@ function renderOpSelect(anim){
     <div class="osInfo"><div class="osName"><b>${cur.name}</b><img src="${opIcon(cur.id)}" alt=""></div><div class="osOrg">${cur.org||''}${cur.real?' · '+cur.real:''}</div>
     <div class="osSide">${sideIc}<span>${cur.side==='A'?'攻擊方':'防守方'}</span>${cur.zh.role?`<span class="hint">· ${cur.zh.role}</span>`:''}<span class="osBatch">${cur.batchZh}</span></div>
     ${vars.length>1?`<div class="osVar">${vars.map((v,i)=>`<button data-ov="${v.id}" class="${v.id===cur.id?'on':''}">卡片版本 ${i+1}</button>`).join('')}</div>`:''}
-    <div class="osG"><div class="gi"><img src="${opIcon(cur.id)}" alt=""></div><div class="gt"><b>${cur.zh.g||'（無特殊裝置）'}</b>${SCRIPTED.has(cur.id)?'<span class="osImp ok">遊戲內已實作</span>':cur.g.ab&&cur.g.ab.some(a=>a.k!=='PASSIVE')?'<span class="osImp">尚未實作，目前只有卡片數值</span>':''}<i>${cur.g.name||''}${cur.g.charges?` · 使用次數 ${cur.g.charges}`:''}</i><p>${cardText(cur)}</p>${OSEL.en&&abEn?`<p class="en">${abEn}</p>`:''}</div></div>
+    <div class="osG"><div class="gi"><img src="${opIcon(cur.id)}" alt=""></div><div class="gt"><b>${cur.zh.g||'（無特殊裝置）'}</b>${SCRIPTED.has(cur.id)?'<span class="osImp ok">遊戲內已實作</span>'+(typeof GDX!=='undefined'&&GDX[cur.id]?`<small class="osGd">遊戲版效果：${GDX[cur.id][0]}</small>`:''):cur.g.ab&&cur.g.ab.some(a=>a.k!=='PASSIVE')?'<span class="osImp">尚未實作，目前只有卡片數值</span>':''}<i>${cur.g.name||''}${cur.g.charges?` · 使用次數 ${cur.g.charges}`:''}</i><p>${cardText(cur)}</p>${OSEL.en&&abEn?`<p class="en">${abEn}</p>`:''}</div></div>
     <div class="osSec"><h4>武器命中骰</h4><div class="osW">${['1-3','4-6','7+'].map((r,i)=>`<div><span>RANGE ${r}<small>${['近','中','遠'][i]}</small></span>${hexDice(cur.w[i])}</div>`).join('')}</div></div>
     <div class="osSec"><h4>能力值</h4><div class="osStats"><div><b>${cur.st??'—'}</b><small>耐力（護甲）</small></div><div><b>${cur.run?'+'+cur.run:'—'}</b><small>${cur.run?'奔跑':'不能奔跑'}</small></div><div><b><span class="dzb ${cur.dz}"></span> ${DZN[cur.dz]}</b><small>破壞力</small></div><div><b>${cur.g.charges??'—'}</b><small>裝置次數</small></div></div>
     ${cur.shield?'<p class="hint" style="margin:8px 0 0">持盾：本身永遠有輕掩護。</p>':''}${cur.up?`<p class="hint" style="margin:8px 0 0">新兵升級骰：近 ${hexDice(cur.up.short)} 中 ${hexDice(cur.up.medium)} 遠 ${hexDice(cur.up.long)}</p>`:''}</div>
