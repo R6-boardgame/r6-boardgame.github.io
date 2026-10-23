@@ -1395,6 +1395,17 @@ body:not([data-scr="game"]) #opsBar{display:none}
 @media (orientation:landscape) and (max-height:520px){.bgrid{gap:2px 4px}.bd b{font-size:11px}.bdL{width:16px;height:16px;right:calc(50% - 38px)}}
 .pstg{flex-wrap:wrap;gap:6px 8px}.pstg button{min-width:44px}
 @media (orientation:landscape) and (max-height:520px){#title[data-s="lib"] #tmenu{gap:4px}#title[data-s="lib"] .tbtn{min-height:62px!important;padding-top:6px!important;padding-bottom:6px!important}#title[data-s="lib"] .tbtn b{font-size:20px}#title[data-s="lib"] .tsec{margin:0 0 2px}}
+/* v42b: scrolling achievement list */
+.achBox:has(.bscroll){height:calc(100dvh - 24px);box-sizing:border-box}
+.bscroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 2px 6px}
+.bsec{display:flex;align-items:center;gap:10px;margin:10px 0 8px;font:800 15px/1 inherit;color:#e9edf1}
+.bsec:first-child{margin-top:2px}
+.bsec::before,.bsec::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,#8d9aa6)}
+.bsec::after{background:linear-gradient(90deg,#8d9aa6,transparent)}
+.bsec em{order:3;font:700 11px/1 ui-monospace,monospace;color:#f0b43c;font-style:normal}
+.bsec::after{order:4}
+.adet{flex:none}
+@media (orientation:landscape) and (max-height:520px){.adet{min-height:40px;padding:5px 10px}.bsec{margin:6px 0 4px}}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -3356,7 +3367,7 @@ const SFX=(()=>{
     get on(){return on;},
     get mOn(){return mOn;},
     toggle(){on=!on;try{localStorage.setItem('r6snd',on?'1':'0');}catch(e){}init();if(ac)fxBus.gain.value=on?.9:0;return on;},
-    toggleMusic(){mOn=!mOn;try{localStorage.setItem('r6mus',mOn?'1':'0');}catch(e){}init();if(ac){muBus.gain.value=mOn?.32:0;if(!mOn&&mus){mus.lvl=0;mus.g.gain.value=0;}}return mOn;},
+    toggleMusic(){mOn=!mOn;if(!mOn)setTimeout(()=>{try{achGive('quiet');}catch(e){}},0);try{localStorage.setItem('r6mus',mOn?'1':'0');}catch(e){}init();if(ac){muBus.gain.value=mOn?.32:0;if(!mOn&&mus){mus.lvl=0;mus.g.gain.value=0;}}return mOn;},
     init};
   // browsers only allow sound after a tap or key press
   ['pointerdown','keydown','touchstart'].forEach(e=>addEventListener(e,()=>init(),{capture:true,passive:true}));
@@ -3457,7 +3468,7 @@ let DMGBY=null;const ST=u=>u.st||(u.st={k:0,dmg:0,taken:0,shots:0,hits:0,gad:0})
 const SRCOP={'毒氣':'smoke','電擊':'bandit','闊刀地雷':null,'集束炸彈':null};
 async function damage(u,n,src){
   if(!u.alive)return;n=dmgMod(u,n);if(n<=0)return;{let by=DMGBY;if(!by&&src&&SRCOP[src])by=G.units.find(x=>x.op===SRCOP[src]&&x.side!==u.side);if(!by&&!src)by=null;
-    const real=Math.min(n,u.hp);ST(u).taken+=real;if(by&&by.side!==u.side){ST(by).dmg+=real;if(u.hp-n<=0)ST(by).k++;}}if(u.hidden)reveal(u,'受傷後');u.hp-=n; if(src)log(`${nm(u)} 受到${src} ${n} 點傷害`,'ks');
+    const real=Math.min(n,u.hp);ST(u).taken+=real;if(by&&by.side===u.side&&by!==u&&by.side===G.player&&u.hp-n<=0)G._ff=1;if(by&&by.side!==u.side){ST(by).dmg+=real;if(u.hp-n<=0)ST(by).k++;}}if(u.hidden)reveal(u,'受傷後');u.hp-=n; if(src)log(`${nm(u)} 受到${src} ${n} 點傷害`,'ks');
   if(u.hp<=0&&finkaSave(u))return render();if(u.hp<=0){SFX.kill();onKill(u);u.alive=false;u.hp=0;u.overwatch=false;if(G.hostage&&G.hostage.by===u.id){G.hostage.by=null;G.hostage.x=u.x;G.hostage.y=u.y;log('人質留在原地','ks');}log(`${nm(u)} 陣亡`,u.side==='A'?'kd':'ka');}
   render(); checkWin();
 }
@@ -4331,7 +4342,28 @@ const ACH=[
  {id:'plant5',ic:'📦',c:'#e8743b',sh:1,n:'拆彈器推銷員',d:'安裝拆彈器並獲勝 5 次',goal:5,k:'plant'},
  {id:'ops10',ic:'🎭',c:'#e86fa0',sh:0,n:'換個人玩玩',d:'用過 10 名不同幹員',goal:10,k:'ops'},
  {id:'lose5',ic:'🩹',c:'#b08a6a',sh:2,n:'越挫越勇',d:'輸掉 5 場對戰',goal:5,k:'losses'},
- {id:'friend5',ic:'🎉',c:'#5cc48a',sh:3,n:'朋友滿天下',d:'有 5 位好友',goal:5,k:'friends'}];
+ {id:'friend5',ic:'🎉',c:'#5cc48a',sh:3,n:'朋友滿天下',d:'有 5 位好友',goal:5,k:'friends'},
+ {id:'tourist',x:1,ic:'📷',c:'#62c1d6',sh:2,n:'我是來觀光的',d:'一槍都沒開就獲勝'},
+ {id:'storm',x:1,ic:'🌪',c:'#c7ced6',sh:1,n:'帝國風暴兵',d:'一場開 8 槍以上，一發都沒中'},
+ {id:'lunch',x:1,ic:'🍱',c:'#f0b43c',sh:2,n:'午休前收工',d:'第 2 輪內獲勝'},
+ {id:'deadline',x:1,ic:'⏰',c:'#e8743b',sh:0,n:'死線戰士',d:'在最後一輪獲勝'},
+ {id:'zero',x:1,ic:'🥚',c:'#b08a6a',sh:2,n:'光頭鴨蛋',d:'全隊陣亡且一個都沒殺到'},
+ {id:'shields',x:1,ic:'🧱',c:'#4aa8e2',sh:0,n:'盾盾盾盾盾',d:'五名幹員全帶盾並獲勝'},
+ {id:'onehp',x:1,ic:'🩸',c:'#e05b4b',sh:3,n:'血條只是裝飾',d:'獲勝時每個存活幹員都只剩 1 血'},
+ {id:'spotless',x:1,ic:'🧼',c:'#62c1d6',sh:1,n:'連汗都沒流',d:'獲勝時全隊滿血'},
+ {id:'sandbag',x:1,ic:'🥊',c:'#b08a6a',sh:0,n:'人形沙包',d:'一場承受 15 點傷害'},
+ {id:'butter',x:1,ic:'🧈',c:'#ffd36b',sh:2,n:'手滑了一下',d:'自己的爆裂物害死人質'},
+ {id:'ff',x:1,ic:'🤡',c:'#e86fa0',sh:3,n:'隊友也是經驗值',d:'用自己的攻擊幹掉隊友'},
+ {id:'thenwhat',x:1,ic:'🤷',c:'#9f8cf0',sh:1,n:'裝好了然後呢',d:'裝了拆彈器卻還是輸了'},
+ {id:'streakW',x:1,ic:'🔥',c:'#e8743b',sh:3,n:'手燙到冒煙',d:'連勝 5 場'},
+ {id:'streakL',x:1,ic:'🧘',c:'#7fb0d8',sh:2,n:'連敗是一種修行',d:'連輸 3 場'},
+ {id:'main',x:1,ic:'💍',c:'#e86fa0',sh:0,n:'本命幹員',d:'同一名幹員出場 20 場'},
+ {id:'owl',x:1,ic:'🦉',c:'#9f8cf0',sh:2,n:'凌晨三點的戰士',d:'凌晨 2 點到 5 點之間打完一場'},
+ {id:'retreat',x:1,ic:'🏃',c:'#c7ced6',sh:1,n:'戰略性撤退',d:'對戰中途離開'},
+ {id:'quiet',x:1,ic:'🤫',c:'#5cc48a',sh:2,n:'耳根清淨',d:'關掉音樂'},
+ {id:'reader',x:1,ic:'🤓',c:'#7fb0d8',sh:0,n:'真的有人看規則',d:'打開規則'},
+ {id:'hunter',x:1,ic:'🏹',c:'#8fc45c',sh:3,n:'成就獵人',d:'打開成就頁 20 次',goal:20,k:'opens'}];
+const ACHSEC=[['基本',a=>!a.goal&&!a.x],['長期目標',a=>a.goal&&!a.x],['刁鑽',a=>a.x]];
 function achProg(a){const n=AS.n,g=a.goal||1;if(!a.goal)return[AS.got[a.id]?1:0,1];
   const v=a.k==='ops'?(n.ops||[]).length:a.k==='friends'?FR.list.length:(n[a.k]||0);return[Math.min(AS.got[a.id]?g:v,g),g];}
 const ACHM=Object.fromEntries(ACH.map(a=>[a.id,a]));
@@ -4350,6 +4382,17 @@ function achFinish(w){if(!G||G._achDone)return;G._achDone=true;G._newAch=[];
   if(c.winA>=3)got.push('winA');if(c.winD>=3)got.push('winD');if(c.games>=10)got.push('vet');if(c.wins>=10)got.push('wins10');
   c.kills=(c.kills||0)+t.k;c.gadT=(c.gadT||0)+t.gad;c.ops=[...new Set([...(c.ops||[]),...mine.map(u=>OPC[u.op]&&OPC[u.op].base||u.op)])];
   if(win&&G._pl){got.push('plant');c.plant=(c.plant||0)+1;}if(win&&P==='A'&&G.mission==='hostage')c.rescue=(c.rescue||0)+1;
+  {const why=G.why||'',hostD=/害死了人質/.test(why);
+    if(win&&t.shots===0)got.push('tourist');if(t.shots>=8&&t.hits===0)got.push('storm');
+    if(win&&G.round<=2)got.push('lunch');if(win&&G.maxRounds<90&&G.round>=G.maxRounds)got.push('deadline');
+    if(!win&&alive===0&&t.k===0)got.push('zero');
+    if(win&&mine.length>=5&&mine.every(u=>PROF[u.op]&&PROF[u.op].shield))got.push('shields');
+    if(win&&alive>0&&mine.filter(u=>u.alive).every(u=>u.hp===1))got.push('onehp');
+    if(win&&alive===mine.length&&mine.every(u=>u.hp>=u.max))got.push('spotless');
+    if(t.taken>=15)got.push('sandbag');if(!win&&hostD)got.push('butter');if(G._ff)got.push('ff');if(!win&&G._pl)got.push('thenwhat');
+    c.sw=win?(c.sw||0)+1:0;c.sl=win?0:(c.sl||0)+1;if(c.sw>=5)got.push('streakW');if(c.sl>=3)got.push('streakL');
+    c.opN=c.opN||{};mine.forEach(u=>{const k=OPC[u.op]&&OPC[u.op].base||u.op;c.opN[k]=(c.opN[k]||0)+1;});if(Object.values(c.opN).some(v=>v>=20))got.push('main');
+    const hr=new Date().getHours();if(hr>=2&&hr<5)got.push('owl');}
   for(const a of ACH)if(a.goal&&a.k!=='friends'&&achProg(a)[0]>=a.goal)got.push(a.id);
   if(win&&P==='A'&&G.mission==='hostage')got.push('rescue');
   if(win&&alive===mine.length)got.push('flaw');
@@ -4379,13 +4422,12 @@ function achBadge(a){const c=a.c||'#f0b43c',id='bg'+a.id,S=[
   return `<svg class="bdS" viewBox="0 0 80 80" style="width:${ACHV.bw}px;height:${ACHV.bw}px"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}"/><stop offset="1" stop-color="#1b2530"/></linearGradient></defs>
     <path d="${S}" fill="url(#${id})" stroke="#e9d9a6" stroke-width="3" stroke-linejoin="round"/><path d="${S}" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="1" transform="translate(40 40) scale(.8) translate(-40 -40)"/>
     <text x="40" y="${a.sh===3?50:51}" text-anchor="middle" font-size="${a.sh===3?24:30}">${a.ic}</text></svg>`;}
-function openAch(tab){ACHV.tab=tab||'ach';ACHV.sel=null;ACHV.pg=0;let el=$('#achp');if(!el){el=document.createElement('div');el.id='achp';el.setAttribute('role','dialog');el.setAttribute('aria-label','成就與好友');document.body.appendChild(el);el.addEventListener('click',e=>{if(e.target===el)el.remove();});}renderAch();}
+function openAch(tab){ACHV.st=0;if((tab||'ach')==='ach'){AS.n.opens=(AS.n.opens||0)+1;achSave();if(AS.n.opens>=20)setTimeout(()=>achGive('hunter'),0);}ACHV.tab=tab||'ach';ACHV.sel=null;ACHV.pg=0;let el=$('#achp');if(!el){el=document.createElement('div');el.id='achp';el.setAttribute('role','dialog');el.setAttribute('aria-label','成就與好友');document.body.appendChild(el);el.addEventListener('click',e=>{if(e.target===el)el.remove();});}renderAch();}
 function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body='';
-  if(T==='ach'){const a=ACHM[ACHV.sel],per=achPer(),pages=Math.ceil(ACH.length/per);ACHV.pg=Math.max(0,Math.min(ACHV.pg,pages-1));
-    body=`<div class="bgrid" style="--cols:${ACHV.cols}">${ACH.slice(ACHV.pg*per,ACHV.pg*per+per).map(x=>{const [v,g]=achProg(x),got=!!AS.got[x.id];
-      return `<button class="bd ${got?'got':''} ${ACHV.sel===x.id?'sel':''}" data-a="${x.id}">${achBadge(x)}${got?'':`<i class="bdL">${SVG_LOCK}</i>`}<b>${x.n}</b><span class="bdP"><i><u style="width:${Math.round(v/g*100)}%"></u></i>${v}/${g}</span></button>`;}).join('')}</div>
-    <div class="adet">${a?`<b>${a.ic} ${a.n}</b><em>${AS.got[a.id]?'已解鎖 · '+new Date(AS.got[a.id]).toLocaleDateString('zh-TW'):'尚未解鎖 · 條件保密，繼續玩就會知道'}</em>`:'<span>點徽章看名稱與解鎖日期</span>'}</div>
-    <div class="bdots">${Array.from({length:pages},(_,k)=>`<button class="${k===ACHV.pg?'on':''}" data-dot="${k}" aria-label="第 ${k+1} 頁"></button>`).join('')}</div>`;
+  if(T==='ach'){const a=ACHM[ACHV.sel];achPer();
+    const card=x=>{const [v,g]=achProg(x),got=!!AS.got[x.id];return `<button class="bd ${got?'got':''} ${ACHV.sel===x.id?'sel':''}" data-a="${x.id}">${achBadge(x)}${got?'':`<i class="bdL">${SVG_LOCK}</i>`}<b>${x.n}</b><span class="bdP"><i><u style="width:${Math.round(v/g*100)}%"></u></i>${v}/${g}</span></button>`;};
+    body=`<div class="bscroll">${ACHSEC.map(([t,f])=>{const L=ACH.filter(f);return `<h5 class="bsec"><span>${t}</span><em>${L.filter(x=>AS.got[x.id]).length}/${L.length}</em></h5><div class="bgrid" style="--cols:${ACHV.cols}">${L.map(card).join('')}</div>`;}).join('')}</div>
+    <div class="adet">${a?`<b>${a.ic} ${a.n}</b><em>${AS.got[a.id]?'已解鎖 · '+new Date(AS.got[a.id]).toLocaleDateString('zh-TW'):'尚未解鎖 · 條件保密，繼續玩就會知道'}</em>`:'<span>點徽章看名稱與解鎖日期</span>'}</div>`;
     if(0)body=`<div class="agrid">${ACH.map(x=>`<button class="ab ${AS.got[x.id]?'got':''} ${ACHV.sel===x.id?'sel':''}" data-a="${x.id}"><i>${x.ic}</i><b>${x.n}</b></button>`).join('')}</div>
     <div class="adet">${a?`<b>${a.ic} ${a.n}</b><span>${a.d}${a.goal?`（${Math.min(AS.n[a.k]||0,a.goal)}/${a.goal}）`:''}</span><em>${AS.got[a.id]?'已解鎖 · '+new Date(AS.got[a.id]).toLocaleDateString('zh-TW'):'尚未解鎖'}</em>`:'<span>點一下成就看條件</span>'}</div>`;}
   else{const per=matchMedia('(orientation:landscape) and (max-height:500px)').matches?4:6,L=FR.list.slice().sort((a,b)=>b.ts-a.ts),pages=Math.max(1,Math.ceil(L.length/per));ACHV.pg=Math.min(ACHV.pg,pages-1);
@@ -4399,7 +4441,8 @@ function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body
   el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{ACHV.sel=b.dataset.a;renderAch();});
   el.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{ACHV.pg+=+b.dataset.pg;ACHV.sel=null;renderAch();});
   el.querySelectorAll('[data-dot]').forEach(b=>b.onclick=()=>{ACHV.pg=+b.dataset.dot;ACHV.sel=null;renderAch();});
-  const gr=el.querySelector('.bgrid');if(gr){let x0=null;gr.addEventListener('pointerdown',e=>{x0=e.clientX;});gr.addEventListener('pointerup',e=>{if(x0==null)return;const dx=e.clientX-x0;x0=null;if(Math.abs(dx)>50){const pages=Math.ceil(ACH.length/achPer());const p=Math.max(0,Math.min(pages-1,ACHV.pg+(dx<0?1:-1)));if(p!==ACHV.pg){ACHV.pg=p;ACHV.sel=null;renderAch();}}});}
+  const sc=el.querySelector('.bscroll');if(sc){sc.scrollTop=ACHV.st||0;sc.onscroll=()=>{ACHV.st=sc.scrollTop;};}
+  const gr=null;if(gr){let x0=null;gr.addEventListener('pointerdown',e=>{x0=e.clientX;});gr.addEventListener('pointerup',e=>{if(x0==null)return;const dx=e.clientX-x0;x0=null;if(Math.abs(dx)>50){const pages=Math.ceil(ACH.length/achPer());const p=Math.max(0,Math.min(pages-1,ACHV.pg+(dx<0?1:-1)));if(p!==ACHV.pg){ACHV.pg=p;ACHV.sel=null;renderAch();}}});}
   el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const id=b.dataset.del;if(ACHV.sel!==id){ACHV.sel=id;renderAch();return;}frDel(id);ACHV.sel=null;renderAch();});
   el.querySelectorAll('[data-addr]').forEach(b=>b.onclick=()=>{const r=FR.recent.find(x=>x.id===b.dataset.addr);if(!b.classList.contains('arm')){b.classList.add('arm');b.querySelector('em').textContent='再點一下加 '+(r?r.name:'');return;}frAdd(r);renderAch();});}
 // ---- mirror to the signed-in player's private store ----
@@ -6182,7 +6225,7 @@ const LEGEND_EXTRA=[
 $('#legend').innerHTML=LEGEND.map(([s,t])=>`<span>${s}${t}</span>`).join('');
 $('#lgfull').innerHTML=[...LEGEND,...LEGEND_EXTRA].map(([s,t])=>`<div>${s}<span>${t}</span></div>`).join('');
 let manualReturn=null;
-function openManual(sec){manualReturn=document.activeElement;$('#manual').hidden=false;if(sec)$('#'+sec).scrollIntoView({block:'start'});$('#manualClose').focus();}
+function openManual(sec){try{achGive('reader');}catch(e){}manualReturn=document.activeElement;$('#manual').hidden=false;if(sec)$('#'+sec).scrollIntoView({block:'start'});$('#manualClose').focus();}
 function closeManual(){$('#manual').hidden=true;if(manualReturn&&manualReturn.focus)manualReturn.focus();}
 // ---------- original rulebook viewer (Traditional Chinese translation), from the lobby and in game ----------
 const RB={books:[{id:'core',title:'核心規則',src:'rulesmd'}],cur:'core',q:'',html:{}};
@@ -6593,7 +6636,7 @@ function hMenu(){let m=$('#hmenu');if(m){m.remove();return;}m=document.createEle
     if(k==='mus'){SFX.toggleMusic();try{musicLevel();}catch(e){}}else if(k==='snd')$('#sndBtn').click();else if(k==='set')openSettings();else if(k==='ach')openAch();else homeGo();};
   setTimeout(()=>addEventListener('pointerdown',function f(e){if(!m.contains(e.target)&&e.target.closest('#homeBtn')==null){m.remove();removeEventListener('pointerdown',f,true);}},true),0);}
 $('#homeBtn').onclick=()=>{if(!G){goTitle();return;}hMenu();};
-function homeGo(){if(!G){goTitle();return;}if(G.over||confirm(G.net?'離開連線對戰？對手會留在房間裡。':'離開這場對戰，回到主畫面？'))goTitle();};
+function homeGo(){if(!G){goTitle();return;}if(G.over)return goTitle();if(confirm(G.net?'離開連線對戰？對手會留在房間裡。':'離開這場對戰，回到主畫面？')){if(!G.tut)achGive('retreat');goTitle();}};
 $('#manualClose').onclick=closeManual;
 $('#manual').addEventListener('click',e=>{if(e.target.id==='manual')closeManual();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#manual').hidden)closeManual();});
