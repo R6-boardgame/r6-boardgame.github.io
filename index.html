@@ -1120,6 +1120,116 @@ html body .hud3d{top:calc(var(--hdrB,52px) + 6px)}
 html body .depBox #acts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
 html body .depBox #acts button{min-width:0;overflow:hidden}
 html body .depBox #acts button .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+/* ===== v38 HUD restyle (reference: dark navy chamfered panels, blue lines, gold primary) ===== */
+:root{--hb:rgba(9,15,23,.9);--hb2:rgba(16,26,38,.92);--hl:rgba(98,152,206,.42);--hblue:#45a6ef;--horg:#f08a2c;--cham:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px)}
+/* top bar: one row of chamfered chips */
+body[data-scr="game"] #sndBtn,body[data-scr="setup"] #sndBtn{display:none}
+html body .tracker .pips,html body .tracker .phases{display:none}
+html body header.top .topright{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+html body header.top .manualbtn,html body header.top .online,html body .tracker>span:first-child,html body .tracker .seg{background:var(--hb);border:1px solid var(--hl);clip-path:var(--cham);color:#e6edf3;min-height:36px;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
+html body header.top .manualbtn{padding:4px 12px;font-size:14px}
+html body #homeBtn{width:40px;padding:0}html body #homeBtn svg{width:20px;height:20px}
+html body .tracker{gap:6px;font-family:inherit}
+html body .tracker>span:first-child{padding:4px 10px;font-size:13px;letter-spacing:.06em;white-space:nowrap}
+html body .tracker .seg{padding:0;overflow:hidden}
+html body .tracker .seg>span{display:inline-flex;align-items:center;gap:4px;padding:0 10px;height:34px;font-size:14px;font-weight:700;opacity:.5}
+html body .tracker .seg svg{width:15px;height:15px}
+html body .tracker .seg .sa{color:var(--horg);border-right:1px solid var(--hl)}html body .tracker .seg .sd{color:var(--hblue)}
+html body .tracker .seg .on{opacity:1}html body .tracker .seg .sa.on{background:rgba(240,138,44,.16)}html body .tracker .seg .sd.on{background:rgba(69,166,239,.16)}
+html body header.top .online{padding:4px 10px}
+#hmenu{position:fixed;z-index:60;display:flex;flex-direction:column;min-width:170px;background:var(--hb2);border:1px solid var(--hl);clip-path:var(--cham);padding:6px;gap:4px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+#hmenu button{text-align:left;padding:10px 12px;font-size:15px;background:rgba(255,255,255,.04);border:1px solid transparent;color:#e6edf3}
+#hmenu button:hover{border-color:var(--hl)}
+/* operator card */
+html body .card .nm,html body .card .gadget{display:none}
+html body .oc{grid-column:1/-1;display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,46%);gap:10px;align-items:stretch;background:var(--hb2);border:1px solid var(--hl);clip-path:var(--cham);padding:8px}
+html body .oc.a{--acc:var(--horg)}html body .oc.d{--acc:var(--hblue)}
+html body .ocL{position:relative;width:74px;height:84px;flex:none}
+html body .ocP{width:100%;height:100%;object-fit:cover;object-position:50% 15%;border:1px solid var(--acc);box-shadow:inset 0 0 0 1px rgba(0,0,0,.5),0 0 10px rgba(69,166,239,.15);background:#0b121a}
+html body .ocI{position:absolute;left:-4px;bottom:-4px;width:26px;height:26px;border-radius:50%;background:#0b121a;border:1px solid var(--acc);padding:2px}
+html body .ocM{display:flex;flex-direction:column;gap:3px;min-width:0}
+html body .ocN{font:800 22px/1.05 var(--display);color:#f2f5f8;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html body .ocR{font-size:12px;color:#a9b7c4}
+html body .ocH{margin-top:auto;display:flex;flex-direction:column;gap:3px}html body .ocH small{font-size:11px;color:#c9d4de}
+html body .ocH .hp{display:flex;gap:3px}html body .ocH .hp i{flex:1;height:7px;max-width:22px;background:rgba(255,255,255,.12)}html body .ocH .hp i.f{background:#3ccf7a;box-shadow:0 0 6px rgba(60,207,122,.5)}
+html body .ocS{display:flex;flex-direction:column;gap:6px;border-left:1px solid var(--hl);padding-left:9px;min-width:0}
+html body .ocAp{display:flex;align-items:center;gap:7px;font-size:11px;color:#a9b7c4}
+html body .ocAp span{display:flex;gap:6px}html body .ocAp i{width:10px;height:10px;transform:rotate(45deg);border:1.5px solid var(--acc);display:block}html body .ocAp i.f{background:var(--acc);box-shadow:0 0 6px var(--acc)}
+html body .ocMp{margin-left:auto}
+html body .ocG{display:flex;gap:7px;align-items:flex-start;min-width:0}
+html body .ocG img{width:34px;height:34px;flex:none;background:#0b121a;border:1px solid var(--hl);padding:3px}
+html body .ocG>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+html body .ocG b{font-size:12.5px;color:#eef2f6}html body .ocG em{font-style:normal;color:#ff6a5a;margin-left:4px}
+html body .ocG span{font-size:10.5px;line-height:1.35;color:#9fb0bf;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+/* phase bar + gold end button */
+html body .panel .box{background:var(--hb);border:1px solid var(--hl);clip-path:var(--cham)}
+html body .status span.a::before,html body .status span.d::before{content:'';display:inline-block;width:18px;height:18px;margin-right:7px;vertical-align:-3px;background:currentColor;-webkit-mask:var(--mi) center/contain no-repeat;mask:var(--mi) center/contain no-repeat}
+html body .status span.d{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z'/%3E%3C/svg%3E")}
+html body .status span.a{--mi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 3l7 7-2 2-7-7V3h2zm16 0h2v2l-9 9 1.5 1.5-1.4 1.4-1.6-1.6-3.3 3.3.9.9-1.4 1.4L3 18.1l1.4-1.4.9.9 3.3-3.3-1.6-1.6 1.4-1.4L10 13.8 19 4.8V3z'/%3E%3C/svg%3E")}
+html body #endphase{background-image:var(--plateYl);color:#15110a;font-size:19px;letter-spacing:.16em;filter:drop-shadow(0 0 8px rgba(227,170,62,.35))}
+html body #endphase .chev{font-style:normal;margin-left:12px;font-size:22px;letter-spacing:0}
+/* action tiles */
+html body #acts button{background:linear-gradient(180deg,#172433,#0c141d);border:1px solid var(--hl);clip-path:var(--cham);color:#e9eef3}
+html body #acts button .sub{color:#8fa3b5}
+html body #acts button.on{background:linear-gradient(180deg,#123452,#0b1d2e);border-color:var(--hblue);color:#fff;box-shadow:inset 0 0 14px rgba(69,166,239,.45)}
+html body #acts button.on img.bic.act{filter:none}
+html body #acts button.primary{background:linear-gradient(180deg,#f2b84a,#c98a22);color:#140f05;border-color:#f2c060}
+html body #acts button:disabled{opacity:.38}
+/* log pill */
+html body #sheetT{display:flex;align-items:center;gap:10px;max-width:min(92vw,520px);padding:7px 14px;border-radius:999px;background:var(--hb);border:1px solid var(--hl);font-size:13px;color:#dfe7ee}
+html body #sheetT b{font-weight:600;white-space:nowrap}
+html body #sheetT .lg{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:1px solid var(--hl);padding-left:10px;color:#c3cfda}
+html body #sheetT i{font-style:normal;color:#8fa3b5}
+@media (max-width:760px){
+ html body .ocL{width:68px;height:78px}
+ html body .ocN{font-size:20px}
+ html body #acts button{padding:6px 2px}
+ html body #acts button .bic,html body #acts button img.bic.act{width:24px;height:24px;flex:0 0 24px}
+ html body #acts button{font-size:12.5px;font-weight:700}
+ html body .panel{max-height:56dvh}
+ html body header.top{padding-top:max(8px,env(safe-area-inset-top))}
+ html body header.top .manualbtn{padding:4px 10px;font-size:13px}
+ html body .tracker>span:first-child{padding:4px 8px;font-size:12px}
+ html body .tracker .seg>span{padding:0 8px;font-size:13px}
+ html body header.top .online{font-size:12px;padding:4px 8px}
+}
+@media (max-height:520px) and (orientation:landscape){
+ html body .oc{grid-template-columns:auto minmax(0,1fr);padding:6px;gap:8px}
+ html body .ocS{grid-column:1/-1;border-left:0;padding-left:0;border-top:1px solid var(--hl);padding-top:5px;flex-direction:row;align-items:flex-start}
+ html body .ocAp{flex-direction:column;align-items:flex-start;gap:3px}html body .ocMp{margin-left:0}
+ html body .ocG span{-webkit-line-clamp:2}
+ html body .ocL{width:52px;height:58px}html body .ocN{font-size:18px}
+ html body #endphase{font-size:16px}
+}
+html body #acts{grid-auto-rows:1fr}
+html body #acts button{white-space:nowrap}
+html body #acts button .bwrap>span,html body #acts button{text-overflow:ellipsis}
+html body #acts button .bwrap>span{max-width:100%;overflow:hidden}
+@media (max-width:760px){
+ html body #acts button{font-size:12px;letter-spacing:0}
+ html body .ocL{width:62px;height:70px}
+ html body .oc{padding:6px 8px}
+ html body .panel .box:has(> #endphase){padding-top:6px;padding-bottom:6px}
+ html body #endphase{min-height:42px}
+}
+@media (max-height:520px) and (orientation:landscape){
+ html body .ocR,html body .ocG span{display:none}
+ html body .ocS{align-items:center}
+ html body .ocAp{flex-direction:row;align-items:center}
+ html body .ocL{width:44px;height:48px}html body .ocI{width:20px;height:20px}
+ html body .ocH{margin-top:2px}
+ html body .ocG img{width:26px;height:26px}
+}
+@media (max-height:520px) and (orientation:landscape){
+ html body .oc{grid-template-columns:auto minmax(0,1fr) minmax(0,50%)}
+ html body .ocS{grid-column:auto;border-top:0;padding-top:0;border-left:1px solid var(--hl);padding-left:8px;flex-direction:column;align-items:stretch;gap:4px}
+ html body .ocN{font-size:17px}
+ html body .ocG b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+@media (min-width:761px) and (min-height:521px){
+ html body .oc{grid-template-columns:auto minmax(0,1fr)}
+ html body .ocS{grid-column:1/-1;border-left:0;padding-left:0;border-top:1px solid var(--hl);padding-top:6px}
+}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -1187,7 +1297,6 @@ html body .depBox #acts button .sub{white-space:nowrap;overflow:hidden;text-over
         <li>每點命中造成 1 傷，傷害達到耐力就陣亡；沒死的目標會被標記位置到回合結束。被閃光彈震暈的幹員只擲兩顆黃骰。</li>
         <li><b>攝影機</b>：地圖上頭頂有紅色鏡頭圖示的就是攝影機，牆後也看得到。它涵蓋整個房間（地板淡黃色的範圍），進攻方走進或在裡面行動就被標記。攝影機雙方都看得見，進攻方可以用「破壞」打掉視線內 8 格內的攝影機；防彈攝影機只能從相鄰格破壞，Thatcher 的 EMP 也能摧毀。<li><b>掩護射擊</b>：地板上紅色的格子是敵方掩護射擊會開火的範圍（面向的半圓、14 格內、有視線），自己的是藍色。走進紅色範圍會被搶先射擊。</li><li>Kapkan 陷阱踏入受 2 傷，Smoke 毒氣受 1 傷。</li>
         <li><b>障礙物</b>：地圖上的桌子、沙發、吧台、車輛等家具。爬上去多花 1 點移動點，不能停在上面，不擋視線；目標緊貼著障礙物、而射擊線穿過它時有輕掩護。</li>
-        <li><b>重擲</b>：每位玩家整場一次。射擊擲完骰後可以使用：保留點數最高的一顆，其他全部重擲。</li>
         <li>還沒做的部分：探頭（lean）、控制任務、樓上區域與上下樓、部分幹員的專屬裝置。完整原版規則見「原版規則書」。</li></ul></section>
       <section id="m-map"><h3>地圖圖例</h3><p>地圖是由上往下看的平面圖。淺色是室內地板，深色是室外。</p><div class="lg" id="lgfull"></div></section>
       <section id="m-ops"><h3>幹員檔案</h3><div class="opgrid" id="opgrid"></div></section>
@@ -3629,7 +3738,7 @@ function newGame(){
 }
 const unplaced=()=>G?alive(G.player).filter(u=>u.x<0):[];
 function nextUnplaced(){const n=unplaced()[0];if(n){G.sel=n;G.mode='move';}}
-function startPlay(){if(G&&!G.reroll)G.reroll={A:1,D:1};
+function startPlay(){if(G&&!G.reroll)G.reroll={A:0,D:0};
   if(!G.net&&G.phase==='setup'&&unplaced().length)return;
   if(!G.net&&G.player==='D'&&!G.decoys.length)seedDecoys();
   G.phase='play';G.sel=null;G.mode='move';clockReset();
@@ -4002,17 +4111,26 @@ function drawPreview(){
   m.cams.forEach(([x,y])=>drawGadgetIcon('cam',x*S+S/2,y*S+S/2));
   ctx.restore();G=null;
 }
+const SVGI={atk:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3l7 7-2 2-7-7V3h2zm16 0h2v2l-9 9 1.5 1.5-1.4 1.4-1.6-1.6-3.3 3.3.9.9-1.4 1.4L3 18.1l1.4-1.4.9.9 3.3-3.3-1.6-1.6 1.4-1.4L10 13.8 19 4.8V3z" fill="currentColor"/></svg>',
+  def:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z" fill="currentColor"/></svg>',
+  more:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" fill="currentColor"/></svg>'};
 function renderTracker(){
   const t=$('#tracker');
   if(!G||G.phase==='setup'){t.innerHTML=`<span>${G?'部署階段':'選擇陣營與地圖'}</span>`;return;}
   t.innerHTML=`<span>第 ${G.round}/${G.maxRounds} 輪</span><span class="pips">${G.maxRounds>12?'':[...Array(G.maxRounds)].map((_,i)=>`<i class="pip ${i+1<G.round?'done':i+1===G.round?'cur':''}"></i>`).join('')}</span>
+  <span class="seg">${(s=>`<span class="sa ${s==='A'?'on':''}">${SVGI.atk}攻</span><span class="sd ${s==='D'?'on':''}">${SVGI.def}守</span>`)(ORDER[G.phaseIdx])}</span>
   <span class="phases">${ORDER.map((s,i)=>`<span class="ph ${s==='A'?'a':'d'} ${i===G.phaseIdx?'cur':''}">${s==='A'?'攻':'守'}</span>`).join('')}</span>
   ${G.defuser?`<span style="color:var(--accent)">拆彈器剩 ${G.defuser.timer} 個防守階段</span>`:''}`;
 }
 function hpBar(u){return `<span class="hp">${[...Array(u.max)].map((_,i)=>`<i class="${i<u.hp?'f':''}"></i>`).join('')}</span>`;}
 function opCard(u){
   const o=OPS[u.op];const own=u.side===G.player;
-  return `<div class="card"><div class="nm"><img class="port" src="${portraitURL(u.op)}" alt="${o.name} 頭像"><b class="${u.side==='A'?'a':'d'}">${o.name}</b><span class="hint">${u.side==='A'?'進攻':'防守'} · ${o.role}</span></div>
+  const apN=own&&G.phase==='play'?(G.active===u?u.ap:u.activated?0:2):2,mpN=G.active===u?u.mp:5;
+  const oc=`<div class="oc ${u.side==='A'?'a':'d'}"><div class="ocL"><img class="ocP" src="${portraitURL(u.op)}" alt="${o.name} 頭像"><img class="ocI" src="${opIcon(u.op)}" alt=""></div>
+    <div class="ocM"><b class="ocN">${o.name}</b><span class="ocR">${u.side==='A'?'進攻':'防守'} · ${o.role}</span><span class="ocH"><small>HP ${u.hp} / ${u.max}</small>${hpBar(u)}</span></div>
+    <div class="ocS"><div class="ocAp"><small>行動點</small><span>${[0,1].map(i=>`<i class="${i<apN?'f':''}"></i>`).join('')}</span><small class="ocMp">移動 ${mpN}</small></div>
+    <div class="ocG"><img src="${opIcon(u.op)}" alt=""><div><b>${o.g||o.passive}${o.g&&own?` <em>剩 ${u.ch>50?'∞':u.ch}</em>`:''}</b><span>${o.g?o.gd:o.pd}</span></div></div></div></div>`;
+  return `<div class="card">${oc}<div class="nm"><img class="port" src="${portraitURL(u.op)}" alt="${o.name} 頭像"><b class="${u.side==='A'?'a':'d'}">${o.name}</b><span class="hint">${u.side==='A'?'進攻':'防守'} · ${o.role}</span></div>
   <dt>耐力</dt><dd>${hpBar(u)} ${u.hp}/${u.max}</dd>
   <dt>移動／奔跑</dt><dd>5 點 · ${u.run?`奔跑 +${u.run}`:'不能奔跑'} · 破壞力${PROF[u.op].dr}</dd>
   <dt>命中骰</dt><dd><span class="dicerow">${PROF[u.op].d.map((d,i)=>`<span>${BAND[i]}${['1–3','4–6','7+'][i]}</span><span>${diceHTML(d)}</span>`).join('')}</span></dd>
@@ -4039,7 +4157,7 @@ function renderPanel(){
     h+=`<div class="box"><div class="status">${G.over?'對戰結束':mine?`<span class="${s==='A'?'a':'d'}">你的${s==='A'?'進攻':'防守'}階段</span><span class="clock" id="clock"></span>`:`<span class="${s==='A'?'a':'d'}">${s==='A'?'進攻方':'防守方'}行動中…</span>`}</div>
       <p class="hint">${mine&&!G.over?`本階段還能啟動 ${Math.max(0,3-G.acts)} 名幹員${G.active?'（點其他幹員會結束目前的行動）':'。點選幹員，再點亮起的格子移動。'}`:'等待對手。'}</p>
       <p class="hint mono">${G.mission==='hostage'?(G.player==='A'?'任務：救出人質，帶到任一出生區':'任務：別讓人質被帶走'):(G.player==='A'?'任務：在 A 或 B 點安裝拆彈器':'任務：守住 A、B 點')}${G.player==='A'?` · 破牆 ${G.charges} · 無人機 ${G.drones} · 破片 ${G.frag} · 閃光 ${G.flash} · 煙霧 ${G.smk}`:` · 加固 ${G.reinf} · 鐵絲網 ${G.wire} · 防彈盾 ${G.shield}`}${G.player==='A'?` · 隱藏標記 ${alive('D').filter(d=>d.hidden).length+(G.decoys||[]).filter(k=>k.alive).length}`:''}</p>
-      ${mine&&!G.over?`<button id="endphase">結束階段</button>`:''}</div>`;
+      ${mine&&!G.over?`<button id="endphase">結束階段<i class="chev">»</i></button>`:''}</div>`;
   }
   if(G.sel)h+=`<div class="box">${opCard(G.sel)}<div class="row" id="acts"></div></div>`;
   const team=G.units.filter(u=>u.side===G.player);
@@ -4047,7 +4165,7 @@ function renderPanel(){
   if(G.phase==='play')h+=`<div class="box opt"><h3>移動紀錄</h3><p class="hint">點一筆可在地圖上看路線。座標對照地圖邊緣的字母與數字。</p><div class="moves" id="moves"></div></div>`;
   h+=`<div class="box opt"><h3>戰況紀錄</h3><div class="log" id="log"></div></div>`;
   const st=$('#moves')?$('#moves').scrollTop:0;
-  h=`<div class="sheetbar"><button id="sheetT">${p.classList.contains('open')?'收起 ▾':'小隊・紀錄 ▴'}</button></div>`+h;
+  {const lm=(G.log[0]&&G.log[0].msg||'').replace(/<[^>]+>/g,'');h=`<div class="sheetbar"><button id="sheetT"><b>${p.classList.contains('open')?'▼ 收起':'▲ 小隊紀錄'}</b>${lm?`<span class="lg">${lm}</span><i>›</i>`:''}</button></div>`+h;}
   p.innerHTML=h;if($('#sheetT'))$('#sheetT').onclick=()=>{p.classList.toggle('open');renderPanel();};renderLog();renderMoves();if($('#moves'))$('#moves').scrollTop=st;
   p.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const u=G.units.find(x=>x.id===b.dataset.u);if(u.alive&&u.x>=0)onCell(u.x,u.y);else{G.sel=u;render();}});
   if($('#go'))$('#go').onclick=startPlay;
@@ -4189,9 +4307,9 @@ function init3D(){
   const camera=new THREE.PerspectiveCamera(38,1,.15,120);
   const controls=new THREE.OrbitControls(camera,renderer.domElement);
   controls.enableDamping=true;controls.dampingFactor=.12;controls.maxPolarAngle=Math.PI*.48;controls.minDistance=1.6;controls.autoRotateSpeed=.8;controls.maxDistance=90;controls.screenSpacePanning=false;controls.touches={ONE:THREE.TOUCH.PAN,TWO:THREE.TOUCH.DOLLY_ROTATE};
-  scene.add(new THREE.HemisphereLight(0xc9d8e6,0x3a332b,.26));
-  const sun=new THREE.DirectionalLight(0xffe8cc,1.55);sun.position.set(-8,20,6);sun.castShadow=true;sun.shadow.mapSize.setScalar(Math.min(innerWidth,innerHeight)<700?2048:4096);sun.shadow.radius=3;
-  const fill=new THREE.DirectionalLight(0x9cb8d8,.35);fill.position.set(10,12,-8);scene.add(fill);
+  scene.add(new THREE.HemisphereLight(0xb7c9dc,0x2e2820,.22));
+  const sun=new THREE.DirectionalLight(0xffe2c4,1.2);sun.position.set(-8,20,6);sun.castShadow=true;sun.shadow.mapSize.setScalar(Math.min(innerWidth,innerHeight)<700?2048:4096);sun.shadow.radius=3;
+  const fill=new THREE.DirectionalLight(0x7fa2d0,.32);fill.position.set(10,12,-8);scene.add(fill);
   Object.assign(sun.shadow.camera,{left:-16,right:16,top:16,bottom:-16,near:1,far:60});sun.shadow.bias=-.0004;sun.shadow.normalBias=.015;
   scene.add(sun);scene.add(sun.target);
   const staticG=new THREE.Group(),unitG=new THREE.Group(),dynG=new THREE.Group(),fxG=new THREE.Group();scene.add(staticG,unitG,dynG,fxG);
@@ -4364,6 +4482,14 @@ function buildStatic(m){
       if(c.elec&&elecVisible(x,y))for(const k of [.2,.5,.8]){const yy=WH*k;hz?addBox(g,M3.elec,cx,yy,cz,1,.035,th+.05,cc,false):addBox(g,M3.elec,cx,yy,cz,th+.05,.035,1,cc,false);}}
   }
   (m.props||[]).forEach((p,i)=>buildProp(g,p,i));envTune(g);
+  {// wall lamps: up to 6, spread across the building, on the room side of a hard wall
+    const cand=[];for(let y=1;y<G.H-1;y++)for(let x=1;x<G.W-1;x++){const c=G.grid[y][x];if(c.t!=='hard')continue;
+      for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]){const n=G.grid[y+dy]&&G.grid[y+dy][x+dx];if(n&&n.indoor&&!['hard','soft','reinf','bar'].includes(n.t)&&!n.obst){cand.push([x,y,dx,dy]);break;}}}
+    const pick=[];const nL=Math.min(6,Math.max(2,Math.round(cand.length/22)));
+    while(pick.length<nL&&cand.length){let best=null,bd=-1;for(const c of cand){const d=pick.length?Math.min(...pick.map(p=>Math.hypot(p[0]-c[0],p[1]-c[1]))):((c[0]*7+c[1]*13)%17);if(d>bd){bd=d;best=c;}}pick.push(best);cand.splice(cand.indexOf(best),1);}
+    for(const [x,y,dx,dy] of pick){const lx=x+.5+dx*.62,lz=y+.5+dy*.62,ly=WH*.8;
+      const lamp=new THREE.Mesh(BOX3,gm('lampM',()=>new THREE.MeshStandardMaterial({color:0xffd9a0,emissive:0xffb35a,emissiveIntensity:2.4})));lamp.scale.set(dx?.06:.22,.12,dy?.06:.22);lamp.position.set(x+.5+dx*.52,ly,y+.5+dy*.52);g.add(lamp);
+      const L=new THREE.PointLight(0xffb060,1.25,6.5,1.6);L.position.set(lx,ly-.1,lz);g.add(L);}}
   for(const s of ['A','B']){const cs=[];for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++)if(G.grid[y][x].site===s)cs.push([x,y]);if(!cs.length)continue;
     const cx=cs.reduce((a,c)=>a+c[0],0)/cs.length+.5,cz=cs.reduce((a,c)=>a+c[1],0)/cs.length+.5;
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:canvasTex(siteBadge(s)),depthTest:false,transparent:true}));sp.scale.set(.9,.9,1);sp.position.set(cx,WH+1.1,cz);sp.renderOrder=9;sp.userData.own=true;sp.visible=!(R3.hero&&R3.hero.visible);g.add(sp);}
@@ -5002,12 +5128,12 @@ function token3D(x,y,faint){const grp=new THREE.Group();grp.position.set(x+.5,0,
 // a printed cut-out standing on a small base, turned to face the camera
 function standeeTex(k){return gm('stx'+k,()=>{const t=new THREE.TextureLoader().load(GIMG[k]);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t;});}
 function standee(k,w,h){const grp=new THREE.Group(),tex=standeeTex(k);
-  const front=new THREE.Mesh(gm('stg'+k+w+h,()=>new THREE.PlaneGeometry(w,h)),gm('stm'+k,()=>new THREE.MeshStandardMaterial({map:tex,transparent:true,alphaTest:.45,roughness:.6,side:THREE.FrontSide})));
-  front.position.y=h/2+.05;front.castShadow=true;grp.add(front);
-  const back=new THREE.Mesh(front.geometry,gm('stb'+k,()=>new THREE.MeshStandardMaterial({map:tex,color:0x55595e,transparent:true,alphaTest:.45,roughness:.8,side:THREE.BackSide})));back.position.copy(front.position);back.position.z=-.012;grp.add(back);
+  const piv=new THREE.Group();piv.position.y=.05;grp.add(piv);grp.userData.piv=piv;
+  const front=new THREE.Mesh(gm('stg'+k+w+h,()=>new THREE.PlaneGeometry(w,h).translate(0,h/2,0)),gm('stm'+k,()=>new THREE.MeshBasicMaterial({map:tex,transparent:true,alphaTest:.4,side:THREE.DoubleSide,color:0xffffff})));
+  front.castShadow=true;front.renderOrder=4;piv.add(front);
   const base=new THREE.Mesh(CYL3,gm('stbase',()=>std(0x1c2126,{metalness:.3,roughness:.5})));base.scale.set(w*.42,.05,.16);base.position.y=.025;base.castShadow=true;grp.add(base);
   const cam=R3&&R3.camera;if(cam)grp.userData.face=true;return grp;}
-function faceCam(grp,x,z){const cam=R3.camera;grp.rotation.y=Math.atan2(cam.position.x-x,cam.position.z-z);}
+function faceCam(grp,x,z){const cam=R3.camera,p=grp.userData.piv;if(p){grp.updateWorldMatrix(true,false);p.quaternion.copy(cam.quaternion);return;}grp.rotation.y=Math.atan2(cam.position.x-x,cam.position.z-z);}
 function hostage3D(h){const grp=new THREE.Group();grp.position.set(h.x+.5,0,h.y+.5);if(h.by)grp.position.x+=.28;
   const s=standee('hostageFig',h.by?.3:.5,h.by?.55:.92);if(h.by)s.position.y=.2;faceCam(s,grp.position.x,grp.position.z);grp.add(s);
   const ring=new THREE.Mesh(new THREE.RingGeometry(.3,.36,6),gm('hosr',()=>new THREE.MeshBasicMaterial({color:0xffd84a,transparent:true,opacity:.9,side:THREE.DoubleSide})));ring.rotation.x=-Math.PI/2;ring.position.y=.03;grp.add(ring);return grp;}
@@ -5777,7 +5903,15 @@ function showMapReveal(key,side,done){const m=MAPS[key];let el=$('#mreveal');if(
 
 $('#manualBtn').onclick=()=>openManual();
 {const sb=$('#sndBtn'),f=()=>{sb.textContent=SFX.on?'🔊':'🔇';sb.title=SFX.on?'關閉音效':'開啟音效';};f();sb.onclick=()=>{SFX.toggle();f();try{musicLevel();}catch(e){}};}
-$('#homeBtn').onclick=()=>{if(!G){goTitle();return;}if(G.over||confirm(G.net?'離開連線對戰？對手會留在房間裡。':'離開這場對戰，回到主畫面？'))goTitle();};
+{const hb=$('#homeBtn');hb.innerHTML=SVGI.more;hb.setAttribute('aria-label','選單');hb.title='選單';}
+function hMenu(){let m=$('#hmenu');if(m){m.remove();return;}m=document.createElement('div');m.id='hmenu';
+  m.innerHTML=`<button data-k="snd">${SFX.on?'🔊 音效：開':'🔇 音效：關'}</button><button data-k="set">⚙ 設定</button><button data-k="home">⏏ 離開對戰</button>`;document.body.appendChild(m);
+  const r=$('#homeBtn').getBoundingClientRect();m.style.top=Math.round(r.bottom+6)+'px';m.style.right=Math.round(innerWidth-r.right)+'px';
+  m.onclick=e=>{const k=e.target.closest('button')&&e.target.closest('button').dataset.k;if(!k)return;m.remove();
+    if(k==='snd')$('#sndBtn').click();else if(k==='set')openSettings();else homeGo();};
+  setTimeout(()=>addEventListener('pointerdown',function f(e){if(!m.contains(e.target)&&e.target.closest('#homeBtn')==null){m.remove();removeEventListener('pointerdown',f,true);}},true),0);}
+$('#homeBtn').onclick=()=>{if(!G){goTitle();return;}hMenu();};
+function homeGo(){if(!G){goTitle();return;}if(G.over||confirm(G.net?'離開連線對戰？對手會留在房間裡。':'離開這場對戰，回到主畫面？'))goTitle();};
 $('#manualClose').onclick=closeManual;
 $('#manual').addEventListener('click',e=>{if(e.target.id==='manual')closeManual();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#manual').hidden)closeManual();});
