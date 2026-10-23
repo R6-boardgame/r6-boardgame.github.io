@@ -1407,6 +1407,37 @@ body:not([data-scr="game"]) #opsBar{display:none}
 .adet{flex:none}
 @media (orientation:landscape) and (max-height:520px){.adet{min-height:40px;padding:5px 10px}.bsec{margin:6px 0 4px}}
 .bd b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-align:center;word-break:break-all}
+/* v43: view / wall buttons removed (walls always full height) */
+#hud3d,.hud3d{display:none!important}
+html body header.top{padding-top:calc(max(8px,env(safe-area-inset-top)) + var(--sbt,0px))!important}
+/* gadget chips */
+.gdC{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.gdC i{font-style:normal;display:inline-flex;align-items:center;gap:1px;padding:1px 5px;border-radius:4px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);font-size:13px;line-height:18px}
+.gdC u{text-decoration:none;font:800 12px/1 ui-monospace,monospace;color:#ffd36b}
+.ocG .gdT{display:none}
+.ocG:has(.gdC:empty) .gdT,.ocG.full .gdT{display:block}
+.ocG.full .gdC{display:none}
+/* portrait phone: actions as a right-hand column */
+@media (orientation:portrait) and (max-width:700px){
+ html body.actsR #actsR #acts{position:fixed;right:max(6px,env(safe-area-inset-right));z-index:9;display:grid!important;grid-auto-flow:column;grid-auto-columns:56px;gap:4px;direction:rtl;overflow:visible;padding:0;margin:0;width:auto}
+ html body.actsR #actsR #acts button{direction:ltr;width:56px;height:56px;min-width:0;padding:3px 2px!important;font-size:10px;line-height:1.1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;text-align:center;background:rgba(14,20,27,.9)!important;border:1px solid rgba(120,150,180,.45)!important;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%);overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+ html body.actsR #actsR #acts button.primary{background:linear-gradient(180deg,#f2b84a,#d99a2b)!important;color:#140f05}
+ html body.actsR #actsR #acts button.on{background:#eef1f3!important;color:#0b0f12}
+ html body.actsR #actsR #acts button:disabled{opacity:.42}
+ html body.actsR #actsR #acts button .bwrap{display:flex;flex-direction:column;align-items:center;gap:1px;width:100%}
+ html body.actsR #actsR #acts button .bwrap>span{display:flex;flex-direction:column;align-items:center;width:100%}
+ html body.actsR #actsR #acts button .bic,html body.actsR #actsR #acts button img.bic.act{width:22px;height:22px;flex:0 0 22px}
+ html body.actsR #actsR #acts button b,html body.actsR #actsR #acts button>span:not(.sub):not(.bwrap){display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:10px;font-weight:800;word-break:break-all}
+ html body.actsR #actsR #acts button .sub{display:block;width:100%;font-size:8.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.8}
+ html body.actsR .panel{max-height:none}
+ html body.actsR .panel .box .hint{display:none}
+ html body[data-scr="game"] .sheetbar{justify-content:flex-start;padding:4px 0 2px}
+ html body[data-scr="game"] .sheetbar button{padding:3px 14px;font-size:12px}
+ html body[data-scr="game"] .panel{padding-bottom:max(6px,env(safe-area-inset-bottom))}
+}
+html body:has(.panel.open) #actsR{display:none}
+/* v43: lobby top keeps only the player card and online count */
+#pach,.ttopr .tlang{display:none!important}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -3469,7 +3500,7 @@ let DMGBY=null;const ST=u=>u.st||(u.st={k:0,dmg:0,taken:0,shots:0,hits:0,gad:0})
 const SRCOP={'毒氣':'smoke','電擊':'bandit','闊刀地雷':null,'集束炸彈':null};
 async function damage(u,n,src){
   if(!u.alive)return;n=dmgMod(u,n);if(n<=0)return;{let by=DMGBY;if(!by&&src&&SRCOP[src])by=G.units.find(x=>x.op===SRCOP[src]&&x.side!==u.side);if(!by&&!src)by=null;
-    const real=Math.min(n,u.hp);ST(u).taken+=real;if(by&&by.side===u.side&&by!==u&&by.side===G.player&&u.hp-n<=0)G._ff=1;if(by&&by.side!==u.side){ST(by).dmg+=real;if(u.hp-n<=0)ST(by).k++;}}if(u.hidden)reveal(u,'受傷後');u.hp-=n; if(src)log(`${nm(u)} 受到${src} ${n} 點傷害`,'ks');
+    const real=Math.min(n,u.hp);ST(u).taken+=real;if(by&&by.side===u.side&&by!==u&&by.side===G.player&&u.hp-n<=0){G._ff=1;G._ffn=(G._ffn||0)+1;}if(by&&by.side!==u.side&&by.side===G.player&&u.hp-n<=0)(G._kl=G._kl||[]).push({s:src||'',d:cheb(by.x,by.y,u.x,u.y),op:by.op,t:performance.now()});if(by&&by.side!==u.side){ST(by).dmg+=real;if(u.hp-n<=0)ST(by).k++;}}if(u.hidden)reveal(u,'受傷後');u.hp-=n; if(src)log(`${nm(u)} 受到${src} ${n} 點傷害`,'ks');
   if(u.hp<=0&&finkaSave(u))return render();if(u.hp<=0){SFX.kill();onKill(u);u.alive=false;u.hp=0;u.overwatch=false;if(G.hostage&&G.hostage.by===u.id){G.hostage.by=null;G.hostage.x=u.x;G.hostage.y=u.y;log('人質留在原地','ks');}log(`${nm(u)} 陣亡`,u.side==='A'?'kd':'ka');}
   render(); checkWin();
 }
@@ -3567,7 +3598,7 @@ async function blastDestroy(x,y,d){ // free Destroy from a gadget with rating d 
   if(c.t==='bar'||(d>=2&&c.t==='soft')||(d>=3&&c.t==='reinf'))destroyCell(x,y);
   for(const g of G.gadgets)if(g.alive&&g.x===x&&g.y===y&&GSTR[g.type]&&GSTR[g.type]<=d){g.alive=false;if(g.type==='clay')await clayBoom(g);if(g.volcan)await ignite(g.x,g.y);}}
 const blastArea=(x,y)=>[[x,y],...adj8(x,y)];
-function hostHarm(area,side,why){const h=G&&G.hostage;if(!h||G.over||G.mission!=='hostage'||!side||!area.some(([i,j])=>i===h.x&&j===h.y))return false;
+function hostHarm(area,side,why){const h=G&&G.hostage;if(!h||G.over||G.mission!=='hostage'||!side||!area.some(([i,j])=>i===h.x&&j===h.y))return false;if(side===G.player&&!G.net||(G.net&&side===G.player)){G._hk=1;AS.n.hk=(AS.n.hk||0)+1;}
   SFX.siren();log(`${why}波及人質，人質死亡`,'kd');bigNote('人質死亡',`${side==='A'?'進攻方':'防守方'}的${why}傷到了人質`,side==='A'?'d':'a',2600);
   finish(side==='A'?'D':'A',`${side==='A'?'進攻方':'防守方'}的${why}害死了人質`);return true;}
 async function clayBoom(g){SFX.boom();g.alive=false;if(hostHarm(blastArea(g.x,g.y),g.side||'A','闊刀地雷'))return;G.fx={x0:g.x,y0:g.y,x1:g.x,y1:g.y,until:performance.now()+500,c:COL.danger};
@@ -3588,6 +3619,15 @@ function escortOK(u){return G.hostage&&!G.hostage.by&&u.side==='A'&&cheb(u.x,u.y
 
 function setupIndoor(x,y){const c=cell(x,y);return c.indoor&&!blocks(c)&&!c.obst;}
 var GSH={"blitz": "閃光盾", "twitch": "電擊無人機", "montagne": "展開護盾", "flores": "Ratero", "castle": "裝甲板", "pulse": "心跳感測", "thunderbird": "Kóna 站", "buck": "萬能鑰匙", "capitao": "十字弩", "hibana": "X-KAIROS", "frost": "捕獸夾", "caveira": "無聲步", "echo": "妖怪無人機", "jackal": "Eyenox", "ying": "坎德拉", "zofia": "震盪彈", "dokkaebi": "邏輯炸彈", "mira": "黑鏡", "lesion": "蠱毒地雷", "ela": "震盪地雷", "finka": "腎上腺素", "maverick": "噴槍", "nomad": "Airjab", "maestro": "邪眼", "kaid": "電爪", "clash": "電擊盾", "gridlock": "Trax", "amaru": "鉤爪", "kali": "LV 長矛", "mozzie": "害蟲無人機", "goyo": "燃燒盾", "wamai": "Mag-NET", "ace": "S.E.L.M.A.", "zero": "Argus", "oryx": "衝刺", "melusi": "Banshee"};
+// a gadget sentence turned into icon chips: 👁 range, 📡 radius, 💥 damage, ➕ heal, plus effect icons
+function gdChips(t){if(!t)return'';const C=[],add=(i,v,tt)=>{if(!C.some(c=>c[0]===i))C.push([i,v,tt]);};let m;
+  if(/^被動/.test(t))add('◎','','被動');
+  if(/相鄰/.test(t))add('👁','1','相鄰');if(m=t.match(/(\d+)\s*格內/))add('👁',m[1],m[1]+' 格內');
+  if(/越牆|穿牆/.test(t))add('🧱','','可穿牆');if(/全圖/.test(t))add('🗺','','全圖');
+  if(m=t.match(/半徑\s*(\d+)/))add('📡',m[1],'半徑 '+m[1]);if(m=t.match(/(\d+)\s*格視野/))add('🔭',m[1],m[1]+' 格視野');
+  if(m=t.match(/受\s*(\d+)\s*(點)?傷/))add('💥',m[1],m[1]+' 傷害');if(m=t.match(/治療[^0-9]*(\d+)/))add('➕',m[1],'治療 '+m[1]);
+  [[/毒/,'☠','毒氣'],[/暈|震盪/,'💫','暈眩'],[/電/,'⚡','電擊'],[/火|燃燒/,'🔥','火焰'],[/煙/,'🌫','煙霧'],[/摧毀|破壞/,'🧨','摧毀'],[/陷阱|地雷/,'🪤','陷阱'],[/攝影機|無人機|偵查/,'📷','偵查'],[/標記|現形|看得到|定位|鎖定/,'📍','標記'],[/盾/,'🛡','護盾'],[/生命上限/,'❤','生命'],[/骰/,'🎲','骰子'],[/次數無限|無限/,'∞','無限']].forEach(([r,i,tt])=>{if(r.test(t))add(i,'',tt);});
+  return C.length?`<span class="gdC">${C.slice(0,6).map(([i,v,tt])=>`<i title="${tt}">${i}${v?`<u>${v}</u>`:''}</i>`).join('')}</span>`:'';}
 function gTargets(u){if(GT[u.op])return GT[u.op](u,G.phase==='setup');
   const s=G.phase==='setup',me=[u.x,u.y];
   const free=([x,y])=>!blocks(cell(x,y));
@@ -4363,6 +4403,29 @@ const ACH=[
  {id:'retreat',x:1,ic:'🏃',c:'#c7ced6',sh:1,n:'我媽叫我吃飯',d:'對戰中途離開'},
  {id:'quiet',x:1,ic:'🤫',c:'#5cc48a',sh:2,n:'給我安靜',d:'關掉音樂'},
  {id:'reader',x:1,ic:'🤓',c:'#7fb0d8',sh:0,n:'居然有人看規則',d:'打開規則'},
+ {id:'hk',x:1,ic:'🔪',c:'#e05b4b',sh:3,n:'人質：我做錯了什麼',d:'害死人質'},
+ {id:'hk3',x:1,ic:'🪦',c:'#c7ced6',sh:0,n:'人質殺手認證',d:'累計害死人質 3 次',goal:3,k:'hk'},
+ {id:'kFrag',x:1,ic:'🎆',c:'#e8743b',sh:3,n:'煙火大會',d:'用破片手榴彈擊殺'},
+ {id:'kC4',x:1,ic:'📮',c:'#e05b4b',sh:1,n:'您的包裹已爆炸',d:'用 C4 擊殺'},
+ {id:'kFire',x:1,ic:'🍖',c:'#e8743b',sh:2,n:'烤肉派對',d:'用火焰擊殺'},
+ {id:'kGas',x:1,ic:'🌬',c:'#8fc45c',sh:2,n:'空氣清新劑',d:'用毒氣擊殺'},
+ {id:'kClay',x:1,ic:'🦶',c:'#b08a6a',sh:0,n:'走路不看路',d:'用闊刀地雷擊殺'},
+ {id:'kZap',x:1,ic:'🔌',c:'#4aa8e2',sh:1,n:'電費我出',d:'用電擊擊殺'},
+ {id:'kFar',x:1,ic:'📬',c:'#62c1d6',sh:2,n:'超遠距離問候',d:'在 10 格以外擊殺'},
+ {id:'kNear',x:1,ic:'💋',c:'#e86fa0',sh:3,n:'貼臉輸出',d:'貼身擊殺'},
+ {id:'kMulti',x:1,ic:'🎳',c:'#f0b43c',sh:3,n:'全倒',d:'一次爆炸擊殺 2 人以上'},
+ {id:'kShield',x:1,ic:'🍳',c:'#7fb0d8',sh:0,n:'用鍋蓋打人',d:'用持盾幹員擊殺'},
+ {id:'ff3',x:1,ic:'🌀',c:'#9f8cf0',sh:1,n:'無差別攻擊',d:'一場幹掉 3 名隊友'},
+ {id:'wipeWin',x:1,ic:'🧹',c:'#5cc48a',sh:2,n:'清場比較快',d:'殲滅對手全員獲勝'},
+ {id:'timeWin',x:1,ic:'⌛',c:'#c9a26b',sh:0,n:'時間是我的隊友',d:'防守撐到時間結束獲勝'},
+ {id:'gift',x:1,ic:'🎁',c:'#f0b43c',sh:3,n:'躺著也能贏',d:'對手害死人質讓你獲勝'},
+ {id:'zen',x:1,ic:'🪷',c:'#5cc48a',sh:2,n:'佛系玩家',d:'不開槍也不用道具就獲勝'},
+ {id:'deadWin',x:1,ic:'👻',c:'#c7ced6',sh:1,n:'全員陣亡但贏了',d:'全隊陣亡仍獲勝'},
+ {id:'gad20',x:1,ic:'🛒',c:'#8fc45c',sh:0,n:'道具清倉大拍賣',d:'一場用 20 次道具'},
+ {id:'spray',x:1,ic:'🔫',c:'#e05b4b',sh:3,n:'子彈不用錢',d:'一場開 30 槍'},
+ {id:'speedL',x:1,ic:'🚑',c:'#b08a6a',sh:2,n:'開場即結束',d:'第 1 輪就輸了'},
+ {id:'mime',x:1,ic:'🤐',c:'#7fb0d8',sh:1,n:'默劇模式',d:'關掉音樂和音效打完一場'},
+ {id:'opsAll',x:1,ic:'🗂',c:'#ffd36b',sh:3,n:'全員集合',d:'用過所有幹員',goal:62,k:'ops'},
  {id:'hunter',x:1,ic:'🏹',c:'#8fc45c',sh:3,n:'這頁你是住這嗎',d:'打開成就頁 20 次',goal:20,k:'opens'}];
 const ACHSEC=[['基本',a=>!a.goal&&!a.x],['長期目標',a=>a.goal&&!a.x],['刁鑽',a=>a.x]];
 function achProg(a){const n=AS.n,g=a.goal||1;if(!a.goal)return[AS.got[a.id]?1:0,1];
@@ -4390,10 +4453,17 @@ function achFinish(w){if(!G||G._achDone)return;G._achDone=true;G._newAch=[];
     if(win&&mine.length>=5&&mine.every(u=>PROF[u.op]&&PROF[u.op].shield))got.push('shields');
     if(win&&alive>0&&mine.filter(u=>u.alive).every(u=>u.hp===1))got.push('onehp');
     if(win&&alive===mine.length&&mine.every(u=>u.hp>=u.max))got.push('spotless');
-    if(t.taken>=15)got.push('sandbag');if(!win&&hostD)got.push('butter');if(G._ff)got.push('ff');if(!win&&G._pl)got.push('thenwhat');
+    if(t.taken>=15)got.push('sandbag');if(!win&&hostD&&G._hk)got.push('butter');if(G._ff)got.push('ff');if(!win&&G._pl)got.push('thenwhat');
     c.sw=win?(c.sw||0)+1:0;c.sl=win?0:(c.sl||0)+1;if(c.sw>=5)got.push('streakW');if(c.sl>=3)got.push('streakL');
     c.opN=c.opN||{};mine.forEach(u=>{const k=OPC[u.op]&&OPC[u.op].base||u.op;c.opN[k]=(c.opN[k]||0)+1;});if(Object.values(c.opN).some(v=>v>=20))got.push('main');
-    const hr=new Date().getHours();if(hr>=2&&hr<5)got.push('owl');}
+    const hr=new Date().getHours();if(hr>=2&&hr<5)got.push('owl');
+    const KL=G._kl||[],has=re=>KL.some(k=>re.test(k.s));
+    if(G._hk)got.push('hk');if(has(/破片/))got.push('kFrag');if(has(/^C4/))got.push('kC4');if(has(/火/))got.push('kFire');if(has(/毒/))got.push('kGas');if(has(/闊刀/))got.push('kClay');if(has(/電/))got.push('kZap');
+    if(KL.some(k=>!k.s&&k.d>=10))got.push('kFar');if(KL.some(k=>!k.s&&k.d<=1))got.push('kNear');if(KL.some(k=>!k.s&&PROF[k.op]&&PROF[k.op].shield))got.push('kShield');
+    {const ex=KL.filter(k=>/破片|C4|闊刀|集束|Ratero|火/.test(k.s));if(ex.some((k,i)=>ex.filter(q=>Math.abs(q.t-k.t)<4000).length>=2))got.push('kMulti');}
+    if((G._ffn||0)>=3)got.push('ff3');if(win&&/全員陣亡/.test(why))got.push('wipeWin');if(win&&/時間耗盡/.test(why))got.push('timeWin');if(win&&hostD)got.push('gift');
+    if(win&&t.shots===0&&t.gad===0)got.push('zen');if(win&&alive===0)got.push('deadWin');if(t.gad>=20)got.push('gad20');if(t.shots>=30)got.push('spray');
+    if(!win&&G.round<=1)got.push('speedL');if(!SFX.on&&!SFX.mOn)got.push('mime');}
   for(const a of ACH)if(a.goal&&a.k!=='friends'&&achProg(a)[0]>=a.goal)got.push(a.id);
   if(win&&P==='A'&&G.mission==='hostage')got.push('rescue');
   if(win&&alive===mine.length)got.push('flaw');
@@ -4762,7 +4832,7 @@ function opCard(u){
   const oc=`<div class="oc ${u.side==='A'?'a':'d'}"><div class="ocL"><img class="ocP" src="${portraitURL(u.op)}" alt="${o.name} 頭像"><img class="ocI" src="${opIcon(u.op)}" alt=""></div>
     <div class="ocM"><b class="ocN">${o.name}</b><span class="ocR">${u.side==='A'?'進攻':'防守'} · ${o.role}</span><span class="ocH"><small>HP ${u.hp} / ${u.max}</small>${hpBar(u)}</span></div>
     <div class="ocS"><div class="ocAp"><small>行動點</small><span>${[0,1].map(i=>`<i class="${i<apN?'f':''}"></i>`).join('')}</span><small class="ocMp">移動 ${mpN}</small></div>
-    <div class="ocG"><img src="${opIcon(u.op)}" alt=""><div><b>${(o.g&&GSH[u.op])||o.g||o.passive}${o.g&&own?` <em>剩 ${u.ch>50?'∞':u.ch}</em>`:''}</b><span>${o.g?o.gd:o.pd}</span></div></div></div></div>`;
+    <div class="ocG"><img src="${opIcon(u.op)}" alt=""><div><b>${(o.g&&GSH[u.op])||o.g||o.passive}${o.g&&own?` <em>剩 ${u.ch>50?'∞':u.ch}</em>`:''}</b>${gdChips(o.g?o.gd:o.pd)}<span class="gdT">${o.g?o.gd:o.pd}</span></div></div></div></div>`;
   return `<div class="card">${oc}<div class="nm"><img class="port" src="${portraitURL(u.op)}" alt="${o.name} 頭像"><b class="${u.side==='A'?'a':'d'}">${o.name}</b><span class="hint">${u.side==='A'?'進攻':'防守'} · ${o.role}</span></div>
   <dt>耐力</dt><dd>${hpBar(u)} ${u.hp}/${u.max}</dd>
   <dt>移動／奔跑</dt><dd>5 點 · ${u.run?`奔跑 +${u.run}`:'不能奔跑'} · 破壞力${PROF[u.op].dr}</dd>
@@ -4774,7 +4844,18 @@ function opCard(u){
 const ACTN={shoot:'射擊',run:'奔跑',destroy:'破壞',special:'專屬道具',tactical:'戰術道具',obj:'任務'};
 function btn(label,sub,on,dis,fn,cls,ic){return {label,sub,on,dis,fn,cls,ic};}
 const eqIc=k=>GIMG[k]?`<img class="bic" src="${GIMG[k]}" alt="">`:(WZI[k]&&typeof WZI[k]==='string'?`<span class="bic">${WZI[k]}</span>`:'');
-function renderPanel(){
+var PORTP=()=>matchMedia('(orientation:portrait) and (max-width:700px)').matches&&document.body.dataset.scr==='game';
+function portActs(){let r=document.getElementById('actsR');if(!r){r=document.createElement('div');r.id='actsR';document.body.appendChild(r);}
+  const a=document.querySelector('#panel #acts'),on=!!(G&&G.phase==='play'&&PORTP()&&a);document.body.classList.toggle('actsR',on);
+  {const g=document.querySelector('#panel .ocG');if(g)g.classList.toggle('full',!!window.OCF);}
+  if(on){r.replaceChildren(a);requestAnimationFrame(actsFit);}else if(!document.querySelector('#panel #acts')||!PORTP())r.replaceChildren();}
+// the column runs from under the top bar down to the bottom panel; a second column opens to its left when it runs out of room
+function actsFit(){const a=document.querySelector('#actsR #acts'),p=$('#panel');if(!a||!p)return;const hb=($('header.top')||{getBoundingClientRect:()=>({bottom:50})}).getBoundingClientRect().bottom;
+  const top=hb+8,bot=p.getBoundingClientRect().top-6,H=Math.max(120,bot-top),n=a.children.length,rows=Math.max(1,Math.min(n,Math.floor((H+4)/60)));
+  a.style.top=top+'px';a.style.gridTemplateRows=`repeat(${rows},56px)`;}
+addEventListener('resize',()=>{try{if(G)render();}catch(e){}});
+document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('.ocG');if(!g||!g.querySelector('.gdC'))return;window.OCF=!window.OCF;g.classList.toggle('full',window.OCF);});
+function renderPanel(){{const r=document.getElementById('actsR');if(r)r.replaceChildren();}
   const p=$('#panel');
   if(!G){p.classList.remove('open');if(SCREEN==='setup'){p.innerHTML='';renderWiz();return;}p.innerHTML=menuHTML();bindMenu();return;}
   p.classList.toggle('dep',G.phase==='setup');if(G.phase==='setup')return renderDeploy(p);
@@ -4798,8 +4879,8 @@ function renderPanel(){
   if(G.phase==='play')h+=`<div class="box opt"><h3>移動紀錄</h3><p class="hint">點一筆可在地圖上看路線。座標對照地圖邊緣的字母與數字。</p><div class="moves" id="moves"></div></div>`;
   h+=`<div class="box opt"><h3>戰況紀錄</h3><div class="log" id="log"></div></div>`;
   const st=$('#moves')?$('#moves').scrollTop:0;
-  {const lm=(G.log[0]&&G.log[0].msg||'').replace(/<[^>]+>/g,'');h=`<div class="sheetbar"><button id="sheetT"><b>${p.classList.contains('open')?'▼ 收起':'▲ 小隊紀錄'}</b>${lm?`<span class="lg">${lm}</span><i>›</i>`:''}</button></div>`+h;}
-  p.innerHTML=h;if($('#sheetT'))$('#sheetT').onclick=()=>{p.classList.toggle('open');renderPanel();};renderLog();renderMoves();if($('#moves'))$('#moves').scrollTop=st;
+  {const lm=(G.log[0]&&G.log[0].msg||'').replace(/<[^>]+>/g,'');h=`<div class="sheetbar"><button id="sheetT"><b>${p.classList.contains('open')?'▼ 收起紀錄':'▲ 紀錄'}</b>${lm&&!PORTP()?`<span class="lg">${lm}</span><i>›</i>`:''}</button></div>`+h;}
+  p.innerHTML=h;if($('#sheetT'))$('#sheetT').onclick=()=>{p.classList.toggle('open');renderPanel();};renderLog();renderMoves();portActs();if($('#moves'))$('#moves').scrollTop=st;
   p.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const u=G.units.find(x=>x.id===b.dataset.u);if(u.alive&&u.x>=0)onCell(u.x,u.y);else{G.sel=u;render();}});
   if($('#go'))$('#go').onclick=startPlay;
   if($('#endphase'))$('#endphase').onclick=()=>{if(!G.busy)endPhase();};
@@ -4814,7 +4895,7 @@ function renderDeploy(p){if(G.player==='D'&&!G.net&&!(G.decoys||[]).length&&!unp
   p.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const u=G.units.find(x=>x.id===b.dataset.u);if(u.alive&&u.x>=0)onCell(u.x,u.y);else{G.sel=u;render();}});
   $('#go').onclick=startPlay;
   if($('#zones'))G.map.spawns.forEach((z,i)=>{const b=document.createElement('button');b.textContent=z.name;if(G.spawn===i)b.className='on';b.onclick=()=>{const z=G.map.spawns[i],free=z.cells.filter(([x,y])=>!unitAt(x,y));unplaced().forEach(u=>{const c=free.shift();if(c){u.x=c[0];u.y=c[1];}});G.spawn=i;nextUnplaced();render();};$('#zones').appendChild(b);});
-  if($('#acts'))renderActs();}
+  if($('#acts'))renderActs();portActs();}
 function actSub(t){return matchMedia('(max-width:760px),(max-height:520px) and (orientation:landscape)').matches?t.replace(/^(戰術|專屬) · /,'').replace(' · +',' +'):t;}
 function renderActs(){setTimeout(hudTop,0);
   const u=G.sel,el=$('#acts'),L=[];
@@ -6455,7 +6536,7 @@ function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;cons
   <section><h4>成就與好友</h4><div class="psrow"><button id="psAch">🏆 成就 ${achCount()}/${ACH.length}</button><button id="psFr">好友 ${FR.list.length} 人</button></div></section>
   <section><h4>登入資料</h4>${acct?`<p class="pshint">已啟用線上身分（綁定這台裝置的瀏覽器）。段位與戰績會存在遊戲伺服器上。</p><div class="psstat">${rankBadge(ME.rating,30)}<span><b>${ME.rating==null?'—':tierName(tierOf(ME.rating))}</b> ${ME.rating??''} 分 · ${ME.w} 勝 ${ME.l} 敗</span></div><div class="psrow"><button id="psLogout">改用訪客身分</button></div>`:
     `<p class="pshint">目前是訪客，可以玩對戰電腦、自訂房間和教學。排名戰需要登入帳號，段位才能保存。</p><div class="pslogin"><button class="primary" id="psLogin"><span class="lgico">C</span>啟用線上身分</button><button disabled title="Google 登入目前還沒開放"><span class="lgico g">G</span>Google 登入（此頁面不支援）</button><button class="on" disabled><span class="lgico">訪</span>訪客（目前）</button></div>`}${PMSG?`<p class="terr">${PMSG}</p>`:''}</section>
-  <section><h4>設定</h4><div class="psrow"><span>語言</span>${langSelect('psLang')}</div><div class="psrow pstg"><span>射擊特寫</span><button id="psCine">${CINE.on?'開':'關'}</button><span>音樂</span><button id="psMus">${SFX.mOn?'開':'關'}</button><span>音效</span><button id="psSfx">${SFX.on?'開':'關'}</button></div></section></div>`;
+  <section><h4>設定</h4><div class="psrow"><span>🌐 語言</span>${langSelect('psLang')}</div><div class="psrow pstg"><span>射擊特寫</span><button id="psCine">${CINE.on?'開':'關'}</button><span>音樂</span><button id="psMus">${SFX.mOn?'開':'關'}</button><span>音效</span><button id="psSfx">${SFX.on?'開':'關'}</button></div></section></div>`;
   $('#psClose').onclick=closeSettings;
   $('#psNickOk').onclick=()=>{ME.nick=$('#psNick').value.trim().slice(0,16);saveMe();renderPlayer();renderSettings();};
   el.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{if(b.dataset.av==='__photo')ME.usePhoto=true;else{ME.usePhoto=false;ME.avatar=b.dataset.av;}saveMe();renderPlayer();renderSettings();});
@@ -6627,6 +6708,9 @@ function showMapReveal(key,side,done){const m=MAPS[key];let el=$('#mreveal');if(
     roll.textContent=m.name;roll.classList.add('final');el.querySelector('img').classList.add('show');el.querySelector('.meta').classList.add('show');el.querySelector('small').textContent='地圖';setTimeout(finish,3200);};
   tick();el.onclick=finish;}
 
+{const pr=document.createElement('div');pr.style.cssText='position:fixed;top:0;height:env(safe-area-inset-top);width:1px;visibility:hidden;pointer-events:none';document.body.appendChild(pr);
+  const sb=()=>{const env=pr.getBoundingClientRect().height,touch=matchMedia('(pointer:coarse)').matches,framed=window.top!==window||navigator.standalone;
+    document.documentElement.style.setProperty('--sbt',(!env&&touch&&framed&&innerHeight>innerWidth)?'40px':'0px');};sb();addEventListener('resize',sb);}
 $('#manualBtn').onclick=()=>openManual();
 {const sb=$('#sndBtn'),f=()=>{sb.textContent=SFX.on?'🔊':'🔇';sb.title=SFX.on?'關閉音效':'開啟音效';};f();sb.onclick=()=>{SFX.toggle();f();try{musicLevel();}catch(e){}};}
 {const hb=$('#homeBtn');hb.innerHTML=SVGI.more;hb.setAttribute('aria-label','選單');hb.title='選單';}
