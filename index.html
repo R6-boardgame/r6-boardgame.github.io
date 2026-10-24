@@ -6139,7 +6139,12 @@ function g3x(gd,add,grp){const em=(k,c,i=1.4)=>gm(k,()=>new THREE.MeshStandardMa
   case 'fire':{const mat=gm('firem',()=>new THREE.MeshBasicMaterial({color:0xff5a14,transparent:true,opacity:.62,depthWrite:false,blending:THREE.AdditiveBlending}));
     const r=rng(gd.x*13+gd.y*7);for(let k=0;k<14;k++){const s=.18+r()*.28;const m=add(SPH3,mat,[s,s*1.6,s],(r()-.5)*2.4,.15+r()*.35,(r()-.5)*2.4);m.castShadow=false;m.userData.ph=r()*6;}
     add(BOX3,gm('fireb',()=>new THREE.MeshBasicMaterial({color:0xff5a1a,transparent:true,opacity:.22,depthWrite:false})),[2.9,.01,2.9],0,.02,0).castShadow=false;grp.userData.gas=true;return true;}
-  case 'trax':{const m=gm('trax',()=>std(0x4a4f55,{metalness:.6,roughness:.4}));add(CYL3,m,[.28,.02,.28],0,.02,0);for(let k=0;k<8;k++){const a=k/8*Math.PI*2;const s=add(CYL3,m,[.012,.08,.012],Math.cos(a)*.2,.06,Math.sin(a)*.2);s.rotation.set(Math.sin(a)*.5,0,-Math.cos(a)*.5);}
+  case 'trax':{const m=gm('trax',()=>std(0x8a9096,{metalness:.85,roughness:.32})),cg=gm('traxc',()=>new THREE.ConeGeometry(.022,.13,5)),r=rng(gd.x*31+gd.y*17);
+    add(BOX3,gm('traxp',()=>std(0x2b2f33,{metalness:.4,roughness:.7})),[.94,.008,.94],0,.004,0).castShadow=false;
+    const DIRS=[[0,1,0],[.943,-.333,0],[-.471,-.333,.816],[-.471,-.333,-.816]].map(v=>new THREE.Vector3(...v)),N=7,im=new THREE.InstancedMesh(cg,m,N*N*4),M=new THREE.Matrix4(),Q=new THREE.Quaternion(),Q2=new THREE.Quaternion(),E=new THREE.Euler(),UP=new THREE.Vector3(0,1,0),P=new THREE.Vector3(),S=new THREE.Vector3(1,1,1);let n=0;
+    for(let i=0;i<N;i++)for(let j=0;j<N;j++){const cx=(i+.5)/N*.88-.44+(r()-.5)*.07,cz=(j+.5)/N*.88-.44+(r()-.5)*.07;E.set(r()*.5,r()*6.28,r()*.5);Q.setFromEuler(E);const sc=.8+r()*.4;
+      for(const d of DIRS){const v=d.clone().applyQuaternion(Q);Q2.setFromUnitVectors(UP,v);P.set(cx,.045,cz).addScaledVector(v,.065*sc);S.setScalar(sc);M.compose(P,Q2,S);im.setMatrixAt(n++,M);}}
+    im.castShadow=true;im.receiveShadow=true;grp.add(im);
     const ring=new THREE.LineLoop(gm('traxr',()=>new THREE.BufferGeometry().setFromPoints([[-1.5,-1.5],[1.5,-1.5],[1.5,1.5],[-1.5,1.5]].map(([a,b])=>new THREE.Vector3(a,.04,b)))),gm('traxl',()=>new THREE.LineDashedMaterial({color:0xef7f3e,dashSize:.2,gapSize:.15})));ring.computeLineDistances();grp.add(ring);return true;}
   case 'argus':case 'eye':{const big=gd.type==='eye';add(CYL3,gm('agp',()=>std(0x2a2f35,{metalness:.5})),[.03,big?1.1:.6,.03],0,big?.55:.3,0);
     add(SPH3,gm(big?'eyeb':'argb',()=>std(big?0x111316:0x30353a,{metalness:.4,roughness:.3})),big?[.16,.16,.16]:[.1,.1,.1],0,big?1.15:.64,0);
