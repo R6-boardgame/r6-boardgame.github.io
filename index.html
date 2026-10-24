@@ -1302,8 +1302,8 @@ html body #clocks{display:none!important}
 html body.hasClk #tracker .seg{display:inline-flex}
 html body header.top.top{padding-top:max(6px,env(safe-area-inset-top))!important}
 @media (max-width:560px){html body #opsBar.hz{--ts:min(32px,calc((100vw - 96px)/10));gap:2px}#opsBar.hz .obTeam{gap:1px}#opsBar.hz .obMid{min-width:48px;padding:0 3px}#opsBar.hz .obMid b{font-size:17px}#opsBar.hz .obMid.inf b{font-size:24px}#opsBar.hz .obActs{padding:0 2px 0 0;gap:4px}#opsBar.hz .obActs i{width:6px;height:6px}#opsBar.hz .ob .obHp{left:2px;right:2px}}
-#rotLock{display:none}
-@media (orientation:landscape) and (max-height:520px) and (pointer:coarse){#rotLock{display:flex;position:fixed;inset:0;z-index:100000;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#070b0f;color:#e6edf2;font:600 18px/1.4 sans-serif;text-align:center}
+#rotLock,html body #rotHint{display:none!important}
+@media (orientation:landscape) and (max-height:520px) and (pointer:coarse) and (min-width:99999px){#rotLock{display:flex;position:fixed;inset:0;z-index:100000;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#070b0f;color:#e6edf2;font:600 18px/1.4 sans-serif;text-align:center}
  #rotLock svg{width:64px;height:64px;animation:rotHint 1.8s ease-in-out infinite}}
 @keyframes rotHint{0%,30%{transform:rotate(-90deg)}60%,100%{transform:rotate(0)}}
 #opsBar .ob.sel{border-color:#ffd166;box-shadow:inset 0 0 10px rgba(255,209,102,.45)}
