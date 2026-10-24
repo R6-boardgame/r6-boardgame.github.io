@@ -1551,7 +1551,7 @@ html body:has(.panel.open) #actsR{display:none}
  #title[data-s="task"] #tmenu{margin-top:56px;padding:8px 12px;gap:4px!important}#title[data-s="task"] .tsec{display:none}
  .tk{min-height:27px;padding:2px 8px;margin-bottom:2px;grid-template-columns:1fr 48px 44px 56px;gap:6px}
  #title[data-s="task"] .tbtn{min-height:44px!important;padding-top:4px!important;padding-bottom:4px!important}#title[data-s="task"] .tbtn b{font-size:18px}
- #title[data-s="title"] #tmenu{gap:4px!important}#title[data-s="title"] .tbtn{min-height:58px!important;padding-top:5px!important;padding-bottom:5px!important}#title[data-s="title"] .tbtn b{font-size:20px}}
+ #title[data-s="title"] #tmenu{gap:4px!important}#title[data-s="title"] .tbtn{min-height:44px!important;padding-top:3px!important;padding-bottom:3px!important}#title[data-s="title"] .tbtn b{font-size:18px}#title[data-s="title"] .tbtn small,#title[data-s="title"] .tbtn .sub{font-size:11px}}
 .anEco{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;justify-content:center;padding:6px 10px;font-size:12px;color:#dbe4ea;border-top:1px solid rgba(255,216,74,.2)}
 .anEco>b{display:flex;align-items:center;font:800 17px var(--mono);color:#ffd84a}
 .anEco i{font-style:normal;color:#ffd84a;font-family:var(--mono)}
@@ -1579,6 +1579,13 @@ body.hasClk #tracker .seg{display:none}
 #anal .anAch.ico span{width:40px;height:40px;padding:0;display:grid;place-items:center;font-size:22px;line-height:1;position:relative;cursor:pointer;border-radius:4px}
 #anal .anAch.ico span.show::after{content:attr(title);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#0b121a;border:1px solid rgba(240,180,60,.5);color:#f3d48a;font-size:12px;padding:3px 8px;z-index:5}
 @media (orientation:landscape) and (max-height:500px){#anal .anAch.ico span{width:30px;height:30px;font-size:17px}}
+/* v49: shop */
+.opsel.shop .osT:not(.lk){outline:1px solid rgba(255,255,255,.08)}
+.osEco #osBuy{font-size:15px;padding:8px 16px}
+.osEco .osOwn{font-weight:800;color:#5fd38a;padding:4px 10px;border:1px solid rgba(95,211,138,.5)}
+.osEco .osNeed{color:#ff8a7a;font-size:12px}
+.osBal{display:inline-flex;align-items:center;gap:3px;color:#ffd84a;font-weight:800}
+@media (orientation:landscape) and (max-height:520px){#title[data-s="title"] #tmenu .tbtn{height:54px!important;min-height:0!important}#title[data-s="title"] #tmenu .tbtn b{line-height:1.1}#title[data-s="title"] #tmenu .tbtn span{font-size:11px;line-height:1.2}}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -6306,7 +6313,7 @@ function renderTitle(){
   const el=$('#tmenu');if(!el)return;if(SCREEN==='rank')SCREEN='title';{const tt=$('#title');if(tt)tt.dataset.s=SCREEN;}const B=(id,label,sub,cls)=>`<button id="${id}" class="tbtn ${cls||''}"><b>${label}</b>${sub?`<span>${sub}</span>`:''}</button>`;
   let h='';if(SCREEN==='task')h=taskHTML()+B('t-back','返回','',' ghost');
   const ops=k=>cfg.picks[k].map(x=>`<img src="${opIcon(x)}" alt="${(OPC[x]||OPS[x]).name}" title="${(OPC[x]||OPS[x]).name}">`).join('');
-  if(SCREEN==='title')h=B('t-rank','線上對戰','PVP · 自動配對對手','primary')+B('t-pve','對戰電腦','PVE · 選陣營、地圖與幹員')+B('t-pvp','自訂房間','建立或尋找房間')+B('t-tut','新手教學','第一次玩從這裡開始')+B('t-lib','作戰檔案',`規則 · ${OPBASE.length} 名幹員圖鑑 · 成就`);
+  if(SCREEN==='title')h=B('t-rank','線上對戰','PVP · 自動配對對手','primary')+B('t-pve','對戰電腦','PVE · 選陣營、地圖與幹員')+B('t-pvp','自訂房間','建立或尋找房間')+B('t-shop','商店','用聲望解鎖幹員')+B('t-tut','新手教學','第一次玩從這裡開始')+B('t-lib','作戰檔案',`規則 · ${OPBASE.length} 名幹員圖鑑 · 成就`);
   else if(SCREEN==='lib')h=`<h2 class="tsec">作戰檔案</h2>`+B('t-man','規則','本遊戲玩法與原版規則全文','primary')+B('t-ops','幹員圖鑑',`共 ${OPBASE.length} 名幹員`)+B('t-ach','成就',`已解鎖 ${achCount()}/${ACH.length}`)+B('t-back','返回','',' ghost');
   else if(SCREEN==='rank'){if(ME.mode!=='account')h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(null,40)}<div><b>排名戰需要登入帳號</b><br><span>登入後，段位與戰績會存在這個遊戲的共用資料裡。訪客可以玩其他所有模式。</span></div></div></div>`+B('t-login','登入帳號','啟用線上身分','primary')+B('t-back','返回','',' ghost');
     else{fillPicks('A');fillPicks('D');h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(ME.rating,44)}<div><span>你的段位</span><br><b>${ME.rating==null?'—':tierName(tierOf(ME.rating))}</b> <span>${ME.rating??''} 分 · ${ME.w} 勝 ${ME.l} 敗</span></div></div>
@@ -6324,7 +6331,7 @@ function renderTitle(){
   const on=(id,fn)=>{const b=$('#'+id);if(b)b.onclick=e=>{if(b._sh)return;if(b.classList.contains('tbtn')){b._sh=1;shatter(b,e).then(()=>{b._sh=0;fn(e);});}else fn(e);};};
   on('t-pve',()=>{['A','D'].forEach(s=>{cfg.picks[s]=cfg.picks[s].filter(owned);});SCREEN='setup';WZ.step=0;WZ.seen=0;render();});on('t-pvp',()=>{SCREEN='pvp';NETMSG='';renderTitle();});on('t-rank',()=>{NETMSG='';rankQueue();});on('t-lib',()=>{SCREEN='lib';NETMSG='';renderTitle();});
   on('t-login',acctLogin);on('t-queue',rankQueue);on('t-qcancel',()=>{rankCancel();SCREEN='title';renderTitle();});if(SCREEN==='task')bindTask();
-  el.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openOpSelect(b.dataset.edit,renderTitle));on('t-tut',startTutorial);on('t-man',()=>openManual());on('t-ach',()=>openAch('ach'));on('t-ops',()=>openOpSelect(cfg.side,null,true));
+  el.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openOpSelect(b.dataset.edit,renderTitle));on('t-tut',startTutorial);on('t-man',()=>openManual());on('t-ach',()=>openAch('ach'));on('t-ops',()=>openOpSelect(cfg.side,null,true));on('t-shop',()=>{const s=cfg.side;openOpSelect(s,()=>{renderTitle();renderPlayer();},'shop');OSEL.cur=OPBASE.find(b=>OPC[b].side===s&&!owned(b))||OSEL.cur;renderOpSelect(true);});
   on('t-back',()=>{SCREEN='title';NETMSG='';renderTitle();});on('t-back2',()=>{SCREEN='pvp';NETMSG='';renderTitle();});on('t-back3',()=>{SCREEN='pvp';NETMSG='';renderTitle();});
   on('t-create',()=>{SCREEN='create';NETMSG='';renderTitle();});on('t-find',()=>{SCREEN='find';NETMSG='';if(NET)NET.list=null;renderTitle();netList();});
   on('t-go',netCreate);on('t-cancel',()=>{netLeave();SCREEN='pvp';renderTitle();});on('t-refresh',()=>{if(NET)NET.list=null;renderTitle();netList();});
@@ -6620,7 +6627,7 @@ function wzStepHTML(){const s=cfg.side,st=WZ.step;
     return `<div class="wzOpHead"><div><h3 class="wzQ">組成你的小隊</h3><p class="wzHint">點頭像加入小隊，再點一次移出。滑鼠移過去可以看能力。</p></div>
     <div class="wzSlots" aria-label="小隊 ${p.length}/5">${[0,1,2,3,4].map(i=>p[i]&&OPC[p[i]]?`<button class="wzS on ${WZ.peekSlot===p[i]?'peek':''}" data-wz-un="${i}" title="移出 ${OPC[p[i]].name}"><img src="${opIcon(p[i])}" alt="${OPC[p[i]].name}"></button>`:'<span class="wzS"></span>').join('')}</div></div>
     <div class="wzOps"><div class="wzOg">${OPBASE.filter(b=>OPC[b].side===s).map(b=>{const i=pickOf(b);
-      return `<button class="wzOt ${i>=0?'on':''} ${cur&&cur.base===b?'cur':''} ${WZ.peek===b?'peek':''} ${opPlayable(b)?'':'na'}${owned(b)?'':' lk'}" data-wz-op="${b}" aria-pressed="${i>=0}" ${opPlayable(b)?'':'aria-disabled="true"'} title="${OPC[b].name}${opPlayable(b)?'':'（尚未實作，暫時不能選）'}"><img src="${opIcon(b)}" alt=""><span>${OPC[b].name}</span>${i>=0?`<i>${i+1}</i>`:''}${owned(b)?'':`<em class="lkp">${RNI}12K</em>`}</button>`;}).join('')}</div>
+      return `<button class="wzOt ${i>=0?'on':''} ${cur&&cur.base===b?'cur':''} ${WZ.peek===b?'peek':''} ${opPlayable(b)?'':'na'}${owned(b)?'':' lk'}" data-wz-op="${b}" aria-pressed="${i>=0}" ${opPlayable(b)?'':'aria-disabled="true"'} title="${OPC[b].name}${opPlayable(b)?'':'（尚未實作，暫時不能選）'}"><img src="${opIcon(b)}" alt=""><span>${OPC[b].name}</span>${i>=0?`<i>${i+1}</i>`:''}</button>`;}).join('')}</div>
       <div class="wzOd" id="wzOd">${cur?wzOpDetail(cur):''}</div></div>
     <div class="wzRow"><button id="wzRand">隨機補滿</button>${p.length?'<button id="wzClear">清空</button>':''}</div>`;}
   case 4:{const inv=cfg.inv[s],used=invUsed(s),cap=INV_CAP[s];return `<h3 class="wzQ">分配戰術裝備</h3><p class="wzHint">全隊共用 ${cap} 個方塊，任何幹員都能用。${s==='A'?'另外固定有 3 架無人機。':'任務另給 3 捲鐵絲網，地圖上也有固定攝影機。'}</p>
@@ -6662,7 +6669,7 @@ function renderWiz(){let el=$('#wiz');const keep=[...(el?el.querySelectorAll('.w
   {const p=cfg.picks[cfg.side],od=$('#wzOd');
     el.querySelectorAll('[data-wz-op]').forEach(b=>{const bs=b.dataset.wzOp;
       b.onmouseenter=b.onfocus=()=>{const k=p.find(x=>OPC[x]&&OPC[x].base===bs)||bs;if(WZ.cur===k)return;WZ.cur=k;el.querySelectorAll('.wzOt.cur').forEach(e=>e.classList.remove('cur'));b.classList.add('cur');if(od){od.innerHTML=wzOpDetail(OPC[k]);bindVar();}};
-      b.onclick=()=>{if(WZ.peek!==bs){WZ.peek=bs;WZ.peekSlot=null;WZ.cur=null;b.onmouseenter();el.querySelectorAll('.wzOt.peek,.wzS.peek').forEach(e=>e.classList.remove('peek'));b.classList.add('peek');const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=(p.some(x=>OPC[x]&&OPC[x].base===bs)?'再點一次移出 ':owned(bs)?'再點一次加入 ':'再點一次解鎖 ')+OPC[bs].name;return;}if(!opPlayable(bs)){b.onmouseenter();const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=`${OPC[bs].name} 的能力還沒做進遊戲，暫時不能選`;return;}if(!owned(bs)){buyOp(bs,()=>renderWiz());return;}const i=p.findIndex(x=>OPC[x]&&OPC[x].base===bs);if(i>=0)p.splice(i,1);else if(p.length<5)p.push(WZ.cur&&OPC[WZ.cur]&&OPC[WZ.cur].base===bs?WZ.cur:bs);else{const m=el.querySelector('.wzFoot .msg');if(m)m.textContent='小隊已滿 5 人，先點右上角的頭像移出一位';return;}WZ.cur=p.find(x=>OPC[x].base===bs)||bs;renderWiz();};});
+      b.onclick=()=>{if(WZ.peek!==bs){WZ.peek=bs;WZ.peekSlot=null;WZ.cur=null;b.onmouseenter();el.querySelectorAll('.wzOt.peek,.wzS.peek').forEach(e=>e.classList.remove('peek'));b.classList.add('peek');const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=(p.some(x=>OPC[x]&&OPC[x].base===bs)?'再點一次移出 ':owned(bs)?'再點一次加入 ':'尚未解鎖，可到首頁「商店」購買 ')+OPC[bs].name;return;}if(!opPlayable(bs)){b.onmouseenter();const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=`${OPC[bs].name} 的能力還沒做進遊戲，暫時不能選`;return;}if(!owned(bs)){const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=`${OPC[bs].name} 尚未解鎖，可到首頁「商店」購買`;return;}const i=p.findIndex(x=>OPC[x]&&OPC[x].base===bs);if(i>=0)p.splice(i,1);else if(p.length<5)p.push(WZ.cur&&OPC[WZ.cur]&&OPC[WZ.cur].base===bs?WZ.cur:bs);else{const m=el.querySelector('.wzFoot .msg');if(m)m.textContent='小隊已滿 5 人，先點右上角的頭像移出一位';return;}WZ.cur=p.find(x=>OPC[x].base===bs)||bs;renderWiz();};});
     el.querySelectorAll('[data-wz-un]').forEach(b=>b.onclick=()=>{const i=+b.dataset.wzUn;if(WZ.peekSlot!==p[i]){WZ.peekSlot=p[i];WZ.peek=null;WZ.cur=p[i];renderWiz();const m=el.querySelector('.wzFoot .msg');if(m)m.textContent='再點一次把 '+OPC[p[i]].name+' 移出小隊';return;}WZ.peekSlot=null;p.splice(i,1);renderWiz();});
     const bindVar=()=>wzFit()||el.querySelectorAll('[data-wz-var]').forEach(b=>b.onclick=()=>{const v=b.dataset.wzVar,i=p.findIndex(x=>OPC[x]&&OPC[x].base===OPC[v].base);if(i>=0)p[i]=v;WZ.cur=v;renderWiz();});bindVar();}
   el.querySelectorAll('[data-inv]').forEach(b=>b.onclick=()=>{const s=cfg.side,k=b.dataset.inv,v=cfg.inv[s][k]+(+b.dataset.dv);if(v<0||v>INV[s][k][1]||(+b.dataset.dv>0&&invUsed(s)>=INV_CAP[s]))return;cfg.inv[s][k]=v;render();});
@@ -7061,16 +7068,16 @@ const BOLT='<svg viewBox="0 0 10 14"><path d="M6 0L0 8h4l-1 6 7-9H6z"/></svg>';
 const hexDice=list=>list.length?list.map(d=>`<i class="hexd ${d[0]}">${d.includes('*')?BOLT:''}</i>`).join(''):'<span class="hint">—</span>';
 const DZN={Y:'輕',O:'中',R:'重'};
 const OSEL={side:'A',cur:null,en:false};
-function osEco(c){const b=c.base,m=mxInfo(b);return `<div class="osEco">${owned(b)?'':`<button class="primary" id="osBuy">${RNI}${fmtN(OPPRICE)} 解鎖</button>`}<span class="osMx"><b>熟練度 Lv${m.lv}</b><span class="tkBar"><i style="width:${m.pct}%"></i></span><small>${m.nx?`${fmtN(m.xp)}/${fmtN(m.nx)}${MXREW[m.lv+1]?' · 下一級'+MXREW[m.lv+1]:MXREW[m.lv+2]?' · Lv'+(m.lv+2)+MXREW[m.lv+2]:''}`:'已滿級'}</small></span></div>`;}
+function osEco(c){const b=c.base,m=mxInfo(b),ok=ECO.rn>=OPPRICE;return `<div class="osEco">${OSEL.shop?(owned(b)?'<span class="osOwn">已擁有</span>':`<button class="primary" id="osBuy" ${ok?'':'disabled'}>購買 ${RNI}${fmtN(OPPRICE)}</button>${ok?'':`<small class="osNeed">聲望不足，還差 ${fmtN(OPPRICE-ECO.rn)}</small>`}`):''}<span class="osMx"><b>熟練度 Lv${m.lv}</b><span class="tkBar"><i style="width:${m.pct}%"></i></span><small>${m.nx?`${fmtN(m.xp)}/${fmtN(m.nx)}${MXREW[m.lv+1]?' · 下一級'+MXREW[m.lv+1]:MXREW[m.lv+2]?' · Lv'+(m.lv+2)+MXREW[m.lv+2]:''}`:'已滿級'}</small></span></div>`;}
 function cardText(c){const zh=c.zh.x||'';return zh.replace(/〔([^〕]+)〕/g,'<em>〔$1〕</em>');}
-function openOpSelect(side,onDone,browse){OSEL.side=side;OSEL.done=onDone;OSEL.browse=!!browse;OSEL.cur=cfg.picks[side][0]||OPBASE.find(b=>OPC[b].side===side);let el=$('#opsel');
+function openOpSelect(side,onDone,browse){OSEL.side=side;OSEL.done=onDone;OSEL.browse=!!browse;OSEL.shop=browse==='shop';OSEL.cur=cfg.picks[side][0]||OPBASE.find(b=>OPC[b].side===side);let el=$('#opsel');
   if(!el){el=document.createElement('div');el.id='opsel';el.className='opsel';document.body.appendChild(el);}el.hidden=false;renderOpSelect(true);}
 function closeOpSelect(){const el=$('#opsel');if(el)el.hidden=true;if(OSEL.done)OSEL.done();}
 function renderOpSelect(anim){
   const el=$('#opsel'),side=OSEL.side,picks=cfg.picks[side],cur=OPC[OSEL.cur]||OPCARDS[0];
   const pickOf=b=>picks.findIndex(p=>OPC[p]&&OPC[p].base===b);
   const col=s=>`<div class="osCol ${s!==side&&!OSEL.browse?'dim':''}"><h3>${s==='A'?'攻擊方':'防守方'}</h3><div class="osGrid">${OPBASE.filter(b=>OPC[b].side===s).map(b=>{const i=s===side&&!OSEL.browse?pickOf(b):-1;
-    return `<button class="osT ${cur.base===b?'cur':''} ${i>=0?'on':''} ${opPlayable(b)?'':'na'}${owned(b)?'':' lk'}" data-ob="${b}" title="${OPC[b].name}"><img src="${opIcon(b)}" alt="${OPC[b].name}">${owned(b)?'':'<i class="lki">🔒</i>'}${i>=0?`<span class="n">${i+1}</span>`:''}</button>`;}).join('')}</div></div>`;
+    return `<button class="osT ${cur.base===b?'cur':''} ${i>=0?'on':''} ${opPlayable(b)?'':'na'}${owned(b)?'':' lk'}" data-ob="${b}" title="${OPC[b].name}"><img src="${opIcon(b)}" alt="${OPC[b].name}">${i>=0?`<span class="n">${i+1}</span>`:''}</button>`;}).join('')}</div></div>`;
   const vars=OPCARDS.filter(c=>c.base===cur.base);const mine=cur.side===side;const pi=pickOf(cur.base);
   const sideIc=emblem(cur.side);
   const abEn=cur.g.ab.map(a=>`${a.k==='PASSIVE'?'':a.k+(a.t?' → '+a.t:'')+' — '}${a.x}`).join('<br>');
@@ -7085,16 +7092,16 @@ function renderOpSelect(anim){
     <div class="osSec inv"><h4>攜帶裝備</h4><p style="margin:0;font-size:13px;line-height:1.7;color:#cfd8df">${cur.zh.g||'無特殊裝置'}${cur.g.charges?` × ${cur.g.charges}`:''}<br>${(()=>{const iv=cfg.inv[cur.side];const l=Object.entries(INV[cur.side]).filter(([k])=>iv[k]>0).map(([k,v])=>v[0]+' × '+iv[k]).join('、');return '小隊戰術裝備（全隊共用，在選單調整）：'+(l||'未選')+(cur.side==='A'?'、無人機 × 3':'、鐵絲網 × 3');})()}</p>
       <button style="margin-top:8px;font-size:12px" id="osEn">${OSEL.en?'隱藏英文原文':'顯示英文原文'}</button></div>
     </div></div>`;
-  el.innerHTML=`<div class="osL"><div class="osBar"><button id="osBack">‹ 返回</button><h2>${OSEL.browse?'幹員圖鑑':'選擇幹員'}</h2><span class="hint">${OSEL.browse?`共 ${OPBASE.length} 名幹員`:side==='A'?'你是進攻方':'你是防守方'}</span></div>
+  el.innerHTML=`<div class="osL"><div class="osBar"><button id="osBack">‹ 返回</button><h2>${OSEL.shop?'商店':OSEL.browse?'幹員圖鑑':'選擇幹員'}</h2><span class="hint">${OSEL.shop?`<span class="osBal">${RNI}${fmtN(ECO.rn)}</span> · 點幹員看技能，再按購買`:OSEL.browse?`共 ${OPBASE.length} 名幹員`:side==='A'?'你是進攻方':'你是防守方'}</span></div>
     <div class="osCols">${col('A')}${col('D')}</div></div><div class="osR">${det}</div>
     ${OSEL.browse?'':`<div class="osFoot"><div class="osSlots">${[0,1,2,3,4].map(i=>`<div class="osSlot">${picks[i]?`<img src="${opIcon(picks[i])}" alt="">`:''}</div>`).join('')}</div>
-      ${mine?`<button class="pick" id="osPick" ${opPlayable(cur.base)&&owned(cur.base)?'':'disabled'}>${!owned(cur.base)?'尚未解鎖':!opPlayable(cur.base)?'尚未實作，不能選':pi>=0?'移出小隊':picks.length>=5?'小隊已滿':'加入小隊'}</button>`:`<span class="hint">敵方幹員，只能查看</span>`}
+      ${mine?`<button class="pick" id="osPick" ${opPlayable(cur.base)&&owned(cur.base)?'':'disabled'}>${!owned(cur.base)?'尚未解鎖（到商店購買）':!opPlayable(cur.base)?'尚未實作，不能選':pi>=0?'移出小隊':picks.length>=5?'小隊已滿':'加入小隊'}</button>`:`<span class="hint">敵方幹員，只能查看</span>`}
       <button class="primary pick" id="osDone" ${picks.length!==5?'disabled':''}>完成（${picks.length}/5）</button></div>`}`;
   el.querySelectorAll('[data-ob]').forEach(b=>b.onclick=()=>{const bs=b.dataset.ob;const p=picks.find(x=>OPC[x]&&OPC[x].base===bs);OSEL.cur=p||bs;el.classList.add('showD');renderOpSelect(true);});
   el.querySelectorAll('[data-ov]').forEach(b=>b.onclick=()=>{const v=b.dataset.ov;const i=pickOf(cur.base);if(i>=0)picks[i]=v;OSEL.cur=v;renderOpSelect(false);});
   const pk=$('#osPick');if(pk)pk.onclick=()=>{if(!opPlayable(cur.base)||!owned(cur.base))return;const i=pickOf(cur.base);if(i>=0)picks.splice(i,1);else if(picks.length<5)picks.push(cur.id);renderOpSelect(false);};
-  el.classList.toggle('browse',OSEL.browse);const dn=$('#osDone');if(dn)dn.onclick=closeOpSelect;$('#osBack').onclick=closeOpSelect;$('#osEn').onclick=()=>{OSEL.en=!OSEL.en;renderOpSelect(false);};
-  const x=$('#osX');if(x)x.onclick=()=>el.classList.remove('showD');{const ob=$('#osBuy');if(ob)ob.onclick=()=>buyOp(cur.base,()=>renderOpSelect(false));}
+  el.classList.toggle('browse',OSEL.browse);el.classList.toggle('shop',!!OSEL.shop);const dn=$('#osDone');if(dn)dn.onclick=closeOpSelect;$('#osBack').onclick=closeOpSelect;$('#osEn').onclick=()=>{OSEL.en=!OSEL.en;renderOpSelect(false);};
+  const x=$('#osX');if(x)x.onclick=()=>el.classList.remove('showD');{const ob=$('#osBuy');if(ob)ob.onclick=()=>{const b=cur.base;if(owned(b)||ECO.rn<OPPRICE)return;ECO.rn-=OPPRICE;ECO.own.push(b);ecoSave();try{SFX.click&&SFX.click();}catch(e){}achToastMsg(`已解鎖 ${OPC[b].name}`,"現在可以選他出戰");renderOpSelect(false);renderPlayer();};}
 }
 
 // ---------- round clocks: each squad gets (time per Operator x Operators in play) per round, shared by its two activation phases ----------
