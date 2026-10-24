@@ -4010,7 +4010,7 @@ async function droneDeploy(u,x,y){
   if(!droneNext(u,x,y).some(([a,b])=>droneCost(a,b)<=5))await droneFinish(u);}
 async function droneStep(u,x,y){const d=dmOf();if(!d)return;d.mp-=droneCost(x,y);d.x=x;d.y=y;SFX.step();camDiscover();render();await sleep(G.ai?260:60);
   if(d.mp<=0||!droneNext(u,x,y).some(([a,b])=>droneCost(a,b)<=d.mp))await droneFinish(u);}
-async function droneFinish(u){const d=dmOf();if(!d)return;droneScanNow(u,d);render();await afterAct(u);}
+async function droneFinish(u,na){const d=dmOf();if(!d)return;const tw=d.own==='twitch';droneScanNow(u,d);if(tw)twShock(u,d.x,d.y);render();if(!na)await afterAct(u);}
 // shortest drone route (within 5 points) from a space next to the operator into the target room
 function dronePlan(u,room){const W=G.W,dist=new Map(),prev=new Map(),q=[];
   for(const [x,y] of droneTargets(u)){const i=y*W+x;dist.set(i,0);prev.set(i,-1);q.push([0,i]);}
@@ -4076,7 +4076,7 @@ function beginAct(u){u.activated=true;u.mp=u.speed;u.ap=2;u.used=new Set();u.ove
 function recordAct(){const r=G.cur;G.cur=null;if(!r||(r.path.length<2&&!r.acts.length))return;G.moves.push(r);
   if(r.side===G.player||r.path.some(p=>p[2]))G.hl=G.moves.length-1;}
 function offObst(u){if(!u||!u.alive||u.x<0||!cell(u.x,u.y).obst)return;const f=adj8(u.x,u.y).find(([a,b])=>!blocks(cell(a,b))&&!cell(a,b).obst&&!unitAt(a,b)&&!shieldAt(a,b));if(f){u.x=f[0];u.y=f[1];}}
-function endAct(u){if(u){const dm=dmOf();if(dm&&dm.by===u.id)droneScanNow(u,dm);if(u.side!==G.player&&u.hidden&&u.alive&&u.mp>0&&!G.net)aiDecoy(u);offObst(u);u.mp=0;if(u.hidden&&u.alive&&!u.overwatch)overwatch(u,true);if(!u.overwatch)u.ap=0;}recordAct();G.active=null;G.mode='move';G.tEnd=0;}
+function endAct(u){if(u){const dm=dmOf();if(dm&&dm.by===u.id){const tw=dm.own==='twitch';droneScanNow(u,dm);if(tw)twShock(u,dm.x,dm.y);}if(u.side!==G.player&&u.hidden&&u.alive&&u.mp>0&&!G.net)aiDecoy(u);offObst(u);u.mp=0;if(u.hidden&&u.alive&&!u.overwatch)overwatch(u,true);if(!u.overwatch)u.ap=0;}recordAct();G.active=null;G.mode='move';G.tEnd=0;}
 function unspent(s){return alive(s).filter(u=>!u.activated&&u.x>=0);}
 function playerAfterAct(){
   endAct(G.active);
@@ -4123,7 +4123,7 @@ function pathCost(u,x,y){
   if(u.side==='D')return Infinity;
   const jam=jammed(x,y);
   if(c.t==='soft'){if((BRK[u.op]&&u.ch>0)||u.op==='sledge'||(u.op==='ash'&&u.ch>0)||(u.op==='thermite'&&u.ch>0&&!jam)||(G.charges>0&&!jam))return 5;return Infinity;}
-  if(c.t==='reinf'){if(u.op==='thermite'&&u.ch>0&&!c.elec&&!jam)return 6;if(BRKR[u.op]&&u.ch>0&&!c.elec&&!jam&&c.panel)return 6;if(u.op==='sledge'&&c.panel)return 5;return Infinity;}
+  if(c.t==='reinf'){if(u.op==='thermite'&&u.ch>0&&!c.elec&&!jam)return 6;if(BRKR[u.op]&&u.ch>0&&!c.elec&&!jam)return 6;if(u.op==='sledge'&&c.panel)return 5;return Infinity;}
   return Infinity;
 }
 function findPath(u,goal){ECU=u;
@@ -5002,8 +5002,8 @@ var GT={
  thunderbird:(u,s)=>s?allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y)):[],
  buck:u=>wallT(u,4,['soft','bar']),
  capitao:u=>thrown(u),
- hibana:u=>wallT(u,6,['soft','bar','reinf']).filter(([x,y])=>cell(x,y).t!=='reinf'||cell(x,y).panel),
- ace:u=>wallT(u,6,['soft','bar','reinf']).filter(([x,y])=>cell(x,y).t!=='reinf'||cell(x,y).panel),
+ hibana:u=>wallT(u,6,['soft','bar','reinf']),
+ ace:u=>wallT(u,6,['soft','bar','reinf']),
  frost:(u,s)=>(s?allCells().filter(([x,y])=>setupIndoor(x,y)):adj8(u.x,u.y)).filter(([x,y])=>cell(x,y).t==='floor'&&!gadgetAt(x,y)&&!unitAt(x,y)),
  lesion:(u,s)=>(s?allCells().filter(([x,y])=>setupIndoor(x,y)):thrown(u,3)).filter(([x,y])=>!gadgetAt(x,y)&&!unitAt(x,y)),
  ela:(u,s)=>(s?allCells().filter(([x,y])=>setupIndoor(x,y)):thrown(u,3)).filter(([x,y])=>!gadgetAt(x,y)&&!unitAt(x,y)),
@@ -5013,7 +5013,7 @@ var GT={
  nomad:u=>seenEnemies(u).filter(e=>cheb(u.x,u.y,e.x,e.y)<=6).map(e=>[e.x,e.y]),
  mira:(u,s)=>(s?allCells().filter(([x,y])=>adj4(x,y).some(([a,b])=>setupIndoor(a,b))):adj4(u.x,u.y)).filter(([x,y])=>{const c=cell(x,y);return (c.t==='soft'||c.t==='reinf')&&!c.mirror;}),
  finka:u=>alive('A').filter(a=>a.x>=0&&a.hp<a.max&&(a===u||(cheb(u.x,u.y,a.x,a.y)<=4&&losTo(u,a.x,a.y)))).map(a=>[a.x,a.y]),
- maverick:u=>adj4(u.x,u.y).filter(([x,y])=>{const c=cell(x,y);return (c.t==='soft'||(c.t==='reinf'&&c.panel))&&!c.elec&&!jammed(x,y);}),
+ maverick:u=>adj4(u.x,u.y).filter(([x,y])=>{const c=cell(x,y);return (c.t==='soft'||c.t==='reinf')&&!c.elec&&!jammed(x,y);}),
  maestro:(u,s)=>s?allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y)):[],
  clash:u=>seenEnemies(u).filter(e=>cheb(u.x,u.y,e.x,e.y)<=3).map(e=>[e.x,e.y]),
  kaid:(u,s)=>s?entryCells():[],
@@ -5040,14 +5040,20 @@ var PLACE={
  wamai:(u,x,y)=>G.gadgets.push({type:'magnet',x,y,side:'D',alive:true}),
  melusi:(u,x,y)=>G.gadgets.push({type:'banshee',x,y,side:'D',alive:true}),
 };
+// the shock drone, once its scan is done: a red die, that many electronic gadgets in the room are fried
+function twShock(u,x,y){const R=cell(x,y).indoor?roomCells(x,y):new Set(within(x,y,2).map(([a,b])=>b*G.W+a));
+  const el=G.gadgets.filter(g=>g.alive&&g.side==='D'&&['cam','jammer','ced','eye','kona','claw','magnet','banshee','grz'].includes(g.type)&&R.has(g.y*G.W+g.x));
+  if(jammed(x,y)){log(`${nm(u)} 的電擊無人機被干擾，無法放電`,'ka');return;}const r=die1('R');let n=0;for(const g of el.slice(0,r)){g.alive=false;n++;}
+  log(`${nm(u)} 的電擊無人機擲出 ${r}，摧毀了 ${n} 個電子道具`,'ka');if(n&&u.side===G.player)bigNote('電擊無人機',`摧毀 ${n} 個電子道具`,'a',1300);}
 async function droneLike(u,x,y,f){G.gadgets.push({type:'drone',x,y,side:u.side,alive:true,own:u.op});const room=roomOrArea(x,y).filter(([a,b])=>cheb(a,b,x,y)<=4);await f(room);render();}
 var UG={
  blitz:async(u,x,y,s)=>{SFX.flash();let n=0;for(const a of G.units)if(a.alive&&a!==u&&cheb(a.x,a.y,x,y)<=2&&roomCells(x,y).has(a.y*G.W+a.x)&&stunU(a)){if(a.hidden)reveal(a,'被閃光盾');n++;}log(`${nm(u)} 的閃光盾震暈了 ${n} 名幹員`,s);},
  ying:async(u,x,y,s)=>{SFX.flash();let n=0;for(const a of G.units)if(a.alive&&a!==u&&cheb(a.x,a.y,x,y)<=2&&roomCells(x,y).has(a.y*G.W+a.x)&&stunU(a)){if(a.hidden)reveal(a,'被坎德拉');n++;}log(`${nm(u)} 的坎德拉閃光彈震暈了 ${n} 名幹員`,s);},
- twitch:(u,x,y,s)=>droneLike(u,x,y,async room=>{const R=new Set(room.map(([a,b])=>b*G.W+a));for(const d of alive('D'))if(R.has(d.y*G.W+d.x))locU(d);
-   const el=G.gadgets.filter(g=>g.alive&&g.side==='D'&&['cam','jammer','ced','eye','kona','claw','magnet','banshee','grz'].includes(g.type)&&R.has(g.y*G.W+g.x));const r=die1('R');let n=0;
-   for(const g of el.slice(0,r)){g.alive=false;n++;}log(`${nm(u)} 的電擊無人機擲出 ${r}，摧毀了 ${n} 個電子道具`,s);}),
- flores:(u,x,y,s)=>droneLike(u,x,y,async()=>{SFX.boom();const area=[[x,y],...adj4(x,y)];if(hostHarm(area,'A','Ratero 炸藥無人機'))return;for(const [i,j] of area)await blastDestroy(i,j,2);
+ twitch:async(u,x,y,s)=>{G.gadgets.push({type:'drone',x,y,side:'A',alive:true,moving:true,mp:5,by:u.id,own:'twitch'});SFX.step();camDiscover();
+    if(u.side===G.player&&!G.ai)log(`${nm(u)} 放出電擊無人機，還有 5 移動點：一步一步開，停下就掃描房間並電擊電子道具`,s);else log(`${nm(u)} 放出了電擊無人機`,s);
+    render();await sleep(G.ai?260:60);
+    let d0;const pl=u._twPlan;u._twPlan=null;if(pl&&u.side!==G.player){for(const [a,b] of pl.slice(1)){if(!dmOf())break;d0=dmOf();d0.mp-=droneCost(a,b);d0.x=a;d0.y=b;SFX.step();camDiscover();render();await sleep(260);}if(dmOf())await droneFinish(u,1);return;}
+    if(!droneNext(u,x,y).some(([a,b])=>droneCost(a,b)<=5))await droneFinish(u,1);}, flores:(u,x,y,s)=>droneLike(u,x,y,async()=>{SFX.boom();const area=[[x,y],...adj4(x,y)];if(hostHarm(area,'A','Ratero 炸藥無人機'))return;for(const [i,j] of area)await blastDestroy(i,j,2);
    for(const a of G.units.filter(a=>a.alive&&a.x>=0&&area.some(([i,j])=>i===a.x&&j===a.y))){const r=die1('O');if(r)await damage(a,r,'Ratero');}
    const d=G.gadgets.find(g=>g.alive&&g.type==='drone'&&g.x===x&&g.y===y&&g.own==='flores');if(d)d.alive=false;log(`${nm(u)} 的 Ratero 無人機在 ${coord(x,y)} 引爆`,s);}),
  echo:(u,x,y,s)=>droneLike(u,x,y,async room=>{const R=new Set(room.map(([a,b])=>b*G.W+a));let n=0;for(const a of alive('A'))if(R.has(a.y*G.W+a.x)){locU(a);if(stunU(a))n++;}log(`${nm(u)} 的妖怪無人機震暈了 ${n} 名進攻方`,s);}),
@@ -5107,7 +5113,7 @@ var AIG={
  montagne:u=>u.rnd!==G.round&&seenEnemies(u).length?'self':null,
  dokkaebi:u=>G.round>=2&&alive('D').some(d=>!d.spotted&&!NOLOC.has(d.op))?'self':null,
  jackal:u=>alive('D').some(d=>!d.spotted&&!NOLOC.has(d.op)&&cheb(u.x,u.y,d.x,d.y)<=12)||alive('D').some(d=>d.spotted&&cheb(u.x,u.y,d.x,d.y)<=3&&!inSight(u,d))?'self':null,
- twitch:u=>{const g=G.gadgets.find(g=>g.alive&&g.side==='D'&&['cam','jammer','ced','eye','kona','claw','magnet','banshee'].includes(g.type)&&gadgetVisibleTo(g,'A')&&cheb(u.x,u.y,g.x,g.y)<=7);if(!g)return null;const R=roomCells(g.x,g.y);return GT.twitch(u).find(([x,y])=>R.has(y*G.W+x))||null;},
+ twitch:u=>{const g=G.gadgets.find(g=>g.alive&&g.side==='D'&&['cam','jammer','ced','eye','kona','claw','magnet','banshee'].includes(g.type)&&gadgetVisibleTo(g,'A')&&cheb(u.x,u.y,g.x,g.y)<=7);if(!g)return null;const R=roomCells(g.x,g.y);let p=null;DRONEANY=true;try{p=dronePlan(u,R);}finally{DRONEANY=false;}if(!p)return null;u._twPlan=p;return p[0];},
  flores:u=>{const t=GT.flores(u);for(const d of alive('D'))if(pub(d)){const p=t.find(([x,y])=>cheb(x,y,d.x,d.y)<=1&&!alive('A').some(a=>cheb(a.x,a.y,x,y)<=1));if(p)return p;}return null;},
  capitao:u=>{const t=GT.capitao(u);for(const d of alive('D'))if(pub(d)){const p=t.find(([x,y])=>x===d.x&&y===d.y&&!alive('A').some(a=>cheb(a.x,a.y,x,y)<=1));if(p)return p;}return null;},
  gridlock:u=>{if(!G.defuser&&!(G.hostage&&G.hostage.by))return null;const c=G.defuser||G.hostage;return nearest(c,GT.gridlock(u).filter(([x,y])=>cheb(x,y,c.x,c.y)>=2&&cheb(x,y,c.x,c.y)<=4))||null;},
