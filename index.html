@@ -16,8 +16,9 @@ if(window.claude&&window.claude.use)return;
 window.R6_STANDALONE=true;
 const BROKERS=window.R6_BROKERS||['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt'];
 const PFX='r6bg-aesop/v1/';
-const uid=(()=>{let v=null;try{v=localStorage.getItem('r6bg.uid');}catch(e){}
+const localUid=(()=>{let v=null;try{v=localStorage.getItem('r6bg.uid');}catch(e){}
   if(!v){v='u'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);try{localStorage.setItem('r6bg.uid',v);}catch(e){}}return v;})();
+let uid=localUid,gName='',gPhoto='';
 const rid=()=>Math.random().toString(36).slice(2,10);
 // one connection per presence scope, so each can carry its own "last will" that clears it on disconnect
 function connect(will){
@@ -91,8 +92,27 @@ function makeRoom(name){
     emit(){},on(){return ()=>{};},
     async leave(){left=true;clearInterval(hb);listeners.clear();if(cP){const c=await cP;await pub(c,topic,null).catch(()=>{});c.end();}}};
 }
+
+// Google sign-in and the cloud save: Firebase, loaded from this site's own copy of the SDK
+const FBC={apiKey:"AIzaSyAXBuiFsa1pCAtuJoCWm00Esl5JBgjgUAk",authDomain:"r6-board-game.firebaseapp.com",projectId:"r6-board-game",storageBucket:"r6-board-game.firebasestorage.app",messagingSenderId:"1067919869716",appId:"1:1067919869716:web:1249505b5c33e10f862401"};
+let fbP=null,fbUser=null,fbReady=false;const fbSubs=new Set();
+const fbLoad=()=>fbP||(fbP=new Promise((res,rej)=>{const ls=['fb/app.js','fb/auth.js','fb/firestore.js'];let i=0;
+  const next=()=>{if(i>=ls.length){try{if(!firebase.apps.length)firebase.initializeApp(FBC);res(firebase);}catch(e){rej(e);}return;}
+    const s=document.createElement('script');s.src=ls[i++];s.onload=next;s.onerror=()=>{fbP=null;rej({code:'network'});};document.head.appendChild(s);};next();}));
+const fbSet=u=>{fbUser=u?{uid:u.uid,name:u.displayName||'',email:u.email||'',photo:u.photoURL||''}:null;
+  uid=fbUser?'g'+fbUser.uid:localUid;gName=fbUser?fbUser.name:'';gPhoto=fbUser?fbUser.photo:'';fbReady=true;fbSubs.forEach(fn=>{try{fn(fbUser);}catch(e){}});};
+const fbDoc=async()=>{const fb=await fbLoad();if(!fbUser)throw {code:'unauthenticated'};return fb.firestore().doc('users/'+fbUser.uid);};
+window.R6FB={user:()=>fbUser,
+  onUser(fn){fbSubs.add(fn);if(fbReady&&fbUser)fn(fbUser);return ()=>fbSubs.delete(fn);},
+  async signIn(){const fb=await fbLoad(),a=fb.auth(),p=new fb.auth.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});
+    try{await a.signInWithPopup(p);}catch(e){if(/popup-blocked|operation-not-supported|web-storage-unsupported/.test((e&&e.code)||''))return a.signInWithRedirect(p);throw e;}},
+  async signOut(){const fb=await fbLoad();await fb.auth().signOut();},
+  async load(){const s=await (await fbDoc()).get();return s.exists?s.data():null;},
+  async save(d){await (await fbDoc()).set(d);}};
+const fbBoot=()=>fbLoad().then(fb=>{const a=fb.auth();a.getRedirectResult().catch(()=>{});a.onAuthStateChanged(fbSet);}).catch(()=>{});
+if(document.readyState==='loading')addEventListener('DOMContentLoaded',fbBoot);else fbBoot();
 let lobby=null;
-const user={async id(){return uid;},async me(){let nick='';try{nick=(JSON.parse(localStorage.getItem('r6bg.profile')||'{}').nick)||'';}catch(e){}return{id:uid,name:nick,avatarUrl:''};},
+const user={async id(){return uid;},async me(){let nick='';try{nick=(JSON.parse(localStorage.getItem('r6bg.profile')||'{}').nick)||'';}catch(e){}return{id:uid,name:nick||gName,avatarUrl:gPhoto};},
   async profiles(ids){const o={};ids.forEach(i=>o[i]={id:i,name:''});return o;},isOwner:()=>false,canEdit:()=>false,can:()=>true};
 window.claude={use:async name=>{
   if(name==='db'){try{await main();return db;}catch(e){return null;}}
@@ -4658,7 +4678,7 @@ async function socialLoad(id){SOC_ID=id;try{const db=await claude.use('db');if(!
   (d.list||[]).forEach(f=>{if(!isFriend(f.id))FR.list.push(f);});(d.recent||[]).forEach(r=>{if(!FR.recent.some(x=>x.id===r.id))FR.recent.push(r);});FR.recent=FR.recent.sort((a,b)=>b.ts-a.ts).slice(0,6);
   for(const k in d.got||{})if(!AS.got[k])AS.got[k]=d.got[k];for(const k in d.n||{})AS.n[k]=Math.max(AS.n[k]||0,d.n[k]|0);
   try{localStorage.setItem(FKEY,JSON.stringify(FR));localStorage.setItem(AKEY,JSON.stringify(AS));}catch(e){}renderPlayer();}catch(e){}}
-let socT=0;function socialPush(){if(!SOC_ID||ME.mode!=='account')return;clearTimeout(socT);socT=setTimeout(async()=>{try{const db=await claude.use('db');if(db)await db.collection('data/users/'+SOC_ID).doc('social').set({list:FR.list.slice(0,200),recent:FR.recent,got:AS.got,n:AS.n,ts:Date.now()});}catch(e){}},800);}
+let socT=0;function socialPush(){gaPush();if(!SOC_ID||ME.mode!=='account')return;clearTimeout(socT);socT=setTimeout(async()=>{try{const db=await claude.use('db');if(db)await db.collection('data/users/'+SOC_ID).doc('social').set({list:FR.list.slice(0,200),recent:FR.recent,got:AS.got,n:AS.n,ts:Date.now()});}catch(e){}},800);}
 // ===== remaining operators: gadgets in the simplified digital rules =====
 var LOSW=false,LOSD=false,SHOTP=null,DRONEANY=false;
 var NOLOC=new Set(['nokk','iana','vigil']);
@@ -6659,7 +6679,7 @@ const PKEY='r6bg.profile';
 const ME=(()=>{let p=null;try{p=JSON.parse(localStorage.getItem(PKEY)||'null');}catch(e){}
   p=Object.assign({mode:'guest',guest:'訪客'+String(1000+Math.floor(Math.random()*9000)),nick:'',avatar:'recruit_a_rifle',usePhoto:false,lang:'zh'},p||{});
   p.acct=null;p.rating=null;p.w=0;p.l=0;return p;})();
-function saveMe(){try{const {mode,guest,nick,avatar,usePhoto,lang}=ME;localStorage.setItem(PKEY,JSON.stringify({mode,guest,nick,avatar,usePhoto,lang}));}catch(e){}}
+function saveMe(){gaPush();try{const {mode,guest,nick,avatar,usePhoto,lang}=ME;localStorage.setItem(PKEY,JSON.stringify({mode,guest,nick,avatar,usePhoto,lang}));}catch(e){}}
 const meName=()=>ME.nick||(ME.mode==='account'&&ME.acct&&ME.acct.name)||ME.guest;
 const meAvatar=()=>ME.usePhoto&&ME.acct&&ME.acct.photo?ME.acct.photo:/^art:/.test(ME.avatar||'')?(opArt(ME.avatar.slice(4))||opIcon(ME.avatar.slice(4))):opIcon(ME.avatar);
 const TIERS=[[0,'紅銅','Copper','カッパー','#b5653a'],[1100,'青銅','Bronze','ブロンズ','#a8794a'],[1200,'白銀','Silver','シルバー','#b8c4cc'],[1350,'黃金','Gold','ゴールド','#e3aa3e'],[1500,'白金','Platinum','プラチナ','#5fc7c2'],[1700,'翡翠','Emerald','エメラルド','#3fbf75'],[1900,'鑽石','Diamond','ダイヤモンド','#9c7cf2'],[2100,'冠軍','Champion','チャンピオン','#e8574e']];
@@ -6688,17 +6708,17 @@ function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;cons
   const avl=[];OPBASE.forEach(b=>{const lv=mxLv(ECO.mx[b]||0);if(b.startsWith('recruit_')||lv>=1||ME.avatar===b)avl.push([b,opIcon(b),OPC[b].name]);if(lv>=3||ME.avatar==='art:'+b)avl.push(['art:'+b,opArt(b)||opIcon(b),OPC[b].name+' 半身像']);});
   const avs=avl.map(([k,src,n])=>`<button class="avb ${!ME.usePhoto&&ME.avatar===k?'on':''} ${k.startsWith('art:')?'art':''}" data-av="${k}" title="${n}"><img src="${src}" alt="${n}"></button>`).join('');
   const ttls=OPBASE.filter(b=>mxLv(ECO.mx[b]||0)>=5);
-  el.innerHTML=`<div class="psbox"><div class="pshead"><img class="pav" src="${meAvatar()}" alt=""><div><b>${esc(meName())}</b><span>${acct?'線上身分':'訪客'}</span></div><button id="psClose" aria-label="關閉">✕</button></div>
+  el.innerHTML=`<div class="psbox"><div class="pshead"><img class="pav" src="${meAvatar()}" alt=""><div><b>${esc(meName())}</b><span>${GA.u?'Google 帳號':acct?'線上身分':'訪客'}</span></div><button id="psClose" aria-label="關閉">✕</button></div>
   <section><h4>名稱</h4><div class="psrow"><input id="psNick" maxlength="16" value="${esc(ME.nick)}" placeholder="${esc(acct&&ME.acct.name?ME.acct.name:ME.guest)}"><button id="psNickOk">儲存</button></div></section>
   <section><h4>頭貼</h4><div class="avgrid">${acct&&ME.acct.photo?`<button class="avb ${ME.usePhoto?'on':''}" data-av="__photo" title="帳號照片"><img src="${ME.acct.photo}" alt="帳號照片"></button>`:''}${avs}</div><p class="pshint">幹員熟練度 Lv1 解鎖頭像、Lv3 解鎖半身像、Lv5 解鎖稱號。</p></section><section><h4>稱號</h4>${ttls.length?`<div class="psrow wrap"><button class="ttl ${!ECO.title?'on':''}" data-ttl="">不顯示</button>${ttls.map(b=>`<button class="ttl ${ECO.title===b?'on':''}" data-ttl="${b}">${esc(mxTitle(b))}</button>`).join('')}</div>`:'<p class="pshint">把任一名幹員練到熟練度 Lv5，就能拿到他的專屬稱號。</p>'}</section>
   <section><h4>成就與好友</h4><div class="psrow"><button id="psAch">🏆 成就 ${achCount()}/${ACH.length}</button><button id="psFr">好友 ${FR.list.length} 人</button></div></section>
-  <section><h4>登入資料</h4>${acct?`<p class="pshint">已用 線上身分登入。</p><div class="psrow"><button id="psLogout">改用訪客身分</button></div>`:
+  <section><h4>登入資料</h4>${window.R6FB?gaHTML():acct?`<p class="pshint">已用 線上身分登入。</p><div class="psrow"><button id="psLogout">改用訪客身分</button></div>`:
     `<p class="pshint">目前是訪客，所有模式都能玩。聲望、解鎖的幹員和熟練度存在這台裝置上。</p><div class="pslogin"><button class="primary" id="psLogin"><span class="lgico">C</span>啟用線上身分</button><button disabled title="Google 登入目前還沒開放"><span class="lgico g">G</span>Google 登入（此頁面不支援）</button><button class="on" disabled><span class="lgico">訪</span>訪客（目前）</button></div>`}${PMSG?`<p class="terr">${PMSG}</p>`:''}</section>
   <section><h4>設定</h4><div class="psrow"><span>🌐 語言</span>${langSelect('psLang')}</div><div class="psrow pstg"><span>射擊特寫</span><button id="psCine">${CINE.on?'開':'關'}</button><span>音樂</span><button id="psMus">${SFX.mOn?'開':'關'}</button><span>音效</span><button id="psSfx">${SFX.on?'開':'關'}</button></div></section></div>`;
   $('#psClose').onclick=closeSettings;
   $('#psNickOk').onclick=()=>{ME.nick=$('#psNick').value.trim().slice(0,16);saveMe();renderPlayer();renderSettings();};
   el.querySelectorAll('[data-ttl]').forEach(b=>b.onclick=()=>{ECO.title=b.dataset.ttl;ecoSave();renderPlayer();renderSettings();});el.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{if(b.dataset.av==='__photo')ME.usePhoto=true;else{ME.usePhoto=false;ME.avatar=b.dataset.av;}saveMe();renderPlayer();renderSettings();});
-  const li=$('#psLogin');if(li)li.onclick=acctLogin;const lo=$('#psLogout');if(lo)lo.onclick=acctLogout;
+  const li=$('#psLogin');if(li)li.onclick=acctLogin;gaBind();const lo=$('#psLogout');if(lo)lo.onclick=acctLogout;
   bindLang('psLang');$('#psAch').onclick=()=>{closeSettings();openAch('ach');};$('#psFr').onclick=()=>{closeSettings();openAch('fr');};
   $('#psMus').onclick=()=>{SFX.toggleMusic();try{musicLevel();}catch(e){}renderSettings();};$('#psSfx').onclick=()=>{$('#sndBtn').click();renderSettings();};
   $('#psCine').onclick=()=>{CINE.on=!CINE.on;const v=$('#view-cine');if(v)v.textContent='射擊特寫：'+(CINE.on?{tp:'肩後',fp:'第一人稱'}[CINE.mode]:'關');renderSettings();};
@@ -6711,7 +6731,7 @@ function renderTopRight(){let el=$('#ttopr');const t=$('#title');if(!t)return;if
   if(!el.querySelector('#tLang')){el.innerHTML=`<span id="tOnline"></span><label class="tlang"><span aria-hidden="true">🌐</span>${langSelect('tLang')}</label>`;bindLang('tLang');}
   else $('#tLang').value=ME.lang;}
 function setLang(l){ME.lang=l;saveMe();document.documentElement.lang={zh:'zh-Hant',en:'en',ja:'ja'}[l];i18nAll();render();renderPlayer();renderSettings();renderTopRight();if(G&&G.tut)tutTick();}
-const I18N={
+const I18N={'使用 Google 登入':['Sign in with Google','Google でログイン'],'登出 Google':['Sign out of Google','Google からログアウト'],'Google 帳號':['Google account','Google アカウント'],'登入中…':['Signing in…','ログイン中…'],'正在讀取雲端存檔…':['Loading your cloud save…','クラウドセーブを読み込み中…'],'已綁定 Google：':['Linked Google account: ','連携中の Google: '],'聲望、幹員、熟練度、成就和好友會自動存到雲端，換裝置登入同一個 Google 帳號就能接著玩。':['Renown, operators, mastery, achievements and friends save to the cloud automatically. Sign in with the same Google account on another device to pick up where you left off.','名声、オペレーター、熟練度、実績、フレンドは自動でクラウドに保存されます。別の端末でも同じ Google アカウントでログインすれば続きから遊べます。'],'目前是訪客，進度只存在這台裝置上。用 Google 登入後，進度會存到雲端，換裝置也能接著玩。':['You are a guest, so progress is saved on this device only. Sign in with Google to save it to the cloud and play on any device.','現在はゲストで、進行状況はこの端末にだけ保存されます。Google でログインするとクラウドに保存され、どの端末でも続きから遊べます。'],'雲端存檔被拒絕：資料庫規則還沒設定好。':['Cloud save was refused: the database rules are not set up yet.','クラウドセーブが拒否されました：データベースのルールが未設定です。'],'讀不到雲端存檔，請檢查網路後重新登入。':['Could not load your cloud save. Check your connection and sign in again.','クラウドセーブを読み込めません。接続を確認して再ログインしてください。'],'這個網址還沒加進 Firebase 的授權網域。':['This address is not an authorized domain in Firebase yet.','このアドレスは Firebase の承認済みドメインに追加されていません。'],'網路連不上 Google，請稍後再試。':['Could not reach Google. Try again later.','Google に接続できません。しばらくしてから再試行してください。'],'雲端存檔失敗，稍後會再試。':['Cloud save failed; it will try again.','クラウドセーブに失敗しました。後で再試行します。'],
 // lobby
 '排名戰':['Ranked','ランクマッチ'],'PVP RANK · 配對對手，累積段位':['PVP RANK · Get matched and climb the ranks','PVP RANK · 対戦相手とマッチしてランクを上げる'],
 '對戰電腦':['Versus AI','AI対戦'],'PVE · 選陣營、地圖與幹員':['PVE · Pick side, map and operators','PVE · 陣営・マップ・オペレーターを選択'],
@@ -6866,7 +6886,37 @@ const fmtN=n=>Math.round(n).toLocaleString('en-US');
 const EKEY='r6bg.eco';
 const ECO=(()=>{let e=null;try{e=JSON.parse(localStorage.getItem(EKEY)||'null');}catch(x){}
   return Object.assign({rn:0,own:[],mx:{},day:'',dt:[],dp:{},dc:[],wk:'',wp:{},wc:[],wops:[],pveDay:'',pveEarn:0,tut:0,title:'',seen:0},e||{});})();
-function ecoSave(){try{localStorage.setItem(EKEY,JSON.stringify(ECO));}catch(e){}}
+function ecoSave(){ECO.ts=Date.now();try{localStorage.setItem(EKEY,JSON.stringify(ECO));}catch(e){}gaPush();}
+// ---- Google account (public site only): renown, operators, mastery, achievements and friends live in the cloud ----
+var GA={u:null,busy:false,ok:false,err:''};let gaT=0;
+function gaPack(){const {nick,avatar,usePhoto}=ME;return{v:1,ts:Date.now(),eco:JSON.parse(JSON.stringify(ECO)),got:AS.got,n:AS.n,fr:FR.list.slice(0,200),prof:{nick,avatar,usePhoto}};}
+function gaPush(now){if(!GA||!GA.u||!GA.ok||!window.R6FB)return;clearTimeout(gaT);gaT=setTimeout(()=>{R6FB.save(gaPack()).catch(e=>{GA.err='雲端存檔失敗，稍後會再試。';});},now?0:1500);}
+// first link on this device: keep the better of both; afterwards the newer save wins, but owned operators and mastery never go backwards
+function gaMerge(d,first){const e=d.eco||{},newer=(e.ts||0)>(ECO.ts||0),lrn=ECO.rn|0,lown=ECO.own.slice(),lmx=Object.assign({},ECO.mx),ltut=ECO.tut|0,lttl=ECO.title;
+  if(newer)Object.assign(ECO,e);
+  ECO.own=[...new Set([...(e.own||[]),...lown])];ECO.mx=Object.assign({},e.mx||{});for(const k in lmx)ECO.mx[k]=Math.max(ECO.mx[k]|0,lmx[k]|0);
+  ECO.tut=Math.max(ltut,e.tut|0);if(first)ECO.rn=Math.max(lrn,e.rn|0);if(!ECO.title)ECO.title=lttl||e.title||'';
+  for(const k in d.got||{})if(!AS.got[k])AS.got[k]=d.got[k];for(const k in d.n||{})AS.n[k]=Math.max(AS.n[k]|0,d.n[k]|0);
+  (d.fr||[]).forEach(f=>{if(f&&f.id&&!FR.list.some(x=>x.id===f.id))FR.list.push(f);});
+  const p=d.prof||{};if(!ME.nick&&p.nick)ME.nick=p.nick;if(newer&&p.avatar){ME.avatar=p.avatar;ME.usePhoto=!!p.usePhoto;}
+  try{localStorage.setItem(EKEY,JSON.stringify(ECO));localStorage.setItem(AKEY,JSON.stringify(AS));localStorage.setItem(FKEY,JSON.stringify(FR));}catch(x){}}
+async function gaOn(u){GA.u=u;GA.ok=false;GA.err='';
+  const re=()=>{renderPlayer();renderSettings();};
+  if(!u){GA.busy=false;re();if(ME.mode==='account')acctLoad().then(re);return;}
+  GA.busy=true;renderSettings();
+  try{const d=await R6FB.load();let first=true;try{first=localStorage.getItem('r6bg.glink')!==u.uid;}catch(x){}
+    if(d)gaMerge(d,first);GA.ok=true;try{localStorage.setItem('r6bg.glink',u.uid);}catch(x){}
+    ME.mode='account';saveMe();gaPush(true);acctLoad().then(re);}
+  catch(e){const c=(e&&e.code)||'';GA.err=/permission/.test(c)?'雲端存檔被拒絕：資料庫規則還沒設定好。':'讀不到雲端存檔，請檢查網路後重新登入。';}
+  GA.busy=false;renderPlayer();renderSettings();if(SCREEN==='title'||SCREEN==='task')renderTitle();}
+function gaHTML(){const u=GA.u,err=GA.err?`<p class="terr">${esc(GA.err)}</p>`:'';
+  if(u)return `<p class="pshint">已綁定 Google：<b>${esc(u.name||u.email)}</b>${u.name&&u.email?` · ${esc(u.email)}`:''}</p><p class="pshint">${GA.busy?'正在讀取雲端存檔…':'聲望、幹員、熟練度、成就和好友會自動存到雲端，換裝置登入同一個 Google 帳號就能接著玩。'}</p>${err}<div class="psrow"><button id="psGout">登出 Google</button></div>`;
+  return `<p class="pshint">目前是訪客，進度只存在這台裝置上。用 Google 登入後，進度會存到雲端，換裝置也能接著玩。</p>${err}<div class="pslogin"><button class="primary" id="psGoogle"${GA.busy?' disabled':''}><span class="lgico g">G</span>${GA.busy?'登入中…':'使用 Google 登入'}</button><button class="on" disabled><span class="lgico">訪</span>訪客（目前）</button></div>`;}
+function gaBind(){const g=$('#psGoogle');if(g)g.onclick=()=>{GA.busy=true;GA.err='';renderSettings();
+    R6FB.signIn().catch(e=>{const c=(e&&e.code)||'';GA.busy=false;
+      GA.err=/popup-closed|cancelled-popup/.test(c)?'':/unauthorized-domain/.test(c)?'這個網址還沒加進 Firebase 的授權網域。':/network/.test(c)?'網路連不上 Google，請稍後再試。':'登入失敗（'+(c||'未知錯誤')+'）';renderSettings();});};
+  const o=$('#psGout');if(o)o.onclick=()=>{clearTimeout(gaT);if(GA.ok)R6FB.save(gaPack()).catch(()=>{}).then(()=>R6FB.signOut());else R6FB.signOut();};}
+if(window.R6FB)R6FB.onUser(u=>{gaOn(u);});
 // the launch roster (core box, recruits included) is free; every later operator costs renown
 const owned=b=>{const c=OPC[b];const k=c?c.base:b;return !OPC[k]||OPC[k].batch==='core'||ECO.own.includes(k);};
 const dayKey=d=>{d=d||new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();};
