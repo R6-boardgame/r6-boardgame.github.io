@@ -1270,6 +1270,42 @@ html body #acts button .bwrap>span{max-width:100%;overflow:hidden}
 #opsBar .ob{position:relative;width:46px;padding:4px 3px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--hb);border:1px solid var(--hl);clip-path:var(--cham);color:#fff}
 #opsBar .ob img{width:32px;height:32px;border-radius:50%;background:#0b121a;border:2px solid var(--horg);padding:2px;box-sizing:border-box}
 #opsBar .ob.d img{border-color:var(--hblue)}
+html body #opsBar.hz{--ts:44px;left:50%;right:auto;transform:translateX(-50%);top:calc(var(--hdrB,52px) + 4px);flex-direction:row;align-items:stretch;gap:3px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
+#opsBar.hz .obTeam{display:flex;gap:2px}
+#opsBar.hz .obActs{flex-direction:column;justify-content:center;gap:5px;padding:0 4px 0 2px}
+#opsBar.hz .obActs i{width:7px;height:7px}
+#opsBar.hz .ob{width:var(--ts);height:calc(var(--ts) + 6px);padding:0;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;clip-path:none;border:1px solid transparent;border-radius:3px;position:relative}
+#opsBar.hz .ob img,#opsBar.hz .ob .obQ{width:calc(var(--ts) - 10px);height:calc(var(--ts) - 10px);border:1.5px solid rgba(255,255,255,.75);border-radius:50%;padding:1px;box-sizing:border-box;background:rgba(8,12,16,.55)}
+#opsBar.hz .ob .obQ{display:grid;place-items:center;font:800 calc(var(--ts)*.5)/1 'Saira Condensed',sans-serif;color:#fff;background:rgba(0,0,0,.18);text-shadow:0 1px 3px rgba(0,0,0,.6)}
+#opsBar.hz .ob.a{background:linear-gradient(180deg,rgba(240,140,70,.62),rgba(200,95,30,.5))}
+#opsBar.hz .ob.d{background:linear-gradient(180deg,rgba(90,165,245,.6),rgba(40,110,210,.48))}
+#opsBar.hz .ob.unk.a{background:linear-gradient(180deg,rgba(240,140,70,.38),rgba(200,95,30,.28))}
+#opsBar.hz .ob.unk.d{background:linear-gradient(180deg,rgba(90,165,245,.36),rgba(40,110,210,.26))}
+#opsBar.hz .ob .obHp{position:absolute;left:4px;right:4px;bottom:2px;display:flex;gap:1px}#opsBar.hz .ob .obHp i{flex:1;width:auto;height:3px}
+#opsBar.hz .ob.foe{pointer-events:none}
+#opsBar.hz .ob.sel{border-color:#ffd166}
+#opsBar.hz .ob.act{border-color:#ffd166;box-shadow:0 0 9px rgba(255,209,102,.6)}
+#opsBar.hz .ob.a.act{background:linear-gradient(180deg,rgba(255,160,90,.85),rgba(220,110,40,.75))}
+#opsBar.hz .ob.d.act{background:linear-gradient(180deg,rgba(120,185,255,.85),rgba(50,125,225,.75))}
+#opsBar.hz .ob.done{opacity:.55}
+#opsBar.hz .ob .obMv{position:absolute;right:1px;top:0;font:700 11px/1 var(--mono,monospace);color:#fff;background:rgba(10,14,19,.8);border-radius:3px;padding:1px 3px}
+#opsBar.hz .ob em{right:2px;top:0;font-size:10px}
+#opsBar.hz .ob.dead{opacity:1;filter:none;background:rgba(40,44,49,.7)}
+#opsBar.hz .ob.dead img,#opsBar.hz .ob.dead .obQ{filter:grayscale(1) brightness(.55)}
+#opsBar.hz .ob.dead::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top right,transparent calc(50% - 1.5px),#ff4a3a calc(50% - 1.5px),#ff4a3a calc(50% + 1.5px),transparent calc(50% + 1.5px))}
+#opsBar.hz .obMid{min-width:64px;display:flex;align-items:center;justify-content:center;padding:0 6px;background:rgba(8,12,17,.82);border-radius:3px;border-bottom:2px solid #e3aa3e}
+#opsBar.hz .obMid.d{border-bottom-color:var(--hblue)}
+#opsBar.hz .obMid b{font:600 24px/1 'Saira Condensed','IBM Plex Mono',monospace;color:#fff;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+#opsBar.hz .obMid.inf b{font-size:30px;font-weight:700}
+#opsBar.hz .obMid.low b{color:var(--danger)}
+html body #clocks{display:none!important}
+html body.hasClk #tracker .seg{display:inline-flex}
+html body header.top.top{padding-top:max(6px,env(safe-area-inset-top))!important}
+@media (max-width:560px){html body #opsBar.hz{--ts:min(32px,calc((100vw - 96px)/10));gap:2px}#opsBar.hz .obTeam{gap:1px}#opsBar.hz .obMid{min-width:48px;padding:0 3px}#opsBar.hz .obMid b{font-size:17px}#opsBar.hz .obMid.inf b{font-size:24px}#opsBar.hz .obActs{padding:0 2px 0 0;gap:4px}#opsBar.hz .obActs i{width:6px;height:6px}#opsBar.hz .ob .obHp{left:2px;right:2px}}
+#rotLock{display:none}
+@media (orientation:landscape) and (max-height:520px) and (pointer:coarse){#rotLock{display:flex;position:fixed;inset:0;z-index:100000;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#070b0f;color:#e6edf2;font:600 18px/1.4 sans-serif;text-align:center}
+ #rotLock svg{width:64px;height:64px;animation:rotHint 1.8s ease-in-out infinite}}
+@keyframes rotHint{0%,30%{transform:rotate(-90deg)}60%,100%{transform:rotate(0)}}
 #opsBar .ob.sel{border-color:#ffd166;box-shadow:inset 0 0 10px rgba(255,209,102,.45)}
 #opsBar .ob.act{border-color:var(--hblue);background:rgba(18,52,82,.95)}
 #opsBar .ob.done{opacity:.5}
@@ -1378,7 +1414,8 @@ body:not([data-scr="game"]) #opsBar{display:none}
 .ab.got i{filter:none}
 .ab.sel{outline:2px solid #45a6ef;outline-offset:-2px}
 .adet{min-height:54px;background:var(--hb2);border:1px solid var(--hl);padding:8px 12px;display:flex;flex-direction:column;gap:3px;font-size:13px}
-.adet b{color:#ffd36b}.adet span{color:#cfd8e0}.adet em{font-style:normal;font-size:11px;color:#8ea2b4}
+.adet b{color:#ffd36b}
+.adet .aTag{display:block;font-style:normal;color:#ffb27a;font-size:13px;margin:0 0 2px}.adet span{color:#cfd8e0}.adet em{font-style:normal;font-size:11px;color:#8ea2b4}
 .frl{display:flex;flex-direction:column;gap:6px}
 .fri{display:flex;align-items:center;gap:10px;background:var(--hb2);border:1px solid var(--hl);padding:8px 10px}
 .fri b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fri span{font-size:12px;color:#9fb2c3}
@@ -3879,7 +3916,7 @@ function camCheck(u){if(u.side!=='A'||!u.alive||u.spotted||NOLOC.has(u.op))retur
 function gHint(c){if(!c||!G)return;const mine=c.u.side===G.player;if(!mine&&!c.msgs.length)return;
   const name=c.name||(OPS[c.u.op]&&(GSH[c.u.op]||OPS[c.u.op].g))||'道具',ic=GADIC[name]||GADIC[GSH[c.u.op]]||opIcon(c.u.op);
   let el=$('#gHint');if(!el){el=document.createElement('div');el.id='gHint';el.setAttribute('role','status');document.body.appendChild(el);}
-  const hb=($('header.top')||{getBoundingClientRect:()=>({bottom:50})}).getBoundingClientRect().bottom;el.style.top=(hb+6)+'px';
+  const hb=($('header.top')||{getBoundingClientRect:()=>({bottom:50})}).getBoundingClientRect().bottom;el.style.top=(hb+6+obH())+'px';
   el.className=c.u.side==='A'?'a':'d';el.innerHTML=`<img src="${ic}" alt=""><div><b>${esc(name)}</b>${(c.msgs.length?c.msgs:['已使用']).map(m=>`<span>${String(m).replace(/<[^>]+>/g,'')}</span>`).join('')}</div>`;
   el.classList.remove('show');void el.offsetWidth;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),G.ai?2200:3000);}
 async function afterAct(u){if(G&&G._ghCap){const c=G._ghCap;G._ghCap=null;try{gHint(c);}catch(e){}}if(!u||!u.alive||G.over)return;camCheck(u);await riposte(u);revealCheck();}
@@ -4722,12 +4759,17 @@ function drawToken(u,cx,cy,r){
 function renderOpsBar(){let b=$('#opsBar');const show=G&&G.phase==='play'&&!G.over&&SCREEN!=='title';
   if(!show){if(b)b.hidden=true;return;}
   if(!b){b=document.createElement('div');b.id='opsBar';document.body.appendChild(b);b.onclick=e=>{const t=e.target.closest('[data-ob]');if(!t||!G)return;const u=G.units.find(x=>x.id===t.dataset.ob);if(!u)return;if(u.alive&&u.x>=0)onCell(u.x,u.y);else{G.sel=u;render();}};}
-  b.hidden=false;const mine=curSide()===G.player,left=Math.max(0,3-(G.acts||0));
-  const team=G.units.filter(u=>u.side===G.player);
-  b.innerHTML=`<div class="obActs ${mine?'':'off'}" title="本階段還能啟動的幹員數">${[0,1,2].map(i=>`<i class="${i<left?'f':''}"></i>`).join('')}</div>`+team.map(u=>{
+  b.hidden=false;b.classList.add('hz');const mine=curSide()===G.player,left=Math.max(0,3-(G.acts||0));
+  const team=G.units.filter(u=>u.side===G.player),foe=G.units.filter(u=>u.side!==G.player),vis=sees(G.player);
+  for(const u of foe)if(u.alive&&u.x>=0&&vis.has(u.id))u.seen1=1;
+  b.innerHTML=`<div class="obActs ${mine?'':'off'}" title="本階段還能啟動的幹員數">${[0,1,2].map(i=>`<i class="${i<left?'f':''}"></i>`).join('')}</div><div class="obTeam">`+team.map(u=>{
     const st=(!u.alive?'dead':G.active===u?'act':u.activated?'done':'')+(u.alive&&u.stun?' stun':'');const mp=G.active===u?u.mp:0;
     return `<button data-ob="${u.id}" class="ob ${u.side==='A'?'a':'d'} ${st} ${G.sel===u?'sel':''}" aria-label="${OPS[u.op].name}"><img src="${opIcon(u.op)}" alt=""><span class="obHp">${[...Array(u.max)].map((_,i)=>`<i class="${i<u.hp?'f':''}"></i>`).join('')}</span>${
-      G.active===u?`<span class="obMp" title="剩餘移動點">${[...Array(Math.max(mp,0))].map(()=>'<i></i>').join('')}<b>${mp}</b></span>`:''}${u.activated&&u.alive&&G.active!==u?'<em>✓</em>':''}${!u.alive?'<em class="x">✕</em>':''}</button>`;}).join('');}
+      G.active===u?`<b class="obMv" title="剩餘移動點">${mp}</b>`:''}${u.activated&&u.alive&&G.active!==u?'<em>✓</em>':''}</button>`;}).join('')
+   +`</div><div class="obMid ${curSide()==='A'?'a':'d'}"><b>∞</b></div><div class="obTeam">`+foe.map(u=>{const k=u.seen1||G.over,st=(!u.alive?' dead':'')+(u.alive&&u.stun&&k?' stun':'');
+    return `<div class="ob foe ${u.side==='A'?'a':'d'}${st}${k?'':' unk'}" aria-label="${k?OPS[u.op].name:'未發現的敵人'}">${k?`<img src="${opIcon(u.op)}" alt="">`:'<b class="obQ">?</b>'}</div>`;}).join('')+'</div>';obClock();}
+function obClock(){const m=document.querySelector('#opsBar .obMid');if(!m||!G)return;const on=clockOn()&&!G.over,s=curSide(),ms=on?G.clock[s]:0,t=on?fmtClock(ms):'∞';
+  const b=m.firstChild;if(b.textContent!==t)b.textContent=t;m.className='obMid '+(s==='A'?'a':'d')+(on?(ms<15000?' low':''):' inf');}
 const SVG_FR={add:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20c.6-3.8 3.2-5.8 6.5-5.8s5.9 2 6.5 5.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 7v6M16 10h6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
   ok:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20c.6-3.8 3.2-5.8 6.5-5.8s5.9 2 6.5 5.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M15.5 10.5l2.2 2.2 4-4.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'};
 // ---- friends: kept in this browser, mirrored to the player's private store when signed in ----
@@ -4751,79 +4793,79 @@ function anCap(side){const mine=side===G.player,o=G.net&&NET&&NET.opp;
 // ---- achievements ----
 // c: badge colour, sh: badge outline (0 shield, 1 hexagon, 2 round, 3 star); conditions (d) are never shown on the page
 const ACH=[
- {id:'first',ic:'🎖',c:'#7fb0d8',sh:0,n:'菜鳥報到免驚',d:'完成一場對戰'},
- {id:'win',ic:'🏆',c:'#f0b43c',sh:2,n:'瞎貓碰到死耗子',d:'贏得一場對戰'},
- {id:'winA',ic:'💥',c:'#e8743b',sh:1,n:'敲門？不存在的',d:'以進攻方獲勝 3 場',goal:3,k:'winA'},
- {id:'winD',ic:'🛡',c:'#4aa8e2',sh:0,n:'釘子戶',d:'以防守方獲勝 3 場',goal:3,k:'winD'},
- {id:'plant',ic:'💣',c:'#e05b4b',sh:3,n:'外送員已抵達',d:'安裝拆彈器並贏下該場'},
- {id:'defuse',ic:'✂',c:'#5cc48a',sh:1,n:'拆家小狗',d:'以防守方拆除敵人的拆彈器'},
- {id:'rescue',ic:'🤝',c:'#62c1d6',sh:2,n:'代客泊人',d:'以進攻方救出人質獲勝'},
- {id:'flaw',ic:'💎',c:'#9f8cf0',sh:1,n:'無傷通關但沒人信',d:'獲勝時全員存活'},
- {id:'clutch',ic:'🐺',c:'#c9a26b',sh:0,n:'隊友都是裝飾品',d:'我方只剩一名幹員時獲勝'},
- {id:'double',ic:'✌',c:'#e86fa0',sh:3,n:'第二件半價',d:'單一幹員在一場擊殺 2 名敵人'},
- {id:'ace',ic:'👑',c:'#ffd36b',sh:3,n:'你們五個一起上',d:'單一幹員在一場擊殺全部敵人'},
- {id:'sharp',ic:'🎯',c:'#e05b4b',sh:2,n:'眼睛有開外掛嗎',d:'一場至少開 6 槍，命中率 80% 以上'},
- {id:'gadget',ic:'🧰',c:'#8fc45c',sh:1,n:'哆啦A夢本人',d:'一場使用 8 次道具'},
- {id:'tank',ic:'🧱',c:'#b08a6a',sh:0,n:'肉做的盾牌',d:'一場承受 8 點傷害並獲勝'},
- {id:'tut',ic:'📘',c:'#7fb0d8',sh:2,n:'乖寶寶有看說明',d:'完成新手教學'},
- {id:'online',ic:'🌐',c:'#4aa8e2',sh:2,n:'終於有人陪我玩',d:'完成一場連線對戰'},
- {id:'ranked',ic:'📈',c:'#f0b43c',sh:1,n:'牌位焦慮症末期',d:'完成一場排名戰'},
- {id:'friend',ic:'👥',c:'#5cc48a',sh:2,n:'交到朋友了媽',d:'加入第一位好友'},
- {id:'vet',ic:'⭐',c:'#c9a26b',sh:3,n:'固定班底',d:'完成 10 場對戰',goal:10,k:'games'},
- {id:'wins10',ic:'🌟',c:'#ffd36b',sh:3,n:'贏到有點煩',d:'贏得 10 場對戰',goal:10,k:'wins'},
- {id:'kills50',ic:'💀',c:'#c7ced6',sh:0,n:'業績達標',d:'累計擊殺 50 名敵人',goal:50,k:'kills'},
- {id:'kills200',ic:'☠',c:'#e05b4b',sh:1,n:'殯葬業VIP',d:'累計擊殺 200 名敵人',goal:200,k:'kills'},
- {id:'gad100',ic:'🔧',c:'#8fc45c',sh:0,n:'工具人轉正職',d:'累計使用 100 次道具',goal:100,k:'gadT'},
- {id:'games50',ic:'🕹',c:'#9f8cf0',sh:2,n:'沒有其他事好做嗎',d:'完成 50 場對戰',goal:50,k:'games'},
- {id:'wins25',ic:'🥇',c:'#f0b43c',sh:3,n:'很會欸了不起',d:'贏得 25 場對戰',goal:25,k:'wins'},
- {id:'rescue5',ic:'🍼',c:'#62c1d6',sh:2,n:'職業保母',d:'救出人質 5 次',goal:5,k:'rescue'},
- {id:'plant5',ic:'📦',c:'#e8743b',sh:1,n:'拆彈器直銷商',d:'安裝拆彈器並獲勝 5 次',goal:5,k:'plant'},
- {id:'ops10',ic:'🎭',c:'#e86fa0',sh:0,n:'見異思遷',d:'用過 10 名不同幹員',goal:10,k:'ops'},
- {id:'lose5',ic:'🩹',c:'#b08a6a',sh:2,n:'輸到沒脾氣',d:'輸掉 5 場對戰',goal:5,k:'losses'},
- {id:'friend5',ic:'🎉',c:'#5cc48a',sh:3,n:'人脈王',d:'有 5 位好友',goal:5,k:'friends'},
- {id:'tourist',x:1,ic:'📷',c:'#62c1d6',sh:2,n:'槍是裝飾品',d:'一槍都沒開就獲勝'},
- {id:'storm',x:1,ic:'🌪',c:'#c7ced6',sh:1,n:'風暴兵預備役',d:'一場開 8 槍以上，一發都沒中'},
- {id:'lunch',x:1,ic:'🍱',c:'#f0b43c',sh:2,n:'下班前搞定',d:'第 2 輪內獲勝'},
- {id:'deadline',x:1,ic:'⏰',c:'#e8743b',sh:0,n:'死線才是生產力',d:'在最後一輪獲勝'},
- {id:'zero',x:1,ic:'🥚',c:'#b08a6a',sh:2,n:'貢獻一個 0',d:'全隊陣亡且一個都沒殺到'},
- {id:'shields',x:1,ic:'🧱',c:'#4aa8e2',sh:0,n:'盾盾的好可愛',d:'五名幹員全帶盾並獲勝'},
- {id:'onehp',x:1,ic:'🩸',c:'#e05b4b',sh:3,n:'一滴血也是血',d:'獲勝時每個存活幹員都只剩 1 血'},
- {id:'spotless',x:1,ic:'🧼',c:'#62c1d6',sh:1,n:'這也太簡單了吧',d:'獲勝時全隊滿血'},
- {id:'sandbag',x:1,ic:'🥊',c:'#b08a6a',sh:0,n:'專業吸彈海綿',d:'一場承受 15 點傷害'},
- {id:'butter',x:1,ic:'🧈',c:'#ffd36b',sh:2,n:'人質：？？？',d:'自己的爆裂物害死人質'},
- {id:'ff',x:1,ic:'🤡',c:'#e86fa0',sh:3,n:'隊友才是敵人',d:'用自己的攻擊幹掉隊友'},
- {id:'thenwhat',x:1,ic:'🤷',c:'#9f8cf0',sh:1,n:'包裹被退貨',d:'裝了拆彈器卻還是輸了'},
- {id:'streakW',x:1,ic:'🔥',c:'#e8743b',sh:3,n:'手感燙到起火',d:'連勝 5 場'},
- {id:'streakL',x:1,ic:'🧘',c:'#7fb0d8',sh:2,n:'今天不宜出門',d:'連輸 3 場'},
- {id:'main',x:1,ic:'💍',c:'#e86fa0',sh:0,n:'這個人我包了',d:'同一名幹員出場 20 場'},
- {id:'owl',x:1,ic:'🦉',c:'#9f8cf0',sh:2,n:'肝不要了嗎',d:'凌晨 2 點到 5 點之間打完一場'},
- {id:'retreat',x:1,ic:'🏃',c:'#c7ced6',sh:1,n:'我媽叫我吃飯',d:'對戰中途離開'},
- {id:'quiet',x:1,ic:'🤫',c:'#5cc48a',sh:2,n:'給我安靜',d:'關掉音樂'},
- {id:'reader',x:1,ic:'🤓',c:'#7fb0d8',sh:0,n:'居然有人看規則',d:'打開規則'},
- {id:'hk',x:1,ic:'🔪',c:'#e05b4b',sh:3,n:'人質：我做錯了什麼',d:'害死人質'},
- {id:'hk3',x:1,ic:'🪦',c:'#c7ced6',sh:0,n:'人質殺手認證',d:'累計害死人質 3 次',goal:3,k:'hk'},
- {id:'kFrag',x:1,ic:'🎆',c:'#e8743b',sh:3,n:'煙火大會',d:'用破片手榴彈擊殺'},
- {id:'kC4',x:1,ic:'📮',c:'#e05b4b',sh:1,n:'您的包裹已爆炸',d:'用 C4 擊殺'},
- {id:'kFire',x:1,ic:'🍖',c:'#e8743b',sh:2,n:'烤肉派對',d:'用火焰擊殺'},
- {id:'kGas',x:1,ic:'🌬',c:'#8fc45c',sh:2,n:'空氣清新劑',d:'用毒氣擊殺'},
- {id:'kClay',x:1,ic:'🦶',c:'#b08a6a',sh:0,n:'走路不看路',d:'用闊刀地雷擊殺'},
- {id:'kZap',x:1,ic:'🔌',c:'#4aa8e2',sh:1,n:'電費我出',d:'用電擊擊殺'},
- {id:'kFar',x:1,ic:'📬',c:'#62c1d6',sh:2,n:'超遠距離問候',d:'在 10 格以外擊殺'},
- {id:'kNear',x:1,ic:'💋',c:'#e86fa0',sh:3,n:'貼臉輸出',d:'貼身擊殺'},
- {id:'kMulti',x:1,ic:'🎳',c:'#f0b43c',sh:3,n:'全倒',d:'一次爆炸擊殺 2 人以上'},
- {id:'kShield',x:1,ic:'🍳',c:'#7fb0d8',sh:0,n:'用鍋蓋打人',d:'用持盾幹員擊殺'},
- {id:'ff3',x:1,ic:'🌀',c:'#9f8cf0',sh:1,n:'無差別攻擊',d:'一場幹掉 3 名隊友'},
- {id:'wipeWin',x:1,ic:'🧹',c:'#5cc48a',sh:2,n:'清場比較快',d:'殲滅對手全員獲勝'},
- {id:'timeWin',x:1,ic:'⌛',c:'#c9a26b',sh:0,n:'時間是我的隊友',d:'防守撐到時間結束獲勝'},
- {id:'gift',x:1,ic:'🎁',c:'#f0b43c',sh:3,n:'躺著也能贏',d:'對手害死人質讓你獲勝'},
- {id:'zen',x:1,ic:'🪷',c:'#5cc48a',sh:2,n:'佛系玩家',d:'不開槍也不用道具就獲勝'},
- {id:'deadWin',x:1,ic:'👻',c:'#c7ced6',sh:1,n:'全員陣亡但贏了',d:'全隊陣亡仍獲勝'},
- {id:'gad20',x:1,ic:'🛒',c:'#8fc45c',sh:0,n:'道具清倉大拍賣',d:'一場用 20 次道具'},
- {id:'spray',x:1,ic:'🔫',c:'#e05b4b',sh:3,n:'子彈不用錢',d:'一場開 30 槍'},
- {id:'speedL',x:1,ic:'🚑',c:'#b08a6a',sh:2,n:'開場即結束',d:'第 1 輪就輸了'},
- {id:'mime',x:1,ic:'🤐',c:'#7fb0d8',sh:1,n:'默劇模式',d:'關掉音樂和音效打完一場'},
- {id:'opsAll',x:1,ic:'🗂',c:'#ffd36b',sh:3,n:'全員集合',d:'用過所有幹員',goal:62,k:'ops'},
- {id:'hunter',x:1,ic:'🏹',c:'#8fc45c',sh:3,n:'這頁你是住這嗎',d:'打開成就頁 20 次',goal:20,k:'opens'}];
+ {id:'first',ic:'🎖',c:'#7fb0d8',sh:0,n:'新手村村民',t:'先把槍拿正再說',d:'完成一場對戰'},
+ {id:'win',ic:'🏆',c:'#f0b43c',sh:2,n:'瞎貓碰到死耗子',t:'新手運啦',d:'贏得一場對戰'},
+ {id:'winA',ic:'💥',c:'#e8743b',sh:1,n:'敲門？不存在的',t:'門是拿來炸的',d:'以進攻方獲勝 3 場',goal:3,k:'winA'},
+ {id:'winD',ic:'🛡',c:'#4aa8e2',sh:0,n:'釘子戶',t:'我家我說了算',d:'以防守方獲勝 3 場',goal:3,k:'winD'},
+ {id:'plant',ic:'💣',c:'#e05b4b',sh:3,n:'外送員已抵達',t:'您的炸彈已送達，請簽收',d:'安裝拆彈器並贏下該場'},
+ {id:'defuse',ic:'✂',c:'#5cc48a',sh:1,n:'拆家小狗',t:'剪錯線也是一種勇氣',d:'以防守方拆除敵人的拆彈器'},
+ {id:'rescue',ic:'🤝',c:'#62c1d6',sh:2,n:'代客泊人',t:'人質：謝謝，但下次輕一點',d:'以進攻方救出人質獲勝'},
+ {id:'flaw',ic:'💎',c:'#9f8cf0',sh:1,n:'無傷通關但沒人信',t:'基本不可能',d:'獲勝時全員存活'},
+ {id:'clutch',ic:'🐺',c:'#c9a26b',sh:0,n:'隊友都是裝飾品',t:'在座的各位都是垃圾',d:'我方只剩一名幹員時獲勝'},
+ {id:'double',ic:'✌',c:'#e86fa0',sh:3,n:'第二件半價',t:'買一送一，童叟無欺',d:'單一幹員在一場擊殺 2 名敵人'},
+ {id:'ace',ic:'👑',c:'#ffd36b',sh:3,n:'你們五個一起上',t:'一打五很合理吧',d:'單一幹員在一場擊殺全部敵人'},
+ {id:'sharp',ic:'🎯',c:'#e05b4b',sh:2,n:'眼睛有開外掛嗎',t:'骰子有灌鉛？',d:'一場至少開 6 槍，命中率 80% 以上'},
+ {id:'gadget',ic:'🧰',c:'#8fc45c',sh:1,n:'哆啦A夢本人',t:'口袋裡到底還有什麼',d:'一場使用 8 次道具'},
+ {id:'tank',ic:'🧱',c:'#b08a6a',sh:0,n:'肉做的盾牌',t:'痛覺神經離家出走',d:'一場承受 8 點傷害並獲勝'},
+ {id:'tut',ic:'📘',c:'#7fb0d8',sh:2,n:'乖寶寶有看說明',t:'已經贏過九成的玩家',d:'完成新手教學'},
+ {id:'online',ic:'🌐',c:'#4aa8e2',sh:2,n:'終於有人陪我玩',t:'不用再跟電腦講話了',d:'完成一場連線對戰'},
+ {id:'ranked',ic:'📈',c:'#f0b43c',sh:1,n:'牌位焦慮症末期',t:'再一場就睡，騙誰',d:'完成一場排名戰'},
+ {id:'friend',ic:'👥',c:'#5cc48a',sh:2,n:'交到朋友了媽',t:'媽，我有朋友了',d:'加入第一位好友'},
+ {id:'vet',ic:'⭐',c:'#c9a26b',sh:3,n:'固定班底',t:'這裡比你家還熟',d:'完成 10 場對戰',goal:10,k:'games'},
+ {id:'wins10',ic:'🌟',c:'#ffd36b',sh:3,n:'贏到有點煩',t:'對手已經在罵你了',d:'贏得 10 場對戰',goal:10,k:'wins'},
+ {id:'kills50',ic:'💀',c:'#c7ced6',sh:0,n:'業績達標',t:'主管說年終有望',d:'累計擊殺 50 名敵人',goal:50,k:'kills'},
+ {id:'kills200',ic:'☠',c:'#e05b4b',sh:1,n:'殯葬業VIP',t:'禮儀社每年寄卡片給你',d:'累計擊殺 200 名敵人',goal:200,k:'kills'},
+ {id:'gad100',ic:'🔧',c:'#8fc45c',sh:0,n:'工具人轉正職',t:'勞健保自己付',d:'累計使用 100 次道具',goal:100,k:'gadT'},
+ {id:'games50',ic:'🕹',c:'#9f8cf0',sh:2,n:'沒有其他事好做嗎',t:'作業寫完了嗎',d:'完成 50 場對戰',goal:50,k:'games'},
+ {id:'wins25',ic:'🥇',c:'#f0b43c',sh:3,n:'很會欸了不起',t:'好啦好啦你最強',d:'贏得 25 場對戰',goal:25,k:'wins'},
+ {id:'rescue5',ic:'🍼',c:'#62c1d6',sh:2,n:'職業保母',t:'人質都記住你的臉了',d:'救出人質 5 次',goal:5,k:'rescue'},
+ {id:'plant5',ic:'📦',c:'#e8743b',sh:1,n:'拆彈器直銷商',t:'上線下線都是炸彈',d:'安裝拆彈器並獲勝 5 次',goal:5,k:'plant'},
+ {id:'ops10',ic:'🎭',c:'#e86fa0',sh:0,n:'見異思遷',t:'渣男渣女本人',d:'用過 10 名不同幹員',goal:10,k:'ops'},
+ {id:'lose5',ic:'🩹',c:'#b08a6a',sh:2,n:'輸到沒脾氣',t:'技術性失誤',d:'輸掉 5 場對戰',goal:5,k:'losses'},
+ {id:'friend5',ic:'🎉',c:'#5cc48a',sh:3,n:'人脈王',t:'開黑再也不用等人',d:'有 5 位好友',goal:5,k:'friends'},
+ {id:'tourist',x:1,ic:'📷',c:'#62c1d6',sh:2,n:'槍是裝飾品',t:'帶槍只是為了拍照',d:'一槍都沒開就獲勝'},
+ {id:'storm',x:1,ic:'🌪',c:'#c7ced6',sh:1,n:'風暴兵預備役',t:'牆壁：你打得到我嗎',d:'一場開 8 槍以上，一發都沒中'},
+ {id:'lunch',x:1,ic:'🍱',c:'#f0b43c',sh:2,n:'下班前搞定',t:'準時打卡，老闆最愛',d:'第 2 輪內獲勝'},
+ {id:'deadline',x:1,ic:'⏰',c:'#e8743b',sh:0,n:'死線才是生產力',t:'拖到最後一秒是藝術',d:'在最後一輪獲勝'},
+ {id:'zero',x:1,ic:'🥚',c:'#b08a6a',sh:2,n:'貢獻一個 0',t:'至少有參加到',d:'全隊陣亡且一個都沒殺到'},
+ {id:'shields',x:1,ic:'🧱',c:'#4aa8e2',sh:0,n:'盾盾的好可愛',t:'烏龜流也是一種流派',d:'五名幹員全帶盾並獲勝'},
+ {id:'onehp',x:1,ic:'🩸',c:'#e05b4b',sh:3,n:'一滴血也是血',t:'醫生說能活是奇蹟',d:'獲勝時每個存活幹員都只剩 1 血'},
+ {id:'spotless',x:1,ic:'🧼',c:'#62c1d6',sh:1,n:'這也太簡單了吧',t:'對手是不是掛網',d:'獲勝時全隊滿血'},
+ {id:'sandbag',x:1,ic:'🥊',c:'#b08a6a',sh:0,n:'專業吸彈海綿',t:'一定是因為愛',d:'一場承受 15 點傷害'},
+ {id:'butter',x:1,ic:'🧈',c:'#ffd36b',sh:2,n:'人質：？？？',t:'你是來救我還是來炸我',d:'自己的爆裂物害死人質'},
+ {id:'ff',x:1,ic:'🤡',c:'#e86fa0',sh:3,n:'隊友才是敵人',t:'不好意思手滑',d:'用自己的攻擊幹掉隊友'},
+ {id:'thenwhat',x:1,ic:'🤷',c:'#9f8cf0',sh:1,n:'包裹被退貨',t:'炸彈都裝了還能輸',d:'裝了拆彈器卻還是輸了'},
+ {id:'streakW',x:1,ic:'🔥',c:'#e8743b',sh:3,n:'手感燙到起火',t:'隔壁要報警了',d:'連勝 5 場'},
+ {id:'streakL',x:1,ic:'🧘',c:'#7fb0d8',sh:2,n:'今天不宜出門',t:'黃曆早就說了',d:'連輸 3 場'},
+ {id:'main',x:1,ic:'💍',c:'#e86fa0',sh:0,n:'這個人我包了',t:'乾脆結婚吧你們',d:'同一名幹員出場 20 場'},
+ {id:'owl',x:1,ic:'🦉',c:'#9f8cf0',sh:2,n:'肝不要了嗎',t:'明天上班加油',d:'凌晨 2 點到 5 點之間打完一場'},
+ {id:'retreat',x:1,ic:'🏃',c:'#c7ced6',sh:1,n:'我媽叫我吃飯',t:'超棒，戰術性撤退',d:'對戰中途離開'},
+ {id:'quiet',x:1,ic:'🤫',c:'#5cc48a',sh:2,n:'給我安靜',t:'鄰居終於能睡了',d:'關掉音樂'},
+ {id:'reader',x:1,ic:'🤓',c:'#7fb0d8',sh:0,n:'居然有人看規則',t:'學習是好事',d:'打開規則'},
+ {id:'hk',x:1,ic:'🔪',c:'#e05b4b',sh:3,n:'人質：我做錯了什麼',t:'你只是剛好站在那',d:'害死人質'},
+ {id:'hk3',x:1,ic:'🪦',c:'#c7ced6',sh:0,n:'人質殺手認證',t:'人質工會已發布通緝',d:'累計害死人質 3 次',goal:3,k:'hk'},
+ {id:'kFrag',x:1,ic:'🎆',c:'#e8743b',sh:3,n:'煙火大會',t:'過年提早到了',d:'用破片手榴彈擊殺'},
+ {id:'kC4',x:1,ic:'📮',c:'#e05b4b',sh:1,n:'您的包裹已爆炸',t:'貨到付命',d:'用 C4 擊殺'},
+ {id:'kFire',x:1,ic:'🍖',c:'#e8743b',sh:2,n:'烤肉派對',t:'要不要撒點胡椒',d:'用火焰擊殺'},
+ {id:'kGas',x:1,ic:'🌬',c:'#8fc45c',sh:2,n:'空氣清新劑',t:'深呼吸，很香吧',d:'用毒氣擊殺'},
+ {id:'kClay',x:1,ic:'🦶',c:'#b08a6a',sh:0,n:'走路不看路',t:'低頭族的下場',d:'用闊刀地雷擊殺'},
+ {id:'kZap',x:1,ic:'🔌',c:'#4aa8e2',sh:1,n:'電費我出',t:'台電感謝您',d:'用電擊擊殺'},
+ {id:'kFar',x:1,ic:'📬',c:'#62c1d6',sh:2,n:'超遠距離問候',t:'隔三條街跟你說嗨',d:'在 10 格以外擊殺'},
+ {id:'kNear',x:1,ic:'💋',c:'#e86fa0',sh:3,n:'貼臉輸出',t:'社交距離是什麼',d:'貼身擊殺'},
+ {id:'kMulti',x:1,ic:'🎳',c:'#f0b43c',sh:3,n:'全倒',t:'保齡球館請你當教練',d:'一次爆炸擊殺 2 人以上'},
+ {id:'kShield',x:1,ic:'🍳',c:'#7fb0d8',sh:0,n:'用鍋蓋打人',t:'廚房兵器譜第一名',d:'用持盾幹員擊殺'},
+ {id:'ff3',x:1,ic:'🌀',c:'#9f8cf0',sh:1,n:'無差別攻擊',t:'敵我不分，人人平等',d:'一場幹掉 3 名隊友'},
+ {id:'wipeWin',x:1,ic:'🧹',c:'#5cc48a',sh:2,n:'清場比較快',t:'任務？什麼任務',d:'殲滅對手全員獲勝'},
+ {id:'timeWin',x:1,ic:'⌛',c:'#c9a26b',sh:0,n:'時間是我的隊友',t:'躲好躲滿也是實力',d:'防守撐到時間結束獲勝'},
+ {id:'gift',x:1,ic:'🎁',c:'#f0b43c',sh:3,n:'躺著也能贏',t:'對手送分，謝囉',d:'對手害死人質讓你獲勝'},
+ {id:'zen',x:1,ic:'🪷',c:'#5cc48a',sh:2,n:'佛系玩家',t:'一切隨緣',d:'不開槍也不用道具就獲勝'},
+ {id:'deadWin',x:1,ic:'👻',c:'#c7ced6',sh:1,n:'全員陣亡但贏了',t:'這波叫同歸於盡',d:'全隊陣亡仍獲勝'},
+ {id:'gad20',x:1,ic:'🛒',c:'#8fc45c',sh:0,n:'道具清倉大拍賣',t:'全部帶走不用找',d:'一場用 20 次道具'},
+ {id:'spray',x:1,ic:'🔫',c:'#e05b4b',sh:3,n:'子彈不用錢',t:'軍火商感謝你',d:'一場開 30 槍'},
+ {id:'speedL',x:1,ic:'🚑',c:'#b08a6a',sh:2,n:'開場即結束',t:'泡麵都還沒泡好',d:'第 1 輪就輸了'},
+ {id:'mime',x:1,ic:'🤐',c:'#7fb0d8',sh:1,n:'默劇模式',t:'靜音才是真專注',d:'關掉音樂和音效打完一場'},
+ {id:'opsAll',x:1,ic:'🗂',c:'#ffd36b',sh:3,n:'全員集合',t:'卡池被你抽乾了',d:'用過所有幹員',goal:62,k:'ops'},
+ {id:'hunter',x:1,ic:'🏹',c:'#8fc45c',sh:3,n:'這頁你是住這嗎',t:'要不要幫你繳房租',d:'打開成就頁 20 次',goal:20,k:'opens'}];
 const ACHSEC=[['基本',a=>!a.goal&&!a.x],['長期目標',a=>a.goal&&!a.x],['刁鑽',a=>a.x]];
 function achProg(a){const n=AS.n,g=a.goal||1;if(!a.goal)return[AS.got[a.id]?1:0,1];
   const v=a.k==='ops'?(n.ops||[]).length:a.k==='friends'?FR.list.length:(n[a.k]||0);return[Math.min(AS.got[a.id]?g:v,g),g];}
@@ -4832,7 +4874,7 @@ const AKEY='r6bg.ach';
 const AS=(()=>{let p=null;try{p=JSON.parse(localStorage.getItem(AKEY)||'null');}catch(e){}return Object.assign({got:{},n:{games:0,wins:0,winA:0,winD:0}},p||{});})();
 const achCount=()=>ACH.filter(a=>AS.got[a.id]).length;
 function achSave(){try{localStorage.setItem(AKEY,JSON.stringify(AS));}catch(e){}socialPush();}
-function achGive(id){if(!ACHM[id]||AS.got[id])return false;AS.got[id]=Date.now();achSave();const a=ACHM[id];achToastMsg(`${a.ic} 成就解鎖：${a.n}`,'到作戰檔案的成就頁看看');if(G&&G.over)(G._newAch=G._newAch||[]).push(id);return true;}
+function achGive(id){if(!ACHM[id]||AS.got[id])return false;AS.got[id]=Date.now();achSave();const a=ACHM[id];achToastMsg(`${a.ic} 成就解鎖：${a.n}`,a.t?`「${a.t}」`:'到作戰檔案的成就頁看看');if(G&&G.over)(G._newAch=G._newAch||[]).push(id);return true;}
 function achFinish(w){if(!G||G._achDone)return;G._achDone=true;G._newAch=[];
   if(G.tut){if(w==='A')achGive('tut');return;}
   const win=w===G.player,P=G.player,mine=G.units.filter(u=>u.side===P),en=G.units.filter(u=>u.side!==P),c=AS.n,got=[];
@@ -4895,7 +4937,7 @@ function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body
   if(T==='ach'){const a=ACHM[ACHV.sel];achPer();
     const card=x=>{const [v,g]=achProg(x),got=!!AS.got[x.id];return `<button class="bd ${got?'got':''} ${ACHV.sel===x.id?'sel':''}" data-a="${x.id}">${achBadge(x)}${got?'':`<i class="bdL">${SVG_LOCK}</i>`}<b>${x.n}</b><span class="bdP"><i><u style="width:${Math.round(v/g*100)}%"></u></i>${v}/${g}</span></button>`;};
     body=`<div class="bscroll">${ACHSEC.map(([t,f])=>{const L=ACH.filter(f);return `<h5 class="bsec"><span>${t}</span><em>${L.filter(x=>AS.got[x.id]).length}/${L.length}</em></h5><div class="bgrid" style="--cols:${ACHV.cols}">${L.map(card).join('')}</div>`;}).join('')}</div>
-    <div class="adet">${a?`<b>${a.ic} ${a.n}</b>${AS.got[a.id]?`<span>達成條件：${a.d}</span><em>已解鎖 · ${new Date(AS.got[a.id]).toLocaleDateString('zh-TW')}</em>`:'<em>尚未解鎖 · 條件保密，繼續玩就會知道</em>'}`:'<span>點徽章看名稱；已解鎖的會顯示達成條件</span>'}</div>`;
+    <div class="adet">${a?`<b>${a.ic} ${a.n}</b>${a.t?`<i class="aTag">「${a.t}」</i>`:''}${AS.got[a.id]?`<span>達成條件：${a.d}</span><em>已解鎖 · ${new Date(AS.got[a.id]).toLocaleDateString('zh-TW')}</em>`:'<em>尚未解鎖 · 條件保密，繼續玩就會知道</em>'}`:'<span>點徽章看名稱；已解鎖的會顯示達成條件</span>'}</div>`;
     if(0)body=`<div class="agrid">${ACH.map(x=>`<button class="ab ${AS.got[x.id]?'got':''} ${ACHV.sel===x.id?'sel':''}" data-a="${x.id}"><i>${x.ic}</i><b>${x.n}</b></button>`).join('')}</div>
     <div class="adet">${a?`<b>${a.ic} ${a.n}</b><span>${a.d}${a.goal?`（${Math.min(AS.n[a.k]||0,a.goal)}/${a.goal}）`:''}</span><em>${AS.got[a.id]?'已解鎖 · '+new Date(AS.got[a.id]).toLocaleDateString('zh-TW'):'尚未解鎖'}</em>`:'<span>點一下成就看條件</span>'}</div>`;}
   else{const per=matchMedia('(orientation:landscape) and (max-height:500px)').matches?4:6,L=FR.list.slice().sort((a,b)=>b.ts-a.ts),pages=Math.max(1,Math.ceil(L.length/per));ACHV.pg=Math.min(ACHV.pg,pages-1);
@@ -5260,9 +5302,10 @@ function portActs(){let r=document.getElementById('actsR');if(!r){r=document.cre
     lp.hidden=!show;if(show){lp.innerHTML='<h4>本場移動紀錄</h4>';mv.classList.add('lpList');lp.appendChild(mv);const pos=()=>{try{actsFit();}catch(e){}const sb=$('#sheetT'),ar=document.querySelector('#actsR #acts');if(!sb)return;
       lp.style.bottom=(innerHeight-sb.getBoundingClientRect().top+6)+'px';lp.style.right=(ar&&ar.children.length?innerWidth-Math.min(...[...ar.children].map(c=>c.getBoundingClientRect().left))+6:8)+'px';};pos();requestAnimationFrame(pos);setTimeout(pos,60);}else lp.replaceChildren();}}
 // the column runs from under the top bar down to the bottom panel; a second column opens to its left when it runs out of room
+function obH(){const b=document.getElementById('opsBar');return b&&!b.hidden&&b.classList.contains('hz')?b.getBoundingClientRect().height+6:0;}
 function actsFit(){const a=document.querySelector('#actsR #acts'),p=$('#panel');if(!a||!p)return;const hb=($('header.top')||{getBoundingClientRect:()=>({bottom:50})}).getBoundingClientRect().bottom;
   // one column only: buttons shrink until they all fit
-  const top=hb+8,bot=p.getBoundingClientRect().top-6,H=Math.max(120,bot-top),n=Math.max(1,a.children.length),sz=Math.max(30,Math.min(56,Math.floor((H+4)/n)-4));
+  const top=hb+8+obH(),bot=p.getBoundingClientRect().top-6,H=Math.max(120,bot-top),n=Math.max(1,a.children.length),sz=Math.max(30,Math.min(56,Math.floor((H+4)/n)-4));
   a.style.top=top+'px';a.style.setProperty('--ab',sz+'px');a.style.gridTemplateRows=`repeat(${n},${sz}px)`;a.classList.toggle('tight',sz<46);a.classList.toggle('tiny',sz<38);}
 addEventListener('resize',()=>{try{if(G)render();}catch(e){}});
 document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('.ocG');if(!g||!g.querySelector('.gdC'))return;window.OCF=!window.OCF;g.classList.toggle('full',window.OCF);});
@@ -7507,7 +7550,7 @@ function clockReset(){if(!G)return;G.clockOut={A:false,D:false};
   G.clock=tpo&&!G.tut?{A:tpo*1000*Math.max(1,alive('A').length),D:tpo*1000*Math.max(1,alive('D').length)}:null;}
 const fmtClock=ms=>{const t=Math.max(0,Math.ceil(ms/1000));return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');};
 function clockWho(s){if(G.net)return s===G.player?'你':'對手';return s===G.player?'你':'電腦';}
-function renderClocks(){
+function renderClocks(){try{obClock();}catch(e){}
   const fr=$('#frame');let box=document.getElementById('clocks');
   const on=clockOn()&&!G.over;document.body.classList.toggle('hasClk',on);
   if(!on){if(box)box.remove();return;}
@@ -7532,6 +7575,6 @@ setInterval(()=>{const el=document.getElementById('clock');if(!G||!G.tEnd||!G.ac
   const left=Math.max(0,(G.tEnd-performance.now())/1000);if(el){el.textContent=`⏱ ${Math.ceil(left)}s`;el.classList.toggle('low',left<10);}
   if(left<=0&&!G.busy&&G.active.side===G.player){log(`${OPS[G.active.op].name} 的啟動時間用完了`,'ks');G.tEnd=0;playerAfterAct();}},250);
 try{init3D();}catch(e){console.error(e);R3=null;}
-render();loadPBR();loadModels();loadWallImg();loadC3D();
+render();loadPBR();loadModels();loadWallImg();loadC3D();{const r=document.createElement('div');r.id='rotLock';r.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="#e3aa3e" stroke-width="1.8"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18.5h2"/></svg><div>請把手機轉成直式<br><small style="opacity:.7">手機版只支援直式畫面</small></div>';document.body.appendChild(r);try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('portrait').catch(()=>{});}catch(e){}}
 </script>
 </body></html>
