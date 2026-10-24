@@ -730,6 +730,16 @@ body[data-scr="setup"] header.top{visibility:hidden}
 @keyframes siWipe{from{clip-path:polygon(0 0,0 0,0 100%,0 100%)}to{clip-path:polygon(0 0,140% 0,100% 100%,0 100%)}}
 @keyframes siSweep{from{transform:translateX(-60%)}to{transform:translateX(60%);opacity:0}}
 .sintro.out{animation:siOut .38s ease-in forwards}
+.fgN{position:absolute;left:0;top:0;width:clamp(40px,7vw,64px);height:clamp(40px,7vw,64px);margin:-50% 0 0 -50%;z-index:4;filter:drop-shadow(0 4px 8px rgba(0,0,0,.7))}
+.fgN svg{width:100%;height:100%;display:block}
+.fgB{position:absolute;width:0;height:0;z-index:4}
+.fgB::before{content:'';position:absolute;left:-28vmin;top:-28vmin;width:56vmin;height:56vmin;border-radius:50%;background:radial-gradient(circle,#fff 0,#fff1b8 12%,#ffb03a 30%,rgba(255,90,20,.45) 50%,transparent 70%);animation:fgBoom .55s ease-out both}
+.fgB::after{content:'';position:absolute;left:-36vmin;top:-36vmin;width:72vmin;height:72vmin;border-radius:50%;border:3px solid rgba(255,214,140,.7);animation:fgRing .6s ease-out both}
+@keyframes fgBoom{from{transform:scale(.15);opacity:1}60%{opacity:1}to{transform:scale(1);opacity:0}}
+@keyframes fgRing{from{transform:scale(.1);opacity:1}to{transform:scale(1);opacity:0}}
+.sintro.fg .siT{animation:siR .5s .08s cubic-bezier(.15,.9,.25,1) both}
+.sintro.fg.boom .siT{animation:fgShk .4s ease-out}
+@keyframes fgShk{0%,100%{transform:none}20%{transform:translate(-9px,5px)}45%{transform:translate(8px,-6px)}70%{transform:translate(-4px,3px)}}
 .siA{position:absolute;left:-2%;bottom:calc(var(--pb) - 4%);width:min(calc((100% - var(--pr))*.58),92vh);aspect-ratio:1/var(--ar);animation:siL .5s cubic-bezier(.15,.9,.25,1) both}
 .siA img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 12px 24px rgba(0,0,0,.7))}
 .siA.half img{object-position:left bottom}
@@ -3751,6 +3761,9 @@ async function shootUnit(sh,t,ow){
   ST(sh).shots++;if(hits)ST(sh).hits++;
   if(hits&&t.op==='blackbeard'&&t.ch>0){const c=Math.min(2,hits);hits-=c;t.ch--;log(`${nm(t)} 的步槍護盾擋下 ${c} 傷（剩 ${t.ch}）`,t.side==='A'?'ka':'kd');}
   DMGBY=sh;if(hits)await damage(t,hits);DMGBY=null;
+  {const dr=lineCells(sh.x,sh.y,t.x,t.y).filter(([x,y])=>{const c=cell(x,y);return c&&c.t==='bar'&&c.kind==='door';});
+   if(dr.length){const bm=SFX.boom;SFX.boom=()=>{};try{for(const [x,y] of dr)if(cell(x,y).t==='bar')destroyCell(x,y);}finally{SFX.boom=bm;}SFX.hit();
+     log(`子彈打穿了門路障，門已經被打爛（之後從這裡穿過不再有掩護）`,'ks');render();}}
   if(hits&&!t.alive){sh._k=(sh._k||0)+1;if(sh._k>=2)bigNote(['','','雙殺','三殺','四殺','王牌'][Math.min(5,sh._k)]+'！',`${OPS[sh.op].name}`,sh.side==='A'?'a':'d',1700);}
   if(t.alive){if(!t.spotted)log(`${nm(t)} 被標記位置（到回合結束）`,'ks');t.spotted=1;if(t.hidden)reveal(t,'中彈後');}
   if(cine){await sleep(t.alive?650:1100);}diceHide();shotCamEnd();
@@ -4005,10 +4018,18 @@ function droneTargets(u){if(G.drones<=0&&!DRONEANY)return [];return adj8(u.x,u.y
 async function droneDeploy(u,x,y){
   G.drones--;useAct(u,'tactical');note(u,'無人機偵查');G.tutDrone=true;
   G.gadgets.push({type:'drone',x,y,side:'A',alive:true,moving:true,mp:5,by:u.id});SFX.step();camDiscover();
-  if(u.side===G.player)log(`${nm(u)} 放出無人機，還有 5 移動點：點相鄰格一步一步開，停下就掃描整個房間`,'ka');else log(`${nm(u)} 放出了一台無人機`,'ka');
+  if(u.side===G.player)log(`${nm(u)} 放出無人機，還有 5 移動點：綠色格子都開得到，點遠的直接開過去，也能一格一格開，停下就掃描整個房間`,'ka');else log(`${nm(u)} 放出了一台無人機`,'ka');
   render();await sleep(G.ai?260:60);
   if(!droneNext(u,x,y).some(([a,b])=>droneCost(a,b)<=5))await droneFinish(u);}
-async function droneStep(u,x,y){const d=dmOf();if(!d)return;d.mp-=droneCost(x,y);d.x=x;d.y=y;SFX.step();camDiscover();render();await sleep(G.ai?260:60);
+// every space the moving drone can still get to with its points left, with the way back to it
+function droneReach(u,d){const W=G.W,m=new Map([[d.y*W+d.x,{c:0,p:-1}]]),q=[[0,d.y*W+d.x]];
+  while(q.length){q.sort((a,b)=>a[0]-b[0]);const [c0,i]=q.shift();if(c0>m.get(i).c)continue;
+    for(const [a,b] of droneNext(u,i%W,(i/W)|0)){const c=c0+droneCost(a,b),k=b*W+a;if(c>d.mp)continue;const o=m.get(k);if(!o||c<o.c){m.set(k,{c,p:i});q.push([c,k]);}}}
+  return m;}
+async function droneStep(u,x,y){const d=dmOf();if(!d)return;
+  const m=droneReach(u,d),W=G.W,path=[];let k=y*W+x;if(!m.has(k))return;while(k>=0&&k!==d.y*W+d.x){path.unshift([k%W,(k/W)|0]);k=m.get(k).p;}
+  for(const [a,b] of path.slice(0,-1)){d.mp-=droneCost(a,b);d.x=a;d.y=b;SFX.step();camDiscover();render();await sleep(G.ai?200:170);}
+  d.mp-=droneCost(x,y);d.x=x;d.y=y;SFX.step();camDiscover();render();await sleep(G.ai?260:60);
   if(d.mp<=0||!droneNext(u,x,y).some(([a,b])=>droneCost(a,b)<=d.mp))await droneFinish(u);}
 async function droneFinish(u,na){const d=dmOf();if(!d)return;const tw=d.own==='twitch';droneScanNow(u,d);if(tw)twShock(u,d.x,d.y);render();if(!na)await afterAct(u);}
 // shortest drone route (within 5 points) from a space next to the operator into the target room
@@ -4033,15 +4054,34 @@ function droneScanNow(u,d){
 // throwables reach 6 spaces in line of sight
 const throwTargets=u=>within(u.x,u.y,6).filter(([x,y])=>!blocks(cell(x,y))&&los(u.x,u.y,x,y,false,true));
 const impactTargets=u=>within(u.x,u.y,6).filter(([x,y])=>{const c=cell(x,y);return c.t!=='hard'&&c.t!=='reinf'&&!(x===u.x&&y===u.y)&&los(u.x,u.y,x,y,false,true)&&(['soft','bar'].includes(c.t)||G.gadgets.some(g=>g.alive&&g.side!==u.side&&g.x===x&&g.y===y&&GSTR[g.type]));});
+// one victim of a frag: thrower's card bottom-left, victim's card top-right, the grenade arcs across and bursts, then the yellow dice
+const FGSVG='<svg viewBox="0 0 40 40"><rect x="17" y="3" width="9" height="7" rx="1.5" fill="#9aa3a8"/><path d="M25 6c6 0 9 4 9 9" stroke="#c9d0d4" stroke-width="2.6" fill="none" stroke-linecap="round"/><circle cx="33" cy="8" r="3" fill="none" stroke="#c9d0d4" stroke-width="2"/><ellipse cx="21" cy="24" rx="12" ry="13" fill="#4d5a3a"/><path d="M10 20h22M9.5 26h23M14 13v22M21 11v26M28 13v22" stroke="#2f3824" stroke-width="1.6"/><ellipse cx="17" cy="19" rx="4" ry="5" fill="#fff" opacity=".18"/></svg>';
+async function fragShow(u,a,pool,idx,r,ctr){
+  if(!CINE.on||document.hidden||a===u||!u.alive){const dice=[...pool].map((ch,i)=>`<i class="die" style="background:${DIEC.Y}">${DIE.Y[idx[i]]}</i>`).join('');
+    await rollDice3D(pool,idx,`<small>破片手榴彈 → ${OPS[a.op].name}${ctr?' · 正中':' · 波及'}</small><span>${dice} = ${r}</span><b class="${r?'hit':'miss'}">${r?r+' 傷':'未受傷'}</b>`,G.ai);diceHide();return;}
+  const fast=!!G.ai,cine=await shotCam(u,a);if(!cine)aimCam(u,[a],1);const si=await shotIntro(u,a,fast,cine);
+  const el=si&&$('.sintro:not(.out)');
+  if(el){el.classList.add('fg');const A=el.querySelector('.siA'),T=el.querySelector('.siT'),bb=e=>({left:e.offsetLeft,top:e.offsetTop,width:e.offsetWidth,height:e.offsetHeight}),ra=bb(A),rt=bb(T);
+    const x0=ra.left+ra.width*.62,y0=ra.top+ra.height*.32,x1=rt.left+rt.width*.5,y1=rt.top+rt.height*.62,hy=Math.min(y0,y1)-Math.max(60,innerHeight*.16);
+    const g=document.createElement('div');g.className='fgN';g.innerHTML=FGSVG;el.appendChild(g);
+    const K=[];for(let i=0;i<=12;i++){const t=i/12,x=x0+(x1-x0)*t,y=(1-t)*(1-t)*y0+2*(1-t)*t*hy+t*t*y1,s=1-.35*t;K.push({transform:`translate(${x}px,${y}px) rotate(${t*720}deg) scale(${s})`});}
+    SFX.step();await new Promise(res=>{const an=g.animate(K,{duration:fast?480:720,easing:'cubic-bezier(.35,.1,.6,1)',fill:'forwards'});an.onfinish=res;setTimeout(res,1200);});
+    g.remove();const b=document.createElement('div');b.className='fgB';b.style.left=x1+'px';b.style.top=y1+'px';el.appendChild(b);SFX.boom();el.classList.add('boom');
+    el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');await sleep(fast?320:480);}
+  else SFX.boom();
+  const dice=[...pool].map((ch,i)=>`<i class="die" style="background:${DIEC.Y}">${DIE.Y[idx[i]]}</i>`).join('');
+  await rollDice3D(pool,idx,`<small>破片手榴彈 → ${OPS[a.op].name} · ${ctr?'正中':'波及'}</small><span>${dice} = ${r}</span><b class="${r?'hit':'miss'}">${r?r+' 傷':'未受傷'}</b>`,fast);
+  diceHide();if(si)si.fire(r);if(r)SFX.hit();else SFX.miss();await shotFX(r,cine||!!si);if(si)si.kill();
+  if(cine)await sleep(300);}
 async function throwGadget(u,kind,x,y){ST(u).gad++;DMGBY=u;aimCam(u,[[x,y]]);
   useAct(u,'tactical');const side=u.side==='A'?'ka':'kd';
   if(catchThrow(u,x,y)){G[kind]--;render();await afterAct(u);return;}
   const area=blastArea(x,y),inA=a=>a.alive&&a.x>=0&&area.some(([i,j])=>i===a.x&&j===a.y);
   const roll=(c,n)=>{let t=0;for(let i=0;i<n;i++)t+=DIE[c][Math.floor(Math.random()*6)];return t;};
-  if(kind==='frag'||kind==='nitro'){const fr=kind==='frag';SFX.boom();G[kind]--;note(u,fr?'破片手榴彈':'C4 遙控炸藥');log(`${nm(u)} ${fr?'丟出破片手榴彈':'引爆 C4 遙控炸藥'}`,side);
-    if(hostHarm(area,u.side,fr?'破片手榴彈':'C4'))return;
-    const hit=G.units.filter(inA);G.scanFx={cells:area,until:performance.now()+900,c:0xff7a2a};if(fr)for(const [i,j] of area)await blastDestroy(i,j,1);
-    for(const a of hit){if(!a.alive)continue;const ctr=a.x===x&&a.y===y,r=fr?roll('Y',ctr?2:1):roll('O',ctr?2:1);if(r)await damage(a,r,fr?'破片':'C4');}}
+  if(kind==='frag'||kind==='nitro'){const fr=kind==='frag';G[kind]--;note(u,fr?'破片手榴彈':'C4 遙控炸藥');log(`${nm(u)} ${fr?'丟出破片手榴彈':'引爆 C4 遙控炸藥'}`,side);
+    if(hostHarm(area,u.side,fr?'破片手榴彈':'C4')){SFX.boom();return;}
+    const hit=G.units.filter(inA);if(!fr||!hit.length)SFX.boom();G.scanFx={cells:area,until:performance.now()+900,c:0xff7a2a};if(fr)for(const [i,j] of area)await blastDestroy(i,j,1);
+    for(const a of hit){if(!a.alive)continue;const ctr=a.x===x&&a.y===y;let r;if(fr){const idx=[...Array(ctr?2:1)].map(()=>Math.floor(Math.random()*6));r=idx.reduce((t,i)=>t+DIE.Y[i],0);await fragShow(u,a,ctr?'YY':'Y',idx,r,ctr);}else r=roll('O',ctr?2:1);if(r)await damage(a,r,fr?'破片':'C4');}if(fr&&hit.length){diceHide();shotCamEnd();}}
   else if(kind==='impact'){G.impact--;note(u,'衝擊手榴彈');const c=cell(x,y),w=c.t==='soft'?'軟牆':c.t==='bar'?(c.kind==='window'?'窗戶路障':'門路障'):'道具';await blastDestroy(x,y,2);log(`${nm(u)} 的衝擊手榴彈炸掉了${w}`,side);}
   else if(kind==='flash'){SFX.flash();G.flash--;note(u,'閃光彈');let n=0;for(const a of G.units)if(inA(a)){stunU(a);if(a.hidden)reveal(a,'被閃光彈');n++;}
     log(`${nm(u)} 丟出閃光彈，${n} 名幹員被震暈（射擊只擲兩顆黃骰，到回合結束）`,side);}
@@ -4370,7 +4410,7 @@ function curTargets(){
     case 'destroy':return destroyTargets(u);
     case 'decoy':return [...decoyReach(u).keys()].map(i=>[i%G.W,(i/G.W)|0]);
     case 'drone':return droneTargets(u);
-    case 'dronemove':{const d=dmOf();return d?droneNext(u,d.x,d.y).filter(([a,b])=>droneCost(a,b)<=d.mp):[];}
+    case 'dronemove':{const d=dmOf();return d?[...droneReach(u,d).keys()].filter(i=>i!==d.y*G.W+d.x).map(i=>[i%G.W,(i/G.W)|0]):[];}
     case 'owdir':case 'owq':return adj4(u.x,u.y);
     case 'frag':case 'flash':case 'smk':case 'nitro':return throwTargets(u);
     case 'impact':return impactTargets(u);
@@ -5050,7 +5090,7 @@ var UG={
  blitz:async(u,x,y,s)=>{SFX.flash();let n=0;for(const a of G.units)if(a.alive&&a!==u&&cheb(a.x,a.y,x,y)<=2&&roomCells(x,y).has(a.y*G.W+a.x)&&stunU(a)){if(a.hidden)reveal(a,'被閃光盾');n++;}log(`${nm(u)} 的閃光盾震暈了 ${n} 名幹員`,s);},
  ying:async(u,x,y,s)=>{SFX.flash();let n=0;for(const a of G.units)if(a.alive&&a!==u&&cheb(a.x,a.y,x,y)<=2&&roomCells(x,y).has(a.y*G.W+a.x)&&stunU(a)){if(a.hidden)reveal(a,'被坎德拉');n++;}log(`${nm(u)} 的坎德拉閃光彈震暈了 ${n} 名幹員`,s);},
  twitch:async(u,x,y,s)=>{G.gadgets.push({type:'drone',x,y,side:'A',alive:true,moving:true,mp:5,by:u.id,own:'twitch'});SFX.step();camDiscover();
-    if(u.side===G.player&&!G.ai)log(`${nm(u)} 放出電擊無人機，還有 5 移動點：一步一步開，停下就掃描房間並電擊電子道具`,s);else log(`${nm(u)} 放出了電擊無人機`,s);
+    if(u.side===G.player&&!G.ai)log(`${nm(u)} 放出電擊無人機，還有 5 移動點：綠色格子都開得到，點遠的直接開過去，也能一格一格開，停下就掃描房間並電擊電子道具`,s);else log(`${nm(u)} 放出了電擊無人機`,s);
     render();await sleep(G.ai?260:60);
     let d0;const pl=u._twPlan;u._twPlan=null;if(pl&&u.side!==G.player){for(const [a,b] of pl.slice(1)){if(!dmOf())break;d0=dmOf();d0.mp-=droneCost(a,b);d0.x=a;d0.y=b;SFX.step();camDiscover();render();await sleep(260);}if(dmOf())await droneFinish(u,1);return;}
     if(!droneNext(u,x,y).some(([a,b])=>droneCost(a,b)<=5))await droneFinish(u,1);}, flores:(u,x,y,s)=>droneLike(u,x,y,async()=>{SFX.boom();const area=[[x,y],...adj4(x,y)];if(hostHarm(area,'A','Ratero 炸藥無人機'))return;for(const [i,j] of area)await blastDestroy(i,j,2);
@@ -5148,9 +5188,9 @@ function render(){try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{
   // targets
   const tg=curTargets();
   if(G.mode==='move'&&G.sel&&G.phase==='play'&&canAct(G.sel)&&!(G.active===G.sel&&G.sel.mp<=0)){
-    const mp=G.active===G.sel?G.sel.mp:G.sel.speed;const m=reach({...G.sel,mp});ctx.fillStyle='rgba(227,170,62,.34)';
+    const mp=G.active===G.sel?G.sel.mp:G.sel.speed;const m=reach({...G.sel,mp});ctx.fillStyle='rgba(70,209,124,.34)';
     for(const [k,v] of m)if(v.d>0)ctx.fillRect((k%G.W)*S+1,((k/G.W)|0)*S+1,S-2,S-2);
-  } else if(tg.length&&!(G.phase==='setup'&&G.mode==='move')){ctx.strokeStyle=G.mode==='shoot'?COL.danger:COL.accent;ctx.lineWidth=2;tg.forEach(([x,y])=>ctx.strokeRect(x*S+2.5,y*S+2.5,S-5,S-5));}
+  } else if(tg.length&&!(G.phase==='setup'&&G.mode==='move')){ctx.strokeStyle=G.mode==='shoot'?COL.danger:G.mode==='dronemove'?'#46d17c':COL.accent;ctx.lineWidth=2;tg.forEach(([x,y])=>ctx.strokeRect(x*S+2.5,y*S+2.5,S-5,S-5));}
   // move trail
   const hm=G.hl!=null&&G.moves[G.hl];
   if(hm){const pts=hm.path.filter(p=>p[2]||hm.side===G.player||G.over);const col=hm.side==='A'?COL.atk:COL.def;
@@ -5455,7 +5495,7 @@ function init3D(){
   const PLANE=new THREE.PlaneGeometry(1,1);PLANE.rotateX(-Math.PI/2);
   const N=40*30;
   const mkIM=(col,op)=>{const m=new THREE.InstancedMesh(PLANE,new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:op,depthWrite:false}),N);m.count=0;m.renderOrder=2;m.frustumCulled=false;scene.add(m);return m;};
-  const fogIM=mkIM(0x04070b,.55),reachIM=mkIM(0xe3aa3e,.38);
+  const fogIM=mkIM(0x04070b,.55),reachIM=mkIM(0x46d17c,.38);
   const tgtIM=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.35,depthWrite:false}),N);tgtIM.count=0;tgtIM.frustumCulled=false;tgtIM.renderOrder=3;scene.add(tgtIM);
   const hover=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1,.06,1)),new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.9}));hover.visible=false;scene.add(hover);
   R3={env,renderer,scene,camera,controls,sun,staticG,unitG,dynG,fxG,fogIM,reachIM,tgtIM,hover,figs:{},sig:'',wall:'full',mats:null,clock:new THREE.Clock(),tracers:[],fxId:null,hoverCell:null,trailKey:''};
@@ -6438,7 +6478,7 @@ function update3D(){
   if(G.mode==='move'&&G.sel&&G.phase==='play'&&canAct(G.sel)&&!(G.active===G.sel&&G.sel.mp<=0)){
     const mp=G.active===G.sel?G.sel.mp:G.sel.speed;const m=reach2(G.sel,mp);for(const [k,v] of m)if(v.d>0&&!v.pass)reach.push([k%G.W,(k/G.W)|0]);}
   if(G.mode==='move'&&G.sel&&G.phase==='play')for(const [x,y] of camClicks(G.sel))tg.push([x,y,.08,0xe8574e]);
-  else if(!(G.phase==='setup'&&G.mode==='move')){const col=G.mode==='shoot'?0xe8574e:0xe3aa3e;
+  else if(!(G.phase==='setup'&&G.mode==='move')){const col=G.mode==='shoot'?0xe8574e:G.mode==='dronemove'?0x46d17c:0xe3aa3e;
     for(const [x,y] of curTargets()){const c=cell(x,y);const wall=isWallC(c);tg.push([x,y,wall?WH+.08:(unitAt(x,y)?1.1:.08),col]);}}
   if(G.phase==='setup'&&G.player==='A')G.map.spawns.forEach((z,i)=>z.cells.forEach(([x,y])=>tg.push([x,y,.06,i===G.spawn?0xffa060:0xef7f3e])));
   if(G.scanFx&&performance.now()<G.scanFx.until){for(const [x,y] of G.scanFx.cells)if(!isWallC(cell(x,y)))tg.push([x,y,.05,G.scanFx.c||0x5ad0ff]);setTimeout(()=>{if(G&&G.scanFx&&performance.now()>=G.scanFx.until){G.scanFx=null;render();}},1450);}
