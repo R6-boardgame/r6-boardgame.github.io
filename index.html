@@ -6947,7 +6947,8 @@ function gaBind(){const g=$('#psGoogle');if(g)g.onclick=()=>{GA.busy=true;GA.err
   const o=$('#psGout');if(o)o.onclick=()=>{clearTimeout(gaT);if(GA.ok)R6FB.save(gaPack()).catch(()=>{}).then(()=>R6FB.signOut());else R6FB.signOut();};}
 if(window.R6FB)R6FB.onUser(u=>{gaOn(u);});
 // the launch roster (core box, recruits included) is free; every later operator costs renown
-const owned=b=>{const c=OPC[b];const k=c?c.base:b;return !OPC[k]||OPC[k].batch==='core'||ECO.own.includes(k);};
+const PAIDCORE=new Set(['flores','thunderbird']);
+const owned=b=>{const c=OPC[b];const k=c?c.base:b;return !OPC[k]||(OPC[k].batch==='core'&&!PAIDCORE.has(k))||ECO.own.includes(k);};
 const dayKey=d=>{d=d||new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();};
 const weekKey=()=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return dayKey(d);};
 const TK_D=[['d_play','完成 2 場對局','games',2,500],['d_win','贏得 1 場對局','wins',1,700],['d_kill','擊倒 6 名敵人','kills',6,600],['d_gad','使用道具 8 次','gad',8,600],
