@@ -1574,6 +1574,11 @@ html body .ocG .ocGB.arm{animation:gbArm 1s ease-in-out infinite}
 @keyframes gbArm{50%{box-shadow:0 0 0 5px rgba(227,170,62,.45)}}
 @media (orientation:landscape) and (max-height:520px){html body .ocG .ocGB{width:50px;height:50px;padding:4px}}
 body.hasClk #tracker .seg{display:none}
+/* v48: achievements earned this match, icons only (tap one to see its name) */
+#anal .anAch.ico{gap:8px}
+#anal .anAch.ico span{width:40px;height:40px;padding:0;display:grid;place-items:center;font-size:22px;line-height:1;position:relative;cursor:pointer;border-radius:4px}
+#anal .anAch.ico span.show::after{content:attr(title);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#0b121a;border:1px solid rgba(240,180,60,.5);color:#f3d48a;font-size:12px;padding:3px 8px;z-index:5}
+@media (orientation:landscape) and (max-height:500px){#anal .anAch.ico span{width:30px;height:30px;font-size:17px}}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -3662,10 +3667,9 @@ function showAnalysis(w,why){if(!G||!G.over||G.tut)return;let o=$('#anal');if(o)
   const cmp=(l,a,b)=>`<span class="anC"><b class="a">${a}</b><em>${l}</em><b class="d">${b}</b></span>`;
   o.innerHTML=`<div class="anBox"><div class="anTop ${w===G.player?'win':'lose'}"><small>戰鬥分析 · 第 ${G.round}/${G.maxRounds} 輪結束</small><h2>${w===G.player?'任務成功':'任務失敗'}</h2><p>${w==='A'?'進攻方':'防守方'}勝利：${why}</p></div>
     <div class="anScroll"><table class="anT a">${anCap('A')}${head}${rows('A')}</table>
-    <div class="anMid"><b>對戰比較</b>${cmp('擊殺',TA.k,TD.k)}${cmp('總傷害',TA.dmg,TD.dmg)}${cmp('命中率',pct(TA.hits,TA.shots),pct(TD.hits,TD.shots))}${cmp('存活',TA.alive+'/'+TA.n,TD.alive+'/'+TD.n)}</div>
     <table class="anT d">${anCap('D')}${head}${rows('D')}</table></div>
     <div class="anFoot"><div class="anS a"><small>進攻方總傷害</small><b>${TA.dmg}</b></div><div class="anS mid"><small>本場 MVP</small><b>${mvp?OPS[mvp.op].name:'–'}</b></div><div class="anS d"><small>防守方總傷害</small><b>${TD.dmg}</b></div></div>
-    ${G._eco&&G._eco.lines.length?`<div class="anEco"><b>${RNI}+${fmtN(G._eco.earn)}</b>${G._eco.lines.map(([t,v])=>`<span>${esc(t)}${v?` <i>+${fmtN(v)}</i>`:''}</span>`).join('')}</div>`:''}${(G._newAch||[]).length?`<div class="anAch"><b>本場解鎖</b>${G._newAch.map(id=>{const a=ACHM[id];return `<span>${a.ic} ${a.n}</span>`;}).join('')}</div>`:''}<div class="anBtns">${!G.net?'<button id="anAgain">再來一局</button>':''}<button class="primary" id="anHome">結束任務・回大廳</button></div></div>`;
+    ${(G._newAch||[]).length?`<div class="anAch ico"><b>成就達成</b>${G._newAch.map(id=>{const a=ACHM[id];return `<span title="${esc(a.n)}" aria-label="${esc(a.n)}" onclick="this.classList.toggle('show')">${a.ic}</span>`;}).join('')}</div>`:''}<div class="anBtns">${!G.net?'<button id="anAgain">再來一局</button>':''}<button class="primary" id="anHome">結束任務・回大廳</button></div></div>`;
   document.body.appendChild(o);const rk=$('#rkres');if(rk)o.querySelector('.anTop').appendChild(rk);
   $('#anHome').onclick=()=>{o.remove();$('#banner').hidden=true;goTitle();};
   o.querySelectorAll('.anFr').forEach(b=>b.onclick=()=>frTap(b));
