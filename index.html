@@ -1555,6 +1555,25 @@ html body:has(.panel.open) #actsR{display:none}
 .anEco{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;justify-content:center;padding:6px 10px;font-size:12px;color:#dbe4ea;border-top:1px solid rgba(255,216,74,.2)}
 .anEco>b{display:flex;align-items:center;font:800 17px var(--mono);color:#ffd84a}
 .anEco i{font-style:normal;color:#ffd84a;font-family:var(--mono)}
+/* v47: one clock, emblem + time; the emblem flips when the phase changes */
+#clocks .clk1{position:absolute;top:8px;left:calc((100% - 380px)/2);transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:4px 16px 4px 6px;background:linear-gradient(90deg,rgba(8,12,17,.88),rgba(8,12,17,.66));border:1px solid rgba(255,255,255,.1);border-radius:4px;pointer-events:none}
+#clocks .clk1 .ic{width:46px;height:46px;display:grid;place-items:center;flex:none}
+#clocks .clk1 .ic img.emb,#clocks .clk1 .ic svg{width:46px;height:46px}
+#clocks .clk1 .tm{font:600 38px/1 'Saira Condensed','IBM Plex Mono',monospace;color:#fff;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+#clocks .clk1.low .tm{color:var(--danger)}#clocks .clk1.out .tm{color:#7d8790}
+#clocks .clk1 .ic.swap{animation:clkSwap .7s cubic-bezier(.2,.8,.3,1.2)}
+@keyframes clkSwap{0%{transform:rotateY(90deg) scale(.5);opacity:0;filter:brightness(2.5)}55%{transform:rotateY(-12deg) scale(1.18);opacity:1;filter:brightness(1.6)}100%{transform:none;filter:none}}
+@media (orientation:landscape) and (max-height:520px){#clocks .clk1{left:12px;top:6px;transform:none;padding:3px 12px 3px 4px;gap:7px}#clocks .clk1 .ic,#clocks .clk1 .ic img.emb{width:34px;height:34px}#clocks .clk1 .tm{font-size:28px}}
+@media (orientation:portrait) and (max-width:700px){#clocks .clk1{transform:none;background:none;border:0;padding:0;gap:6px}#clocks .clk1 .ic,#clocks .clk1 .ic img.emb{width:36px;height:36px}#clocks .clk1 .tm{font-size:30px;text-shadow:0 2px 6px rgba(0,0,0,.9),0 0 2px #000}}
+/* the operator's own gadget is a big button on the card */
+html body .ocG .ocGB{flex:none;width:62px;height:62px;padding:5px;margin:0;border:2px solid #e3aa3e;background:#0b121a;border-radius:4px;cursor:pointer;display:grid;place-items:center;min-height:0;transition:box-shadow .2s,background .2s}
+html body .ocG .ocGB img{width:100%;height:100%;border:0;padding:0;background:none}
+html body .ocG .ocGB:disabled{opacity:.42;filter:grayscale(.85);border-color:var(--hl);cursor:default}
+html body .ocG .ocGB.on{background:rgba(227,170,62,.28);box-shadow:0 0 14px rgba(227,170,62,.75)}
+html body .ocG .ocGB.arm{animation:gbArm 1s ease-in-out infinite}
+@keyframes gbArm{50%{box-shadow:0 0 0 5px rgba(227,170,62,.45)}}
+@media (orientation:landscape) and (max-height:520px){html body .ocG .ocGB{width:50px;height:50px;padding:4px}}
+body.hasClk #tracker .seg{display:none}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -1613,7 +1632,7 @@ html body:has(.panel.open) #actsR{display:none}
         <tr><td>專屬道具</td><td>各自</td><td>幹員自己的技能，見「幹員檔案」。被動技能不用花行動。</td></tr>
         <tr><td>戰術道具</td><td>各自</td><td>小隊共用的方塊，每次啟動只能用一個。進攻：破牆炸藥（相鄰軟牆或路障，D3）、無人機（開到 5 格內，標記停下房間裡的所有防守方）、破片手榴彈（目標 2 黃骰、相鄰 1 黃骰，炸掉路障）、閃光彈（目標與相鄰格所有幹員震暈）、闊刀地雷（相鄰格，敵人踏入或走到箭頭格時 2 紅骰）、煙霧彈（2×2 擋視線）。防守：衝擊手榴彈（炸掉軟牆、路障或道具，D2）、C4 遙控炸藥（目標 2 橙骰、相鄰 1 橙骰）。投擲物射程 6 格，道具傷害不受掩護減免，也會傷到自己人。</td></tr>
         <tr><td>任務</td><td>各自</td><td>安裝或解除拆彈器、護送人質。</td></tr>
-        <tr><td>掩護射擊</td><td>全部</td><td>結束這次啟動，面向一個方向的半圓。敵人走進或在半圓內行動時，每次都能免費還擊，次數不限，直到這名幹員下次行動。隱藏的防守方結束啟動時會自動進入掩護射擊。</td></tr>
+        <tr><td>掩護射擊</td><td>全部</td><td>不用按：結束階段時，這一方所有幹員自動面向最近的敵人進入掩護射擊，警戒前方半圓。敵人走進或在半圓內行動時，每次都能免費還擊，次數不限，直到這名幹員下次行動。隱藏的防守方結束啟動時會自動進入掩護射擊。</td></tr>
         </tbody></table></div></section>
       <section id="m-fire"><h3>射擊與視線</h3><ul>
         <li>視線從格子中心連到格子中心，被牆、完好的門窗路障、煙霧，以及中間站著的其他幹員擋住。對<b>被標記</b>的目標，軟牆、路障和煙霧都不再擋視線，可以隔著射擊（有掩護）；承重牆、加固牆和中間的其他幹員仍然會擋。</li>
@@ -3900,6 +3919,7 @@ function endPhase(){
   if(G.net&&curSide()===G.player)G._handoff=true;
   const s=curSide();
   if(G.active)endAct(G.active);
+  {const ow=alive(s).filter(u=>u.x>=0&&!u.overwatch);ow.forEach(u=>overwatch(u,true));const sh=ow.filter(u=>pub(u)||s===G.player);if(sh.length&&(s===G.player||G.over))log(`${sh.map(nm).join('、')} 自動進入掩護射擊`,s==='A'?'ka':'kd');}
   G.gadgets.forEach(g=>{if((g.type==='gas'||g.type==='fire')&&g.alive&&--g.life<=0)g.alive=false;});
   if(s==='D'&&G.defuser){G.defuser.timer--;if(G.defuser.timer<=0){render();return finish('A','拆彈器運作完成');}}
   G.phaseIdx++;
@@ -4988,7 +5008,7 @@ function opCard(u){
   const oc=`<div class="oc ${u.side==='A'?'a':'d'}"><div class="ocL"><img class="ocP" src="${portraitURL(u.op)}" alt="${o.name} 頭像"><img class="ocI" src="${opIcon(u.op)}" alt=""></div>
     <div class="ocM"><b class="ocN">${o.name}</b><span class="ocR">${u.side==='A'?'進攻':'防守'} · ${o.role}</span><span class="ocH"><small>HP ${u.hp} / ${u.max}</small>${hpBar(u)}</span></div>
     <div class="ocS"><div class="ocAp"><small>行動點</small><span>${[0,1].map(i=>`<i class="${i<apN?'f':''}"></i>`).join('')}</span><small class="ocMp">移動 ${mpN}</small></div>
-    <div class="ocG"><img src="${opIcon(u.op)}" alt=""><div><b>${(o.g&&GSH[u.op])||o.g||o.passive}${o.g&&own?` <em>剩 ${u.ch>50?'∞':u.ch}</em>`:''}</b>${gdChips(o.g?o.gd:o.pd)}<span class="gdT">${o.g?o.gd:o.pd}</span></div></div></div></div>`;
+    <div class="ocG">${own&&u.alive&&G.phase==='play'&&o.g&&!NOBTN.has(u.op)?`<button class="ocGB" aria-label="${(GSH[u.op]||o.g)}"><img src="${opIcon(u.op)}" alt=""></button>`:`<img src="${opIcon(u.op)}" alt="">`}<div><b>${(o.g&&GSH[u.op])||o.g||o.passive}${o.g&&own?` <em>剩 ${u.ch>50?'∞':u.ch}</em>`:''}</b>${gdChips(o.g?o.gd:o.pd)}<span class="gdT">${o.g?o.gd:o.pd}</span></div></div></div></div>`;
   return `<div class="card">${oc}<div class="nm"><img class="port" src="${portraitURL(u.op)}" alt="${o.name} 頭像"><b class="${u.side==='A'?'a':'d'}">${o.name}</b><span class="hint">${u.side==='A'?'進攻':'防守'} · ${o.role}</span></div>
   <dt>耐力</dt><dd>${hpBar(u)} ${u.hp}/${u.max}</dd>
   <dt>移動／奔跑</dt><dd>5 點 · ${u.run?`奔跑 +${u.run}`:'不能奔跑'} · 破壞力${PROF[u.op].dr}</dd>
@@ -5059,7 +5079,13 @@ function renderDeploy(p){if(G.player==='D'&&!G.net&&!(G.decoys||[]).length&&!unp
   if($('#zones'))G.map.spawns.forEach((z,i)=>{const b=document.createElement('button');b.textContent=z.name;if(G.spawn===i)b.className='on';b.onclick=()=>{const z=G.map.spawns[i],free=z.cells.filter(([x,y])=>!unitAt(x,y));unplaced().forEach(u=>{const c=free.shift();if(c){u.x=c[0];u.y=c[1];}});G.spawn=i;nextUnplaced();render();};$('#zones').appendChild(b);});
   if($('#acts'))renderActs();portActs();}
 function actSub(t){return matchMedia('(max-width:760px),(max-height:520px) and (orientation:landscape)').matches?t.replace(/^(戰術|專屬) · /,'').replace(' · +',' +'):t;}
-function renderActs(){setTimeout(hudTop,0);
+var GB=null;
+function bindGB(){document.querySelectorAll('.ocGB').forEach(e=>{const g=GB;if(!g||!G||!G.sel||G.sel.side!==G.player){e.disabled=true;return;}
+  e.disabled=!!g.dis||G.busy;e.classList.toggle('on',!!g.on);
+  e.onclick=ev=>{ev.stopPropagation();if(G.mode==='gadget'){setMode('move');return;}
+    if(g.self&&!e.classList.contains('arm')){e.classList.add('arm');const c=e.closest('.ocG');if(c&&c.querySelector('.gdC')){window.OCF=true;c.classList.add('full');}return;}
+    e.classList.remove('arm');g.fn();};});}
+function renderActs(){setTimeout(hudTop,0);GB=null;
   const u=G.sel,el=$('#acts'),L=[];
   if(G.phase==='setup'){
     if(u.side!=='D'||G.player!=='D'){el.remove();return;}
@@ -5076,10 +5102,10 @@ function renderActs(){setTimeout(hudTop,0);
     L.push(btn('射擊',sub('shoot','1 行動'),G.mode==='shoot',!can('shoot')||!shootables(u).length,tmode('shoot',shootables(u))));
     L.push(btn('奔跑',u.run?sub('run',`1 行動 · +${u.run} 移動點`):'這名幹員不能奔跑',false,!can('run')||!u.run,wrap(async()=>{if(G.active!==u)return;sprint(u);})));
     const dt=destroyTargets(u);L.push(btn('破壞',sub('destroy',(PROF[u.op].dz||1)>=2?'路障、軟牆或道具':'路障或道具'),G.mode==='destroy',!can('destroy')||!dt.length,tmode('destroy',dt)));
-    const o=OPS[u.op];
+    const o=OPS[u.op];GB=null;
     if(o.g&&!NOBTN.has(u.op)){const t=gTargets(u);const none=t!=='self'&&!t.length;
-      L.push(btn(GSH[u.op]||o.g,sub('special',`專屬 · 剩 ${u.ch>50?'∞':u.ch}`),G.mode==='gadget',!can('special')||u.ch<=0||none,t==='self'?wrap(()=>useGadget(u)):tmode('gadget',t),'',u.op==='thatcher'?eqIc('emp'):u.op==='valkyrie'?eqIc('valk'):''));}
-    const tac=(m,label,n,list)=>L.push(btn(label,sub('tactical',`戰術 · 剩 ${n}`),G.mode===m,!can('tactical')||n<=0||!list.length,tmode(m,list),'',eqIc(m)));
+      GB=btn(GSH[u.op]||o.g,'',G.mode==='gadget',!can('special')||u.ch<=0||none,t==='self'?wrap(()=>useGadget(u)):tmode('gadget',t));GB.self=t==='self';}
+    const tac=(m,label,n,list)=>n>0&&L.push(btn(label,sub('tactical',`戰術 · 剩 ${n}`),G.mode===m,!can('tactical')||n<=0||!list.length,tmode(m,list),'',eqIc(m)));
     if(u.side==='A'){
       tac('drone','無人機',G.drones,G.drones>0?droneTargets(u):[]);
       tac('charge','破牆炸藥',G.charges,chargeTargets(u));
@@ -5090,11 +5116,10 @@ function renderActs(){setTimeout(hudTop,0);
       tac('impact','衝擊手榴彈',G.impact,impactTargets(u));tac('nitro','C4 遙控炸藥',G.nitro,throwTargets(u));
       if(G.mission!=='hostage'&&G.defuser)L.push(btn('解除拆彈器',sub('obj','站上或相鄰'),false,!can('obj')||!defuseOK(u),wrap(async()=>{defuse(u);await afterAct(u);}),'primary'));
     }
-    L.push(btn('掩護射擊','結束並警戒半圓',false,!ok||(isA&&u.ap<=0&&u.mp<=0),wrap(async()=>overwatch(u))));
     if(G.active===u)L.push(btn('結束行動','',false,G.busy,()=>{playerAfterAct();}));
   } else {el.remove();return;}
   el.innerHTML='';
-  L.forEach(b=>{if(!b.ic&&GADIC[b.label])b.ic=`<img class="bic gic" src="${GADIC[b.label]}" alt="">`;if(!b.ic&&ACTIC[b.label])b.ic=`<img class="bic act" src="${uiImg('act_'+ACTIC[b.label])}" alt="">`;const e=document.createElement('button');e.innerHTML=`${b.ic?`<span class="bwrap">${b.ic}<span>`:''}${b.label}${b.sub?`<span class="sub">${actSub(b.sub)}</span>`:''}${b.ic?'</span></span>':''}`;if(b.ic)e.classList.add('hasic');if(b.on)e.classList.add('on');if(b.cls)e.classList.add(b.cls);e.disabled=!!b.dis||G.busy;e.onclick=b.fn;el.appendChild(e);});
+  L.forEach(b=>{if(!b.ic&&GADIC[b.label])b.ic=`<img class="bic gic" src="${GADIC[b.label]}" alt="">`;if(!b.ic&&ACTIC[b.label])b.ic=`<img class="bic act" src="${uiImg('act_'+ACTIC[b.label])}" alt="">`;const e=document.createElement('button');e.innerHTML=`${b.ic?`<span class="bwrap">${b.ic}<span>`:''}${b.label}${b.sub?`<span class="sub">${actSub(b.sub)}</span>`:''}${b.ic?'</span></span>':''}`;if(b.ic)e.classList.add('hasic');if(b.on)e.classList.add('on');if(b.cls)e.classList.add(b.cls);e.disabled=!!b.dis||G.busy;e.onclick=b.fn;el.appendChild(e);});bindGB();
 }
 function renderMoves(){const el=$('#moves');if(!el||!G)return;
   const rows=G.moves.map((r,i)=>[r,i]).filter(([r])=>G.over||r.side===G.player||r.path.some(p=>p[2])).reverse();
@@ -6417,12 +6442,12 @@ const TUT=[
   {t:'歡迎來到訓練場',d:'你是進攻方，任務是在 A 點安裝拆彈器。這關會一步步帶你走完：移動、破門、無人機偵查、射擊、安裝拆彈器。先試試轉動鏡頭：電腦拖曳旋轉、滾輪縮放；手機單指平移、雙指轉動與縮放。',next:'開始'},
   {t:'1. 選取幹員',d:'點右側「我方小隊」裡的 Sledge，或直接點地圖上的他。選取後，黃色格子就是這次能走到的地方。',ok:()=>G.sel&&G.sel.op==='sledge',hi:'[data-u="A0"]'},
   {who:'sledge',t:'2. 移動',d:'點亮起的格子，把 Sledge 走到大廳門口 F15（門就在他正北方的 F14）。每次啟動有 5 點移動，可以斜走；穿過窗戶或牆洞要多花 1 點。',ok:()=>{const u=tutU('sledge');return u&&man(u.x,u.y,5,13)===1;},cell:[5,14]},
-  {who:'sledge',t:'3. 破門',d:'按「破門大錘」，再點地圖上黃框標出的門。每次啟動是「移動」加上兩個不同的行動，同一種行動不能做兩次。',ok:()=>cell(5,13).t==='floor',btn:'破門大錘'},
+  {who:'sledge',t:'3. 破門',d:'點下方幹員卡上的大錘技能圖示（破門大錘），再點地圖上黃框標出的門。每次啟動是「移動」加上兩個不同的行動，同一種行動不能做兩次。',ok:()=>cell(5,13).t==='floor',btn:'破門大錘'},
   {who:'sledge',t:'4. 進入大廳',d:'讓 Sledge 穿過門口，站到門內左側的 E13，把門口讓出來。幹員會擋住視線，站在門口會擋到隊友。',ok:()=>{const u=tutU('sledge');return u&&u.y<=12&&u.x!==5;},cell:[4,12]},
   {who:'iq',t:'5. 無人機偵查',d:'防守方一開始都是「?」隱藏標記，其中有一半是誘餌。點 IQ（會結束 Sledge 的行動），按「無人機」，再點大廳裡亮起的格子：無人機停下的房間裡，所有防守方都會被標記到回合結束。',ok:()=>G.tutDrone||G.units.some(u=>u.side==='D'&&u.spotted>0),btn:'無人機'},
   {who:'ash',t:'6. 射擊',d:'大廳裡的 Mute 現形了。選 Ash 走到門口 F14，按「射擊」點他。1～3 格是近距離，Ash 擲紅、橙骰和一顆閃電黃骰，點數加總就是傷害；目標有掩護時扣 2 點，而且不擲閃電骰。',ok:()=>G.tutShot||!G.units[5].alive,btn:'射擊',cell:[5,13]},
   {t:'7. 前往 A 點',d:'沿著大廳往北走：E10 和 F7 的門有路障，相鄰時按「破壞路障」或用 Sledge 的大錘。每個階段最多啟動 3 人，動完會自動換到防守階段（教學中防守方不行動）。走到橘色的 A 點格子上，按「安裝拆彈器」。',ok:()=>!!G.defuser,btn:'安裝拆彈器'},
-  {t:'8. 守住拆彈器',d:'拆彈器要撐過兩個防守階段。按「結束階段」讓時間過去，正式對戰時防守方會來解除它，記得用掩護射擊守住門口。',ok:()=>G.over},
+  {t:'8. 守住拆彈器',d:'拆彈器要撐過兩個防守階段。按「結束階段」讓時間過去，正式對戰時防守方會來解除它，結束階段時幹員會自動掩護射擊守住門口。',ok:()=>G.over},
 ];
 const tutU=op=>G.units.find(u=>u.op===op&&u.alive);
 function startTutorial(){
@@ -6452,7 +6477,7 @@ function tutTick(){
   if(s.next)glow($('#tutnext'));
   const need=s.who&&!(G.sel&&G.sel.op===s.who&&G.sel.alive);
   if(need){const u=tutU(s.who);if(u)glow(document.querySelector(`[data-u="${u.id}"]`));}
-  else if(s.btn){let hit=false;document.querySelectorAll('#acts button').forEach(b=>{if(!hit&&b.textContent.includes(s.btn)&&!b.disabled){b.classList.add('pulse');hit=true;}});
+  else if(s.btn){let hit=false;document.querySelectorAll('#acts button,.ocGB').forEach(b=>{if(!hit&&(b.textContent+(b.getAttribute('aria-label')||'')).includes(s.btn)&&!b.disabled){b.classList.add('pulse');hit=true;}});
     if(!hit&&s.who){const u=tutU(s.who);if(u)glow(document.querySelector(`[data-u="${u.id}"]`));}}
   if(s.hi)glow(document.querySelector(s.hi));
   if($('#endphase')&&T.i===TUT.length-1)$('#endphase').classList.add('pulse');
@@ -7078,19 +7103,16 @@ const fmtClock=ms=>{const t=Math.max(0,Math.ceil(ms/1000));return String(Math.fl
 function clockWho(s){if(G.net)return s===G.player?'你':'對手';return s===G.player?'你':'電腦';}
 function renderClocks(){
   const fr=$('#frame');let box=document.getElementById('clocks');
-  if(!clockOn()||G.over){if(box)box.remove();return;}
-  if(!box){box=document.createElement('div');box.id='clocks';box.className='clocks';
-    box.innerHTML=['A','D'].map(s=>`<div class="clk ${s}" data-s="${s}"><div class="ic">${emblem(s)}</div><div class="tx"><span class="who"></span><span class="sub"></span><span class="tm"></span></div><button class="pz" aria-label="暫停"><svg viewBox="0 0 20 20"><rect x="4" y="3" width="4" height="14"/><rect x="12" y="3" width="4" height="14"/></svg></button></div>`).join('');
-    fr.appendChild(box);box.querySelectorAll('.pz').forEach(b=>b.onclick=()=>{G.cPause=!G.cPause;renderClocks();});}
-  const act=curSide();
-  for(const el of box.querySelectorAll('.clk')){const s=el.dataset.s,big=s===act,ms=G.clock[s];
-    el.classList.toggle('big',big);el.classList.toggle('small',!big);el.classList.toggle('low',big&&ms<15000&&ms>0);el.classList.toggle('out',ms<=0);
-    el.querySelector('.who').textContent=`${clockWho(s)} · ${s==='A'?'進攻方':'防守方'}`;
-    el.querySelector('.sub').textContent=big?`第 ${G.round} 輪剩餘時間`:'等待中';
-    el.querySelector('.tm').textContent=fmtClock(ms);if(big&&ms>0&&ms<10000&&!G.cPause)SFX.tick();}
-  let pz=document.getElementById('clkpause');
-  if(G.cPause&&!pz){pz=document.createElement('div');pz.id='clkpause';pz.className='clkpause';pz.textContent='已暫停 · 點擊繼續';pz.onclick=()=>{G.cPause=false;renderClocks();};fr.appendChild(pz);}
-  else if(!G.cPause&&pz)pz.remove();
+  const on=clockOn()&&!G.over;document.body.classList.toggle('hasClk',on);
+  if(!on){if(box)box.remove();return;}
+  if(!box){box=document.createElement('div');box.id='clocks';box.className='clocks';box.innerHTML='<div class="clk1"><div class="ic"></div><span class="tm"></span></div>';fr.appendChild(box);}
+  const s=curSide(),el=box.firstChild,ms=G.clock[s],ic=el.querySelector('.ic');
+  if(el.dataset.s!==s){const first=!el.dataset.s;el.dataset.s=s;ic.innerHTML=emblem(s);if(!first){ic.classList.remove('swap');void ic.offsetWidth;ic.classList.add('swap');}}
+  el.classList.toggle('low',ms<15000&&ms>0);el.classList.toggle('out',ms<=0);
+  el.querySelector('.tm').textContent=fmtClock(ms);if(ms>0&&ms<10000)SFX.tick();
+  // portrait: sits right under the online counter, no frame
+  if(PORTP()){const a=$('#online')||document.querySelector('header.top'),fb=fr.getBoundingClientRect();if(a){const r=a.getBoundingClientRect();el.style.left=(r.left-fb.left)+'px';el.style.top=(($('#online')?r.bottom:r.bottom)-fb.top+6)+'px';}}
+  else{el.style.left='';el.style.top='';}
 }
 let CLK_LAST=performance.now();
 setInterval(()=>{const now=performance.now(),dt=now-CLK_LAST;CLK_LAST=now;
