@@ -1586,6 +1586,117 @@ body.hasClk #tracker .seg{display:none}
 .osEco .osNeed{color:#ff8a7a;font-size:12px}
 .osBal{display:inline-flex;align-items:center;gap:3px;color:#ffd84a;font-weight:800}
 @media (orientation:landscape) and (max-height:520px){#title[data-s="title"] #tmenu .tbtn{height:54px!important;min-height:0!important}#title[data-s="title"] #tmenu .tbtn b{line-height:1.1}#title[data-s="title"] #tmenu .tbtn span{font-size:11px;line-height:1.2}}
+/* ===== v50: shop ===== */
+#shop{position:fixed;inset:0;z-index:120;--sc:var(--atk);background:radial-gradient(120% 70% at 50% -10%,color-mix(in srgb,var(--sc) 26%,transparent),transparent 60%),linear-gradient(180deg,#0d141c,#070b10);color:#e8eef3;animation:shIn .22s ease;font-family:'Noto Sans TC',system-ui,sans-serif}
+#shop[data-side="D"]{--sc:var(--def)}
+#shop.out{animation:shOut .18s ease forwards}
+@keyframes shIn{from{opacity:0;transform:scale(1.02)}}@keyframes shOut{to{opacity:0;transform:scale(1.02)}}
+#shop .shBox{position:absolute;inset:0;display:flex;flex-direction:column;padding:max(12px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));gap:10px;max-width:1280px;margin:0 auto}
+.shHd{display:flex;align-items:center;gap:12px;flex:none}
+.shBack{flex:none;min-height:40px;padding:0 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.18);color:#e8eef3;font-size:15px;clip-path:var(--cham)}
+.shTt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.1}
+.shTt h2{margin:0;font:800 26px/1 var(--display);letter-spacing:.12em}
+.shTt span{font-size:11px;color:#8fa1b1;letter-spacing:.08em;margin-top:3px}
+.shBal{flex:none;display:flex;align-items:center;gap:6px;padding:6px 14px 6px 10px;background:linear-gradient(90deg,rgba(255,216,74,.16),rgba(255,216,74,.04));border:1px solid rgba(255,216,74,.45);clip-path:var(--cham)}
+.shBal .rni{width:24px;height:24px}.shBal b{font:800 20px/1 var(--mono);color:#ffd84a;font-variant-numeric:tabular-nums}
+.shBar{display:flex;align-items:stretch;gap:10px;flex:none}
+.shTabs{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.shTabs button{display:flex;align-items:center;gap:10px;min-height:52px;padding:6px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.12);border-bottom:3px solid transparent;color:#9fb0bf;text-align:left;transition:background .2s,border-color .2s,color .2s}
+.shTabs button img.emb{width:34px;height:34px;flex:none;opacity:.55;transition:opacity .2s,transform .2s}
+.shTabs button span{display:flex;flex-direction:column;line-height:1.15}.shTabs button b{font-size:16px;letter-spacing:.06em}.shTabs button small{font-size:11px;color:#8193a3}
+.shTabs button.on{color:#fff;background:linear-gradient(180deg,color-mix(in srgb,var(--sc) 22%,transparent),rgba(255,255,255,.02));border-color:color-mix(in srgb,var(--sc) 60%,transparent);border-bottom-color:var(--sc)}
+.shTabs button.on img.emb{opacity:1;transform:scale(1.06)}
+.shFil{display:flex;flex-direction:column;gap:4px;flex:none}
+.shFil button{flex:1;min-height:0;padding:2px 12px;font-size:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.12);color:#9fb0bf}
+.shFil button.on{background:#e8eef3;color:#0b0f12;border-color:#e8eef3;font-weight:700}
+.shStage{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;touch-action:pan-y}
+.shGrid{display:grid;justify-content:center;align-content:center}
+.shGrid.slideL{animation:shSlL .28s ease}.shGrid.slideR{animation:shSlR .28s ease}
+@keyframes shSlL{from{opacity:0;transform:translateX(30px)}}@keyframes shSlR{from{opacity:0;transform:translateX(-30px)}}
+.shC{position:relative;display:block;padding:0;margin:0;min-height:0;overflow:hidden;background:#111a24;border:1px solid rgba(255,255,255,.1);clip-path:polygon(0 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%);text-align:left;cursor:pointer;transition:transform .15s,border-color .15s,filter .15s}
+.shC::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--atk);z-index:2}.shC.D::before{background:var(--def)}
+.shArtW{position:absolute;inset:0;background:radial-gradient(90% 60% at 50% 30%,rgba(255,255,255,.07),transparent 70%)}
+.shArt{position:absolute;left:50%;top:0;height:100%;width:auto;min-width:100%;transform:translateX(-50%);object-fit:cover;object-position:50% 12%}
+.shC::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 42%,rgba(5,8,12,.78) 70%,rgba(5,8,12,.96));pointer-events:none}
+.shIc{position:absolute;left:6px;top:8px;width:24px;height:24px;z-index:2;filter:drop-shadow(0 1px 2px #000)}
+.shNm{position:absolute;left:8px;right:6px;bottom:24px;z-index:2;font:800 15px/1.05 var(--display);letter-spacing:.04em;text-transform:uppercase;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shTag{position:absolute;left:8px;right:6px;bottom:6px;z-index:2;display:flex;align-items:center;gap:3px;font:700 12px/1 var(--mono);color:#ffd84a}
+.shTag .rni{width:14px;height:14px}
+.shOk{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:var(--ok);color:#06210f;font-size:10px;font-style:normal;margin-right:3px}
+.shC.own .shTag{color:#7fdc9c;font-family:inherit}
+.shC.own .shArt{filter:saturate(.75) brightness(.8)}
+.shC.soon .shArt{filter:grayscale(1) brightness(.5)}.shC.soon .shTag{color:#8a98a6;font-family:inherit}
+.shC:hover{border-color:rgba(255,255,255,.4)}.shC:active{transform:scale(.97)}
+.shC.buy{border-color:rgba(255,216,74,.28)}
+.shEmpty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:6px;color:#9fb0bf;padding:30px}.shEmpty b{font-size:18px;color:#e8eef3}
+.shPg{flex:none;display:flex;align-items:center;justify-content:center;gap:12px;min-height:40px}
+.shPg button{width:44px;height:36px;min-height:0;padding:0;font-size:22px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.18);color:#e8eef3}
+.shPg button:disabled{opacity:.25}
+.shDots{display:flex;gap:6px}.shDots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.22);cursor:pointer;transition:width .2s,background .2s}.shDots i.on{width:22px;border-radius:4px;background:var(--sc)}
+.shPn{font:600 12px var(--mono);color:#8193a3;min-width:44px;text-align:center}
+.shPg.one{min-height:20px}
+/* detail */
+.shDet{position:absolute;inset:0;z-index:5;display:grid;place-items:center;background:rgba(3,6,9,.72);backdrop-filter:blur(3px);padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));animation:shIn .18s ease}
+.shDBox{--sc:var(--atk);position:relative;width:min(920px,100%);height:min(560px,100%);display:grid;grid-template-columns:42% 1fr;background:linear-gradient(160deg,#152131,#0a1018);border:1px solid color-mix(in srgb,var(--sc) 45%,transparent);box-shadow:0 30px 80px rgba(0,0,0,.6);clip-path:polygon(0 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%);overflow:hidden;animation:shPop .26s cubic-bezier(.2,.9,.3,1.15)}
+.shDBox.D{--sc:var(--def)}
+@keyframes shPop{from{opacity:0;transform:translateY(14px) scale(.97)}}
+.shDArt{position:relative;overflow:hidden;background:radial-gradient(80% 60% at 50% 30%,color-mix(in srgb,var(--sc) 30%,transparent),transparent 70%)}
+.shDArt>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 10%}
+.shDArt::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(8,12,18,.92))}
+.shX{position:absolute;top:10px;left:10px;z-index:3;width:38px;height:38px;min-height:0;padding:0;font-size:18px;background:rgba(5,8,12,.7);border:1px solid rgba(255,255,255,.25);color:#fff}
+.shDName{position:absolute;left:16px;right:12px;bottom:14px;z-index:2}
+.shDSide{display:flex;align-items:center;gap:6px;font-size:12px;color:#c9d4dd;letter-spacing:.06em}.shDSide img.emb{width:22px;height:22px}
+.shDName h3{margin:4px 0 2px;font:900 clamp(30px,5vw,46px)/.95 var(--display);font-style:italic;letter-spacing:.03em;text-transform:uppercase;color:#fff;text-shadow:0 3px 14px rgba(0,0,0,.6)}
+.shDOrg{font-size:11px;color:#9fb0bf;letter-spacing:.1em;text-transform:uppercase}
+.shDInfo{display:flex;flex-direction:column;gap:12px;padding:18px 18px 16px;min-height:0}
+.shG{display:flex;gap:12px;align-items:flex-start;min-height:0;flex:1;overflow:hidden}
+.shG>img{width:52px;height:52px;flex:none;padding:6px;background:#0b121a;border:1px solid color-mix(in srgb,var(--sc) 55%,transparent)}
+.shG b{font-size:17px;color:#fff;display:block}.shG small{font-size:11px;color:var(--sc);font-weight:700}
+.shG p{margin:6px 0 0;font-size:13.5px;line-height:1.6;color:#c6d2dc}
+.shStats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex:none}
+.shStats div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.shStats b{font:800 19px/1 var(--display);color:#fff;display:flex;align-items:center;gap:4px}.shStats .dzb{width:14px;height:14px}.shStats small{font-size:11px;color:#8fa1b1}
+.shDice{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;flex:none}
+.shDice div{display:flex;flex-direction:column;gap:4px;padding:6px 8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}
+.shDice small{font-size:11px;color:#8fa1b1}.shDice .hexd{width:20px;height:18px;margin-right:1px}
+.shCta{flex:none;display:grid;grid-template-columns:auto 1fr;grid-template-areas:"p b" "n n";align-items:center;gap:6px 12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)}
+.shCta.own{grid-template-columns:1fr;grid-template-areas:"b" "n"}
+.shPrice{grid-area:p;display:flex;align-items:center;gap:6px}.shPrice .rni{width:26px;height:26px}.shPrice b{font:800 26px/1 var(--mono);color:#ffd84a}
+.shBuy{grid-area:b;min-height:50px;font:800 20px/1 var(--display);letter-spacing:.3em;color:#15110a;background:var(--plateYl,linear-gradient(180deg,#f2b84a,#d99a2b)) center/100% 100% no-repeat;background-color:#e3aa3e;border:0;filter:drop-shadow(0 0 10px rgba(227,170,62,.35))}
+.shBuy:disabled{filter:grayscale(1) brightness(.6);color:#222;letter-spacing:.1em}
+.shNote{grid-area:n;font-size:12px;color:#8fa1b1}
+.shOwn{grid-area:b;display:flex;align-items:center;justify-content:center;gap:6px;min-height:50px;font:800 20px var(--display);letter-spacing:.2em;color:#7fdc9c;border:1px solid rgba(95,194,125,.5);background:rgba(95,194,125,.08)}
+.shDBox.got{animation:shGot .7s ease}
+@keyframes shGot{30%{box-shadow:0 0 0 3px #ffd84a,0 0 60px rgba(255,216,74,.6)}100%{box-shadow:0 30px 80px rgba(0,0,0,.6)}}
+/* portrait phone: art on top, info below, everything fits */
+@media (orientation:portrait) and (max-width:700px){
+ .shTt span{display:none}.shTt h2{font-size:22px}
+ .shBar{flex-direction:column;gap:6px}.shFil{flex-direction:row}.shFil button{min-height:30px;font-size:13px}
+ .shTabs button{min-height:48px}.shTabs button img.emb{width:28px;height:28px}
+ .shDBox{grid-template-columns:1fr;grid-template-rows:34% 1fr;height:100%}
+ .shDInfo{padding:12px 14px 12px;gap:9px}.shG p{font-size:13px;line-height:1.5}
+ .shNm{font-size:13px}.shTag{font-size:11px}
+}
+/* landscape phone: compact header */
+@media (orientation:landscape) and (max-height:520px){
+ #shop .shBox{gap:6px;padding-top:max(8px,env(safe-area-inset-top));padding-bottom:max(6px,env(safe-area-inset-bottom))}
+ .shTt span{display:none}.shTt h2{font-size:20px}.shBack{min-height:34px}
+ .shTabs button{min-height:40px;padding:3px 10px}.shTabs button img.emb{width:24px;height:24px}.shTabs button b{font-size:14px}
+ .shPg{min-height:30px}.shPg button{height:28px}
+ .shDBox{height:100%;grid-template-columns:36% 1fr}.shDInfo{padding:10px 14px;gap:7px}.shDName h3{font-size:30px}
+ .shG>img{width:40px;height:40px}.shG b{font-size:15px}.shG p{font-size:12px;line-height:1.45;margin-top:3px}
+ .shStats div{padding:4px}.shStats b{font-size:16px}.shDice div{padding:3px 6px;gap:2px}.shCta{padding-top:7px}.shBuy,.shOwn{min-height:40px;font-size:17px}.shPrice b{font-size:21px}
+}
+.shNm.l{font-size:13px}.shNm.xl{font-size:11.5px;letter-spacing:0}
+.shOrig{border-top:1px dashed rgba(255,255,255,.12);padding-top:8px;color:#9fb0bf!important;font-size:12.5px!important}
+.shOrig small{display:block;font-size:10.5px;letter-spacing:.14em;color:var(--sc);margin-bottom:2px}
+.shOrig em{font-style:normal;color:#e3c27a}
+.shBuy{text-align:center;padding:0 0 0 .3em}
+@media (orientation:portrait) and (max-width:700px){.shDBox{grid-template-rows:42% 1fr}.shNm.l{font-size:12px}.shNm.xl{font-size:10.5px}}
+@media (orientation:landscape) and (max-height:520px){.shOrig{display:none}}
+/* v50: name size follows the card width so long names never get cut */
+.shC{container-type:inline-size}
+#shop .shNm,#shop .shNm.l,#shop .shNm.xl{font-size:min(15px,calc((100cqw - 16px) / (var(--n) * .74)));letter-spacing:.02em;text-overflow:clip}
 @media (max-width:760px){
  .title{grid-template-columns:1fr!important}
  .tlogo{padding:10px 14px;max-width:100%}.tlogo .six{height:70px}.tlogo .r6{height:20px}.tlogo h1{font-size:32px!important;white-space:nowrap}.tlogo .lg small{font-size:10px;letter-spacing:.3em}.tlogo .lg{gap:12px}
@@ -6331,7 +6442,7 @@ function renderTitle(){
   const on=(id,fn)=>{const b=$('#'+id);if(b)b.onclick=e=>{if(b._sh)return;if(b.classList.contains('tbtn')){b._sh=1;shatter(b,e).then(()=>{b._sh=0;fn(e);});}else fn(e);};};
   on('t-pve',()=>{['A','D'].forEach(s=>{cfg.picks[s]=cfg.picks[s].filter(owned);});SCREEN='setup';WZ.step=0;WZ.seen=0;render();});on('t-pvp',()=>{SCREEN='pvp';NETMSG='';renderTitle();});on('t-rank',()=>{NETMSG='';rankQueue();});on('t-lib',()=>{SCREEN='lib';NETMSG='';renderTitle();});
   on('t-login',acctLogin);on('t-queue',rankQueue);on('t-qcancel',()=>{rankCancel();SCREEN='title';renderTitle();});if(SCREEN==='task')bindTask();
-  el.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openOpSelect(b.dataset.edit,renderTitle));on('t-tut',startTutorial);on('t-man',()=>openManual());on('t-ach',()=>openAch('ach'));on('t-ops',()=>openOpSelect(cfg.side,null,true));on('t-shop',()=>{const s=cfg.side;openOpSelect(s,()=>{renderTitle();renderPlayer();},'shop');OSEL.cur=OPBASE.find(b=>OPC[b].side===s&&!owned(b))||OSEL.cur;renderOpSelect(true);});
+  el.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openOpSelect(b.dataset.edit,renderTitle));on('t-tut',startTutorial);on('t-man',()=>openManual());on('t-ach',()=>openAch('ach'));on('t-ops',()=>openOpSelect(cfg.side,null,true));on('t-shop',()=>openShop());
   on('t-back',()=>{SCREEN='title';NETMSG='';renderTitle();});on('t-back2',()=>{SCREEN='pvp';NETMSG='';renderTitle();});on('t-back3',()=>{SCREEN='pvp';NETMSG='';renderTitle();});
   on('t-create',()=>{SCREEN='create';NETMSG='';renderTitle();});on('t-find',()=>{SCREEN='find';NETMSG='';if(NET)NET.list=null;renderTitle();netList();});
   on('t-go',netCreate);on('t-cancel',()=>{netLeave();SCREEN='pvp';renderTitle();});on('t-refresh',()=>{if(NET)NET.list=null;renderTitle();netList();});
@@ -7021,6 +7132,80 @@ function taskHTML(){ecoRoll();const row=(id,daily)=>{const t=TKALL[id],p=tkProg(
   <p class="tkFoot">對局獎勵：線上對戰 勝 300／敗 120 · 電腦練習 勝 150／敗 50（每日上限 1,500）· 自訂房間 勝 30／敗 10</p>`;}
 function bindTask(){document.querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{const id=b.dataset.tk,daily=id[0]==='d',t=TKALL[id],L=daily?ECO.dc:ECO.wc;
   if(L.includes(id)||tkProg(id,daily)<t[3])return;L.push(id);ecoAdd(t[4]);ecoSave();try{SFX.alert();}catch(e){}renderTitle();renderPlayer();});}
+// ---------- shop: a dedicated page for unlocking operators with renown ----------
+const SHOP={side:'A',filter:'all',pg:0,sel:null,per:12};
+const shopAll=s=>OPBASE.filter(b=>OPC[b].side===s&&!b.startsWith('recruit_'));
+// what can be bought comes first, then what is coming later, then what is already owned
+const shopRank=b=>owned(b)?2:opPlayable(b)?0:1;
+function shopList(){return shopAll(SHOP.side).filter(b=>SHOP.filter==='all'||!owned(b)).map((b,i)=>[b,i]).sort((x,y)=>shopRank(x[0])-shopRank(y[0])||x[1]-y[1]).map(x=>x[0]);}
+function openShop(side){SHOP.side=side||cfg.side||'A';SHOP.pg=0;SHOP.sel=null;let el=$('#shop');
+  if(!el){el=document.createElement('div');el.id='shop';el.setAttribute('role','dialog');el.setAttribute('aria-label','商店');document.body.appendChild(el);
+    addEventListener('resize',()=>{if(!el.hidden)renderShop();});
+    addEventListener('keydown',e=>{if(el.hidden||e.key!=='Escape')return;if(SHOP.sel){SHOP.sel=null;renderShopDet();}else closeShop();});}
+  el.hidden=false;el.classList.remove('out');renderShop();}
+function closeShop(){const el=$('#shop');if(!el)return;el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');},180);renderPlayer();if(SCREEN==='title')renderTitle();}
+function shopCard(b){const c=OPC[b],own=owned(b),play=opPlayable(b),st=own?'own':play?'buy':'soon';
+  return `<button class="shC ${st} ${c.side}" data-sb="${b}" aria-label="${esc(c.name)}"><span class="shArtW"><img class="shArt" src="${opArt(b)||opIcon(b)}" alt="" loading="lazy"></span>
+    <img class="shIc" src="${opIcon(b)}" alt=""><span class="shNm" style="--n:${c.name.length}">${esc(c.name)}</span>
+    <span class="shTag">${own?'<i class="shOk">✓</i>已擁有':play?`${RNI}${fmtN(OPPRICE)}`:'即將開放'}</span></button>`;}
+function renderShop(){const el=$('#shop');if(!el||el.hidden)return;const s=SHOP.side;
+  const cnt=k=>{const a=shopAll(k);return [a.filter(owned).length,a.length];};
+  el.dataset.side=s;
+  el.innerHTML=`<div class="shBox">
+    <header class="shHd"><button class="shBack" id="shBack">‹ 返回</button><div class="shTt"><h2>商店</h2><span>用聲望解鎖新幹員</span></div><div class="shBal" id="shBal">${RNI}<b>${fmtN(ECO.rn)}</b></div></header>
+    <div class="shBar"><div class="shTabs" role="tablist">${['A','D'].map(k=>{const [o,n]=cnt(k);return `<button role="tab" data-ss="${k}" class="${k} ${k===s?'on':''}" aria-selected="${k===s}">${emblem(k)}<span><b>${k==='A'?'進攻方':'防守方'}</b><small>已擁有 ${o}/${n}</small></span></button>`;}).join('')}</div>
+      <div class="shFil">${[['all','全部'],['new','未擁有']].map(([k,t])=>`<button data-sf="${k}" class="${SHOP.filter===k?'on':''}">${t}</button>`).join('')}</div></div>
+    <div class="shStage" id="shStage"><div class="shGrid" id="shGrid"></div></div>
+    <footer class="shPg" id="shPg"></footer></div><div class="shDet" id="shDet" hidden></div>`;
+  $('#shBack').onclick=closeShop;
+  el.querySelectorAll('[data-ss]').forEach(b=>b.onclick=()=>{if(SHOP.side===b.dataset.ss)return;SHOP.side=b.dataset.ss;SHOP.pg=0;renderShop();});
+  el.querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{SHOP.filter=b.dataset.sf;SHOP.pg=0;renderShop();});
+  const stg=$('#shStage');let x0=null;stg.onpointerdown=e=>{x0=e.clientX;};stg.onpointerup=e=>{if(x0==null)return;const dx=e.clientX-x0;x0=null;if(Math.abs(dx)>50)shopPage(dx<0?1:-1);};
+  shopLayout();renderShopDet();}
+// cards are sized to fill the stage exactly; whatever does not fit goes to the next page (no scrolling)
+function shopLayout(){const stg=$('#shStage'),g=$('#shGrid');if(!stg||!g)return;const L=shopList();
+  const W=stg.clientWidth,H=stg.clientHeight,gap=W<500?8:12,ratio=1.36,minW=W<500?80:W<900?96:118,maxW=W<500?118:170;
+  let cols=Math.max(2,Math.floor((W+gap)/(minW+gap))),w=(W-(cols-1)*gap)/cols;if(w>maxW){w=maxW;cols=Math.max(2,Math.floor((W+gap)/(w+gap)));}
+  let h=w*ratio,rows=Math.max(1,Math.floor((H+gap)/(h+gap)));
+  // a single row of tall cards wastes the stage: shrink the cards until two rows fit
+  if(rows<2&&H>2*96+gap){h=(H-gap)/2;w=h/ratio;rows=2;cols=Math.max(2,Math.floor((W+gap)/(w+gap)));}
+  // nearly fits on one page: shrink a little so nobody is left alone on page two
+  for(let k=0;k<12&&cols*rows<L.length&&L.length<=cols*rows*1.3;k++){w*=.96;h=w*ratio;cols=Math.max(2,Math.floor((W+gap)/(w+gap)));rows=Math.max(1,Math.floor((H+gap)/(h+gap)));}
+  const per=SHOP.per=cols*rows,pages=Math.max(1,Math.ceil(L.length/per));SHOP.pg=Math.min(SHOP.pg,pages-1);
+  // no empty band: let the cards grow taller to fill the stage height
+  {const ru=pages>1?rows:Math.max(1,Math.ceil(L.length/cols));h=Math.max(h,Math.min(w*1.85,(H-(ru-1)*gap)/ru));}
+  g.style.gridTemplateColumns=`repeat(${cols},${Math.floor(w)}px)`;g.style.gridAutoRows=`${Math.floor(h)}px`;g.style.gap=gap+'px';
+  const items=L.slice(SHOP.pg*per,SHOP.pg*per+per);
+  g.innerHTML=items.length?items.map(shopCard).join(''):`<div class="shEmpty"><b>這一方的幹員都買齊了</b><span>切到「全部」可以看所有幹員</span></div>`;
+  g.classList.toggle('empty',!items.length);
+  g.querySelectorAll('[data-sb]').forEach(b=>b.onclick=()=>{SHOP.sel=b.dataset.sb;renderShopDet();});
+  const pg=$('#shPg');pg.innerHTML=pages>1?`<button id="shPrev" ${SHOP.pg?'':'disabled'} aria-label="上一頁">‹</button><span class="shDots">${Array.from({length:pages},(_,i)=>`<i class="${i===SHOP.pg?'on':''}" data-pg="${i}"></i>`).join('')}</span><span class="shPn">${SHOP.pg+1} / ${pages}</span><button id="shNext" ${SHOP.pg<pages-1?'':'disabled'} aria-label="下一頁">›</button>`:`<span class="shPn">共 ${L.length} 名</span>`;
+  pg.classList.toggle('one',pages<=1);
+  const pv=$('#shPrev'),nx=$('#shNext');if(pv)pv.onclick=()=>shopPage(-1);if(nx)nx.onclick=()=>shopPage(1);pg.querySelectorAll('[data-pg]').forEach(d=>d.onclick=()=>{SHOP.pg=+d.dataset.pg;shopLayout();});}
+function shopPage(d){const pages=Math.max(1,Math.ceil(shopList().length/SHOP.per)),n=Math.max(0,Math.min(pages-1,SHOP.pg+d));if(n===SHOP.pg)return;SHOP.pg=n;shopLayout();const g=$('#shGrid');if(g){g.classList.remove('slideL','slideR');void g.offsetWidth;g.classList.add(d>0?'slideL':'slideR');}}
+function renderShopDet(){const el=$('#shDet');if(!el)return;const b=SHOP.sel;if(!b){el.hidden=true;el.innerHTML='';return;}
+  const c=OPC[b],own=owned(b),play=opPlayable(b),ok=ECO.rn>=OPPRICE,fx=(typeof GDX!=='undefined'&&GDX[b])?GDX[b][0]:'',m=mxInfo(b);
+  const cta=own?`<div class="shCta own"><span class="shOwn"><i class="shOk">✓</i>已擁有</span><span class="shNote">熟練度 Lv${m.lv} · 可以在對戰中選他</span></div>`
+    :!play?`<div class="shCta"><button class="shBuy" disabled>即將開放</button><span class="shNote">這名幹員的能力還在製作中</span></div>`
+    :`<div class="shCta"><div class="shPrice">${RNI}<b>${fmtN(OPPRICE)}</b></div><button class="shBuy" id="shBuy" ${ok?'':'disabled'}>${ok?'購買':'聲望不足'}</button><span class="shNote">${ok?`購買後剩 ${fmtN(ECO.rn-OPPRICE)}`:`還差 ${fmtN(OPPRICE-ECO.rn)}，完成每日、每週任務最快`}</span></div>`;
+  el.hidden=false;el.dataset.side=c.side;
+  el.innerHTML=`<div class="shDBox ${c.side}" role="dialog" aria-label="${esc(c.name)}">
+    <div class="shDArt"><img src="${opArt(b)||opIcon(b)}" alt=""><button class="shX" id="shX" aria-label="關閉">✕</button>
+      <div class="shDName"><div class="shDSide">${emblem(c.side)}<span>${c.side==='A'?'進攻方':'防守方'}${c.zh.role?` · ${esc(c.zh.role)}`:''}</span></div><h3>${esc(c.name)}</h3><span class="shDOrg">${esc(c.org||'')}${c.real?' · '+esc(c.real):''}</span></div></div>
+    <div class="shDInfo">
+      <div class="shG"><img src="${opIcon(b)}" alt=""><div><b>${esc(c.zh.g||c.g.name||'')}</b>${c.g.charges?`<small>使用 ${c.g.charges} 次</small>`:''}<p>${fx||cardText(c)}</p>${fx&&c.zh.x?`<p class="shOrig"><small>原版卡片</small>${cardText(c)}</p>`:''}</div></div>
+      <div class="shStats"><div><b>${c.st??'—'}</b><small>耐力</small></div><div><b>${c.run?'+'+c.run:'—'}</b><small>奔跑</small></div><div><b><span class="dzb ${c.dz}"></span>${DZN[c.dz]||'—'}</b><small>破壞力</small></div><div><b>${c.g.charges??'—'}</b><small>裝置次數</small></div></div>
+      <div class="shDice">${['近 1–3','中 4–6','遠 7+'].map((r,i)=>`<div><small>${r}</small><span>${hexDice(c.w[i])}</span></div>`).join('')}</div>
+      ${cta}</div></div>`;
+  el.onclick=e=>{if(e.target===el){SHOP.sel=null;renderShopDet();}};$('#shX').onclick=()=>{SHOP.sel=null;renderShopDet();};
+  const by=$('#shBuy');if(by)by.onclick=()=>shopBuy(b);}
+function shopBuy(b){if(owned(b)||!opPlayable(b)||ECO.rn<OPPRICE)return;const from=ECO.rn;ECO.rn-=OPPRICE;ECO.own.push(b);ecoSave();
+  try{SFX.round&&SFX.round();}catch(e){}
+  const box=document.querySelector('.shDBox');if(box){box.classList.add('got');}
+  // count the balance down so the cost is felt
+  const bal=document.querySelector('#shBal b'),t0=performance.now(),D=700;const step=t=>{const k=Math.min(1,(t-t0)/D);if(bal)bal.textContent=fmtN(from-(from-ECO.rn)*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);
+  setTimeout(()=>{renderShopDet();shopLayout();const tb=document.querySelectorAll('#shop .shTabs small');['A','D'].forEach((k,i)=>{const a=shopAll(k);if(tb[i])tb[i].textContent=`已擁有 ${a.filter(owned).length}/${a.length}`;});},750);
+  achToastMsg(`已解鎖 ${OPC[b].name}`,'現在可以在對戰中選他出場');renderPlayer();}
 // ---------- PvP: the map is drawn at random and revealed once both players are in ----------
 function showMapReveal(key,side,done){const m=MAPS[key];let el=$('#mreveal');if(el)el.remove();el=document.createElement('div');el.id='mreveal';el.className='mreveal';el.setAttribute('role','dialog');el.setAttribute('aria-label','地圖揭曉');
   el.innerHTML=`<small>配對成功 · 地圖抽選中</small><div class="roll"></div><img alt="${m.name}平面圖" src="${mapThumb(key)}"><div class="meta"><span>任務 <b>炸彈</b></span><span>你是 <b class="${side==='A'?'a':'d'}">${side==='A'?'進攻方':'防守方'}</b></span></div><small style="margin-top:14px">點一下繼續</small>`;
