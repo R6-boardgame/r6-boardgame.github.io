@@ -6164,12 +6164,25 @@ function unit3D(u){
   R3.unitG.add(f.grp);R3.figs[u.id]=f;return f;
 }
 function clearFigs(){for(const k in R3.figs){R3.unitG.remove(R3.figs[k].grp);}R3.figs={};}
+// target glow: an open tube of light standing on the figure's base, bright at the floor and gone by the waist, plus a ring on the base
+function tgtGlow(list){if(!R3)return;let g=R3.glow;
+  if(!g){const c=document.createElement('canvas');c.width=4;c.height=128;const x=c.getContext('2d'),gr=x.createLinearGradient(0,128,0,0);
+    gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.3,'rgba(255,255,255,.85)');gr.addColorStop(.7,'rgba(255,255,255,.35)');gr.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=gr;x.fillRect(0,0,4,128);
+    const am=new THREE.CanvasTexture(c),N=24,mk=(geo,mat)=>{const m=new THREE.InstancedMesh(geo,mat,N);m.count=0;m.frustumCulled=false;m.renderOrder=4;R3.scene.add(m);return m;};
+    const tm=new THREE.MeshBasicMaterial({color:0xffffff,alphaMap:am,transparent:true,opacity:.9,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending});
+    const rm=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.85,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending});
+    const tube=mk(new THREE.CylinderGeometry(.42,.44,.8,40,1,true),tm),ring=mk(new THREE.RingGeometry(.38,.47,48),rm);ring.geometry.rotateX(-Math.PI/2);
+    tube.onBeforeRender=()=>{const t=performance.now()/1000;tm.opacity=.7+.25*Math.sin(t*4);rm.opacity=.6+.3*Math.sin(t*4);};
+    g=R3.glow={tube,ring};}
+  const M=new THREE.Matrix4();let i=0;
+  for(const [x,y,,col] of list){if(i>=24)break;const C=new THREE.Color(col);M.makeTranslation(x+.5,.41,y+.5);g.tube.setMatrixAt(i,M);g.tube.setColorAt(i,C);M.makeTranslation(x+.5,.035,y+.5);g.ring.setMatrixAt(i,M);g.ring.setColorAt(i,C);i++;}
+  for(const m of [g.tube,g.ring]){m.count=i;m.instanceMatrix.needsUpdate=true;if(m.instanceColor)m.instanceColor.needsUpdate=true;}}
 function setInst(im,list,yy,scaleY){const m=new THREE.Matrix4();let i=0;for(const [x,y,h,col] of list){m.makeScale(.98,h||1,.98);m.setPosition(x+.5,(yy!=null?yy:(h||1)/2),y+.5);im.setMatrixAt(i,m);if(col!=null&&im.setColorAt)im.setColorAt(i,new THREE.Color(col));i++;}
   im.count=i;im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;}
 function preview3D(){
   const mk=SCREEN==='setup'?cfg.map:'consulate',m=MAPS[mk];G={map:m,grid:parseMap(m),W:22,H:m.rows.length,gadgets:[],units:[],player:'A',over:true};
   const sig='pv'+mk+R3.wall;if(R3.sig!==sig){R3.sig=sig;buildStatic(m);clearFigs();}
-  R3.fogIM.count=0;R3.reachIM.count=0;R3.tgtIM.count=0;
+  R3.fogIM.count=0;R3.reachIM.count=0;R3.tgtIM.count=0;tgtGlow([]);
   const dg=R3.dynG;while(dg.children.length)dg.remove(dg.children[0]);
   setInst(R3.tgtIM,m.spawns.flatMap(z=>z.cells.map(([x,y])=>[x,y,.05,0xef7f3e])),.03);
   m.cams.forEach(([x,y])=>dg.add(gadget3D({type:'cam',x,y})));
@@ -6522,15 +6535,15 @@ function update3D(){
   const fog=[];if(G.phase==='play'&&!G.over){const v=fogVis();for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++)if(!v.has(y*G.W+x)&&!isWallC(G.grid[y][x]))fog.push([x,y]);}
   setInst(R3.fogIM,fog,.012);
   // reach + targets
-  const reach=[],tg=[];const WH=WALLH[R3.wall];
+  const reach=[],tg=[],glow=[];const WH=WALLH[R3.wall];
   if(G.mode==='move'&&G.sel&&G.phase==='play'&&canAct(G.sel)&&!(G.active===G.sel&&G.sel.mp<=0)){
     const mp=G.active===G.sel?G.sel.mp:G.sel.speed;const m=reach2(G.sel,mp);for(const [k,v] of m)if(v.d>0&&!v.pass)reach.push([k%G.W,(k/G.W)|0]);}
   if(G.mode==='move'&&G.sel&&G.phase==='play')for(const [x,y] of camClicks(G.sel))tg.push([x,y,.08,0xe8574e]);
   else if(!(G.phase==='setup'&&G.mode==='move')){const col=G.mode==='shoot'?0xe8574e:G.mode==='dronemove'?0x46d17c:0xe3aa3e;
-    for(const [x,y] of curTargets()){const c=cell(x,y);const wall=isWallC(c);tg.push([x,y,wall?WH+.08:(unitAt(x,y)?1.1:.08),col]);}}
+    for(const [x,y] of curTargets()){const c=cell(x,y);const wall=isWallC(c);if(!wall&&unitAt(x,y)){glow.push([x,y,0,col]);continue;}tg.push([x,y,wall?WH+.08:.08,col]);}}
   if(G.phase==='setup'&&G.player==='A')G.map.spawns.forEach((z,i)=>z.cells.forEach(([x,y])=>tg.push([x,y,.06,i===G.spawn?0xffa060:0xef7f3e])));
   if(G.scanFx&&performance.now()<G.scanFx.until){for(const [x,y] of G.scanFx.cells)if(!isWallC(cell(x,y)))tg.push([x,y,.05,G.scanFx.c||0x5ad0ff]);setTimeout(()=>{if(G&&G.scanFx&&performance.now()>=G.scanFx.until){G.scanFx=null;render();}},1450);}
-  setInst(R3.reachIM,reach,.02);setInst(R3.tgtIM,tg);R3.hl=new Set([...reach,...tg].map(c=>c[0]+','+c[1]));
+  setInst(R3.reachIM,reach,.02);setInst(R3.tgtIM,tg);tgtGlow(glow);R3.hl=new Set([...reach,...tg,...glow].map(c=>c[0]+','+c[1]));
   // gadgets, defuser, trail
   const dg=R3.dynG;while(dg.children.length)dg.remove(dg.children[0]);
   for(const g of G.gadgets){if(!g.alive)continue;if(!G.over&&!gadgetVisibleTo(g,G.player))continue;const gm3=gadget3D(g);if(CAMT.includes(g.type))gm3.userData.cell=[g.x,g.y];dg.add(gm3);}
