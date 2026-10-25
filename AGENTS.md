@@ -6,7 +6,7 @@
 
 - 《Rainbow Six Siege – The Board Game》的網頁版，可對戰電腦、新手教學、自訂房間連線、排名戰、成就、商店。
 - 線上版：https://r6-boardgame.github.io/ （GitHub Pages，`main` 分支根目錄直接發佈，推上去就上線）。
-- 目前版本 v71（見 `git log`）。
+- 目前版本 v72（見 `git log`）。
 
 ## 檔案結構
 
@@ -49,7 +49,7 @@
 1. 直接改 `index.html`（從現在起它就是唯一原始碼）。
 2. 本機測試：`python3 -m http.server` 後開 `http://localhost:8000/`。至少測兩種尺寸：**手機直式 390×844** 與 **桌機 1400×900**。
 3. 自動化測試建議用 Playwright：開頁 → `#t-pve` 進入對戰電腦 → 可在 `page.evaluate` 裡直接呼叫全域函式（例如 `WZ.step=2;renderWiz()` 跳到選地圖），截圖確認並收集 `pageerror`，必須沒有錯誤。
-4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v72）。
+4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v73）。
 
 ### 舊流程說明（只是背景，不需要照做）
 
@@ -74,6 +74,7 @@
 - 移除手機橫放提示。
 - 選地圖：拿掉「再點一次確定」標籤與地圖說明，選中的地圖名字下方顯示小格局圖（v70）。
 - 可攻擊的敵人不再整格變紅，改成底座紅環加往上到腰部的紅光（v71）。
+- 銀行地圖照真實一樓藍圖重做（v72）：28×19 格，A 檔案室、B 櫃員室；彎的櫃台是可翻越的掩護（`arc` prop）；家具型別見 `BANKP`、`bankProp`、`drawBankProp`；銀行專用地板 `bankTEX`（bmarble、bcarpet…）與米白牆 `bankWallMats`；地圖欄位 `tl:1` 表示 props 座標是左上角，`matRects` 可指定局部地板材質。
 
 ## 尚未完成 / 等使用者回覆
 

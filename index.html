@@ -3493,27 +3493,31 @@ const MAPS={
     labels:[['酒吧',4.5,5.5,'wood'],['撞球間',11,3.5,'redcarpet'],['CCTV 室',17.5,2.5,'tile'],['走廊',15,7.5,'wood'],['健身房',4.5,9.5,'rubber'],['教堂',11,11.5,'parquet'],['車庫',17.5,10.5,'concrete']],
     props:[['bar',2.15,2.2,4.7,.55],['plant',6.25,5.25,.6,.6],['pool',9.3,4.2,2.6,1.3],['plant',12.35,2.2,.6,.6],['desk',15.2,5.35,3.6,.55],['mat',2.3,10.2,2.2,1.3],['bench',5.3,11.3,1.4,.45],['pew',8.2,11.25,1.5,.5],['pew',12.3,11.25,1.5,.5],['car',16.4,9.1,1.4,2.4],['crate',18.7,11.15,.7,.7],['car',2.2,13.3,2.4,1.3],['car',15.2,13.3,2.4,1.3],['tree',19.5,14.3,1.2,1.2],['tree',0.1,1.6,.9,.9]],
     spawns:[{name:'西側巷口',cells:[[0,5],[0,6],[0,7],[0,8],[0,9]]},{name:'南側停車場',cells:[[9,13],[10,13],[11,13],[12,13],[10,14]]},{name:'東側車庫',cells:[[21,8],[21,9],[21,10],[21,11],[21,12]]}]},
-  bank:{name:'銀行',sub:'依原作一樓藍圖改編：A 點在櫃員辦公室，B 點在開放辦公區；西側是挑高大廳與櫃台。',rows:[
-    '~~~~~~~~~~~~~~~~~~~~~~',
-    '~##=DD=##~~~~~~~~~~~~~',
-    '~#......#~~~~~~~~~~~~~',
-    '~#=D==D=#~~~~~~~~~~~~~',
-    '~#......#=W=#=W=#=D=#~',
-    '~#......=...=...#...#~',
-    '~W......=AA.D...#...W~',
-    '~#......DAA.=...D...#~',
-    '~W......=...=...#...#~',
-    '~#......#=D=#==D#=D=#~',
-    '~#......D...=...=...#~',
-    '~#==D===#...D.BB=...W~',
-    '~W......=...=.BBD...#~',
-    '~#......#...=...=...D~',
-    '~#=W==W=##D###=W=#==#~',
-    '~~~~~~~~~~~~~~~~~~~~~~'],
-    cams:[[3,7],[10,11],[18,6]],
-    labels:[['前廳',4.5,2,'marble'],['大廳',4.5,6.5,'marble'],['貴賓室',4.5,12.5,'redcarpet'],['櫃員辦公室',10,5.5,'wood'],['檔案室',14,6.5,'concrete'],['東側樓梯',18,6.5,'tile'],['電梯走廊',10,12.5,'tile'],['開放辦公區',14,10.5,'carpet'],['員工休息室',18,11.5,'tile']],
-    props:[['bar',5.25,5.2,.55,4.4],['plant',2.15,4.15,.6,.6],['plant',2.15,9.3,.6,.6],['sofa',2.3,12.2,1.6,.55],['desk',9.3,7.9,1.6,.55],['table',13.3,5.3,1.6,.7],['table',13.3,7.6,1.6,.7],['desk',13.2,12.4,1.5,.55],['table',17.4,11.8,1.3,.8],['crate',18.8,8.2,.7,.7],['tree',12.3,1.2,.9,.9],['tree',15.2,1.6,.9,.9],['tree',18.6,1.3,.9,.9]],
-    spawns:[{name:'北側廣場',cells:[[11,2],[12,2],[13,2],[11,3],[12,3]]},{name:'西側大街',cells:[[0,5],[0,6],[0,7],[0,8],[0,9]]},{name:'南側巷道',cells:[[9,15],[10,15],[11,15],[12,15],[13,15]]}]},
+  bank:{name:'銀行',sub:'',tl:1,rows:[
+    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
+    '~####DD#####~~~~~~~~~~~~~~~~',
+    '~W.........#~~~~~~~~~~~~~~~~',
+    '~#.........#~~~~~~~~~~~~~~~~',
+    '~###D###D###~~~~~~~~~~~~~~~~',
+    '~W.........##W##W####W#####~',
+    '~#.........D..#....#...####~',
+    '~W.........=BB#..AAD...####~',
+    '~#.........=BB#..AA#...####~',
+    '~W.........D..D....W...D..#~',
+    '~#.........#..#====#==D=..D~',
+    '~W.........#.##....=...D..#~',
+    '~#==D=#D=D=#D##....=...##D#~',
+    '~#....=......###D##=...W~~~~',
+    '~W....=......D.....D...#~~~~',
+    '~##WW###D##.##.....#===#~~~~',
+    '~~~~~~#..#...#.....D...W~~~~',
+    '~~~~~~##################~~~~',
+    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~'],
+    cams:[[3,6],[22,6],[15,3],[25,14]],
+    labels:[['前廳',6,2.6,'bentry'],['大廳',4.5,7.6,'bmarble'],['櫃員室',12.9,10.5,'bconc'],['檔案室',16.9,9.5,'bgrey'],['天窗大廳',21.5,7.5,'bbeige'],['後勤室',25,10.5,'bconc'],['行政辦公室',16.5,11.9,'bcarpet'],['餐廳',21,14.6,'bwhite'],['影印室',21.5,16.5,'bgrey'],['辦公走廊',10,13.6,'bbeige'],['開放辦公區',16.5,15.9,'bgrey'],['貸款辦公室',3.9,14.6,'bcarpet'],['電梯',8,16.5,'bconc'],['樓梯',11.5,16.5,'bbeige'],['櫃台',9.4,7.4,'bmarble']],
+    matRects:[[7,6,10,11,'bcarpet'],[5,2,6,3,'bcarpet']],
+    props:[['plant',2.1,2.1,0.6,0.6],['plant',9.3,2.1,0.6,0.6],['atm',7.1,2.03,0.5,0.32],['atm',7.75,2.03,0.5,0.32],['atm',8.4,2.03,0.5,0.32],['rug',4.15,2.05,2.7,1.9],['hedge',2.04,5.2,0.3,6.6],['pillar',2.62,6.0,0.5,0.5],['pillar',2.62,8.4,0.5,0.5],['pillar',2.62,10.7,0.5,0.5],['sofa',4.1,5.08,1.7,0.5],['chair',3.35,6.2,0.45,0.45],['chair',3.4,7.55,0.45,0.45],['ctable',4.0,6.7,0.6,0.45],['chair',3.3,9.85,0.45,0.45],['poster',9.2,5.05,0.6,0.18],['postarc',11.0,11.6,4.15,182,268],['cstairs',5.95,9.25,1.85,95,178],['arc',11.0,11.6,2.85,182,268],['pc',9.25,10.15,0.3,0.22],['pc',9.95,9.55,0.3,0.22],['hatch',9.1,11.1,0.8,0.8],['desk',12.05,6.1,1.7,0.55],['desk',12.1,9.9,0.55,1.2],['printer',12.2,11.25,0.55,0.55],['shelf',15.05,6.1,0.42,3.8],['shelf',16.1,6.15,0.85,0.36],['shelf',16.1,7.4,0.85,0.36],['shelf',16.1,8.65,0.85,0.36],['cabinet',18.4,9.15,0.5,0.7],['stairs',20.05,6.05,1.7,0.85],['stairs',22.15,6.05,0.8,0.7],['hatch',21.1,7.25,0.8,0.8],['chair',20.25,8.4,0.45,0.45],['desk',21.85,8.0,0.6,1.3],['shelf',25.5,9.05,0.42,2.8],['crate',24.15,9.15,0.6,0.6],['desk',15.15,11.15,1.5,0.55],['hatch',17.1,11.15,0.8,0.8],['cabinet',18.35,11.1,0.5,0.42],['table',20.25,11.85,1.3,0.7],['table',20.25,13.35,1.3,0.7],['counter',22.48,11.9,0.45,3.0],['tv',21.0,11.04,0.9,0.12],['dishes',22.52,13.9,0.36,0.6],['printer',20.2,16.18,0.6,0.6],['printer',21.15,16.18,0.6,0.6],['shelf',22.5,16.05,0.42,0.85],['cubicle',14.2,14.2,1.6,1.25],['cubicle',16.35,14.2,1.6,1.25],['desk',14.2,16.3,1.1,0.5],['plant',18.3,16.3,0.55,0.55],['plant',12.35,13.1,0.55,0.55],['plant',7.1,13.1,0.55,0.55],['sofa',2.05,13.1,0.5,1.75],['desk',3.9,13.3,1.4,0.55],['plant',5.35,14.35,0.5,0.5],['hatch',7.1,16.1,0.8,0.8],['stairs',10.1,16.08,2.8,0.84],['tree',13.0,1.1,0.9,0.9],['tree',18.0,1.2,0.9,0.9],['tree',21.2,1.0,0.9,0.9],['bench',17.3,3.3,1.4,0.45],['bench',19.6,3.3,1.4,0.45],['planter',23.0,2.6,0.8,0.8],['car',0.1,1.4,1.1,2.3],['car',0.1,11.8,1.1,2.3],['car',25.0,16.1,2.4,1.2]],
+    spawns:[{name:'北側廣場',cells:[[13,3],[14,3],[15,3],[16,3],[14,4]]},{name:'西側停車場',cells:[[0,5],[0,6],[0,7],[0,8],[0,9]]},{name:'東側後巷',cells:[[25,13],[26,13],[26,14],[26,15],[26,16]]}]},
   kafe:{name:'咖啡館',sub:'依原作一樓藍圖改編：A 點在廚房烹飪區，B 點在出餐區；北側臨街大門，南側後巷。',rows:[
     '~~~~~~~~~~~~~~~~~~~~~~',
     '~#=W==#=DD=#W=W==W=W#~',
@@ -3608,12 +3612,14 @@ function los(x0,y0,x1,y1,located,noOps){
 function protection(sh,t){let n=PROF[t.op]&&PROF[t.op].shield?1:0,ob=0;for(const [x,y] of lineCells(sh.x,sh.y,t.x,t.y)){const c=cell(x,y);
     if(c.breach||c.t==='soft'||c.t==='bar')n++;else if(shieldAt(x,y)&&cheb(x,y,t.x,t.y)<=1)n++;else if(c.obst&&!ob&&cheb(x,y,t.x,t.y)<=1){ob=1;n++;}}if(t.op==='montagne'&&t.rnd===G.round)n=Math.max(n,2);return n>=2?((t.op==='montagne'||t.op==='clash')?4:3):n?2:0;}
 
-const OBSTK=new Set(['desk','sofa','table','bar','pool','bench','pew','car','crate','counter','shelf','bed']);
+const OBSTK=new Set(['desk','sofa','table','bar','pool','bench','pew','car','crate','counter','shelf','bed','arc','cstairs','stairs','cubicle','pillar']);
 function markObst(g,m){const sp=new Set((m.spawns||[]).flatMap(z=>z.cells.map(([x,y])=>y*999+x)));
-  for(const [k,cx,cy,w,h] of m.props||[]){if(!OBSTK.has(k))continue;
-    for(let y=Math.floor(cy-h/2);y<=Math.floor(cy+h/2);y++)for(let x=Math.floor(cx-w/2);x<=Math.floor(cx+w/2);x++){const c=g[y]&&g[y][x];
-      if(!c||(c.t!=='floor'&&c.t!=='out')||c.site||sp.has(y*999+x))continue;
-      if(Math.abs(x+.5-cx)<=w/2+.15&&Math.abs(y+.5-cy)<=h/2+.15)c.obst=true;}}}
+  const mark=(x,y)=>{const c=g[y]&&g[y][x];if(!c||(c.t!=='floor'&&c.t!=='out')||c.site||sp.has(y*999+x))return;c.obst=true;};
+  for(const p of m.props||[]){const [k,px,py,w,h]=p;if(!OBSTK.has(k))continue;
+    if(k==='arc'||k==='cstairs'){for(const [x,y] of arcCells(p[1],p[2],p[3],p[4],p[5]))mark(x,y);continue;}
+    const cx=m.tl?px+w/2:px,cy=m.tl?py+h/2:py,pad=m.tl?.3:.15;
+    for(let y=Math.floor(cy-h/2);y<=Math.floor(cy+h/2);y++)for(let x=Math.floor(cx-w/2);x<=Math.floor(cx+w/2);x++)
+      if(Math.abs(x+.5-cx)<=w/2+pad&&Math.abs(y+.5-cy)<=h/2+pad)mark(x,y);}}
 function parseMap(m){
   const g=m.rows.map(row=>[...row].map(ch=>{
     const c={t:'floor',indoor:true,site:null,elec:false,rubble:false,kind:null,wasSoft:false};
@@ -4547,7 +4553,7 @@ async function doCharge(u,x,y){useAct(u,'tactical');note(u,'爆破炸藥');G.cha
 
 // ---------- rendering ----------
 const cv=$('#board');let ctx=cv.getContext('2d');let S=30,M=20,OFF=false;
-const COLS='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const COLS=[...'ABCDEFGHIJKLMNOPQRSTUVWXYZ','AA','AB','AC','AD'];
 const coord=(x,y)=>COLS[x]+(y+1);
 const BODYF="'Noto Sans TC',system-ui,sans-serif",DISPF="'Saira Condensed',sans-serif",MONOF="'IBM Plex Mono',monospace";
 // floor-plan palette with material textures generated in-canvas
@@ -4610,12 +4616,113 @@ function buildTex(){
       for(let y=0;y<h;y+=1.2){g.strokeStyle=r()<.5?'rgba(255,255,255,.08)':'rgba(0,0,0,.08)';g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke();}}),
     hazard:P(16,(g,w,h)=>{g.strokeStyle='rgba(239,127,62,.22)';g.lineWidth=S*.12;for(let i=-h;i<w;i+=S*.35){g.beginPath();g.moveTo(i,h);g.lineTo(i+h,0);g.stroke();}},S,S),
   };
+  Object.assign(TEX,bankTEX(P));
+}
+// ---------- v72: bank furniture (curved counter, stairs, shelving, cubicles...), floors and walls ----------
+const BANKP=new Set(['arc','postarc','cstairs','stairs','shelf','cubicle','counter','pillar','chair','ctable','rug','hatch','printer','pc','tv','hedge','poster','atm','cabinet','dishes','planter']);
+// grid cells an arc passes through (angles in degrees, 0 = east, 90 = south)
+function arcCells(cx,cy,r,a0,a1){const out=new Map();for(let a=a0;a<=a1;a+=1.5){const t=a*Math.PI/180,x=Math.floor(cx+Math.cos(t)*r),y=Math.floor(cy+Math.sin(t)*r);out.set(x+','+y,[x,y]);}return [...out.values()];}
+function bankTEX(P){
+  const ph=(g,n,w,h,tint,a,br)=>{if(PBR.ready&&PBR.img[n]){g.drawImage(pbrCanvas(n,256,tint,a,br),0,0,w,h);return true;}return false;};
+  const grout=(g,w,n,col,lw)=>{g.fillStyle=col;const t=w/n;for(let i=0;i<=n;i++){g.fillRect(i*t-lw/2,0,lw,w);g.fillRect(0,i*t-lw/2,w,lw);}};
+  const shade=(g,w,n,r,a)=>{const t=w/n;for(let i=0;i<n;i++)for(let j=0;j<n;j++){g.fillStyle=r()<.5?`rgba(255,255,255,${a*r()})`:`rgba(60,40,20,${a*r()})`;g.fillRect(i*t,j*t,t,t);}};
+  return {
+    // lobby: cream marble slabs framed by walnut bands, dark diamonds at the joints
+    bmarble:P(41,(g,w,h,r)=>{if(!ph(g,'marble',w,h,'#f0e2c4',.6,1.05)){g.fillStyle='#e3d5b8';g.fillRect(0,0,w,h);}shade(g,w,2,r,.08);
+      const t=w/2,b=t*.085;g.fillStyle='rgba(176,140,92,.6)';for(let i=0;i<=2;i++){g.fillRect(i*t-b*1.55,0,b*.3,h);g.fillRect(i*t+b*1.25,0,b*.3,h);g.fillRect(0,i*t-b*1.55,w,b*.3);g.fillRect(0,i*t+b*1.25,w,b*.3);}
+      g.fillStyle='#4a2e1e';for(let i=0;i<=2;i++){g.fillRect(i*t-b/2,0,b,h);g.fillRect(0,i*t-b/2,w,b);}
+      g.fillStyle='#2e1c12';for(let i=0;i<=2;i++)for(let j=0;j<=2;j++){g.save();g.translate(i*t,j*t);g.rotate(Math.PI/4);g.fillRect(-b*1.25,-b*1.25,b*2.5,b*2.5);g.fillStyle='#b8925a';g.fillRect(-b*.45,-b*.45,b*.9,b*.9);g.fillStyle='#2e1c12';g.restore();}}),
+    // entrance: polished pale marble, large slabs
+    bentry:P(42,(g,w,h,r)=>{if(!ph(g,'marble',w,h,'#f6ecdb',.45,1.1)){g.fillStyle='#ece2cf';g.fillRect(0,0,w,h);}shade(g,w,4,r,.07);grout(g,w,4,'rgba(120,100,80,.45)',1.2);}),
+    // deep bank red carpet with a faint gold lattice
+    bcarpet:P(43,(g,w,h,r)=>{g.fillStyle='#7a2024';g.fillRect(0,0,w,h);speck(g,w,h,r,w*h/3,['#661a1d','#8c2a2c','#701d20','#962f31'],1.1,.5);
+      g.strokeStyle='rgba(214,170,90,.13)';g.lineWidth=Math.max(1,w/150);const s=w/4;for(let k=-4;k<=8;k++){g.beginPath();g.moveTo(k*s,0);g.lineTo(k*s+h,h);g.stroke();g.beginPath();g.moveTo(k*s,h);g.lineTo(k*s+h,0);g.stroke();}
+      g.fillStyle='rgba(214,170,90,.25)';for(let i=0;i<4;i++)for(let j=0;j<4;j++){g.beginPath();g.arc((i+.5)*s,(j+.5)*s,s*.07,0,7);g.fill();}}),
+    // office carpet tiles, alternating pile direction
+    bgrey:P(44,(g,w,h,r)=>{g.fillStyle='#a7acb1';g.fillRect(0,0,w,h);speck(g,w,h,r,w*h/3,['#93989d','#b8bdc1','#9da2a7'],1.1,.5);
+      const t=w/4;for(let i=0;i<4;i++)for(let j=0;j<4;j++){g.fillStyle=(i+j)%2?'rgba(255,255,255,.04)':'rgba(0,0,0,.035)';g.fillRect(i*t,j*t,t,t);g.strokeStyle='rgba(0,0,0,.05)';for(let k=2;k<t;k+=3){g.beginPath();(i+j)%2?(g.moveTo(i*t+k,j*t),g.lineTo(i*t+k,j*t+t)):(g.moveTo(i*t,j*t+k),g.lineTo(i*t+t,j*t+k));g.stroke();}}
+      grout(g,w,4,'rgba(40,44,48,.25)',1);}),
+    // warm limestone tiles for halls and the sky lobby
+    bbeige:P(45,(g,w,h,r)=>{if(!ph(g,'marble',w,h,'#dcc79e',.75,1)){g.fillStyle='#cdbb98';g.fillRect(0,0,w,h);}shade(g,w,4,r,.09);grout(g,w,4,'rgba(110,92,66,.55)',1.4);}),
+    // white ceramic kitchen tile
+    bwhite:P(46,(g,w,h,r)=>{if(!ph(g,'marble',w,h,'#f4f2ec',.3,1.15)){g.fillStyle='#ebe9e3';g.fillRect(0,0,w,h);}shade(g,w,6,r,.05);grout(g,w,6,'rgba(150,146,138,.7)',1.2);}),
+    // sealed light concrete
+    bconc:P(47,(g,w,h,r)=>{if(!ph(g,'concrete',w,h,'#d2d4cf',.45,1.12)){g.fillStyle='#b4b6b1';g.fillRect(0,0,w,h);speck(g,w,h,r,w*h/8,['#9a9c97','#c9cbc6'],2,.4);}grout(g,w,2,'rgba(80,82,78,.3)',1);}),
+  };
+}
+// bank walls: cream limestone-like plaster
+function bankWallMats(){
+  const N=512,c=document.createElement('canvas');c.width=c.height=N;const g=c.getContext('2d'),r=rng(91);
+  if(PBR.ready&&PBR.img.plaster)g.drawImage(pbrCanvas('plaster',N,'#f3ead8',.85,1.15),0,0);else{g.fillStyle='#ebe2cf';g.fillRect(0,0,N,N);for(let i=0;i<5000;i++){g.fillStyle=r()<.5?'rgba(0,0,0,.03)':'rgba(255,255,255,.05)';g.fillRect(r()*N,r()*N,2,2);}}
+  g.fillStyle='rgba(120,100,70,.10)';for(let y=0;y<N;y+=N/8)g.fillRect(0,y,N,2);
+  const t=canvasTex(c),side=std(0xffffff,{map:t,bumpMap:t,bumpScale:.08,roughness:.8}),top=std('#d6cdbb',{roughness:.85});
+  return [side,side,top,top,side,side];
+}
+let HATCHT=null;
+function hatchTex(){if(HATCHT)return HATCHT;const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');g.fillStyle='#e6b422';g.fillRect(0,0,128,128);
+  g.strokeStyle='#1c1a16';g.lineWidth=9;for(let k=-128;k<256;k+=32){g.beginPath();g.moveTo(k,0);g.lineTo(k+128,128);g.stroke();g.beginPath();g.moveTo(k+128,0);g.lineTo(k,128);g.stroke();}
+  g.strokeStyle='#1c1a16';g.lineWidth=8;g.strokeRect(4,4,120,120);HATCHT=canvasTex(c);return HATCHT;}
+function bankProp(g,p,i,B,P,M3){
+  const [t,x,y,w,h]=p,cx=x+w/2,cz=y+h/2,WH=WALLH[R3.wall]||1.45,v=h>w;
+  const mesh=(geo,mat,px,py,pz,ry)=>{const m=new THREE.Mesh(geo,mat);m.position.set(px,py,pz);if(ry)m.rotation.y=ry;m.castShadow=m.receiveShadow=true;g.add(m);return m;};
+  const wood=M3.wood,marble=P('#efe9df',{roughness:.28}),dark=P('#23282d',{roughness:.4,metalness:.3}),steel=P('#7d868d',{metalness:.55,roughness:.45});
+  if(t==='arc'){const [,ax,ay,r,a0,a1]=p,n=Math.ceil((a1-a0)/5),da=(a1-a0)/n,seg=2*r*Math.sin(da*Math.PI/360)+.035,top=P('#2b2f33',{roughness:.22,metalness:.25}),front=P('#5c3d28',{roughness:.45});
+    const gb=new THREE.BoxGeometry(seg,.54,.3),gt=new THREE.BoxGeometry(seg+.02,.05,.44),gk=new THREE.BoxGeometry(seg,.08,.32);
+    for(let k=0;k<n;k++){const a=(a0+(k+.5)*da)*Math.PI/180,px=ax+Math.cos(a)*r,pz=ay+Math.sin(a)*r,ry=-(a+Math.PI/2);mesh(gb,front,px,.27,pz,ry);mesh(gt,top,px,.565,pz,ry);mesh(gk,dark,px,.04,pz,ry);}
+    return true;}
+  if(t==='postarc'){const [,ax,ay,r,a0,a1]=p,n=Math.round((a1-a0)/11),pg=new THREE.CylinderGeometry(.045,.06,.5,12),sg=new THREE.SphereGeometry(.07,12,8),wht=P('#f4f1ea',{roughness:.3}),brass=P('#c9a24a',{metalness:.85,roughness:.25});
+    for(let k=0;k<=n;k++){const a=(a0+k*(a1-a0)/n)*Math.PI/180,px=ax+Math.cos(a)*r,pz=ay+Math.sin(a)*r;mesh(pg,wht,px,.25,pz);mesh(sg,brass,px,.53,pz);}
+    return true;}
+  if(t==='cstairs'){const [,ax,ay,r,a0,a1]=p,n=9,da=(a1-a0)/n;
+    for(let k=0;k<n;k++){const a=(a0+(k+.5)*da)*Math.PI/180,hh=.09+k*.1,px=ax+Math.cos(a)*r,pz=ay+Math.sin(a)*r,tw=2*r*Math.sin(da*Math.PI/360)+.06;
+      mesh(new THREE.BoxGeometry(1.0,hh,tw),marble,px,hh/2,pz,-a);
+      const ox=ax+Math.cos(a)*(r+.5),oz=ay+Math.sin(a)*(r+.5);mesh(new THREE.BoxGeometry(.08,hh+.32,tw),wood,ox,(hh+.32)/2,oz,-a);}
+    return true;}
+  if(t==='stairs'){const n=6,L=v?h:w,Wd=v?w:h;for(let k=0;k<n;k++){const hh=.08+k*.12,o=-L/2+(k+.5)*L/n;v?B(marble,cx,hh/2,cz+o,Wd,hh,L/n+.01):B(marble,cx+o,hh/2,cz,L/n+.01,hh,Wd);}
+    v?(B(wood,x+.03,.45,cz,.06,.9,L),B(wood,x+w-.03,.45,cz,.06,.9,L)):(B(wood,cx,.45,y+.03,L,.9,.06),B(wood,cx,.45,y+h-.03,L,.9,.06));return true;}
+  if(t==='shelf'){const r=rng(i+21),H=.95;for(const [a,b] of [[-1,-1],[1,-1],[-1,1],[1,1]])B(steel,cx+a*(w/2-.03),H/2,cz+b*(h/2-.03),.05,H,.05);
+    for(let k=0;k<4;k++){const yy=.05+k*.3;B(steel,cx,yy,cz,w,.03,h);if(k<3){const L=v?h:w;let o=-L/2+.04;while(o<L/2-.1){const s=.12+r()*.18,col=['#b08a5a','#c19a66','#3d5a80','#7a2e2e','#d9d2c0','#556b4a'][(r()*6)|0];
+      v?B(P(col),cx,yy+.1,cz+o+s/2,w*.8,.17+r()*.06,s-.02):B(P(col),cx+o+s/2,yy+.1,cz,s-.02,.17+r()*.06,h*.8);o+=s;}}}return true;}
+  if(t==='cubicle'){const pan=P('#6f7a83',{roughness:.9});B(pan,cx,.36,y+.03,w,.72,.06);B(pan,x+.03,.36,cz,.06,.72,h);B(pan,cx,.36,cz,w,.6,.05);B(pan,cx,.36,cz,.05,.6,h);
+    for(const [a,b] of [[-1,-1],[1,-1],[-1,1],[1,1]]){const qx=cx+a*w/4,qz=cz+b*h/4;B(wood,qx,.38,qz,w/2-.12,.04,h/2-.12);B(dark,qx-a*.1,.52,qz-b*.12,.26,.18,.03);}return true;}
+  if(t==='counter'){B(P('#5c3d28',{roughness:.45}),cx,.27,cz,w,.54,h);B(P('#2b2f33',{roughness:.22,metalness:.25}),cx,.565,cz,w+.08,.05,h+.08);return true;}
+  if(t==='pillar'){const rr=Math.min(w,h)/2*.85;mesh(new THREE.CylinderGeometry(rr,rr,WH,24),marble,cx,WH/2,cz);B(marble,cx,.05,cz,rr*2.3,.1,rr*2.3);B(marble,cx,WH-.05,cz,rr*2.3,.1,rr*2.3);return true;}
+  if(t==='chair'){const c=P('#7a2d2a',{roughness:.85});B(c,cx,.13,cz,w,.2,h);B(c,cx,.32,y+.05,w,.28,.1);B(c,x+.04,.24,cz,.08,.16,h);B(c,x+w-.04,.24,cz,.08,.16,h);return true;}
+  if(t==='ctable'){B(P('#1e2226',{roughness:.2,metalness:.3}),cx,.22,cz,w,.04,h);B(P('#b9a27a',{metalness:.7,roughness:.3}),cx,.1,cz,.06,.2,.06);return true;}
+  if(t==='rug'){B(P('#b8913f',{roughness:.9}),cx,.006,cz,w+.1,.012,h+.1);B(P('#7a1f22',{roughness:1}),cx,.014,cz,w,.012,h);return true;}
+  if(t==='hatch'){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),std(0xffffff,{map:hatchTex(),roughness:.7}));m.rotation.x=-Math.PI/2;m.position.set(cx,.012,cz);m.receiveShadow=true;g.add(m);return true;}
+  if(t==='printer'){B(P('#d6d9db',{roughness:.5}),cx,.28,cz,w,.56,h);B(dark,cx,.57,cz,w*.9,.03,h*.7);B(P('#f5f5f2'),cx,.6,cz,w*.5,.01,h*.4);return true;}
+  if(t==='pc'){B(dark,cx,.72,cz,w,.2,.03);B(dark,cx,.61,cz,.04,.06,.04);return true;}
+  if(t==='tv'){B(P('#0d0f12',{roughness:.2,metalness:.3}),cx,1.0,cz,w,.5,h);B(P('#244a6a',{emissive:'#1a3a5a',emissiveIntensity:.6}),cx,1.0,cz+h/2+.002,w*.92,.44,.004);return true;}
+  if(t==='hedge'){B(P('#4a3b30'),cx,.16,cz,w,.32,h);const r=rng(i+7),L=v?h:w,n=Math.round(L*3);for(let k=0;k<n;k++){const s=new THREE.Mesh(SPH3,P(['#2f6a39','#3b7d45','#285c31'][k%3]));s.scale.setScalar(.13+r()*.06);const o=-L/2+(k+.5)*L/n;v?s.position.set(cx+(r()-.5)*.08,.38+r()*.1,cz+o):s.position.set(cx+o,.38+r()*.1,cz+(r()-.5)*.08);s.castShadow=true;g.add(s);}return true;}
+  if(t==='poster'){B(P('#c9a24a',{metalness:.8,roughness:.3}),cx,.42,cz,.05,.84,.05);B(P('#1d2a3a'),cx,.62,cz,w,.42,.03);return true;}
+  if(t==='atm'){B(P('#39414a',{metalness:.45,roughness:.4}),cx,.5,cz,w,1.0,h);B(P('#5ac8ff',{emissive:'#2a8acc',emissiveIntensity:.7}),cx,.72,cz+h/2+.002,w*.6,.2,.004);B(dark,cx,.5,cz+h/2+.04,w*.7,.05,.08);return true;}
+  if(t==='cabinet'){B(steel,cx,.36,cz,w,.72,h);for(let k=0;k<3;k++)B(dark,cx,.14+k*.22,cz+h/2+.003,w*.4,.03,.01);return true;}
+  if(t==='dishes'){const wht=P('#f4f4f0',{roughness:.2});for(let k=0;k<3;k++){const m=new THREE.Mesh(CYL3,wht);m.scale.set(.1,.08+k*.03,.1);m.position.set(cx,.6+(.08+k*.03)/2,cz-h/3+k*h/3);g.add(m);}return true;}
+  if(t==='planter'){B(P('#8d8a82',{roughness:.9}),cx,.25,cz,w,.5,h);const r=rng(i+11);for(let k=0;k<5;k++){const s=new THREE.Mesh(SPH3,P(['#2f6a39','#3b7d45'][k%2]));s.scale.setScalar(.2+r()*.08);s.position.set(cx+(r()-.5)*w*.5,.6+r()*.15,cz+(r()-.5)*h*.5);s.castShadow=true;g.add(s);}return true;}
+  return false;
+}
+// 2D board view of the same props
+function drawBankProp([t,x,y,w,h,a1],i){
+  const X=x*S,Y=y*S,Wd=w*S,Ht=h*S;ctx.save();
+  if(t==='arc'||t==='cstairs'||t==='postarc'){const [ ,ax,ay,r,b0,b1]=arguments[0];ctx.beginPath();ctx.arc(ax*S,ay*S,r*S,b0*Math.PI/180,b1*Math.PI/180);
+    if(t==='arc'){ctx.strokeStyle='#5c3d28';ctx.lineWidth=S*.32;ctx.stroke();ctx.strokeStyle='#2b2f33';ctx.lineWidth=S*.1;ctx.stroke();}
+    else if(t==='cstairs'){ctx.strokeStyle='#e8e2d6';ctx.lineWidth=S*.9;ctx.stroke();ctx.strokeStyle='rgba(0,0,0,.25)';ctx.lineWidth=1;for(let k=0;k<=9;k++){const a=(b0+k*(b1-b0)/9)*Math.PI/180;ctx.beginPath();ctx.moveTo((ax+Math.cos(a)*(r-.45))*S,(ay+Math.sin(a)*(r-.45))*S);ctx.lineTo((ax+Math.cos(a)*(r+.45))*S,(ay+Math.sin(a)*(r+.45))*S);ctx.stroke();}}
+    else{ctx.fillStyle='#f4f1ea';const n=Math.round((b1-b0)/11);for(let k=0;k<=n;k++){const a=(b0+k*(b1-b0)/n)*Math.PI/180;ctx.beginPath();ctx.arc((ax+Math.cos(a)*r)*S,(ay+Math.sin(a)*r)*S,S*.07,0,7);ctx.fill();}}
+    ctx.restore();return;}
+  const col={stairs:'#e8e2d6',shelf:'#6d757b',cubicle:'#7d8790',counter:'#5c3d28',pillar:'#efe9df',chair:'#7a2d2a',ctable:'#2a2e33',rug:'#7a1f22',hatch:'#e6b422',printer:'#d6d9db',pc:'#23282d',tv:'#111',hedge:'#2f6a39',poster:'#1d2a3a',atm:'#39414a',cabinet:'#7d868d',dishes:'#f4f4f0',planter:'#3b7d45'}[t]||'#666';
+  if(t==='pillar'){ctx.fillStyle=col;ctx.beginPath();ctx.arc(X+Wd/2,Y+Ht/2,Math.min(Wd,Ht)/2,0,7);ctx.fill();ctx.strokeStyle='rgba(0,0,0,.3)';ctx.stroke();}
+  else{ctx.fillStyle=col;ctx.fillRect(X,Y,Wd,Ht);if(t==='hatch'){ctx.strokeStyle='#1c1a16';ctx.lineWidth=Math.max(1,S*.05);for(let k=0;k<4;k++){ctx.beginPath();ctx.moveTo(X+Wd*k/4,Y);ctx.lineTo(X+Wd*k/4+Ht*.25,Y+Ht);ctx.stroke();}}
+    else if(t==='stairs'||t==='shelf'){ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=1;const n=6,vv=Ht>Wd;for(let k=1;k<n;k++){ctx.beginPath();vv?(ctx.moveTo(X,Y+Ht*k/n),ctx.lineTo(X+Wd,Y+Ht*k/n)):(ctx.moveTo(X+Wd*k/n,Y),ctx.lineTo(X+Wd*k/n,Y+Ht));ctx.stroke();}}
+    else if(t!=='rug'){ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=1;ctx.strokeRect(X,Y,Wd,Ht);}}
+  ctx.restore();
 }
 function assignMats(grid,m){
   const W=grid[0].length,get=(x,y)=>grid[y]&&grid[y][x];
   for(const [,lx,ly,mat] of m.labels){const sx=Math.floor(lx),sy=Math.floor(ly);const q=[[sx,sy]],seen=new Set([sy*W+sx]);
     while(q.length){const [x,y]=q.shift();get(x,y).mat=mat;for(const [nx,ny] of [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]){const c=get(nx,ny);if(!c||seen.has(ny*W+nx)||c.t!=='floor')continue;seen.add(ny*W+nx);q.push([nx,ny]);}}}
   grid.forEach((row,y)=>row.forEach((c,x)=>{if(c.t==='out')c.mat=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]].some(([a,b])=>{const n=get(x+a,y+b);return n&&n.t!=='out';})?'sidewalk':'asphalt';else if(!c.mat)c.mat='concrete';}));
+  (m.matRects||[]).forEach(([x0,y0,x1,y1,k])=>{for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){const c=get(x,y);if(c&&c.t==='floor')c.mat=k;}});
 }
 const regionCol=c=>!c?TEX.asphalt:(TEX[c.t==='out'?c.mat:(c.rubble?'concrete':c.mat)]||TEX.concrete);
 function quadCol(x,y,dx,dy){const d=cell(x+dx,y+dy),h=cell(x+dx,y),v=cell(x,y+dy);
@@ -4679,6 +4786,7 @@ function drawWall(x,y,c){
 function rrect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 const CARCOL=['#b8322c','#2d5d8a','#d9d4c8','#3a3f44','#c98a2a'];
 function drawProp([t,x,y,w,h],i){
+  if(BANKP.has(t))return drawBankProp(arguments[0],i);
   const X=x*S,Y=y*S,Wd=w*S,Ht=h*S,v=Ht>Wd;ctx.save();
   if(t==='tree'||t==='plant'){ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(X+Wd/2+S*.06,Y+Ht/2+S*.08,Wd*.45,Ht*.45,0,0,7);ctx.fill();}
   else{ctx.fillStyle='rgba(0,0,0,.28)';rrect(X+S*.06,Y+S*.08,Wd,Ht,S*.08);ctx.fill();}
@@ -5672,14 +5780,15 @@ function floorCanvas(m){
   ctx=sc;S=sS;M=sM;OFF=false;TEXKEY='';
   return c;
 }
-const ROUGH={marble:.16,tile:.3,parquet:.42,wood:.5,concrete:.82,rubber:.9,carpet:1,redcarpet:1,sidewalk:.85,asphalt:.92};
+const ROUGH={bmarble:.14,bentry:.14,bcarpet:1,bgrey:.95,bbeige:.3,bwhite:.25,bconc:.55,marble:.16,tile:.3,parquet:.42,wood:.5,concrete:.82,rubber:.9,carpet:1,redcarpet:1,sidewalk:.85,asphalt:.92};
 function roughCanvas(){const P=8,c=document.createElement('canvas');c.width=(G.W+2)*P;c.height=(G.H+2)*P;const g=c.getContext('2d');g.fillStyle='#e8e8e8';g.fillRect(0,0,c.width,c.height);
   for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++){const cl=G.grid[y][x],v=Math.round(255*(cl.rubble?.95:(ROUGH[cl.mat]??.8)));g.fillStyle=`rgb(${v},${v},${v})`;g.fillRect((x+1)*P,(y+1)*P,P,P);}return c;}
 function envTune(root,k){root.traverse(o=>{const ms=o.material?(Array.isArray(o.material)?o.material:[o.material]):[];for(const m of ms)if(m.isMeshStandardMaterial&&!m.userData.envT){m.userData.envT=1;m.envMapIntensity*=(k||.4);}});}
 function staticSig(){let s=R3.wall;for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++){const c=G.grid[y][x];s+=c.t[0]+(c.elec&&elecVisible(x,y)?'e':'')+(c.rubble?'r':'');}return s;}
 function addBox(parent,mats,x,y,z,sx,sy,sz,cc,shadow=true){const m=new THREE.Mesh(boxUV(sx,sy,sz),mats);m.position.set(x,y,z);m.castShadow=shadow;m.receiveShadow=true;if(cc)m.userData.cell=cc;parent.add(m);return m;}
 let BOX3=null,SPH3=null,HSPH3=null,CYL3=null;
-function buildStatic(m){
+function buildStatic(m){make3DMats();const _M=R3.mats,_h=_M.hard;if(G.map===MAPS.bank)_M.hard=_M.hardB||(_M.hardB=bankWallMats());try{return buildStatic0(m);}finally{_M.hard=_h;}}
+function buildStatic0(m){
   const g=R3.staticG;while(g.children.length){const o=g.children.pop();if(o.material&&o.material.map&&o.userData.own){o.material.map.dispose();o.material.dispose();}}
   BOX3=BOX3||new THREE.BoxGeometry(1,1,1);SPH3=SPH3||new THREE.SphereGeometry(1,20,14);HSPH3=HSPH3||new THREE.SphereGeometry(1,20,10,0,Math.PI*2,0,Math.PI/2);CYL3=CYL3||new THREE.CylinderGeometry(1,1,1,16);
   const fc=floorCanvas(m);const ft=canvasTex(fc);ft.wrapS=ft.wrapT=THREE.ClampToEdgeWrapping;
@@ -5756,6 +5865,7 @@ function buildOpening(g,x,y,c,WH){
 function buildProp(g,[t,x,y,w,h],i){
   const M3=R3.mats,cx=x+w/2,cz=y+h/2,v=h>w,B=(mats,px,py,pz,sx,sy,sz)=>addBox(g,mats,px,py,pz,sx,sy,sz,null);
   R3.pm=R3.pm||{};const P=(col,o)=>{const k=col+JSON.stringify(o||{});return R3.pm[k]||(R3.pm[k]=std(col,o));};
+  if(BANKP.has(t)){bankProp(g,arguments[1],i,B,P,M3);return;}
   if(t==='car'){const col=['#b8322c','#2d5d8a','#d9d4c8','#3a3f44','#c98a2a'][i%5];const L=v?h:w,Wd=v?w:h;
     const grp=new THREE.Group();grp.position.set(cx,0,cz);if(v)grp.rotation.y=Math.PI/2;g.add(grp);
     const add=(mats,px,py,pz,sx,sy,sz,r)=>{const m=new THREE.Mesh(rboxG(sx,sy,sz,r??.07),mats);m.position.set(px,py,pz);m.castShadow=m.receiveShadow=true;grp.add(m);return m;};
