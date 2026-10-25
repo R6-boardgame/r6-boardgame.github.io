@@ -6,7 +6,7 @@
 
 - 《Rainbow Six Siege – The Board Game》的網頁版，可對戰電腦、新手教學、自訂房間連線、排名戰、成就、商店。
 - 線上版：https://r6-boardgame.github.io/ （GitHub Pages，`main` 分支根目錄直接發佈，推上去就上線）。
-- 目前版本 v72（見 `git log`）。
+- 目前版本 v73（見 `git log`）。
 
 ## 檔案結構
 
@@ -49,7 +49,7 @@
 1. 直接改 `index.html`（從現在起它就是唯一原始碼）。
 2. 本機測試：`python3 -m http.server` 後開 `http://localhost:8000/`。至少測兩種尺寸：**手機直式 390×844** 與 **桌機 1400×900**。
 3. 自動化測試建議用 Playwright：開頁 → `#t-pve` 進入對戰電腦 → 可在 `page.evaluate` 裡直接呼叫全域函式（例如 `WZ.step=2;renderWiz()` 跳到選地圖），截圖確認並收集 `pageerror`，必須沒有錯誤。
-4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v73）。
+4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v74）。
 
 ### 舊流程說明（只是背景，不需要照做）
 
@@ -75,6 +75,12 @@
 - 選地圖：拿掉「再點一次確定」標籤與地圖說明，選中的地圖名字下方顯示小格局圖（v70）。
 - 可攻擊的敵人不再整格變紅，改成底座紅環加往上到腰部的紅光（v71）。
 - 銀行地圖照真實一樓藍圖重做（v72）：28×19 格，A 檔案室、B 櫃員室；彎的櫃台是可翻越的掩護（`arc` prop）；家具型別見 `BANKP`、`bankProp`、`drawBankProp`；銀行專用地板 `bankTEX`（bmarble、bcarpet…）與米白牆 `bankWallMats`；地圖欄位 `tl:1` 表示 props 座標是左上角，`matRects` 可指定局部地板材質。
+
+- v73：聲望改為對電腦勝 500／敗 300、對玩家勝 700／敗 500、投降 0；任務加給（裝或拆拆彈器 +50、人質護送成功 +100、害死人質 −50）寫在結算聲望旁（`ecoGame`、`G._bonus`）。
+  - 銀行：高家具（`TALLK`：shelf、pillar）不能通過；桌類（`STANDH`：desk、table、counter、arc、cubicle…）可以站上去，幹員模型會抬高。樓梯改成單格 `stair` 圖示（上綠／下橘），拿掉活門。除了轉角、T 字、十字的牆以外都改成可破壞（`bank/gen.py` 規則）。
+  - 屋外、靠近出生點的監視器（`outCam`）攻擊方一開始就看得到；攻擊方第一次啟動結束後，還在鏡頭視野內、已經移動過的攻擊方會被標記（`outCamSees`）。
+  - 防守部署「調整場景」時，可調整的攝影機與路障顯示往上延伸的綠色光柱（`tgtGlow` 第 5 個參數是高度倍數）。
+  - 預設視角改成斜 45° 的近景（`followCam`），點上方頭像會把鏡頭移到該幹員。
 
 ## 尚未完成 / 等使用者回覆
 
