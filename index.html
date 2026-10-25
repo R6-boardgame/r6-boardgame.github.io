@@ -515,7 +515,7 @@ i.die.bolt{outline:1.5px dashed rgba(255,255,255,.85);outline-offset:-3px}
 .wzGrid{display:grid;gap:14px;width:100%;max-width:1100px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
 .wzGrid.two{max-width:900px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
 .wzCard{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;min-height:200px;padding:16px;border:2px solid var(--line);background:rgba(16,23,30,.85);color:inherit;text-align:center;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .15s}
-.wzCard:hover{transform:translateY(-2px);border-color:#5a6875}
+.wzCard:hover{transform:translateY(-2px);border-color:#5a6875}[data-wz-map].armed::before{display:none!important}.wzCard img.mplan{position:relative;display:block;width:auto;max-width:72%;max-height:min(18vh,120px);object-fit:contain;image-rendering:pixelated;background:rgba(8,12,17,.78);border:1px solid rgba(227,170,62,.55);border-radius:4px;padding:4px;margin:2px auto 0;box-shadow:0 4px 14px rgba(0,0,0,.5)}
 .wzCard.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 10px 30px rgba(227,170,62,.15)}
 .wzCard.on::after{content:'✓';position:absolute;top:10px;right:12px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#111;display:grid;place-items:center;font-weight:700}
 .wzCard b{font-size:22px;letter-spacing:.04em;position:relative}.wzCard span{font-size:13px;color:#aab6c0;position:relative;line-height:1.5}
@@ -6909,7 +6909,7 @@ function wzStepHTML(){const s=cfg.side,st=WZ.step;
     wzCard('data-wz-mis="bomb"',cfg.mission!=='hostage',`<i class="misph"></i><div class="ic">${WZI.bomb}</div><b>炸彈</b>`,'big mis')+
     wzCard('data-wz-mis="hostage"',cfg.mission==='hostage',`<i class="misph"></i><div class="ic">${WZI.hostage}</div><b>人質</b>`,'big mis')}</div>`;
   case 2:return `<h3 class="wzQ">選擇地圖</h3><p class="wzHint">背後是目前選中地圖的 3D 預覽。</p><div class="wzGrid two maps">${Object.entries(MAPS).map(([k,m])=>
-    wzCard(`data-wz-map="${k}"`,cfg.map===k,`${mapBig(k)?`<i class="mph big" style="background-image:url(${mapBig(k)})"></i>`:`<img class="thumb" src="${mapThumb(k)}" alt="${m.name}平面圖">`}<b>${m.name}</b><span>${m.sub}</span>`,mapBig(k)?'mapc':'')).join('')}</div>`;
+    wzCard(`data-wz-map="${k}"`,cfg.map===k,`${mapBig(k)?`<i class="mph big" style="background-image:url(${mapBig(k)})"></i>`:`<img class="thumb" src="${mapThumb(k)}" alt="${m.name}平面圖">`}<b>${m.name}</b>${cfg.map===k?`<img class="mplan" src="${mapThumb(k)}" alt="">`:''}`,mapBig(k)?'mapc':'')).join('')}</div>`;
   case 3:{const p=cfg.picks[s],pickOf=b=>p.findIndex(k=>OPC[k]&&OPC[k].base===b);
     const cur=OPC[WZ.cur]&&OPC[WZ.cur].side===s?OPC[WZ.cur]:OPC[p[0]||OPBASE.find(b=>OPC[b].side===s)];
     return `<div class="wzOpHead"><div><h3 class="wzQ">組成你的小隊</h3><p class="wzHint">點頭像加入小隊，再點一次移出。滑鼠移過去可以看能力。</p></div>
@@ -6943,7 +6943,7 @@ function renderWiz(){let el=$('#wiz');const keep=[...(el?el.querySelectorAll('.w
   const reach=i=>i<=WZ.seen||WZSTEPS.slice(0,i).every(x=>x.ok());
   el.innerHTML=`<div class="wzTop"><h2>對戰電腦</h2><nav class="wzSteps">${WZSTEPS.map((x,i)=>`<button data-wz-go="${i}" class="${i===st?'cur':i<WZ.seen||(i<st)?'done':''}" ${reach(i)&&WZSTEPS.slice(0,i).every(y=>y.ok())?'':'disabled'}><i>${i<st?'✓':i+1}</i><span>${x.t}</span></button>`).join('')}</nav><span id="wzOnline"></span><button id="wzRules">規則</button></div>
     <div class="wzBody">${wzStepHTML()}</div>
-    <div class="wzFoot"><button id="wzBack">${st?'‹ 上一步':'‹ 返回主畫面'}</button><span class="msg">${st===1?'點一下就選定':[0,2,5].includes(st)?(WZ.arm?'再點一次確定':'點一下看說明，再點一次確定'):ok?`第 ${st+1} 步，共 ${WZSTEPS.length} 步`:WZSTEPS[st].why}</span><button class="primary${last?' start':''}" id="wzNext" ${ok?'':'disabled'} >${last?'開始任務':'下一步 ›'}</button></div>`;
+    <div class="wzFoot"><button id="wzBack">${st?'‹ 上一步':'‹ 返回主畫面'}</button><span class="msg">${st===1?'點一下就選定':st===2?'點地圖選擇，再按下一步':[0,5].includes(st)?(WZ.arm?'再點一次確定':'點一下看說明，再點一次確定'):ok?`第 ${st+1} 步，共 ${WZSTEPS.length} 步`:WZSTEPS[st].why}</span><button class="primary${last?' start':''}" id="wzNext" ${ok?'':'disabled'} >${last?'開始任務':'下一步 ›'}</button></div>`;
   if(keep.length&&WZ.lastStep===st)el.querySelectorAll('.wzBody,.wzOg').forEach((e,i)=>{if(keep[i]!=null)e.scrollTop=keep[i];});WZ.lastStep=st;
   const go=i=>{WZ.step=i;WZ.arm=null;WZ.peek=null;WZ.peekSlot=null;renderWiz();el.querySelector('.wzBody').scrollTop=0;};
   const twice=(key,set,after)=>{if(WZ.arm===key){WZ.arm=null;after();return;}WZ.arm=key;set();renderWiz();};
