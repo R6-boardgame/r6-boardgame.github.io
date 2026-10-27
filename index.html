@@ -1825,10 +1825,10 @@ body.hasClk #tracker .seg{display:none}
       <section id="m-fire"><h3>射擊與視線</h3><ul>
         <li>視線從格子中心連到格子中心，被牆、完好的門窗路障、煙霧，以及中間站著的其他幹員擋住。對<b>被標記</b>的目標，軟牆、路障和煙霧都不再擋視線，可以隔著射擊（有掩護）；承重牆、加固牆和中間的其他幹員仍然會擋。</li>
         <li>距離：近 1～3 格、中 4～6 格、遠 7 格以上。每名幹員卡上寫著三種距離各擲哪些骰：<i class="die" style="background:#e8574e"></i>紅骰平均 2、<i class="die" style="background:#ef8a3a"></i>橙骰平均 1.5、<i class="die" style="background:#e8c840"></i>黃骰平均 1。點數加總就是命中數。</li>
-        <li>掩護：射擊線穿過牆洞、軟牆或路障（只有被標記的目標能隔著打），或目標緊貼著盾牌，就有輕掩護 −2；兩個以上來源算重掩護 −3。卡上有盾牌圖示的幹員永遠算一個來源。目標有掩護時，閃電骰不擲。</li>
+        <li>掩護（各來源相加）：射擊線每穿過一面牆洞、軟牆或路障 −2（只有被標記的目標能隔著打）；目標緊貼障礙物（桌子、書櫃、牆邊）−1；目標緊貼可部署盾牌、子彈從盾牌正面的半圓打來 −2，從側邊或背後打來沒有掩護。卡上有盾牌圖示的幹員永遠 −2。目標有掩護時，閃電骰不擲。</li><li>隔牆射擊：打中目標不會讓他現身，但會標記他的位置；開槍的人也會被標記位置。</li>
         <li>每點命中造成 1 傷，傷害達到耐力就陣亡；沒死的目標會被標記位置到回合結束。被閃光彈震暈的幹員只擲兩顆黃骰。</li>
         <li><b>攝影機</b>：地圖上頭頂有紅色鏡頭圖示的就是攝影機，牆後也看得到。它涵蓋整個房間（地板淡黃色的範圍），進攻方走進或在裡面行動就被標記。攝影機雙方都看得見，進攻方可以用「破壞」打掉視線內 8 格內的攝影機；防彈攝影機只能從相鄰格破壞，Thatcher 的 EMP 也能摧毀。<li><b>掩護射擊</b>：地板上紅色的格子是敵方掩護射擊會開火的範圍（面向的半圓、14 格內、有視線），自己的是藍色。走進紅色範圍會被搶先射擊。</li><li>Kapkan 陷阱踏入受 2 傷，Smoke 毒氣受 1 傷。</li>
-        <li><b>障礙物</b>：地圖上的桌子、沙發、吧台、車輛等家具。爬上去多花 1 點移動點，不能停在上面，不擋視線；目標緊貼著障礙物、而射擊線穿過它時有輕掩護。</li>
+        <li><b>障礙物</b>：地圖上的桌子、沙發、吧台、車輛等家具。爬上去多花 1 點移動點，不能停在上面，不擋視線；目標緊貼著障礙物時 −1 掩護。無人機可以穿過窗戶和各種障礙物。</li>
         <li>還沒做的部分：探頭（lean）、控制任務、樓上區域與上下樓、部分幹員的專屬裝置。完整原版規則見「原版規則書」。</li></ul></section>
       <section id="m-map"><h3>地圖圖例</h3><p>地圖是由上往下看的平面圖。淺色是室內地板，深色是室外。</p><div class="lg" id="lgfull"></div></section>
       <section id="m-ops"><h3>幹員檔案</h3><div class="opgrid" id="opgrid"></div></section>
@@ -3609,8 +3609,18 @@ function los(x0,y0,x1,y1,located,noOps){
   return true;
 }
 // light protection: holed walls, light walls / barricades shot through, deployable shields on the line
-function protection(sh,t){let n=PROF[t.op]&&PROF[t.op].shield?1:0,ob=0;for(const [x,y] of lineCells(sh.x,sh.y,t.x,t.y)){const c=cell(x,y);
-    if(c.breach||c.t==='soft'||c.t==='bar')n++;else if(shieldAt(x,y)&&cheb(x,y,t.x,t.y)<=1)n++;else if(c.obst&&!ob&&cheb(x,y,t.x,t.y)<=1){ob=1;n++;}}if(t.op==='montagne'&&t.rnd===G.round)n=Math.max(n,2);return n>=2?((t.op==='montagne'||t.op==='clash')?4:3):n?2:0;}
+function shDef(x,y){let b=null,bd=1e9;for(const z of G.map.spawns||[])for(const [a,c] of z.cells){const d=Math.abs(a-x)+Math.abs(c-y);if(d<bd){bd=d;b=[a,c];}}
+  if(!b)return [0,-1];const dx=b[0]-x,dy=b[1]-y;return Math.abs(dx)>=Math.abs(dy)?[Math.sign(dx)||1,0]:[0,Math.sign(dy)||1];}
+const shFaces=(g,sh)=>{const D=g.dir||(g.dir=shDef(g.x,g.y));return (sh.x-g.x)*D[0]+(sh.y-g.y)*D[1]>0;};
+// cover: every wall face the shot passes −2, furniture or a wall edge beside the target −1, a deployable shield facing the shooter −2; sources add up
+function protection(sh,t){let n=PROF[t.op]&&PROF[t.op].shield?2:0,ob=0,sd=0;const L=lineCells(sh.x,sh.y,t.x,t.y),on=new Set(L.map(([x,y])=>x+','+y));
+  for(const [x,y] of L){const c=cell(x,y);if(c.breach||c.t==='soft'||c.t==='bar'){n+=2;continue;}
+    const g=shieldAt(x,y);if(g&&cheb(x,y,t.x,t.y)<=1){if(!sd&&shFaces(g,sh)){sd=1;n+=2;}continue;}
+    if(c.obst&&!ob&&cheb(x,y,t.x,t.y)<=1){ob=1;n++;}}
+  if(!ob){const vx=sh.x-t.x,vy=sh.y-t.y,l=Math.hypot(vx,vy)||1;
+    for(const [x,y] of adj8(t.x,t.y)){if(on.has(x+','+y))continue;const c=cell(x,y);if(!c||!blocks(c))continue;const wx=x-t.x,wy=y-t.y;
+      if((wx*vx+wy*vy)/l>.3&&Math.abs(wx*vy-wy*vx)/l<=.95){ob=1;n++;break;}}}
+  if(t.op==='montagne'&&t.rnd===G.round)n=Math.max(n,4);return n;}
 
 const OBSTK=new Set(['desk','sofa','table','bar','pool','bench','pew','car','crate','counter','shelf','bed','arc','cstairs','stairs','cubicle','pillar']);
 const TALLK=new Set(['shelf','pillar']),STANDH={desk:.42,table:.45,counter:.6,arc:.6,cubicle:.42,bench:.45,pew:.45,bar:.55};
@@ -3664,7 +3674,7 @@ function sees(side){if(G.phase==='setup'&&!G.over)return new Set();const s=new S
 function inSight(a,b){return cheb(a.x,a.y,b.x,b.y)<=14&&los(a.x,a.y,b.x,b.y);}
 // attackers with line of sight unmask hidden defenders and see through decoys
 function revealCheck(){if(!G||G.phase!=='play'||G.over)return;const atk=alive('A').filter(a=>a.x>=0);
-  for(const d of alive('D'))if(d.hidden&&(d.spotted>0||atk.some(a=>inSight(a,d))))reveal(d,'被看見，');
+  for(const d of alive('D'))if(d.hidden&&((d.spotted>0&&!d.wmark)||atk.some(a=>inSight(a,d))))reveal(d,'被看見，');
   for(const k of G.decoys||[])if(k.alive&&atk.some(a=>cheb(a.x,a.y,k.x,k.y)<=14&&los(a.x,a.y,k.x,k.y))){k.alive=false;log('一個隱藏標記被識破，是誘餌','ka');}
   const h=G.hostage;if(h&&!h.known&&!h.by&&atk.some(a=>cheb(a.x,a.y,h.x,h.y)<=14&&los(a.x,a.y,h.x,h.y,false,true)))hostFound();}
 function hostFound(){const h=G.hostage;if(!h||h.known)return;h.known=true;if(G.player==='A')bigNote('發現人質',`在 ${coord(h.x,h.y)}`,'a',1500);log('進攻方發現了人質的位置','ka');}
@@ -3782,7 +3792,7 @@ function askReroll(hits){return new Promise(res=>{const el=document.createElemen
   el.innerHTML=`<b>${hits?`這一槍 ${hits} 傷`:'沒打中'}</b><span>要用掉唯一一次重擲嗎？會保留點數最高的一顆，其他重擲</span><div><button class="primary" data-r="1">重擲</button><button data-r="0">不用</button></div>`;
   document.body.appendChild(el);let done=false;const fin=v=>{if(done)return;done=true;el.remove();res(v);};el.querySelectorAll('button').forEach(b=>b.onclick=()=>fin(b.dataset.r==='1'));setTimeout(()=>fin(false),9000);});}
 async function shootUnit(sh,t,ow){
-  const {d,b,p,pool}=shotPool(sh,t);if(sh.hidden)reveal(sh,ow?'還擊時':'開火時');
+  const {d,b,p,pool}=shotPool(sh,t),tw=thruWall(sh,t);if(tw){if(!sh.spotted)log(`${nm(sh)} 隔牆開火，位置被標記`,'ks');sh.spotted=1;sh.wmark=1;}else if(sh.hidden)reveal(sh,ow?'還擊時':'開火時');
   let idx=[...pool].map(()=>Math.floor(Math.random()*6)),rolls=[...pool].map((ch,i)=>DIE[ch.toUpperCase()][idx[i]]),sum=rolls.reduce((a,c)=>a+c,0),hits=Math.max(0,sum-p);
   sh.fd=[Math.sign(t.x-sh.x),Math.sign(t.y-sh.y)];
   let dice=[...pool].map((ch,i)=>`<i class="die${ch>'Z'?' bolt':''}" style="background:${DIEC[ch.toUpperCase()]}">${rolls[i]}</i>`).join('');
@@ -3809,7 +3819,7 @@ async function shootUnit(sh,t,ow){
    if(dr.length){const bm=SFX.boom;SFX.boom=()=>{};try{for(const [x,y] of dr)if(cell(x,y).t==='bar')destroyCell(x,y);}finally{SFX.boom=bm;}SFX.hit();
      log(`子彈打穿了門路障，門已經被打爛（之後從這裡穿過不再有掩護）`,'ks');render();}}
   if(hits&&!t.alive){sh._k=(sh._k||0)+1;if(sh._k>=2)bigNote(['','','雙殺','三殺','四殺','王牌'][Math.min(5,sh._k)]+'！',`${OPS[sh.op].name}`,sh.side==='A'?'a':'d',1700);}
-  if(t.alive){if(!t.spotted)log(`${nm(t)} 被標記位置（到回合結束）`,'ks');t.spotted=1;if(t.hidden)reveal(t,'中彈後');}
+  if(t.alive){if(!t.spotted)log(`${nm(t)} 被標記位置（到回合結束）`,'ks');t.spotted=1;if(tw)t.wmark=1;else if(t.hidden)reveal(t,'中彈後');}
   if(cine){await sleep(t.alive?650:1100);}diceHide();shotCamEnd();
 }
 // screen boxes (feet point and body height in px) of the two fighters, seen from the close-up camera
@@ -4056,7 +4066,7 @@ async function useGadget(u,x,y){ST(u).gad++;DMGBY=u;if(x!=null)aimCam(u,[[x,y]])
 }
 // drones: deploy next to the operator, roll up to 5 spaces (under doors, not through windows or wire), then locate every defender in that room
 // drones never cross partitions, obstacles, barbed wire or shields; like operators, a breach or an open window costs 1 extra point
-const droneOK=(u,x,y)=>{const c=cell(x,y);return !!c&&(!blocks(c)||(c.t==='bar'&&c.kind==='door'))&&!c.obst&&!gadgetAt(x,y,'wire')&&!shieldAt(x,y)&&!(u.side==='A'&&gadgetAt(x,y,'claw'));};
+const droneOK=(u,x,y)=>{const c=cell(x,y);return !!c&&(!blocks(c)||c.t==='bar')&&!gadgetAt(x,y,'wire')&&!shieldAt(x,y)&&!(u.side==='A'&&gadgetAt(x,y,'claw'));};
 const droneCost=(x,y)=>{const c=cell(x,y);return 1+(c.breach||(c.wasBar&&c.kind==='window')?1:0);};
 const droneNext=(u,x,y)=>adj8(x,y).filter(([a,b])=>droneOK(u,a,b));
 const dmOf=()=>G&&G.gadgets.find(g=>g.alive&&g.type==='drone'&&g.moving);
@@ -4141,7 +4151,8 @@ async function deployGadget(u,kind,x,y){
   if(G.phase!=='setup')useAct(u,'tactical');
   if(kind==='wire'){G.wire--;G.gadgets.push({type:'wire',x,y,side:'D',alive:true});if(pub(u)||G.player==='D')log(`${nm(u)} 拉起鐵絲網`,'kd');}
   else if(kind==='bpcam'){G.bpcam--;G.gadgets.push({type:'cam',bp:true,x,y,side:'D',alive:true});if(G.player==='D')log(`${nm(u)} 裝上防彈攝影機`,'kd');}
-  else{G.shield--;G.gadgets.push({type:'shield',x,y,side:'D',alive:true});if(pub(u)||G.player==='D')log(`${nm(u)} 架設防彈盾`,'kd');}
+  else{G.shield--;const sg={type:'shield',x,y,side:'D',alive:true};sg.dir=shDef(x,y);G.gadgets.push(sg);if(pub(u)||G.player==='D')log(`${nm(u)} 架設防彈盾`,'kd');
+    if(u.side===G.player&&!G.ai){G.shdir=sg;G.mode='shdir';bigNote('選擇盾牌正面','點盾牌旁邊的格子，只擋那一側的半圓','d',1600);}}
   render();if(G.phase==='play')await afterAct(u);
 }
 async function escort(u){useAct(u,'obj');G.hostage.known=true;note(u,'護送人質');G.hostage.by=u.id;G.hostage.x=u.x;G.hostage.y=u.y;SFX.alert();bigNote('人質已被帶走','送到任一出生區就能撤離','a',2200);log(`${nm(u)} 帶上人質，送到任一出生區就能撤離`,'ka');render();await afterAct(u);}
@@ -4181,7 +4192,7 @@ function endPhase(){
   if(G.phaseIdx>=4){
     G.phaseIdx=0;
     if(G.round>=G.maxRounds&&!G.defuser){render();return finish('D',G.mission==='hostage'?'時間耗盡，人質沒有被救出':'時間耗盡，進攻方沒有完成任務');}
-    G.round++;G.units.forEach(u=>{u._k=0;u.activated=false;u.spotted=0;u.stun=false;});G.gadgets.forEach(g=>{if(g.type==='smk')g.alive=false;});
+    G.round++;G.units.forEach(u=>{u._k=0;u.activated=false;u.spotted=0;u.wmark=0;u.stun=false;});G.gadgets.forEach(g=>{if(g.type==='smk')g.alive=false;});
     log(`—— 第 ${G.round} 輪開始 ——`,'ks');SFX.round();bigNote(`第 ${G.round} 輪`,G.round===G.maxRounds?'最後一輪':`共 ${G.maxRounds} 輪`,'r',1300);if(G.clock)clockReset();
   }
   startPhase();
@@ -4406,7 +4417,7 @@ function placeAttackers(zi){
   const z=G.map.spawns[zi];G.spawn=zi;alive('A').forEach((u,i)=>{u.x=z.cells[i][0];u.y=z.cells[i][1];});
 }
 const INV={A:{frag:['破片手榴彈',3,'投擲 6 格：目標格 2 黃骰、相鄰格各 1 黃骰傷害，並破壞路障'],charges:['爆破炸藥',3,'相鄰：炸開軟牆或路障（D3）'],flash:['閃光彈',2,'投擲：目標格與相鄰格所有幹員震暈'],clay:['闊刀地雷',2,'部署在相鄰格，敵人踏入或走到箭頭格時引爆：2 紅骰'],smk:['煙霧彈',2,'投擲：2×2 煙霧擋視線到回合結束']},
-  D:{bpcam:['防彈攝影機',3,'部署階段：放在室內，看整個房間；只能從相鄰格破壞'],shield:['可部署盾牌',2,'部署階段：障礙物，提供相鄰目標輕掩護'],impact:['衝擊手榴彈',3,'投擲 6 格：破壞軟牆、路障與道具（D2）'],nitro:['C4 遙控炸藥',2,'投擲 6 格：目標 2 橙骰、相鄰各 1 橙骰傷害']}};
+  D:{bpcam:['防彈攝影機',3,'部署階段：放在室內，看整個房間；只能從相鄰格破壞'],shield:['可部署盾牌',2,'部署時選正面方向，只擋前方半圓，相鄰目標 −2'],impact:['衝擊手榴彈',3,'投擲 6 格：破壞軟牆、路障與道具（D2）'],nitro:['C4 遙控炸藥',2,'投擲 6 格：目標 2 橙骰、相鄰各 1 橙骰傷害']}};
 const INV_CAP={A:6,D:4};
 function invFor(side,inv){const o={};for(const k in INV[side])o[k]=Math.max(0,Math.min(INV[side][k][1],(inv&&inv[k])|0));return o;}
 const invUsed=side=>Object.values(cfg.inv[side]).reduce((a,b)=>a+b,0);
@@ -4441,6 +4452,7 @@ function startPlay(){if(G&&!G.reroll)G.reroll={A:0,D:0};try{playStartHooks();}ca
 
 // ---------- player input ----------
 function curTargets(){
+  if(G.mode==='shdir'&&G.shdir)return adj4(G.shdir.x,G.shdir.y);
   const u=G.sel;if(!u)return [];
   if(G.phase==='setup'){
     if(G.player==='A')return [];
@@ -4488,6 +4500,7 @@ async function act(fn){G.busy=true;render();try{await fn();}finally{G.busy=false
 }
 async function onCell(x,y){
   if(!G||G.over||G.busy)return;
+  if(G.mode==='shdir'&&G.shdir){const g=G.shdir;if(adj4(g.x,g.y).some(([a,b])=>a===x&&b===y)){g.dir=[x-g.x,y-g.y];log(`盾牌正面朝${dirName(g.dir)}，只擋這一側的半圓`,'kd');G.shdir=null;G.mode=G.phase==='setup'&&G.shield>0?'shield':'move';render();}return;}
   if(G.mode==='owq')return owqTap(x,y);
   const u=G.sel,c=cell(x,y),k=`${x},${y}`;
   const inT=curTargets().some(([a,b])=>a===x&&b===y);
@@ -4500,7 +4513,7 @@ async function onCell(x,y){
     if(!inT||!u)return;
     if(G.mode==='move'){const was=u.x<0;u.x=x;u.y=y;u.anchor=[x,y];if(was)nextUnplaced();}
     else if(G.mode==='gadget'){await useGadget(u,x,y);if(u.ch<=0)G.mode='move';}
-    else if(G.mode==='wire'||G.mode==='shield'||G.mode==='bpcam'){await deployGadget(u,G.mode,x,y);if(!G[G.mode])G.mode='move';}
+    else if(G.mode==='wire'||G.mode==='shield'||G.mode==='bpcam'){await deployGadget(u,G.mode,x,y);if(G.mode!=='shdir'&&!G[G.mode])G.mode='move';}
     else if(G.mode==='decoy'){const k=decoyOf(u);if(k){k.x=x;k.y=y;}G.mode='move';}
     else if(G.mode==='rearr'){G.rearr=G.rearr??5;const cg=G.gadgets.find(g=>g.alive&&g.type==='cam'&&g.fixed&&g.x===x&&g.y===y);
       if(G.rearrCam){if(!G.rearrCam.moved){G.rearr--;G.rearrCam.moved=1;}G.rearrCam.x=x;G.rearrCam.y=y;G.rearrCam=null;log('攝影機換了位置','kd');}
@@ -6358,7 +6371,7 @@ function gadget3D(gd){
     add(SPH3,gm('dled',()=>new THREE.MeshStandardMaterial({color:0xef7f3e,emissive:0xef7f3e,emissiveIntensity:1.4})),[.025,.025,.025],0,.13,.07);void d;}
   else if(gd.type==='wire'){const m=gm('wirem',()=>std(0x9aa3aa,{metalness:.8,roughness:.35}));for(let k=-2;k<=2;k++){const t=add(new THREE.TorusGeometry(.14,.008,4,18),m,[1,1,1],k*.17,.13,0);t.rotation.y=Math.PI/2;}
     add(BOX3,m,[.85,.01,.01],0,.13,0);}
-  else if(gd.type==='shield'){add(BOX3,gm('shd',()=>std(0x3a4148,{metalness:.55,roughness:.4})),[.8,.7,.06],0,.35,0);add(BOX3,gm('shdg',()=>new THREE.MeshStandardMaterial({color:0x9fd2f0,transparent:true,opacity:.5,roughness:.05})),[.3,.1,.07],0,.55,0);if(gd.volcan){add(CYL3,gm('volc',()=>std(0xc0302a,{metalness:.3,roughness:.5})),[.08,.24,.08],0,.12,.13);add(SPH3,gm('volcl',()=>new THREE.MeshStandardMaterial({color:0xff6a2a,emissive:0xff5a1a,emissiveIntensity:1.4})),[.03,.03,.03],0,.26,.13);}}
+  else if(gd.type==='shield'){{const D=gd.dir||(gd.dir=shDef(gd.x,gd.y));grp.rotation.y=Math.atan2(D[0],D[1]);grp.position.x+=D[0]*.3;grp.position.z+=D[1]*.3;}add(BOX3,gm('shd',()=>std(0x3a4148,{metalness:.55,roughness:.4})),[.8,.7,.06],0,.35,0);add(BOX3,gm('shdg',()=>new THREE.MeshStandardMaterial({color:0x9fd2f0,transparent:true,opacity:.5,roughness:.05})),[.3,.1,.07],0,.55,0);if(gd.volcan){add(CYL3,gm('volc',()=>std(0xc0302a,{metalness:.3,roughness:.5})),[.08,.24,.08],0,.12,.13);add(SPH3,gm('volcl',()=>new THREE.MeshStandardMaterial({color:0xff6a2a,emissive:0xff5a1a,emissiveIntensity:1.4})),[.03,.03,.03],0,.26,.13);}}
   else if(gd.type==='smk'){grp.position.set(gd.x+1,0,gd.y+1);const mat=gm('smkm',()=>new THREE.MeshStandardMaterial({color:0xc8ccd0,transparent:true,opacity:.42,depthWrite:false,roughness:1}));
     const r=rng(gd.x*17+gd.y);for(let k=0;k<12;k++){const s=.45+r()*.5;const m=add(SPH3,mat,[s,s*.8,s],(r()-.5)*1.6,.35+r()*.7,(r()-.5)*1.6);m.castShadow=false;}grp.userData.gas=true;}
   else if(g3x(gd,add,grp)){}
