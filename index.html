@@ -245,6 +245,11 @@ canvas.gl{display:block;margin:0 auto;touch-action:none;cursor:pointer}
 .sheethead h2{margin:0;font-family:var(--display);font-size:26px;letter-spacing:.04em}
 .mtabs{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;border-bottom:1px solid var(--line)}
 .mtabs button{padding:4px 10px;font-size:13px}
+.rqDiaRow{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);padding:10px 12px;margin:8px 0}.rqDiaRow p{margin:0;line-height:1.6}
+.rqDia{display:flex;gap:6px;flex:none;padding:0 4px}.rqDia i{width:11px;height:11px;transform:rotate(45deg);border:1.5px solid #e3aa3e}.rqDia i.f{background:#e3aa3e;box-shadow:0 0 6px rgba(227,170,62,.7)}
+.rqAct{list-style:none;padding:0;margin:6px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px}
+#sheetbody .rqAct li{display:grid;grid-template-columns:34px auto 1fr;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);padding:6px 10px 6px 6px;margin:0;line-height:1.45}
+#sheetbody .rqAct{padding:0}.rqAct img{width:34px;height:34px;object-fit:contain}.rqAct img:not([src]){visibility:hidden}.rqAct b{white-space:nowrap}.rqAct span{color:var(--muted);font-size:13px}
 .rqI{display:inline-grid;place-items:center;width:22px;height:22px;margin-right:6px;vertical-align:-5px;color:var(--accent);flex:none}.rqI svg{width:18px;height:18px}
 h3 .rqI{width:26px;height:26px;vertical-align:-6px}h3 .rqI svg{width:22px;height:22px}
 .rqP{margin:6px 0;line-height:1.6}.rqFlow{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:8px 0}
@@ -1807,7 +1812,7 @@ body.hasClk #tracker .seg{display:none}
   <div class="sheet">
     <div class="sheethead"><h2 id="manualTitle">規則</h2><span style="flex:1"></span><button id="manualClose">關閉</button></div>
     <nav class="mtabs" id="mtabs">
-      <button data-go="m-turn">回合流程</button><button data-go="m-setup">部署</button><button data-go="m-goal">開始行動</button><button data-go="m-cover">掩護</button><button data-go="m-win">獲勝條件</button><button data-go="m-acts">行動一覽</button><button data-go="m-fire">射擊與視線</button><button data-go="m-map">地圖圖例</button><button data-go="m-ops">幹員檔案</button><button data-go="m-ui">操作方式</button>
+      <button data-go="m-turn">回合流程</button><button data-go="m-setup">部署</button><button data-go="m-goal">開始行動</button><button data-go="m-cover">掩護</button><button data-go="m-win">獲勝條件</button><button data-go="m-acts">行動一覽</button><button data-go="m-fire">射擊與視線</button><button data-go="m-ui">操作方式</button>
     </nav>
     <div class="sheetbody" id="sheetbody">
       <section id="m-turn"><h3><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></i>回合流程</h3>
@@ -1823,7 +1828,7 @@ body.hasClk #tracker .seg{display:none}
       <section id="m-goal"><h3><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></i>開始行動</h3>
         <div class="rqCards">
           <div class="rqCard a"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg>進攻方</h4><p>一開始就在<b>監視器範圍內</b>時：</p>
-            <ol class="rqSteps"><li><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i><span><b>直接移動</b>：立刻被標註位置，但不會顯示是哪名幹員。</span></li>
+            <ol class="rqSteps"><li><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i><span><b>直接移動</b>：立刻被標註位置，並顯現是哪名幹員。</span></li>
               <li><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 11l5-3v8l-5-3M4 4l16 16"/></svg></i><span><b>先打掉監視器</b>：不會被標註。</span></li>
               <li><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></i><span><b>移動後被標註</b>，打掉監視器再移動，標註就消失。</span></li></ol></div>
           <div class="rqCard d"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/></svg>防守方</h4><p>敵人<b>被標註</b>而且在射程內時，可以<b>穿牆攻擊</b>。</p></div></div></section>
@@ -1833,28 +1838,15 @@ body.hasClk #tracker .seg{display:none}
       <section id="m-win"><h3><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M9 17h6"/></svg></i>獲勝條件</h3>
         <div class="rqCards">
           <div class="rqCard"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="3.5"/><path d="M5 21c.8-4.3 3.6-6.5 7-6.5s6.2 2.2 7 6.5"/></svg>人質局</h4><p><b class="a">進攻方</b>：把人質帶到戶外撤離點，或殲滅對方。</p><p><b class="d">防守方</b>：撐到時間結束，或殲滅對方。</p></div>
-          <div class="rqCard"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="14" r="6.5"/><path d="M15.5 9.5L18 7M18 7l1-1M19.5 3.5l.5-1M21 5h1"/></svg>炸彈局</h4><p><b class="a">進攻方</b>：在 A 或 B 點裝上拆彈器，裝好後第三個防守階段結束時引爆、炸毀整個房間，或殲滅對方。</p><p><b class="d">防守方</b>：撐到時間結束，或殲滅對方。拆彈器裝好後一定要拆除，殲滅進攻方也一樣。</p><p>拆彈：站上或相鄰拆彈器開始拆，要撐一回合（撐過進攻方下一個階段，到自己下一個防守階段結束）才完成。拆的人不能移動、射擊或掩護，只能挨打；拆的人倒下就中斷。只要在引爆前開始拆，時間到也不會爆。</p></div></div></section>
-      <section id="m-acts"><h3>行動一覽</h3><div class="tbl"><table>
-        <thead><tr><th>行動</th><th>陣營</th><th>效果</th></tr></thead><tbody>
-        <tr><td>移動</td><td>全部</td><td>5 移動點，每次啟動一次，可分段。</td></tr>
-        <tr><td>奔跑</td><td>全部</td><td>多 2 或 5 移動點（看幹員卡），重裝幹員不能奔跑。</td></tr>
-        <tr><td>射擊</td><td>全部</td><td>對視線內的敵人擲命中骰，見「射擊與視線」。</td></tr>
-        <tr><td>破壞</td><td>全部</td><td>打掉視線內的門窗路障；破壞力「中」的幹員也能打穿軟牆。也能摧毀視線內的敵方道具（攝影機、干擾器、無人機、鐵絲網、防彈盾），防彈道具要站在旁邊才打得掉。</td></tr>
-        <tr><td>專屬道具</td><td>各自</td><td>幹員自己的技能，見「幹員檔案」。被動技能不用花行動。</td></tr>
-        <tr><td>戰術道具</td><td>各自</td><td>小隊共用的方塊，每次啟動只能用一個。進攻：爆破炸藥（相鄰軟牆或路障，D3）、無人機（開到 5 格內，標記停下房間裡的所有防守方）、破片手榴彈（目標 2 黃骰、相鄰 1 黃骰，炸掉路障）、閃光彈（目標與相鄰格所有幹員震暈）、闊刀地雷（相鄰格，敵人踏入或走到箭頭格時 2 紅骰）、煙霧彈（2×2 擋視線）。防守：衝擊手榴彈（炸掉軟牆、路障或道具，D2）、C4 遙控炸藥（目標 2 橙骰、相鄰 1 橙骰）。投擲物射程 6 格，道具傷害不受掩護減免，也會傷到自己人。</td></tr>
-        <tr><td>任務</td><td>各自</td><td>安裝或解除拆彈器、護送人質。</td></tr>
-        <tr><td>掩護射擊</td><td>全部</td><td>不用按：結束階段時，這一方所有幹員自動面向最近的敵人進入掩護射擊，警戒前方半圓。敵人走進或在半圓內行動時，每次都能免費還擊，次數不限，直到這名幹員下次行動。隱藏的防守方結束啟動時會自動進入掩護射擊。</td></tr>
-        </tbody></table></div></section>
+          <div class="rqCard"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="14" r="6.5"/><path d="M15.5 9.5L18 7M18 7l1-1M19.5 3.5l.5-1M21 5h1"/></svg>炸彈局</h4><p><b class="a">進攻方</b>：在 A 或 B 點裝上拆彈器，裝好後第三個防守階段結束時引爆、炸毀整個房間，或殲滅對方。</p><p><b class="d">防守方</b>：撐到時間結束，或殲滅對方。拆彈器裝好後一定要拆除，殲滅進攻方也一樣。</p></div></div></section>
+      <section id="m-acts"><h3>行動一覽</h3>
+        <div class="rqDiaRow"><span class="rqDia"><i class="f"></i><i class="f"></i><i></i></span><p><b>畫面上方三個菱形</b>：這個階段還能啟動幾名幹員。每階段最多 3 名，啟動一名就暗一格。</p></div>
+        <p class="rqP">右側的行動按鈕：</p><ul class="rqAct"><li><img data-ua="shoot" alt=""><b>射擊</b><span>打視線內的敵人，花 1 行動。</span></li><li><img data-ua="run" alt=""><b>奔跑</b><span>多走幾格，花 1 行動。</span></li><li><img data-ua="destroy" alt=""><b>破壞</b><span>打掉門窗路障、軟牆或敵方道具。</span></li><li><img data-eq="drone" alt=""><b>無人機</b><span>開進去偵查，標記看到的防守方。</span></li><li><img data-eq="charge" alt=""><b>爆破炸藥</b><span>炸開相鄰的軟牆或路障。</span></li><li><img data-eq="frag" alt=""><b>破片手榴彈</b><span>丟出去造成傷害。</span></li><li><img data-eq="flash" alt=""><b>閃光彈</b><span>震暈目標和旁邊的幹員。</span></li><li><img data-eq="smk" alt=""><b>煙霧彈</b><span>擋住視線到回合結束。</span></li><li><img data-ua="plant" alt=""><b>安裝／解除拆彈器</b><span>在 A、B 點安裝；防守方站旁邊開始拆。</span></li><li><img data-ua="overwatch" alt=""><b>監視並結束</b><span>選方向後結束，敵人進入前方半圓會被射擊。</span></li><li><img data-ua="endphase" alt=""><b>結束行動</b><span>這名幹員動完，換下一名。</span></li><li><img data-op="1" alt=""><b>專屬道具</b><span>幹員自己的技能，按鈕名稱就是道具名。</span></li></ul></section>
       <section id="m-fire"><h3>射擊與視線</h3><ul>
-        <li>視線從格子中心連到格子中心，被牆、完好的門窗路障、煙霧，以及中間站著的其他幹員擋住。對<b>被標記</b>的目標，軟牆、路障和煙霧都不再擋視線，可以隔著射擊（有掩護）；承重牆、加固牆和中間的其他幹員仍然會擋。</li>
-        <li>距離：近 1～3 格、中 4～6 格、遠 7 格以上。每名幹員卡上寫著三種距離各擲哪些骰：<i class="die" style="background:#e8574e"></i>紅骰平均 2、<i class="die" style="background:#ef8a3a"></i>橙骰平均 1.5、<i class="die" style="background:#e8c840"></i>黃骰平均 1。點數加總就是命中數。</li>
-        <li>掩護（各來源相加）：射擊線每穿過一面牆洞、軟牆或路障 −2（只有被標記的目標能隔著打）；目標緊貼障礙物（桌子、書櫃、牆邊）−1；目標緊貼可部署盾牌、子彈從盾牌正面的半圓打來 −2，從側邊或背後打來沒有掩護。卡上有盾牌圖示的幹員永遠 −2。目標有掩護時，閃電骰不擲。</li><li>隔牆射擊：打中目標不會讓他現身，但會標記他的位置；開槍的人也會被標記位置。</li>
-        <li>每點命中造成 1 傷，傷害達到耐力就陣亡；沒死的目標會被標記位置到回合結束。被閃光彈震暈的幹員只擲兩顆黃骰。</li>
-        <li><b>攝影機</b>：地圖上頭頂有紅色鏡頭圖示的就是攝影機，牆後也看得到。它涵蓋整個房間（地板淡黃色的範圍），進攻方走進或在裡面行動就被標記。攝影機雙方都看得見，進攻方可以用「破壞」打掉視線內 8 格內的攝影機；防彈攝影機只能從相鄰格破壞，Thatcher 的 EMP 也能摧毀。<li><b>掩護射擊</b>：每個敵人在同一次掩護射擊裡只會被打一次（每輪重置）。地板上紅色的格子是敵方掩護射擊會開火的範圍（面向的半圓、14 格內、有視線），自己的是藍色。走進紅色範圍會被搶先射擊。</li><li>Kapkan 陷阱踏入受 2 傷，Smoke 毒氣受 1 傷。</li>
-        <li><b>障礙物</b>：地圖上的桌子、沙發、吧台、車輛等家具。爬上去多花 1 點移動點，不能停在上面，不擋視線；目標緊貼著障礙物時 −1 掩護。無人機可以穿過窗戶和各種障礙物。</li>
-        <li>還沒做的部分：探頭（lean）、控制任務、樓上區域與上下樓、部分幹員的專屬裝置。</li></ul></section>
-      <section id="m-map"><h3>地圖圖例</h3><p>地圖是由上往下看的平面圖。淺色是室內地板，深色是室外。</p><div class="lg" id="lgfull"></div></section>
-      <section id="m-ops"><h3>幹員檔案</h3><div class="opgrid" id="opgrid"></div></section>
+        <li><b>距離</b>：近 1～3 格、中 4～6 格、遠 7 格以上。幹員卡上寫著三種距離各擲哪些骰：<i class="die" style="background:#e8574e"></i>紅骰平均 2、<i class="die" style="background:#ef8a3a"></i>橙骰平均 1.5、<i class="die" style="background:#e8c840"></i>黃骰平均 1，點數加總就是命中數。</li>
+        <li><b>掩護</b>：每隔一面牆 −2；目標緊貼障礙物（桌子、書櫃、牆邊）−1；可部署盾牌從正面打來 −2，側邊或背後沒有掩護。各項可以相加。</li>
+        <li><b>隔牆射擊</b>：目標被標記時，軟牆、路障和煙霧不擋視線，可以隔著打；承重牆和加固牆仍然會擋。隔牆打中不會讓目標現身，但雙方都會被標記。</li></ul></section>
+      <div hidden><div class="lg" id="lgfull"></div><div class="opgrid" id="opgrid"></div></div>
       <section id="m-ui"><h3>操作方式</h3><ol>
         <li>地圖是 3D 的：滑鼠左鍵拖曳旋轉視角，右鍵拖曳平移，滾輪縮放；手機用單指拖曳平移地圖，雙指轉動視角與捏合縮放。左上角可以切換斜角、俯視，把牆降成矮牆方便看清室內；「聚焦幹員」會把鏡頭飛到目前選取的幹員身邊，「環繞」讓鏡頭自動繞場，＋／－ 縮放。鍵盤：左右方向鍵旋轉、上下方向鍵縮放、F 聚焦。</li>
         <li>點我方幹員選取，黃色格子是這次可以走到的地方（可以斜走），點一下就移動。半透明的半圓是掩護射擊範圍，「?」是隱藏標記。</li>
@@ -7034,7 +7026,7 @@ const LEGEND_EXTRA=[
 $('#legend').innerHTML=LEGEND.map(([s,t])=>`<span>${s}${t}</span>`).join('');
 $('#lgfull').innerHTML=[...LEGEND,...LEGEND_EXTRA].map(([s,t])=>`<div>${s}<span>${t}</span></div>`).join('');
 let manualReturn=null;
-function openManual(sec){try{achGive('reader');}catch(e){}manualReturn=document.activeElement;$('#manual').hidden=false;if(sec)$('#'+sec).scrollIntoView({block:'start'});$('#manualClose').focus();}
+function openManual(sec){try{document.querySelectorAll('#manual img[data-eq]').forEach(m=>{if(!m.getAttribute('src')){const r=/src="([^"]+)"/.exec(eqIc(m.dataset.eq)||'');if(r)m.src=r[1];else if(m.dataset.eq==='drone')m.src=GADIC['無人機'];}});document.querySelectorAll('#manual img[data-ua]').forEach(m=>{if(!m.src)m.src=uiImg('act_'+m.dataset.ua);});document.querySelectorAll('#manual img[data-op]').forEach(m=>{const u=G&&G.units.find(x=>x.side===G.player)||{op:'ash'};if(!m.src)m.src=opIcon(u.op);});}catch(e){}try{achGive('reader');}catch(e){}manualReturn=document.activeElement;$('#manual').hidden=false;if(sec)$('#'+sec).scrollIntoView({block:'start'});$('#manualClose').focus();}
 function closeManual(){$('#manual').hidden=true;if(manualReturn&&manualReturn.focus)manualReturn.focus();}
 // ---------- original rulebook viewer (Traditional Chinese translation), from the lobby and in game ----------
 const RB={books:[{id:'core',title:'核心規則',src:'rulesmd'}],cur:'core',q:'',html:{}};
