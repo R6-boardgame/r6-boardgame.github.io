@@ -245,6 +245,20 @@ canvas.gl{display:block;margin:0 auto;touch-action:none;cursor:pointer}
 .sheethead h2{margin:0;font-family:var(--display);font-size:26px;letter-spacing:.04em}
 .mtabs{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;border-bottom:1px solid var(--line)}
 .mtabs button{padding:4px 10px;font-size:13px}
+.rqI{display:inline-grid;place-items:center;width:22px;height:22px;margin-right:6px;vertical-align:-5px;color:var(--accent);flex:none}.rqI svg{width:18px;height:18px}
+h3 .rqI{width:26px;height:26px;vertical-align:-6px}h3 .rqI svg{width:22px;height:22px}
+.rqP{margin:6px 0;line-height:1.6}.rqFlow{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:8px 0}
+.rqFlow b{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;font:600 14px var(--display);clip-path:var(--cham)}.rqFlow em{color:var(--muted);font-style:normal}
+.rqFlow b.a{background:rgba(239,127,62,.18);color:var(--atk)}.rqFlow b.d{background:rgba(74,168,226,.18);color:var(--def)}
+.rqFlow svg,.rqCard h4 svg{width:16px;height:16px;flex:none}
+.rqCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:8px 0}
+.rqCard{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--line);padding:10px 12px}.rqCard.a{border-top-color:var(--atk)}.rqCard.d{border-top-color:var(--def)}
+.rqCard h4{display:flex;align-items:center;gap:6px;margin:0 0 6px;font-size:15px}.rqCard.a h4{color:var(--atk)}.rqCard.d h4{color:var(--def)}.rqCard p{margin:4px 0;line-height:1.6}
+.rqList{list-style:none;padding:0;margin:6px 0 0;display:flex;flex-wrap:wrap;gap:6px}.rqList li{display:flex;align-items:center;background:var(--panel2);padding:4px 9px 4px 4px;font-size:13px}.rqList .rqI{margin-right:2px}
+.rqSteps{list-style:none;padding:0;margin:6px 0 0}.rqSteps li{display:flex;gap:4px;align-items:flex-start;margin:7px 0;line-height:1.55}
+.rqChips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}.rqChips span{display:inline-flex;align-items:center;background:var(--panel);border:1px solid var(--line);padding:6px 10px 6px 6px}.rqChips b{color:var(--danger);font:700 18px var(--display);margin-left:8px}
+.rqCard.a,.rqCard.d{color:var(--fg)}#sheetbody .rqCard p,#sheetbody .rqCard li{color:var(--fg)}#sheetbody .rqCard b{color:var(--accent)}#sheetbody .rqCard b.a{color:var(--atk)}#sheetbody .rqCard b.d{color:var(--def)}#sheetbody .rqList{padding:0}#sheetbody .rqList li{flex:0 0 auto;margin:0}
+.rqNote{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6}#sheetbody b.a{color:var(--atk)}#sheetbody b.d{color:var(--def)}
 .sheetbody{overflow-y:auto;padding:16px 16px 24px;display:flex;flex-direction:column;gap:22px}
 .sheetbody section{display:flex;flex-direction:column;gap:8px;scroll-margin-top:8px}
 .sheetbody h3{margin:0;font-family:var(--display);font-size:21px;letter-spacing:.03em;color:var(--accent)}
@@ -1792,25 +1806,33 @@ body.hasClk #tracker .seg{display:none}
   <div class="sheet">
     <div class="sheethead"><h2 id="manualTitle">規則</h2><div class="rbTabs"><button class="on">本遊戲玩法</button><button onclick="closeManual();openRules()">原版規則全文</button></div><span style="flex:1"></span><button id="manualClose">關閉</button></div>
     <nav class="mtabs" id="mtabs">
-      <button data-go="m-goal">任務目標</button><button data-go="m-setup">部署</button><button data-go="m-turn">回合流程</button><button data-go="m-acts">行動一覽</button><button data-go="m-fire">射擊與視線</button><button data-go="m-map">地圖圖例</button><button data-go="m-ops">幹員檔案</button><button data-go="m-ui">操作方式</button>
+      <button data-go="m-turn">回合流程</button><button data-go="m-setup">部署</button><button data-go="m-goal">開始行動</button><button data-go="m-cover">掩護</button><button data-go="m-win">獲勝條件</button><button data-go="m-acts">行動一覽</button><button data-go="m-fire">射擊與視線</button><button data-go="m-map">地圖圖例</button><button data-go="m-ops">幹員檔案</button><button data-go="m-ui">操作方式</button>
     </nav>
     <div class="sheetbody" id="sheetbody">
-      <section id="m-goal"><h3>任務目標</h3><p class="hint">規則依《6: Siege》官方規則書改編：攻守各 5 名幹員，最多 6 輪。</p><ul>
-        <li><b>炸彈</b>：<b class="a">進攻方</b>站在 A 或 B 點安裝拆彈器，撐過接下來兩個防守階段就獲勝。<b class="d">防守方</b>站上或相鄰時花 1 行動解除；第 6 輪結束時沒有拆彈器在運作就獲勝。</li>
-        <li><b>人質</b>：人質在 A 點房間。進攻方在相鄰格用「護送人質」帶上他，走到任一出生區就撤離成功；護送者陣亡時人質留在原地。第 6 輪結束前沒救出，防守方獲勝。</li>
-        <li>兩種任務都可以靠殲滅對方全員獲勝；最後一人在同一次啟動中同歸於盡則雙方都不算贏。</li></ul></section>
-      <section id="m-setup"><h3>部署</h3><ol>
-        <li>雙方各選 5 名幹員。</li>
-        <li>開局前雙方在選單的「戰術裝備」自選方塊：進攻方 6 個（破片手榴彈、爆破炸藥、閃光彈、闊刀地雷、煙霧彈），另有 3 架無人機；防守方 4 個（防彈攝影機、可部署盾牌、衝擊手榴彈、C4 遙控炸藥）。</li><li>防守方在建築內就位。任務另給 3 捲鐵絲網，地圖上有固定攝影機；鐵絲網、盾牌、防彈攝影機只能在部署階段放置。原版沒有加固牆，這裡也拿掉了。</li>
-        <li><b>隱藏標記</b>：防守方開局全部是「?」標記，每名防守方有一真一假兩個標記，進攻方看不出哪個是真的。移動時可以把移動點分給自己的誘餌。進攻方的視線碰到標記、標記被無人機或攝影機掃到、防守方受傷，或防守方做移動以外的行動時，真幹員就會現身，他的誘餌同時收走；誘餌被看到就移除。部署時防守方可以調整最多 5 處場景：移動攝影機或拆掉門窗路障。</li>
-        <li>進攻方從出生區選一個。</li></ol></section>
-      <section id="m-turn"><h3>回合流程</h3><ul>
-        <li>每輪 5 個階段：進攻啟動 → 防守啟動 → 進攻啟動 → 防守啟動 → 回合結束。</li>
-        <li>每個啟動階段可以啟動 1～3 名幹員，每名幹員每輪只啟動一次；如果第一階段就把所有人動完，第二階段跳過。</li>
-        <li>啟動一名幹員時，他有「移動」加上兩個<b>不同</b>的行動，順序自由，移動可以分段穿插。</li>
-        <li>移動：5 點移動點，可以斜走（不能從兩面牆的夾角鑽過去）；穿過窗戶或牆洞多花 1 點。可以穿過隊友但不能停在隊友身上，不能走進敵人所在格。</li>
-        <li>回合結束時：「標記」與「震暈」清除，煙霧散去，所有幹員可再啟動；掩護射擊會保留。</li>
-        <li>可在選單設定每名幹員的啟動時間（入門 120 秒、冷靜 90 秒、標準 60 秒、極限 45 秒），時間到這次啟動就結束。</li></ul></section>
+      <section id="m-turn"><h3><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></i>回合流程</h3>
+        <p class="rqP">最多 6 回合。<b>每回合四個階段</b>，攻守輪流：</p>
+        <div class="rqFlow"><b class="a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg>進攻</b><em>›</em><b class="d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/></svg>防守</b><em>›</em><b class="a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg>進攻</b><em>›</em><b class="d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/></svg>防守</b></div>
+        <p class="rqP">每個階段<b>最多移動三名幹員</b>，每名幹員每輪只能啟動一次。</p></section>
+      <section id="m-setup"><h3><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></i>部署階段</h3>
+        <div class="rqCards">
+          <div class="rqCard d"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/></svg>防守方</h4><p>有 <b>5 次</b>「調整場景」（不含幹員技能）：</p>
+            <ul class="rqList"><li><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 11l5-3v8l-5-3"/></svg></i>移動監視器</li><li><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V3h12v18M3 21h18"/><circle cx="14.5" cy="12" r="1"/></svg></i>開關門窗</li><li><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9.3h18M3 14.6h18M9 4v5.3M15 9.3v5.3M9 14.6V20"/></svg></i>封鐵牆</li></ul></div>
+          <div class="rqCard a"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg>進攻方</h4><p>每名幹員可以分別部署到<b>不同側</b>的進攻位置。</p></div></div>
+        <p class="rqNote">防守方開局是「?」隱藏標記，每人一真一假；被看見、被掃描、受傷或做移動以外的行動才會現身。戰術裝備在選單的「戰術裝備」自選。</p></section>
+      <section id="m-goal"><h3><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></i>開始行動</h3>
+        <div class="rqCards">
+          <div class="rqCard a"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></svg>進攻方</h4><p>一開始就在<b>監視器範圍內</b>時：</p>
+            <ol class="rqSteps"><li><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i><span><b>直接移動</b>：立刻被標註位置，但不會顯示是哪名幹員。</span></li>
+              <li><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 11l5-3v8l-5-3"/></svg>X</i><span><b>先打掉監視器</b>：不會被標註。</span></li>
+              <li><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></i><span><b>移動後被標註</b>，打掉監視器再移動，標註就消失。</span></li></ol></div>
+          <div class="rqCard d"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/></svg>防守方</h4><p>敵人<b>被標註</b>而且在射程內時，可以<b>穿牆攻擊</b>。</p></div></div></section>
+      <section id="m-cover"><h3><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></i>掩護</h3>
+        <p class="rqP">掩護會扣掉攻擊力（命中數），可以相加：</p>
+        <div class="rqChips"><span><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9.3h18M3 14.6h18M9 4v5.3M15 9.3v5.3M9 14.6V20"/></svg></i>每隔一面牆<b>−2</b></span><span><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h18M5 9v10M19 9v10M5 14h14"/></svg></i>掩體、障礙物<b>−1</b></span></div></section>
+      <section id="m-win"><h3><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M9 17h6"/></svg></i>獲勝條件</h3>
+        <div class="rqCards">
+          <div class="rqCard"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="3.5"/><path d="M5 21c.8-4.3 3.6-6.5 7-6.5s6.2 2.2 7 6.5"/></svg>人質局</h4><p><b class="a">進攻方</b>：把人質帶到戶外撤離點，或殲滅對方。</p><p><b class="d">防守方</b>：撐到時間結束，或殲滅對方。</p></div>
+          <div class="rqCard"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="14" r="6.5"/><path d="M15.5 9.5L18 7M18 7l1-1M19.5 3.5l.5-1M21 5h1"/></svg>炸彈局</h4><p><b class="a">進攻方</b>：在 A 或 B 點裝上拆彈器，撐過防守方接下來兩個階段沒被拆掉，或殲滅對方。</p><p><b class="d">防守方</b>：撐到時間結束，或殲滅對方。</p></div></div></section>
       <section id="m-acts"><h3>行動一覽</h3><div class="tbl"><table>
         <thead><tr><th>行動</th><th>陣營</th><th>效果</th></tr></thead><tbody>
         <tr><td>移動</td><td>全部</td><td>5 移動點，每次啟動一次，可分段。</td></tr>
@@ -3937,7 +3959,7 @@ async function riposte(u){
 }
 function camRooms(){const o=[];for(const g of G.gadgets)if(g.alive&&g.type==='cam'&&!jammed(g.x,g.y)&&cell(g.x,g.y).indoor){const r=new Set(roomOf(g.x,g.y).map(([x,y])=>y*G.W+x));o.push(r);}return o;}
 const outCam=g=>g.alive&&g.type==='cam'&&g.fixed&&cell(g.x,g.y)&&cell(g.x,g.y).t==='out'&&(G.map.spawns||[]).some(z=>z.cells.some(([a,b])=>cheb(a,b,g.x,g.y)<=2));
-function outCamSees(u){return (G._atkActs||0)>=1&&!!u._mv&&G.gadgets.some(g=>outCam(g)&&!jammed(g.x,g.y)&&cheb(g.x,g.y,u.x,u.y)<=8&&los(g.x,g.y,u.x,u.y));}
+function outCamSees(u){return !!u._mv&&G.gadgets.some(g=>outCam(g)&&!jammed(g.x,g.y)&&cheb(g.x,g.y,u.x,u.y)<=8&&los(g.x,g.y,u.x,u.y));}
 function camCheck(u){if(u.side!=='A'||!u.alive||u.spotted||NOLOC.has(u.op))return;if(camRooms().some(r=>r.has(u.y*G.W+u.x))||outCamSees(u)){u.spotted=1;SFX.alert();if(u.side===G.player)bigNote('被攝影機發現！',`${OPS[u.op].name} 的位置已暴露`,'warn',1500);log(`${nm(u)} 被攝影機拍到，位置被標記`,'kd');}}
 function gHint(c){if(!c||!G)return;const mine=c.u.side===G.player;if(!mine&&!c.msgs.length)return;
   const name=c.name||(OPS[c.u.op]&&(GSH[c.u.op]||OPS[c.u.op].g))||'道具',ic=GADIC[name]||GADIC[GSH[c.u.op]]||opIcon(c.u.op);
@@ -4467,7 +4489,7 @@ function curTargets(){
     if(G.mode==='wire'||G.mode==='shield'||G.mode==='bpcam')return allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y));
     if(G.mode==='decoy')return allCells().filter(([x,y])=>setupIndoor(x,y)&&!unitAt(x,y)&&!(G.decoys||[]).some(k=>k.alive&&k.x===x&&k.y===y));
     if(G.mode==='rearr'){if(G.rearrCam)return allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y));
-      return [...G.gadgets.filter(g=>g.alive&&g.type==='cam'&&g.fixed).map(g=>[g.x,g.y]),...allCells().filter(([x,y])=>cell(x,y).t==='bar'&&(G.rearr??5)>0||cell(x,y).unbar)];}
+      return [...G.gadgets.filter(g=>g.alive&&g.type==='cam'&&g.fixed).map(g=>[g.x,g.y]),...allCells().filter(([x,y])=>{const c=cell(x,y);return (c.t==='bar'||c.t==='soft')&&(G.rearr??5)>0||c.unbar||c.rfR;})];}
     return allCells().filter(([x,y])=>setupIndoor(x,y)&&!unitAt(x,y));
   }
   switch(G.mode){
@@ -4526,6 +4548,8 @@ async function onCell(x,y){
       if(G.rearrCam){if(!G.rearrCam.moved){G.rearr--;G.rearrCam.moved=1;}G.rearrCam.x=x;G.rearrCam.y=y;G.rearrCam=null;log('攝影機換了位置','kd');}
       else if(cg){if(G.rearr>0||cg.moved)G.rearrCam=cg;}
       else if(c.unbar){c.t='bar';c.unbar=false;c.opened=false;G.rearr++;R3&&(R3.sig='');}
+      else if(c.rfR){c.t='soft';c.rfR=false;G.rearr++;G._wv=(G._wv||0)+1;R3&&(R3.sig='');}
+      else if(c.t==='soft'&&G.rearr>0){c.t='reinf';c.rfR=true;G.rearr--;G._wv=(G._wv||0)+1;R3&&(R3.sig='');log('封上一面鐵牆','kd');}
       else if(c.t==='bar'&&G.rearr>0){c.t='floor';c.unbar=true;c.opened=true;G.rearr--;R3&&(R3.sig='');log(`拆掉一道${c.kind==='window'?'窗戶':'門'}路障`,'kd');}
       if(G.rearr<=0&&!G.rearrCam)G.mode='move';}
     return render();
@@ -5517,7 +5541,7 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
     if(u.side!=='D'||G.player!=='D'){el.remove();return;}
     L.push(btn('移動幹員','點建築內空格',G.mode==='move',false,()=>setMode('move')));
     if(decoyOf(u))L.push(btn('移動誘餌','點空格放這名幹員的誘餌',G.mode==='decoy',false,()=>setMode('decoy')));
-    L.push(btn('調整場景',`攝影機或路障 · 剩 ${G.rearr??5} 次`,G.mode==='rearr',(G.rearr??5)<=0&&!G.rearrCam,()=>{G.rearrCam=null;setMode('rearr');}));
+    L.push(btn('調整場景',`攝影機、門窗、鐵牆 · 剩 ${G.rearr??5} 次`,G.mode==='rearr',(G.rearr??5)<=0&&!G.rearrCam,()=>{G.rearrCam=null;setMode('rearr');}));
     if(setupGadget(u.op))L.push(btn(GSH[u.op]||OPS[u.op].g,`剩 ${u.ch}`,G.mode==='gadget',u.ch<=0,()=>setMode('gadget'),'',u.op==='valkyrie'?eqIc('valk'):''));
     L.push(btn('鐵絲網',`剩 ${G.wire}`,G.mode==='wire',G.wire<=0,()=>setMode('wire')));L.push(btn('可部署盾牌',`剩 ${G.shield}`,G.mode==='shield',G.shield<=0,()=>setMode('shield'),'',eqIc('shield')));L.push(btn('防彈攝影機',`剩 ${G.bpcam}`,G.mode==='bpcam',G.bpcam<=0,()=>setMode('bpcam'),'',eqIc('bpcam')));
   } else if(u.side===G.player&&u.alive){
@@ -6698,7 +6722,7 @@ function update3D(){
   if(G.mode==='move'&&G.sel&&G.phase==='play')for(const [x,y] of camClicks(G.sel))tg.push([x,y,.08,0xe8574e]);
   else if(!(G.phase==='setup'&&G.mode==='move')){const col=G.mode==='shoot'?0xe8574e:G.mode==='dronemove'?0x46d17c:0xe3aa3e;
     const rg=G.phase==='setup'&&G.mode==='rearr'&&!G.rearrCam;
-    for(const [x,y] of curTargets()){const c=cell(x,y);const wall=isWallC(c);if(rg){glow.push([x,y,0,0x22d860,2.3]);continue;}if(!wall&&unitAt(x,y)){glow.push([x,y,0,col]);continue;}tg.push([x,y,wall?WH+.08:.08,col]);}}
+    for(const [x,y] of curTargets()){const c=cell(x,y);const wall=isWallC(c);if(rg){if(c.t==='soft'||c.rfR)tg.push([x,y,WH+.08,c.rfR?0x9aa4ad:0x22d860]);else glow.push([x,y,0,0x22d860,2.3]);continue;}if(!wall&&unitAt(x,y)){glow.push([x,y,0,col]);continue;}tg.push([x,y,wall?WH+.08:.08,col]);}}
   if(G.phase==='setup'&&G.player==='A')G.map.spawns.forEach((z,i)=>z.cells.forEach(([x,y])=>tg.push([x,y,.06,i===G.spawn?0xffa060:0xef7f3e])));
   if(G.scanFx&&performance.now()<G.scanFx.until){for(const [x,y] of G.scanFx.cells)if(!isWallC(cell(x,y)))tg.push([x,y,.05,G.scanFx.c||0x5ad0ff]);setTimeout(()=>{if(G&&G.scanFx&&performance.now()>=G.scanFx.until){G.scanFx=null;render();}},1450);}
   setInst(R3.reachIM,reach,.02);setInst(R3.tgtIM,tg);tgtGlow(glow);R3.hl=new Set([...reach,...tg,...glow].map(c=>c[0]+','+c[1]));

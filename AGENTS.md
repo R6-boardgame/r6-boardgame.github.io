@@ -6,7 +6,7 @@
 
 - 《Rainbow Six Siege – The Board Game》的網頁版，可對戰電腦、新手教學、自訂房間連線、排名戰、成就、商店。
 - 線上版：https://r6-boardgame.github.io/ （GitHub Pages，`main` 分支根目錄直接發佈，推上去就上線）。
-- 目前版本 v76（見 `git log`）。
+- 目前版本 v77（見 `git log`）。
 
 ## 檔案結構
 
@@ -49,7 +49,7 @@
 1. 直接改 `index.html`（從現在起它就是唯一原始碼）。
 2. 本機測試：`python3 -m http.server` 後開 `http://localhost:8000/`。至少測兩種尺寸：**手機直式 390×844** 與 **桌機 1400×900**。
 3. 自動化測試建議用 Playwright：開頁 → `#t-pve` 進入對戰電腦 → 可在 `page.evaluate` 裡直接呼叫全域函式（例如 `WZ.step=2;renderWiz()` 跳到選地圖），截圖確認並收集 `pageerror`，必須沒有錯誤。
-4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v77）。
+4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v78）。
 
 ### 舊流程說明（只是背景，不需要照做）
 
@@ -87,6 +87,8 @@
   - 隔牆射擊（`thruWall`）：目標不現身但被標記，開槍者也被標記；`wmark` 讓這種標記不會觸發 `revealCheck` 現身。
 
 - v76：掩護射擊（`riposte`）對同一個敵人只開一槍，記錄在 `u.owHit`，重新進入掩護射擊或新的一輪時清空。
+
+- v77：規則頁「本遊戲玩法」前段重寫成回合流程、部署階段、開始行動、掩護、獲勝條件，加 SVG 圖示（樣式 `.rq*`）。部署「調整場景」可以把軟牆封成鐵牆（`c.rfR`，再點一次撤回）。屋外監視器取消第一次啟動的緩衝，進攻方在鏡頭內一移動就被標註。
 
 ## 尚未完成 / 等使用者回覆
 
