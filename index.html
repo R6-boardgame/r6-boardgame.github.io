@@ -3466,7 +3466,7 @@ const OPS={
   fuze:{name:'Fuze',side:'A',armor:3,role:'清場',g:'集束炸彈',gd:'投向 3 格內任一格（可越牆），半徑 1 內所有幹員（含隊友）受 1 傷害。',ch:2},
   mute:{name:'Mute',side:'D',armor:2,role:'反情報',g:'訊號干擾器',gd:'放在自己或相鄰格。半徑 2 內：爆破炸藥、放熱炸藥失效，無人機看不到防守方。',ch:2},
   bandit:{name:'Bandit',side:'D',armor:1,role:'反破牆',g:'電擊線',gd:'讓相鄰的加固牆通電，Thermite 無法破壞（EMP 可解除）。',ch:2},
-  kapkan:{name:'Kapkan',side:'D',armor:2,role:'陷阱',g:'入口引爆裝置',gd:'在相鄰的門窗或地板設置隱藏陷阱，進攻方踏入受 2 傷害。',ch:3},
+  kapkan:{name:'Kapkan',side:'D',armor:2,role:'陷阱',g:'入口引爆裝置',gd:'在門窗拉一條只有防守方看得到的紅外線，進攻方經過就爆炸，擲出 1～2 點傷害。進攻方看不到也點不到，但能被技能或爆炸破壞。',ch:3},
   valkyrie:{name:'Valkyrie',side:'D',armor:2,role:'情報',g:'黑眼攝影機',gd:'在 4 格內視線可及處放攝影機，提供 7 格視野。',ch:2},
   smoke:{name:'Smoke',side:'D',armor:2,role:'區域封鎖',g:'遙控毒氣罐',gd:'投向 4 格內視線可及處：半徑 1 內進攻方立即受 1 傷害，毒氣留到下個階段結束，踏入再受 1 傷害。',ch:2},
   rook:{name:'Rook',side:'D',armor:3,role:'支援',passive:'防彈板',pd:'被動：開局時全體防守方生命上限 +1。'},
@@ -3715,6 +3715,7 @@ function visCells(side){
 function gadgetVisibleTo(g,side){
   if(g.side===side||['gas','smk','drone','wire','shield','fire','trax','argus'].includes(g.type))return true;
   if(g.type==='cam')return !!g.found||G.over||outCam(g);
+  if(g.type==='trap')return false;
   const atk=alive('A').filter(u=>u.x>=0);
   if(atk.some(u=>u.op==='iq'&&cheb(u.x,u.y,g.x,g.y)<=5))return true;
   if(g.type==='trap'||g.type==='gu'||g.type==='mat')return false;
@@ -3930,7 +3931,7 @@ async function step(u,x,y){DMGBY=null;
   if(G.cur&&G.cur.u===u)G.cur.path.push([x,y,pubNow(u)]); if(pub(u))SFX.step(); render(); await sleep(G.ai?(pub(u)?85:10):70);
   if(u.side==='A'){
     const tr=gadgetAt(x,y,'trap');
-    if(tr){tr.alive=false;log(`${nm(u)} 觸發了 Kapkan 的陷阱！`,'kd');await damage(u,2);if(!u.alive)return false;}
+    if(tr){tr.alive=false;const n=1+Math.floor(Math.random()*2);try{SFX.boom();wallBlast3D(x,y,'floor');}catch(e){}log(`${nm(u)} 觸發了 Kapkan 的入口引爆裝置！擲出 ${n} 點`,'kd');await damage(u,n);if(!u.alive)return false;}
     if(inGas(x,y)&&!u.gassed){u.gassed=true;await damage(u,1,'毒氣');if(!u.alive)return false;}
     if(cedAt(x,y)&&!u.shocked){u.shocked=true;stunU(u);log(`${nm(u)} 踩到 Bandit 的電擊線，被震暈`,'kd');await damage(u,1,'電擊');if(!u.alive)return false;}
     if(gadgetAt(x,y,'wire')){log(`${nm(u)} 被鐵絲網纏住，啟動結束`,'kd');u.mp=0;u.ap=0;await damage(u,1,'鐵絲網');if(!u.alive)return false;}
@@ -4061,7 +4062,7 @@ function gTargets(u){if(GT[u.op])return GT[u.op](u,G.phase==='setup');
     case 'lion':return 'self';
     case 'mute':return (s?allCells().filter(([x,y])=>setupIndoor(x,y)):[me,...adj4(u.x,u.y)]).filter(free).filter(([x,y])=>!gadgetAt(x,y,'jammer'));
     case 'bandit':return (s?allCells().filter(([x,y])=>setupIndoor(x,y)):adj8(u.x,u.y)).filter(free).filter(([x,y])=>!gadgetAt(x,y)&&!unitAt(x,y));
-    case 'kapkan':return (s?allCells().filter(([x,y])=>cell(x,y).indoor):adj4(u.x,u.y)).filter(([x,y])=>{const c=cell(x,y);return (c.t==='bar'||c.t==='floor')&&!gadgetAt(x,y,'trap');});
+    case 'kapkan':return (s?allCells():adj4(u.x,u.y)).filter(([x,y])=>{const c=cell(x,y);return c&&(c.t==='bar'||((c.kind==='door'||c.kind==='window')&&!blocks(c)))&&!gadgetAt(x,y,'trap');});
     case 'valkyrie':return (s?allCells().filter(([x,y])=>setupIndoor(x,y)):within(u.x,u.y,4).filter(([x,y])=>free([x,y])&&los(u.x,u.y,x,y))).filter(([x,y])=>!gadgetAt(x,y,'cam'));
     case 'smoke':return within(u.x,u.y,4).filter(([x,y])=>free([x,y])&&los(u.x,u.y,x,y));
     case 'doc':return alive('D').filter(a=>a.hp<a.max&&(a===u||(cheb(u.x,u.y,a.x,a.y)<=4&&los(u.x,u.y,a.x,a.y)))).map(a=>[a.x,a.y]);
@@ -4076,7 +4077,7 @@ async function useGadget(u,x,y){ST(u).gad++;DMGBY=u;if(x!=null)aimCam(u,[[x,y]])
     case 'sledge':destroyCell(x,y);log(`${nm(u)} 用大錘砸開了牆面`,side);break;
     case 'thermite':destroyCell(x,y);log(`${nm(u)} 燒穿了${'加固牆'}`,side);break;
     case 'ash':destroyCell(x,y);G.fx={x0:u.x,y0:u.y,x1:x,y1:y,until:performance.now()+400,c:COL.atk};log(`${nm(u)} 的破牆彈炸開了缺口`,side);break;
-    case 'thatcher':{let n=0;for(const g of G.gadgets)if(g.alive&&!['gas','fire','mat','gu','trap'].includes(g.type)&&g.side==='D'&&cheb(g.x,g.y,x,y)<=2){g.alive=false;n++;}
+    case 'thatcher':{let n=0;for(const g of G.gadgets)if(g.alive&&!['gas','fire','mat','gu'].includes(g.type)&&g.side==='D'&&cheb(g.x,g.y,x,y)<=2){g.alive=false;n++;}
       for(const [i,j] of within(x,y,2))if(cell(i,j).elec){cell(i,j).elec=false;n++;}
       log(`${nm(u)} 的 EMP 癱瘓了 ${n} 個防守道具`,side);break;}
     case 'fuze':{log(`${nm(u)} 引爆集束炸彈`,side);if(hostHarm(within(x,y,1),u.side,'集束炸彈'))break;const hit=G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,x,y)<=1);
@@ -6441,7 +6442,7 @@ function gadget3D(gd){
   else if(gd.type==='ced'){add(BOX3,gm('ced',()=>std(0x2a2f35,{metalness:.5})),[.22,.12,.16],0,.06,0);grp.userData.blink=add(SPH3,gm('cedled',()=>new THREE.MeshStandardMaterial({color:0xffd84a,emissive:0xffd84a,emissiveIntensity:1.6})),[.04,.04,.04],0,.14,0);}
   else if(gd.type==='clay'){const b=add(BOX3,gm('clay',()=>std(0x3b4a2c,{roughness:.7})),[.2,.12,.05],0,.12,0);b.rotation.y=Math.atan2(gd.dx||0,gd.dy||1);
     const l=add(BOX3,gm('laser',()=>new THREE.MeshBasicMaterial({color:0xff3b30,transparent:true,opacity:.85})),[.012,.012,.85],(gd.dx||0)*.45,.12,(gd.dy||0)*.45);l.rotation.y=Math.atan2(gd.dx||0,gd.dy||1);}
-  else if(gd.type==='trap'){add(BOX3,gm('trap',()=>std(0x2a2f35,{metalness:.4})),[.14,.1,.1],-.4,.4,0);add(BOX3,gm('laser',()=>new THREE.MeshBasicMaterial({color:0xff3b30,transparent:true,opacity:.85})),[.85,.012,.012],0,.4,0);}
+  else if(gd.type==='trap'){const hz=isWallC(cell(gd.x-1,gd.y))||isWallC(cell(gd.x+1,gd.y));if(!hz)grp.rotation.y=Math.PI/2;const bm=gm('trap',()=>std(0x2a2f35,{metalness:.5}));const kz=blocks(cell(gd.x,gd.y))?[-.13,.13]:[0];for(const z of kz){add(BOX3,bm,[.07,.09,.06],-.47,.32,z);add(BOX3,bm,[.07,.09,.06],.47,.32,z);add(BOX3,gm('kbeam',()=>new THREE.MeshBasicMaterial({color:0xff2a1a,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false})),[.94,.008,.008],0,.32,z).castShadow=false;add(BOX3,gm('kglow',()=>new THREE.MeshBasicMaterial({color:0xff3b30,transparent:true,opacity:.28,blending:THREE.AdditiveBlending,depthWrite:false})),[.94,.03,.03],0,.32,z).castShadow=false;}grp.userData.blink=add(SPH3,gm('kled',()=>new THREE.MeshBasicMaterial({color:0xff3b30})),[.018,.018,.018],-.47,.38,kz[kz.length-1]+.04);}
   else if(gd.type==='drone'){const d=add(BOX3,gm('drn',()=>std(0x2a2f35,{metalness:.5,roughness:.4})),[.2,.06,.14],0,.09,0);
     for(const s of [-1,1])add(CYL3,gm('whl',()=>std(0x111316,{roughness:.8})),[.09,.03,.09],s*.13,.09,0).rotation.z=Math.PI/2;
     add(SPH3,gm('dled',()=>new THREE.MeshStandardMaterial({color:0xef7f3e,emissive:0xef7f3e,emissiveIntensity:1.4})),[.025,.025,.025],0,.13,.07);void d;}
