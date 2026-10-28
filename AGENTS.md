@@ -6,7 +6,7 @@
 
 - 《Rainbow Six Siege – The Board Game》的網頁版，可對戰電腦、新手教學、自訂房間連線、排名戰、成就、商店。
 - 線上版：https://r6-boardgame.github.io/ （GitHub Pages，`main` 分支根目錄直接發佈，推上去就上線）。
-- 目前版本 v74（見 `git log`）。
+- 目前版本 v75（見 `git log`）。
 
 ## 檔案結構
 
@@ -49,7 +49,7 @@
 1. 直接改 `index.html`（從現在起它就是唯一原始碼）。
 2. 本機測試：`python3 -m http.server` 後開 `http://localhost:8000/`。至少測兩種尺寸：**手機直式 390×844** 與 **桌機 1400×900**。
 3. 自動化測試建議用 Playwright：開頁 → `#t-pve` 進入對戰電腦 → 可在 `page.evaluate` 裡直接呼叫全域函式（例如 `WZ.step=2;renderWiz()` 跳到選地圖），截圖確認並收集 `pageerror`，必須沒有錯誤。
-4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v75）。
+4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v76）。
 
 ### 舊流程說明（只是背景，不需要照做）
 
@@ -91,3 +91,4 @@
 - 使用者說「如果技能需要消耗兩個行動點，只剩一個行動點就不能開」：但目前程式和原版卡片裡**沒有任何技能要 2 行動點**，已問使用者是指哪個技能，尚未回覆。
 - 手機橫放：曾提議用 CSS 把整頁轉 90° 來假裝鎖直式（點擊、拖曳座標會有風險），使用者尚未回覆。
 - 曾提議但未回覆：Echo、Flores、Mozzie 的無人機也改成一步一步走；全面核對幹員卡能力。
+- v75：銀行地板和牆改用 Poly Haven CC0 掃描材質（`R6_TEX` 的 `bkMarble`、`bkLime`、`bkVelvet`、`bkWool`、`bkWood`、`bkPlaster`，512px）。大廳／前廳大理石每塊取不同區域（`slabs`），檔案室改成橡木地板 `bwood`。`bankWallMats(soft)`：實心牆暖米色加石縫、可破壞牆淡色，都有深色木踢腳板（貼圖 repeat 0.5，一張涵蓋兩個牆高）。ambientCG 被雲端網路擋，Poly Haven 可以連。
