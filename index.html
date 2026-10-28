@@ -1842,7 +1842,7 @@ body.hasClk #tracker .seg{display:none}
       <section id="m-acts"><h3>行動一覽</h3>
         <div class="rqDiaRow"><span class="rqDia"><i class="f"></i><i class="f"></i><i></i></span><p><b>畫面上方三個菱形</b>：這個階段還能啟動幾名幹員。每階段最多 3 名，啟動一名就暗一格。</p></div>
         <div class="rqDiaRow"><span class="rqDia ap"><i class="f"></i><i class="f"></i><em>移動 5</em></span><p><b>下方幹員卡的行動點</b>：每名幹員啟動一次有 2 個行動點，射擊、奔跑、破壞、用道具各花 1 點，用掉就暗一格。旁邊的「移動」是這次還能走的格數。</p></div>
-        <p class="rqP">右側的行動按鈕：</p><ul class="rqAct"><li><img data-ua="shoot" alt=""><b>射擊</b><span>打視線內的敵人，花 1 行動。</span></li><li><img data-ua="run" alt=""><b>奔跑</b><span>多走幾格，花 1 行動。</span></li><li><img data-ua="destroy" alt=""><b>破壞</b><span>打掉門窗路障、軟牆或敵方道具。</span></li><li><img data-eq="drone" alt=""><b>無人機</b><span>開進去偵查，標記看到的防守方。</span></li><li><img data-eq="charge" alt=""><b>爆破炸藥</b><span>炸開相鄰的軟牆或路障。</span></li><li><img data-eq="frag" alt=""><b>破片手榴彈</b><span>丟出去造成傷害。</span></li><li><img data-eq="flash" alt=""><b>閃光彈</b><span>震暈目標和旁邊的幹員。</span></li><li><img data-eq="smk" alt=""><b>煙霧彈</b><span>擋住視線到回合結束。</span></li><li><img data-ua="plant" alt=""><b>安裝／解除拆彈器</b><span>在 A、B 點安裝；防守方站旁邊開始拆。</span></li><li><img data-ua="overwatch" alt=""><b>監視並結束</b><span>選方向後結束，敵人進入前方半圓會被射擊。</span></li></ul><p class="rqP"><b>專屬道具</b>：下方幹員卡會顯示幹員和他的專屬道具，以 Ash 為例：</p><div id="rqOpCard"></div></section>
+        <p class="rqP">右側的行動按鈕：</p><ul class="rqAct"><li><img data-ua="shoot" alt=""><b>射擊</b><span>打視線內的敵人，花 1 行動。</span></li><li><img data-ua="run" alt=""><b>奔跑</b><span>多走幾格，花 1 行動。</span></li><li><img data-ua="destroy" alt=""><b>破壞</b><span>打掉門窗路障、軟牆或敵方道具；鐵絲網要站在旁邊。行動點夠就能連續破壞。</span></li><li><img data-eq="drone" alt=""><b>無人機</b><span>開進去偵查，標記看到的防守方。</span></li><li><img data-eq="charge" alt=""><b>爆破炸藥</b><span>炸開相鄰的軟牆或路障。</span></li><li><img data-eq="frag" alt=""><b>破片手榴彈</b><span>丟出去造成傷害。</span></li><li><img data-eq="flash" alt=""><b>閃光彈</b><span>震暈目標和旁邊的幹員。</span></li><li><img data-eq="smk" alt=""><b>煙霧彈</b><span>擋住視線到回合結束。</span></li><li><img data-ua="plant" alt=""><b>安裝／解除拆彈器</b><span>在 A、B 點安裝；防守方站旁邊開始拆。</span></li><li><img data-ua="overwatch" alt=""><b>監視並結束</b><span>選方向後結束，敵人進入前方半圓會被射擊。</span></li></ul><p class="rqP"><b>專屬道具</b>：下方幹員卡會顯示幹員和他的專屬道具，以 Ash 為例：</p><div id="rqOpCard"></div></section>
       <section id="m-fire"><h3>射擊與視線</h3><ul>
         <li><b>距離</b>：近 1～3 格、中 4～6 格、遠 7 格以上。幹員卡上寫著三種距離各擲哪些骰：<i class="die" style="background:#e8574e"></i>紅骰平均 2、<i class="die" style="background:#ef8a3a"></i>橙骰平均 1.5、<i class="die" style="background:#e8c840"></i>黃骰平均 1，點數加總就是命中數。</li>
         <li><b>掩護</b>：每隔一面牆 −2；目標緊貼障礙物（桌子、書櫃、牆邊）−1；可部署盾牌從正面打來 −2，側邊或背後沒有掩護。各項可以相加。</li>
@@ -3608,7 +3608,7 @@ const inGas=(x,y)=>G.gadgets.some(g=>g.alive&&g.type==='gas'&&cheb(g.x,g.y,x,y)<
 const smokeAt=(x,y)=>G.gadgets.some(g=>g.alive&&g.type==='smk'&&x>=g.x&&x<=g.x+1&&y>=g.y&&y<=g.y+1);
 const shieldAt=(x,y)=>gadgetAt(x,y,'shield');
 const cedAt=(x,y)=>G.gadgets.some(g=>g.alive&&g.type==='ced'&&cheb(g.x,g.y,x,y)<=1&&(g.x===x&&g.y===y||adj8(g.x,g.y).some(([a,b])=>a===x&&b===y)));
-const canDo=(u,k)=>u.ap>0&&!u.used.has(k);
+const canDo=(u,k)=>u.ap>0&&(k==='destroy'||!u.used.has(k));
 function useAct(u,k){if(k==='tactical'||k==='special')G._ghCap={u,msgs:[],name:''};u.ap--;u.used.add(k);if(u.hidden&&k!=='run')reveal(u,'行動時');}
 const decoyOf=u=>(G.decoys||[]).find(k=>k.alive&&k.owner===u.id);
 function decoyReach(u){const k=decoyOf(u);if(!k)return new Map();const mp=G.active===u?u.mp:u.speed,m=reach({...u,x:k.x,y:k.y,mp});
@@ -3933,7 +3933,7 @@ async function step(u,x,y){DMGBY=null;
     if(tr){tr.alive=false;log(`${nm(u)} 觸發了 Kapkan 的陷阱！`,'kd');await damage(u,2);if(!u.alive)return false;}
     if(inGas(x,y)&&!u.gassed){u.gassed=true;await damage(u,1,'毒氣');if(!u.alive)return false;}
     if(cedAt(x,y)&&!u.shocked){u.shocked=true;stunU(u);log(`${nm(u)} 踩到 Bandit 的電擊線，被震暈`,'kd');await damage(u,1,'電擊');if(!u.alive)return false;}
-    if(gadgetAt(x,y,'wire')){log(`${nm(u)} 被鐵絲網纏住，啟動結束`,'kd');u.mp=0;u.ap=0;}
+    if(gadgetAt(x,y,'wire')){log(`${nm(u)} 被鐵絲網纏住，啟動結束`,'kd');u.mp=0;u.ap=0;await damage(u,1,'鐵絲網');if(!u.alive)return false;}
   }
   if(u.side==='D'){const cl=G.gadgets.find(g=>g.alive&&g.type==='clay'&&((g.x===x&&g.y===y)||(g.x+g.dx===x&&g.y+g.dy===y)));
     if(cl){log(`${nm(u)} 觸發了闊刀地雷！`,'ka');await clayBoom(cl);if(!u.alive)return false;}}
@@ -4443,6 +4443,12 @@ function autoDefSetup(withGadgets){
   const walls=shuffle(allCells().filter(([x,y])=>cell(x,y).t==='soft'&&adj4(x,y).some(([a,b])=>roomSet.has(b*G.W+a))));
   void walls;
   if(!withGadgets)return;
+  {let n=5,g=0;const W=walls.length?walls:shuffle(allCells().filter(([x,y])=>cell(x,y).t==='soft'));const cams=shuffle(G.gadgets.filter(q=>q.alive&&q.type==='cam'&&q.fixed));const bars=shuffle(allCells().filter(([x,y])=>cell(x,y).t==='bar'));
+    while(n>0&&g++<40){const r=Math.random();
+      if(r<.5&&W.length){const [x,y]=W.shift(),c=cell(x,y);if(c.t==='soft'){c.t='reinf';c.rfR=true;n--;}}
+      else if(r<.75&&cams.length){const q=cams.shift(),t=shuffle(indoor.filter(([x,y])=>!gadgetAt(x,y)&&!unitAt(x,y)&&!roomSet.has(y*G.W+x)))[0];if(t){q.x=t[0];q.y=t[1];q.moved=1;n--;}}
+      else if(bars.length){const [x,y]=bars.shift(),c=cell(x,y);if(c.t==='bar'){c.t='floor';c.unbar=true;c.opened=true;n--;}}}
+    G.rearr=0;G._wv=(G._wv||0)+1;}
   for(let i=0;i<3&&G.wire>0;i++){const c=shuffle(allCells().filter(([x,y])=>cell(x,y).t==='floor'&&cell(x,y).indoor&&!gadgetAt(x,y)&&!unitAt(x,y)&&adj4(x,y).some(([a,b])=>cell(a,b).t==='bar')))[0];if(c){G.wire--;G.gadgets.push({type:'wire',x:c[0],y:c[1],side:'D',alive:true});}}
   for(let i=0;i<2&&G.shield>0;i++){const d=ds[i%ds.length],c=shuffle(adj8(d.x,d.y).filter(([x,y])=>cell(x,y).t==='floor'&&!gadgetAt(x,y)&&!unitAt(x,y)))[0];if(c){G.shield--;G.gadgets.push({type:'shield',x:c[0],y:c[1],side:'D',alive:true});}}
   for(let i=0;i<3&&G.bpcam>0;i++){const c=shuffle(indoor.filter(([x,y])=>!roomSet.has(y*G.W+x)&&!gadgetAt(x,y)&&!unitAt(x,y)&&!camRooms().some(r=>r.has(y*G.W+x))))[0];if(!c)break;G.bpcam--;G.gadgets.push({type:'cam',bp:true,x:c[0],y:c[1],side:'D',alive:true});}
@@ -5570,7 +5576,7 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
     if(setupGadget(u.op))L.push(btn(GSH[u.op]||OPS[u.op].g,`剩 ${u.ch}`,G.mode==='gadget',u.ch<=0,()=>setMode('gadget'),'',u.op==='valkyrie'?eqIc('valk'):''));
     L.push(btn('鐵絲網',`剩 ${G.wire}`,G.mode==='wire',G.wire<=0,()=>setMode('wire')));L.push(btn('可部署盾牌',`剩 ${G.shield}`,G.mode==='shield',G.shield<=0,()=>setMode('shield'),'',eqIc('shield')));L.push(btn('防彈攝影機',`剩 ${G.bpcam}`,G.mode==='bpcam',G.bpcam<=0,()=>setMode('bpcam'),'',eqIc('bpcam')));
   } else if(u.side===G.player&&u.alive){
-    const ok=canAct(u),isA=G.active===u,can=k=>ok&&(!isA||canDo(u,k)),sub=(k,t)=>isA&&u.used.has(k)?'已用過':t;
+    const ok=canAct(u),isA=G.active===u,can=k=>ok&&(!isA||canDo(u,k)),sub=(k,t)=>isA&&k!=='destroy'&&u.used.has(k)?'已用過':t;
     const dmv=dmOf();if(dmv&&isA){L.push(btn('結束移動並掃描',`無人機剩 ${dmv.mp} 移動點`,false,G.busy,()=>act(()=>droneFinish(u)),'primary','',eqIc('drone')));}else{
     if(u.hidden&&decoyOf(u))L.push(btn('移動誘餌',`用掉這名幹員的移動點 · 剩 ${isA?u.mp:u.speed}`,G.mode==='decoy',!ok||!decoyReach(u).size,()=>{if(commit(u))setMode('decoy');}));
     const wrap=fn=>()=>{if(commit(u))act(fn);};
