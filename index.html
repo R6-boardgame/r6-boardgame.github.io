@@ -1805,7 +1805,7 @@ body.hasClk #tracker .seg{display:none}
 
 <div class="manual" id="manual" hidden role="dialog" aria-modal="true" aria-labelledby="manualTitle">
   <div class="sheet">
-    <div class="sheethead"><h2 id="manualTitle">規則</h2><div class="rbTabs"><button class="on">本遊戲玩法</button><button onclick="closeManual();openRules()">原版規則全文</button></div><span style="flex:1"></span><button id="manualClose">關閉</button></div>
+    <div class="sheethead"><h2 id="manualTitle">規則</h2><span style="flex:1"></span><button id="manualClose">關閉</button></div>
     <nav class="mtabs" id="mtabs">
       <button data-go="m-turn">回合流程</button><button data-go="m-setup">部署</button><button data-go="m-goal">開始行動</button><button data-go="m-cover">掩護</button><button data-go="m-win">獲勝條件</button><button data-go="m-acts">行動一覽</button><button data-go="m-fire">射擊與視線</button><button data-go="m-map">地圖圖例</button><button data-go="m-ops">幹員檔案</button><button data-go="m-ui">操作方式</button>
     </nav>
@@ -1852,7 +1852,7 @@ body.hasClk #tracker .seg{display:none}
         <li>每點命中造成 1 傷，傷害達到耐力就陣亡；沒死的目標會被標記位置到回合結束。被閃光彈震暈的幹員只擲兩顆黃骰。</li>
         <li><b>攝影機</b>：地圖上頭頂有紅色鏡頭圖示的就是攝影機，牆後也看得到。它涵蓋整個房間（地板淡黃色的範圍），進攻方走進或在裡面行動就被標記。攝影機雙方都看得見，進攻方可以用「破壞」打掉視線內 8 格內的攝影機；防彈攝影機只能從相鄰格破壞，Thatcher 的 EMP 也能摧毀。<li><b>掩護射擊</b>：每個敵人在同一次掩護射擊裡只會被打一次（每輪重置）。地板上紅色的格子是敵方掩護射擊會開火的範圍（面向的半圓、14 格內、有視線），自己的是藍色。走進紅色範圍會被搶先射擊。</li><li>Kapkan 陷阱踏入受 2 傷，Smoke 毒氣受 1 傷。</li>
         <li><b>障礙物</b>：地圖上的桌子、沙發、吧台、車輛等家具。爬上去多花 1 點移動點，不能停在上面，不擋視線；目標緊貼著障礙物時 −1 掩護。無人機可以穿過窗戶和各種障礙物。</li>
-        <li>還沒做的部分：探頭（lean）、控制任務、樓上區域與上下樓、部分幹員的專屬裝置。完整原版規則見「原版規則書」。</li></ul></section>
+        <li>還沒做的部分：探頭（lean）、控制任務、樓上區域與上下樓、部分幹員的專屬裝置。</li></ul></section>
       <section id="m-map"><h3>地圖圖例</h3><p>地圖是由上往下看的平面圖。淺色是室內地板，深色是室外。</p><div class="lg" id="lgfull"></div></section>
       <section id="m-ops"><h3>幹員檔案</h3><div class="opgrid" id="opgrid"></div></section>
       <section id="m-ui"><h3>操作方式</h3><ol>
@@ -6828,8 +6828,8 @@ function renderTitle(){
   const el=$('#tmenu');if(!el)return;if(SCREEN==='rank')SCREEN='title';{const tt=$('#title');if(tt)tt.dataset.s=SCREEN;}const B=(id,label,sub,cls)=>`<button id="${id}" class="tbtn ${cls||''}"><b>${label}</b>${sub?`<span>${sub}</span>`:''}</button>`;
   let h='';if(SCREEN==='task')h=taskHTML()+B('t-back','返回','',' ghost');
   const ops=k=>cfg.picks[k].map(x=>`<img src="${opIcon(x)}" alt="${(OPC[x]||OPS[x]).name}" title="${(OPC[x]||OPS[x]).name}">`).join('');
-  if(SCREEN==='title')h=B('t-rank','線上對戰','PVP · 自動配對對手','primary')+B('t-pve','對戰電腦','PVE · 選陣營、地圖與幹員')+B('t-pvp','自訂房間','建立或尋找房間')+B('t-shop','商店','用聲望解鎖幹員')+B('t-tut','新手教學','第一次玩從這裡開始')+B('t-lib','作戰檔案',`規則 · ${OPBASE.length} 名幹員圖鑑 · 成就`);
-  else if(SCREEN==='lib')h=`<h2 class="tsec">作戰檔案</h2>`+B('t-man','規則','本遊戲玩法與原版規則全文','primary')+B('t-ops','幹員圖鑑',`共 ${OPBASE.length} 名幹員`)+B('t-ach','成就',`已解鎖 ${achCount()}/${ACH.length}`)+B('t-back','返回','',' ghost');
+  if(SCREEN==='title')h=B('t-rank','線上對戰','PVP · 自動配對對手','primary')+B('t-pve','對戰電腦','PVE · 選陣營、地圖與幹員')+B('t-shop','商店','用聲望解鎖幹員')+B('t-tut','新手教學','第一次玩從這裡開始')+B('t-lib','作戰檔案',`規則 · ${OPBASE.length} 名幹員圖鑑 · 成就`);
+  else if(SCREEN==='lib')h=`<h2 class="tsec">作戰檔案</h2>`+B('t-man','規則','本遊戲玩法','primary')+B('t-ops','幹員圖鑑',`共 ${OPBASE.length} 名幹員`)+B('t-ach','成就',`已解鎖 ${achCount()}/${ACH.length}`)+B('t-back','返回','',' ghost');
   else if(SCREEN==='rank'){if(ME.mode!=='account')h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(null,40)}<div><b>排名戰需要登入帳號</b><br><span>登入後，段位與戰績會存在這個遊戲的共用資料裡。訪客可以玩其他所有模式。</span></div></div></div>`+B('t-login','登入帳號','啟用線上身分','primary')+B('t-back','返回','',' ghost');
     else{fillPicks('A');fillPicks('D');h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(ME.rating,44)}<div><span>你的段位</span><br><b>${ME.rating==null?'—':tierName(tierOf(ME.rating))}</b> <span>${ME.rating??''} 分 · ${ME.w} 勝 ${ME.l} 敗</span></div></div>
       <div class="sq"><em>進攻小隊</em>${ops('A')}<button data-edit="A">更換</button></div><div class="sq"><em>防守小隊</em>${ops('D')}<button data-edit="D">更換</button></div><span class="hint">陣營隨機分配，地圖配對後揭曉。勝利 +25 分，落敗 −20 分。</span></div>`+B('t-queue','開始配對','PVP RANK','primary')+B('t-back','返回','',' ghost');}}
