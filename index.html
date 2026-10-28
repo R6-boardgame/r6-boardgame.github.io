@@ -5573,7 +5573,7 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
     L.push(btn('移動幹員','點建築內空格',G.mode==='move',false,()=>setMode('move')));
     if(decoyOf(u))L.push(btn('移動誘餌','點空格放這名幹員的誘餌',G.mode==='decoy',false,()=>setMode('decoy')));
     L.push(btn('調整場景',`攝影機、門窗、鐵牆 · 剩 ${G.rearr??5} 次`,G.mode==='rearr',(G.rearr??5)<=0&&!G.rearrCam,()=>{G.rearrCam=null;setMode('rearr');}));
-    if(setupGadget(u.op))L.push(btn(GSH[u.op]||OPS[u.op].g,`剩 ${u.ch}`,G.mode==='gadget',u.ch<=0,()=>setMode('gadget'),'',u.op==='valkyrie'?eqIc('valk'):''));
+    for(const d of alive('D').filter(d=>setupGadget(d.op)))L.push(btn(GSH[d.op]||OPS[d.op].g,`${OPS[d.op].name} · 剩 ${d.ch}`,G.mode==='gadget'&&u===d,d.ch<=0,()=>{if(G.mode==='gadget'&&G.sel===d)return setMode('move');G.sel=d;setMode('gadget');},'',d.op==='valkyrie'?eqIc('valk'):`<img class="bic" src="${opIcon(d.op)}" alt="">`));
     L.push(btn('鐵絲網',`剩 ${G.wire}`,G.mode==='wire',G.wire<=0,()=>setMode('wire')));L.push(btn('可部署盾牌',`剩 ${G.shield}`,G.mode==='shield',G.shield<=0,()=>setMode('shield'),'',eqIc('shield')));L.push(btn('防彈攝影機',`剩 ${G.bpcam}`,G.mode==='bpcam',G.bpcam<=0,()=>setMode('bpcam'),'',eqIc('bpcam')));
   } else if(u.side===G.player&&u.alive){
     const ok=canAct(u),isA=G.active===u,can=k=>ok&&(!isA||canDo(u,k)),sub=(k,t)=>isA&&k!=='destroy'&&u.used.has(k)?'已用過':t;
