@@ -6,7 +6,7 @@
 
 - 《Rainbow Six Siege – The Board Game》的網頁版，可對戰電腦、新手教學、自訂房間連線、排名戰、成就、商店。
 - 線上版：https://r6-boardgame.github.io/ （GitHub Pages，`main` 分支根目錄直接發佈，推上去就上線）。
-- 目前版本 v82（見 `git log`）。
+- 目前版本 v83（見 `git log`）。
 
 ## 檔案結構
 
@@ -49,7 +49,7 @@
 1. 直接改 `index.html`（從現在起它就是唯一原始碼）。
 2. 本機測試：`python3 -m http.server` 後開 `http://localhost:8000/`。至少測兩種尺寸：**手機直式 390×844** 與 **桌機 1400×900**。
 3. 自動化測試建議用 Playwright：開頁 → `#t-pve` 進入對戰電腦 → 可在 `page.evaluate` 裡直接呼叫全域函式（例如 `WZ.step=2;renderWiz()` 跳到選地圖），截圖確認並收集 `pageerror`，必須沒有錯誤。
-4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v83）。
+4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v84）。
 
 ### 舊流程說明（只是背景，不需要照做）
 
@@ -94,6 +94,7 @@
 - v80：規則頁精簡：拿掉地圖圖例、幹員檔案（`#lgfull`、`#opgrid` 留在隱藏 div 裡）；射擊與視線只留距離、掩護、隔牆射擊；行動一覽改成上方三菱形說明加右側按鈕圖示清單（`.rqAct`，`openManual` 時用 `eqIc`/`uiImg` 補圖）。直接移動改為「被標註並顯現幹員」，炸彈局拿掉拆彈細節段落。
 - v81：行動一覽在三菱形後加「下方幹員卡的行動點」說明（橘色菱形＋移動），按鈕清單拿掉「結束行動」。
 - v82：行動一覽的「專屬道具」改成直接顯示 Ash 的幹員卡（`#rqOpCard`，`openManual` 時用 `mkUnit`＋`opCard` 產生，取 `.oc` 那段）。
+- v83：對戰電腦選單的任務也改成點兩下確定（陣營、任務、地圖、計時、幹員加入／移出都一樣）。開局地圖封面 `mapIntro` 改在 `newGame` 建好 G 後同步加上，且不再從透明淡入，避免先閃到 3D 地圖。
 
 ## 尚未完成 / 等使用者回覆
 

@@ -922,7 +922,7 @@ html body .wzBody button,html body .wz button{letter-spacing:.02em}
 .miTx b{font:800 clamp(48px,9vw,120px)/1 'Noto Sans TC',sans-serif;letter-spacing:.06em;color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.7)}
 .miTx span{font:500 clamp(14px,1.6vw,20px) 'Noto Sans TC',sans-serif;color:#cfd8df;letter-spacing:.08em}
 .mapintro.out{animation:miOut .6s ease-in forwards}
-@keyframes miIn{from{opacity:0;background-size:110%}to{opacity:1}}
+@keyframes miIn{from{background-size:110%}}
 @keyframes miTx{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
 @keyframes miOut{to{opacity:0}}
 /* keep wizard cards dark when selected (the white "on" fill is for small buttons only) */
@@ -4478,9 +4478,9 @@ const invUsed=side=>Object.values(cfg.inv[side]).reduce((a,b)=>a+b,0);
 function invHTML(side){const inv=cfg.inv[side],used=invUsed(side);
   return `<h3>戰術裝備（${used}/${INV_CAP[side]} 個方塊${side==='A'?'，另有 3 架無人機':'；任務另給 3 捲鐵絲網與地圖上的攝影機'}）</h3><div class="invrow">${Object.entries(INV[side]).map(([k,[n,max,d]])=>`<div class="inv"><b>${n}</b><span class="hint">${d}</span><div class="invc"><button data-inv="${k}" data-dv="-1" ${inv[k]<=0?'disabled':''} aria-label="減少${n}">−</button><i>${inv[k]}</i><button data-inv="${k}" data-dv="1" ${inv[k]>=max||used>=INV_CAP[side]?'disabled':''} aria-label="增加${n}">＋</button><small>上限 ${max}</small></div></div>`).join('')}</div>`;}
 function newGame(){
-  $('#banner').hidden=true;setTimeout(()=>{try{if(G&&!G.tut&&!G.net)mapIntro(cfg.map);}catch(e){}},60);setTimeout(()=>{try{preloadShots();}catch(e){}},400);
+  $('#banner').hidden=true;setTimeout(()=>{try{preloadShots();}catch(e){}},400);
   const m=MAPS[cfg.map];
-  G={map:m,grid:parseMap(m),W:m.rows[0].length,H:m.rows.length,units:[],gadgets:[],reinf:0,drones:3,wire:3,...invFor('A',cfg.side==='A'?cfg.inv.A:INV_DEF.A),...invFor('D',cfg.side==='D'?cfg.inv.D:INV_DEF.D),decoys:[],mission:cfg.mission||'bomb',hostage:null,round:1,maxRounds:6,phaseIdx:0,phase:'setup',acts:0,active:null,sel:null,mode:'move',defuser:null,over:false,busy:false,ai:false,log:[],moves:[],cur:null,hl:null,player:cfg.side,aiSite:Math.random()<.5?'A':'B',fx:null,spawn:null};
+  G={map:m,grid:parseMap(m),W:m.rows[0].length,H:m.rows.length,units:[],gadgets:[],reinf:0,drones:3,wire:3,...invFor('A',cfg.side==='A'?cfg.inv.A:INV_DEF.A),...invFor('D',cfg.side==='D'?cfg.inv.D:INV_DEF.D),decoys:[],mission:cfg.mission||'bomb',hostage:null,round:1,maxRounds:6,phaseIdx:0,phase:'setup',acts:0,active:null,sel:null,mode:'move',defuser:null,over:false,busy:false,ai:false,log:[],moves:[],cur:null,hl:null,player:cfg.side,aiSite:Math.random()<.5?'A':'B',fx:null,spawn:null};try{mapIntro(cfg.map);}catch(e){}
   const enemy=cfg.side==='A'?'D':'A';
   const epicks=shuffle(OPBASE.filter(k=>OPC[k].side===enemy&&SCRIPTED.has(k))).slice(0,5);
   const apicks=cfg.side==='A'?cfg.picks.A:epicks,dpicks=cfg.side==='D'?cfg.picks.D:epicks;
@@ -7163,14 +7163,14 @@ function renderWiz(){let el=$('#wiz');const keep=[...(el?el.querySelectorAll('.w
   const reach=i=>i<=WZ.seen||WZSTEPS.slice(0,i).every(x=>x.ok());
   el.innerHTML=`<div class="wzTop"><h2>對戰電腦</h2><nav class="wzSteps">${WZSTEPS.map((x,i)=>`<button data-wz-go="${i}" class="${i===st?'cur':i<WZ.seen||(i<st)?'done':''}" ${reach(i)&&WZSTEPS.slice(0,i).every(y=>y.ok())?'':'disabled'}><i>${i<st?'✓':i+1}</i><span>${x.t}</span></button>`).join('')}</nav><span id="wzOnline"></span><button id="wzRules">規則</button></div>
     <div class="wzBody">${wzStepHTML()}</div>
-    <div class="wzFoot"><button id="wzBack">${st?'‹ 上一步':'‹ 返回主畫面'}</button><span class="msg">${st===1?'點一下就選定':st===2?'點地圖選擇，再按下一步':[0,5].includes(st)?(WZ.arm?'再點一次確定':'點一下看說明，再點一次確定'):ok?`第 ${st+1} 步，共 ${WZSTEPS.length} 步`:WZSTEPS[st].why}</span><button class="primary${last?' start':''}" id="wzNext" ${ok?'':'disabled'} >${last?'開始任務':'下一步 ›'}</button></div>`;
+    <div class="wzFoot"><button id="wzBack">${st?'‹ 上一步':'‹ 返回主畫面'}</button><span class="msg">${[0,1,2,5].includes(st)?(WZ.arm?'再點一次確定':'點一下看說明，再點一次確定'):ok?`第 ${st+1} 步，共 ${WZSTEPS.length} 步`:WZSTEPS[st].why}</span><button class="primary${last?' start':''}" id="wzNext" ${ok?'':'disabled'} >${last?'開始任務':'下一步 ›'}</button></div>`;
   if(keep.length&&WZ.lastStep===st)el.querySelectorAll('.wzBody,.wzOg').forEach((e,i)=>{if(keep[i]!=null)e.scrollTop=keep[i];});WZ.lastStep=st;
   const go=i=>{WZ.step=i;WZ.arm=null;WZ.peek=null;WZ.peekSlot=null;renderWiz();el.querySelector('.wzBody').scrollTop=0;};
   const twice=(key,set,after)=>{if(WZ.arm===key){WZ.arm=null;after();return;}WZ.arm=key;set();renderWiz();};
   const pick=()=>{const r=WZ.ret;WZ.ret=null;go(r!=null?r:st+1);};
   el.querySelectorAll('[data-wz-go]').forEach(b=>b.onclick=()=>{WZ.ret=st===WZSTEPS.length-1&&b.closest('.wzSum')?st:null;go(+b.dataset.wzGo);});
   el.querySelectorAll('[data-wz-side]').forEach(b=>b.onclick=()=>twice('side'+b.dataset.wzSide,()=>{if(cfg.side!==b.dataset.wzSide){cfg.side=b.dataset.wzSide;WZ.cur=null;WZ.seen=Math.min(WZ.seen,2);}if(R3)render();},pick));
-  el.querySelectorAll('[data-wz-mis]').forEach(b=>b.onclick=()=>{cfg.mission=b.dataset.wzMis;pick();});
+  el.querySelectorAll('[data-wz-mis]').forEach(b=>b.onclick=()=>twice('mis'+b.dataset.wzMis,()=>{cfg.mission=b.dataset.wzMis;},pick));
   el.querySelectorAll('[data-wz-map]').forEach(b=>b.onclick=()=>twice('map'+b.dataset.wzMap,()=>{cfg.map=b.dataset.wzMap;render();},pick));
   el.querySelectorAll('[data-tm]').forEach(b=>b.onclick=()=>twice('tm'+b.dataset.tm,()=>{cfg.timer=+b.dataset.tm;},pick));
   {const a=WZ.arm&&el.querySelector({side:'[data-wz-side="'+cfg.side+'"]',mis:'[data-wz-mis="'+cfg.mission+'"]',map:'[data-wz-map="'+cfg.map+'"]',tm:'[data-tm="'+(cfg.timer||0)+'"]'}[(WZ.arm.match(/^(side|mis|map|tm)/)||[])[1]]);if(a)a.classList.add('armed');}
