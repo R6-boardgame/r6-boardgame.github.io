@@ -1826,6 +1826,115 @@ body.hasClk #tracker .seg{display:none}
 @keyframes obStun{0%{box-shadow:0 0 0 2px #ff3b30,0 0 12px #ff3b30}100%{box-shadow:0 0 0 2px rgba(255,59,48,.3),0 0 2px rgba(255,59,48,.3)}}
 @keyframes obGl{0%{transform:translate(0,0)}33%{transform:translate(-1px,1px)}66%{transform:translate(1px,-1px)}}
 @keyframes obSp{to{transform:rotate(360deg)}}
+/* v91 custom operator page */
+#cop{position:fixed;inset:0;z-index:115;background:radial-gradient(90% 55% at 50% 22%,#22405e99,transparent 70%),linear-gradient(180deg,#0e141b,#090d12);color:#e2e8ee;animation:shIn .22s ease;font-family:var(--body);font-size:13px;line-height:1.35;--Y:#e8c840;--O:#ef8a3a;--R:#e8574e;--G:#5fc27d;--B:#4aa8e2;--V:#b48cf0;--ln:#2c3b4a}
+#cop.out{animation:shOut .18s ease forwards}
+#cop button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#cop button:disabled{cursor:default}
+.cpBox{position:absolute;inset:0;max-width:480px;margin:0 auto;display:flex;flex-direction:column;padding:max(8px,env(safe-area-inset-top)) 0 max(8px,env(safe-area-inset-bottom))}
+.cpTop{display:flex;align-items:center;gap:10px;padding:4px 14px 6px;position:relative;z-index:3;flex:none}
+.cpBack{width:32px;height:32px;border:1px solid var(--ln)!important;display:grid;place-items:center;color:#8b9cad!important;font-size:18px!important;background:#0e141bcc!important}
+.cpTt small{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--accent)}
+.cpTt h2{margin:0;font-family:var(--display);font-size:21px;line-height:1}
+.cpSw{margin-left:auto;display:flex;border:1px solid var(--ln);background:#0b1016d8}
+.cpSw button{padding:8px 12px!important;font-size:12px!important;font-weight:700;color:#8b9cad!important}
+.cpSw button.on{background:var(--accent)!important;color:#1b1305!important}
+.cpStage{position:relative;flex:1 1 auto;min-height:200px;overflow:hidden;margin-top:-44px}
+.cpArt{position:absolute;left:50%;top:34px;height:calc(100% + 120px);max-height:820px;transform:translateX(-46%);pointer-events:none;-webkit-mask-image:linear-gradient(#000 60%,transparent 88%);mask-image:linear-gradient(#000 60%,transparent 88%)}
+.cpBig{position:absolute;right:-6px;top:52px;font-family:var(--display);font-size:92px;line-height:.8;color:#ffffff0d;writing-mode:vertical-rl;pointer-events:none}
+.cpId{position:absolute;left:14px;top:56px;z-index:3;max-width:60%}
+.cpPen{display:grid!important;place-items:center;width:28px;height:24px;border:1px solid var(--ln)!important;background:#0b1016d8!important;color:#8b9cad!important;margin-bottom:4px}
+.cpPen svg{width:14px;height:14px}
+.cpNm{font-family:var(--display);font-size:30px;line-height:1;text-shadow:0 2px 8px #000;word-break:break-all}
+.cpEd{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+.cpEd input{width:150px;font-family:var(--display);font-size:22px;background:#0b1016;border:1px solid var(--accent);color:#fff;padding:2px 6px;border-radius:0}
+.cpEd span{font-family:var(--mono);font-size:10px;color:#8b9cad;background:#0b1016d8;padding:1px 4px}
+.cpTag{display:inline-block;margin-top:4px;background:#3a4654;padding:1px 7px;font-size:11px;font-weight:700}
+.cpKd{display:flex;gap:6px;margin-top:8px}
+.cpKd div{background:#0b1016d8;border:1px solid var(--ln);border-left:3px solid var(--accent);padding:3px 9px 4px;line-height:1}
+.cpKd div+div{border-left-color:var(--G)}
+.cpKd b{display:block;font-family:var(--display);font-size:26px}.cpKd span{font-size:10px;color:#8b9cad}
+.cpPenta{position:absolute;left:6px;bottom:4px;width:138px;height:132px;z-index:3;font-family:var(--body)}
+.cpKit{position:absolute;right:12px;bottom:8px;width:124px;z-index:3;display:flex;flex-direction:column;gap:5px}
+.cpKl{font-size:10px;color:#8b9cad;font-family:var(--mono);letter-spacing:.08em}
+.cpGs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cpSlot{background:#0b1016e6!important;border:1.5px dashed #4a5d70!important;display:grid!important;place-items:center;color:#6f8396!important;font-size:22px!important;position:relative;overflow:hidden}
+.cpSlot.g{height:50px}.cpSlot.s{height:70px;font-size:30px!important}
+.cpSlot.f{border:1.5px solid var(--accent)!important;color:#e2e8ee!important}
+.cpGi,.cpGi>*{display:grid;place-items:center;width:40px;height:40px}.cpGi img,.cpGi svg{width:40px;height:40px;object-fit:contain}
+.cpSlot.s img{width:40px;height:40px}.cpSkN{position:absolute;left:0;right:0;bottom:2px;font-size:10px;text-align:center;color:#c9d3dc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 3px}
+.cpSlot.s.f{align-content:start;padding-top:6px}
+.cpStats{padding:0 12px;display:flex;flex-direction:column;gap:3px;flex:none}
+.cpRow{display:grid;grid-template-columns:52px 1fr 30px 30px;align-items:center;gap:5px;height:clamp(32px,4.7vh,40px);background:linear-gradient(90deg,#16202a,#121a23);border-left:3px solid var(--ln);padding:0 6px 0 8px}
+.cpRow.dice{border-left-color:var(--Y)}.cpRow.arm{border-left-color:var(--G)}.cpRow.spd{border-left-color:var(--B)}.cpRow.vis{border-left-color:var(--V)}
+.cpLb{font-weight:700;font-size:12.5px;line-height:1.05}
+.cpCells{display:flex;gap:4px;padding-left:6px;align-items:center;min-width:0}
+.cpC{flex:1;height:22px;transform:skewX(-22deg);background:#22303d;position:relative;max-width:46px;display:block}
+.cpC.Y{background:var(--Y)!important}.cpC.O{background:var(--O)!important}.cpC.R{background:var(--R)!important}.cpC.G{background:var(--G)}.cpC.B{background:var(--B)}.cpC.V{background:var(--V)}
+.cpC.cap{background:#141c25;border:1px solid var(--ln)}.cpC.cap svg{position:absolute;inset:0;margin:auto;width:13px;height:13px;transform:skewX(22deg)}
+.cpC.pend{animation:cpBl 1s ease-in-out infinite}
+@keyframes cpBl{50%{opacity:.35;box-shadow:0 0 10px #fff9}}
+.cpC .nx{position:absolute;top:0;right:0;width:0;height:0;border-top:11px solid var(--O);border-left:11px solid transparent}.cpC .nx.R{border-top-color:var(--R)}
+.cpVal{font-family:var(--display);font-size:14px;color:#8b9cad;margin-left:auto;padding-left:6px;white-space:nowrap;text-align:right}
+.cpPm{width:30px;height:30px;border:1px solid var(--ln)!important;display:grid!important;place-items:center;font-weight:700;font-size:16px!important;background:#0e141b!important}
+.cpPm.p{border-color:var(--accent)!important;color:var(--accent)!important}
+.cpPm:disabled{opacity:.3}
+.cpPbar{display:flex;align-items:center;gap:12px;margin:6px 12px 0;padding:5px 10px;background:#121a23;border:1px solid var(--ln);flex:none}
+.cpPv{display:flex;align-items:baseline;gap:6px}.cpPv span{font-size:11px;color:#8b9cad}.cpPv b{font-family:var(--display);font-size:28px;color:var(--accent);line-height:1}
+.cpPt{flex:1}.cpTr{height:6px;background:#22303d;position:relative}.cpTr i{position:absolute;left:0;top:0;bottom:0;background:var(--accent)}.cpTr i.pd{background:#fff;opacity:.6}
+.cpLg{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:#8b9cad;margin-top:3px}
+.cpFoot{display:grid;grid-template-columns:1fr 1.5fr;gap:8px;padding:6px 12px 4px;flex:none}
+.cpFoot.in{padding:12px 0 0}
+.cpBtn{min-height:50px;display:flex!important;flex-direction:column;justify-content:center;align-items:center;font-family:var(--display)!important;font-size:17px!important;letter-spacing:.05em;clip-path:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px)}
+.cpBtn small{font-family:var(--mono);font-size:10px;letter-spacing:0}
+.cpBtn.g{background:#16202a!important;color:#8b9cad!important;border:1px solid var(--ln)!important}.cpBtn.g small{color:var(--accent)}
+.cpBtn.p{background:var(--accent)!important;color:#1b1305!important;font-weight:700}.cpBtn.p small{color:#5a3d06}
+.cpBtn:disabled{opacity:.45}
+.cpOv{position:absolute;inset:0;background:#05080cd8;z-index:10;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.cpSheet{width:100%;max-width:480px;background:linear-gradient(180deg,#1b2733,#121a22);border-top:1.5px solid var(--accent);padding:14px 14px max(16px,env(safe-area-inset-bottom))}
+.cpSheet small.e{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--accent)}
+.cpSheet h3{margin:2px 0 10px;font-family:var(--display);font-size:24px;line-height:1.1;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.cpSheet h3 span{font-family:var(--body);font-size:11px;color:#8b9cad;font-weight:400}
+.cpMsg{margin:0;color:#c9d3dc;line-height:1.6}.cpMsg .rni{width:15px;height:15px;vertical-align:-2px}
+.cpGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cpIt{background:#0e141b!important;border:1px solid var(--ln)!important;padding:8px 4px 6px!important;text-align:center;font-size:11px!important;position:relative;display:flex!important;flex-direction:column;align-items:center}
+.cpIt .ic,.cpIt .ic>*{height:48px;width:48px;display:grid;place-items:center;overflow:hidden}.cpIt .ic img,.cpIt .ic svg{width:48px;height:48px;object-fit:contain}
+.cpIt.sel{border-color:var(--accent)!important;box-shadow:inset 0 0 0 1px var(--accent)}
+.cpIt .used{position:absolute;top:4px;right:4px;font-size:9px;background:var(--accent);color:#1b1305;padding:0 4px;font-weight:700}
+#cop .sd{position:absolute;top:5px;left:5px;width:6px;height:6px;border-radius:50%;background:var(--atk)}#cop .sd.D{background:var(--def)}
+.cpNote{margin:8px 0 0;font-size:11px;color:#8b9cad}
+.cpFull{position:absolute;inset:0;z-index:10;background:linear-gradient(180deg,#0e141b,#090d12);display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding:max(8px,env(safe-area-inset-top)) 0 max(8px,env(safe-area-inset-bottom))}
+.cpBal{margin-left:auto;text-align:right;line-height:1.1}.cpBal .rni{width:16px;height:16px;vertical-align:-2px}.cpBal b{font-family:var(--display);font-size:20px;color:var(--accent);margin-left:3px}.cpBal small{display:block;font-family:var(--mono);font-size:10px;color:#8b9cad}
+.cpTabs{display:flex;gap:6px;padding:4px 14px 8px;flex:none}
+.cpTabs button{padding:5px 12px!important;border:1px solid var(--ln)!important;font-size:12px!important;color:#8b9cad!important}.cpTabs button.on{border-color:var(--accent)!important;color:var(--accent)!important}
+.cpSg{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,minmax(0,1fr));gap:7px;padding:0 14px}
+.cpSk{background:#16202a!important;border:1px solid var(--ln)!important;padding:4px 3px!important;text-align:center;position:relative;display:flex!important;flex-direction:column;align-items:center;justify-content:center;min-height:0;overflow:hidden}
+.cpSk .ic img{width:38px;height:38px}
+.cpSk .n{font-size:10px;line-height:1.2;max-height:24px;overflow:hidden}
+.cpSk .pr{font-family:var(--mono);font-size:9.5px;color:var(--accent);margin-top:1px}
+.cpSk.lock .ic{filter:grayscale(1) brightness(.55)}.cpSk.lock .n{color:#8b9cad}
+.cpSk.own .pr{color:var(--G)}.cpSk.eq{border-color:var(--G)!important}
+.cpSk.sel{border-color:var(--accent)!important;box-shadow:inset 0 0 0 1px var(--accent)}
+.cpPg{display:flex;justify-content:center;align-items:center;gap:14px;padding:6px 0 0;font-family:var(--mono);font-size:11px;color:#8b9cad;flex:none}
+.cpPg button{width:34px;height:28px;border:1px solid var(--ln)!important;font-size:16px!important}.cpPg button:disabled{opacity:.3}
+.cpDet{margin:8px 14px 0;background:#121a22;border:1px solid var(--accent);padding:9px 10px;display:grid;grid-template-columns:46px 1fr;gap:10px;align-items:center;flex:none;min-height:72px}
+.cpDet img{width:44px;height:44px}.cpDet b{font-family:var(--display);font-size:18px}.cpDet small{display:block;font-size:10.5px;color:var(--accent)}
+.cpDet p{margin:2px 0 0;font-size:11px;color:#8b9cad;line-height:1.4;max-height:46px;overflow:hidden}
+.cpDet.empty{display:block;border-color:var(--ln);color:#8b9cad;font-size:12px}
+@media (max-height:700px){.cpKd b{font-size:20px}.cpNm{font-size:24px}.cpBig{display:none}.cpBtn{min-height:44px}}
+/* shop: skills */
+#shop[data-side="S"]{--sc:var(--accent)}
+.shTabs.three{grid-template-columns:1fr 1fr .8fr}
+.shTabs .skTab .skI{width:30px;height:30px;flex:none;display:grid;place-items:center;border:1.5px solid currentColor;transform:rotate(45deg);opacity:.6}.shTabs .skTab .skI b{transform:rotate(-45deg);font-size:13px}
+@media (max-width:520px){.shTabs.three button{gap:6px;padding:6px 8px}.shTabs.three button img.emb{width:24px;height:24px}.shTabs.three .skI{width:20px;height:20px}}
+.shK{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:4px;position:relative}
+.shK .sd{position:absolute;top:7px;left:7px;width:7px;height:7px;border-radius:50%;background:var(--atk)}.shK .sd.D{background:var(--def)}
+.shKIc{width:58%;aspect-ratio:1;display:grid;place-items:center}.shKIc img{width:100%;height:100%}
+.shKNm{font-weight:700;font-size:13px;text-align:center;line-height:1.2;padding:0 4px}.shKOp{font-size:10.5px;color:#8193a3}
+.shK.own .shKIc{opacity:.6}
+.shKD{position:relative;padding:18px 18px 16px;max-width:440px;width:calc(100% - 32px);background:linear-gradient(180deg,#1b2733,#121a22);border:1px solid color-mix(in srgb,var(--accent) 60%,transparent)}
+.shKD .shKDh{display:flex;gap:12px;align-items:center}.shKD .shKDh img{width:64px;height:64px}.shKD h3{margin:2px 0 0;font-family:var(--display);font-size:26px}.shKD small{color:#8193a3}
+.shKD p{color:#c9d3dc;line-height:1.6}
 </style>
 
 <div class="wrap">
@@ -3723,7 +3832,8 @@ function ensureOp(id){
   if(!LOOK[id])LOOK[id]={...LOOK[c.side==='A'?'thermite':'smoke']};}
 function mkUnit(op,side,i){
   ensureOp(op);const o=OPS[op],P=PROF[op],hp=P.st;
-  return {id:side+i,op,side,hp,max:hp,speed:5,run:P.run,x:-1,y:-1,alive:true,activated:false,mp:0,ap:0,used:new Set(),ch:o.ch||0,overwatch:false,owd:[0,-1],fd:[0,side==='A'?-1:1],spotted:0,stun:false,hidden:side==='D',anchor:null,gassed:false};
+  const u={id:side+i,op,side,hp,max:hp,speed:5,run:P.run,x:-1,y:-1,alive:true,activated:false,mp:0,ap:0,used:new Set(),ch:o.ch||0,overwatch:false,owd:[0,-1],fd:[0,side==='A'?-1:1],spotted:0,stun:false,hidden:side==='D',anchor:null,gassed:false};
+  if(P.cop!=null)copUnit(u,P.cop);return u;
 }
 
 // ---------- visibility ----------
@@ -3735,7 +3845,7 @@ function sees(side){if(G.phase==='setup'&&!G.over)return new Set();const s=new S
 // v89: every operator sees a 120° fan in front of him (10 cells, snipers 14), straight-line distance, nothing behind; seeing an enemy is what lets you shoot him
 const SNIPE=new Set(['glaz','kali']),VR=u=>SNIPE.has(u.op)?14:10,edist=(a,b,c,d)=>Math.round(Math.hypot(a-c,b-d));
 function inFan(u,x,y,r,half){const dx=x-u.x,dy=y-u.y;if(!dx&&!dy)return true;const d=Math.hypot(dx,dy);if(d>(r??VR(u))+.01)return false;
-  const f=u.fd||[0,1],l=Math.hypot(f[0],f[1])||1;return (dx*f[0]+dy*f[1])/(d*l)>=Math.cos((half??60)*Math.PI/180)-1e-6;}
+  const f=u.fd||[0,1],l=Math.hypot(f[0],f[1])||1;return (dx*f[0]+dy*f[1])/(d*l)>=Math.cos((half??(u.fh||60))*Math.PI/180)-1e-6;}
 function inSight(a,b){return inFan(a,b.x,b.y)&&los(a.x,a.y,b.x,b.y);}
 function fanCells(u){const s=new Set([u.y*G.W+u.x]),r=VR(u);
   for(let y=Math.max(0,u.y-r);y<=Math.min(G.H-1,u.y+r);y++)for(let x=Math.max(0,u.x-r);x<=Math.min(G.W-1,u.x+r);x++)if(inFan(u,x,y,r)&&los(u.x,u.y,x,y))s.add(y*G.W+x);return s;}
@@ -3779,7 +3889,7 @@ function elecVisible(x,y){
   return alive('A').some(u=>u.x>=0&&((u.op==='iq'&&cheb(u.x,u.y,x,y)<=5)||(cheb(u.x,u.y,x,y)<=10&&los(u.x,u.y,x,y))));
 }
 const pub=u=>u.side===G.player||G.over||seenBy(G.player,u);
-const nm=u=>pub(u)?`<b class="${u.side==='A'?'a':'d'}">${OPS[u.op].name}</b>`:`<b class="${u.side==='A'?'a':'d'}">某名${u.side==='A'?'進攻':'防守'}幹員</b>`;
+const nm=u=>pub(u)?`<b class="${u.side==='A'?'a':'d'}">${u.nmz||OPS[u.op].name}</b>`:`<b class="${u.side==='A'?'a':'d'}">某名${u.side==='A'?'進攻':'防守'}幹員</b>`;
 
 // ---------- sound: everything is synthesised with Web Audio, so no files to load ----------
 const SFX=(()=>{
@@ -4606,6 +4716,7 @@ function newGame(){
   $('#banner').hidden=true;setTimeout(()=>{try{preloadShots();}catch(e){}},400);
   const m=MAPS[cfg.map];
   G={map:m,grid:parseMap(m),W:m.rows[0].length,H:m.rows.length,units:[],gadgets:[],reinf:0,drones:3,wire:3,...invFor('A',cfg.side==='A'?cfg.inv.A:INV_DEF.A),...invFor('D',cfg.side==='D'?cfg.inv.D:INV_DEF.D),decoys:[],mission:cfg.mission||'bomb',hostage:null,round:1,maxRounds:6,phaseIdx:0,phase:'setup',acts:0,active:null,sel:null,mode:'move',defuser:null,over:false,busy:false,ai:false,log:[],moves:[],cur:null,hl:null,player:cfg.side,aiSite:Math.random()<.5?'A':'B',fx:null,spawn:null};try{mapIntro(cfg.map);}catch(e){}
+  copPrep(true);copGear();
   const enemy=cfg.side==='A'?'D':'A';
   const epicks=shuffle(OPBASE.filter(k=>OPC[k].side===enemy&&SCRIPTED.has(k))).slice(0,5);
   const apicks=cfg.side==='A'?cfg.picks.A:epicks,dpicks=cfg.side==='D'?cfg.picks.D:epicks;
@@ -5611,7 +5722,7 @@ function opCard(u){
   const oc=`<div class="oc ${u.side==='A'?'a':'d'}"><div class="ocL"><img class="ocP" src="${portraitURL(u.op)}" alt="${o.name} 頭像"><img class="ocI" src="${opIcon(u.op)}" alt=""></div>
     <div class="ocM"><b class="ocN">${o.name}</b><span class="ocR">${u.side==='A'?'進攻':'防守'} · ${o.role}</span><span class="ocH"><small>HP ${u.hp} / ${u.max}</small>${hpBar(u)}</span></div>
     <div class="ocS"><div class="ocAp"><small>行動點</small><span>${[0,1].map(i=>`<i class="${i<apN?'f':''}"></i>`).join('')}</span><small class="ocMp">移動 ${mpN}</small></div>
-    <div class="ocG">${own&&u.alive&&G.phase==='play'&&o.g&&!NOBTN.has(u.op)?`<button class="ocGB" aria-label="${(GSH[u.op]||o.g)}"><img src="${opIcon(u.op)}" alt=""></button>`:`<img src="${opIcon(u.op)}" alt="">`}<div><b>${(o.g&&GSH[u.op])||o.g||o.passive}${o.g&&own?` <em>剩 ${u.ch>50?'∞':u.ch}</em>`:''}</b>${gdChips(o.g?o.gd:o.pd)}<span class="gdT">${o.g?o.gd:o.pd}</span></div></div></div></div>`;
+    <div class="ocG">${own&&u.alive&&G.phase==='play'&&o.g&&!NOBTN.has(u.op)?`<button class="ocGB" aria-label="${(GSH[u.op]||o.g)}"><img src="${opIcon(u.sk||u.op)}" alt=""></button>`:`<img src="${opIcon(u.sk||u.op)}" alt="">`}<div><b>${(o.g&&GSH[u.op])||o.g||o.passive}${o.g&&own?` <em>剩 ${u.ch>50?'∞':u.ch}</em>`:''}</b>${gdChips(o.g?o.gd:o.pd)}<span class="gdT">${o.g?o.gd:o.pd}</span></div></div></div></div>`;
   return `<div class="card">${oc}<div class="nm"><img class="port" src="${portraitURL(u.op)}" alt="${o.name} 頭像"><b class="${u.side==='A'?'a':'d'}">${o.name}</b><span class="hint">${u.side==='A'?'進攻':'防守'} · ${o.role}</span></div>
   <dt>耐力</dt><dd>${hpBar(u)} ${u.hp}/${u.max}</dd>
   <dt>移動／奔跑</dt><dd>5 點 · ${u.run?`奔跑 +${u.run}`:'不能奔跑'} · 破壞力${PROF[u.op].dr}</dd>
@@ -5696,7 +5807,7 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
     L.push(btn('移動幹員','點建築內空格',G.mode==='move',false,()=>setMode('move')));
     if(decoyOf(u))L.push(btn('移動誘餌','點空格放這名幹員的誘餌',G.mode==='decoy',false,()=>setMode('decoy')));
     L.push(btn('調整場景',`攝影機、門窗、鐵牆 · 剩 ${G.rearr??5} 次`,G.mode==='rearr',(G.rearr??5)<=0&&!G.rearrCam,()=>{G.rearrCam=null;setMode('rearr');}));
-    for(const d of alive('D').filter(d=>setupGadget(d.op)))L.push(btn(GSH[d.op]||OPS[d.op].g,`${OPS[d.op].name} · 剩 ${d.ch}`,G.mode==='gadget'&&u===d,d.ch<=0,()=>{if(G.mode==='gadget'&&G.sel===d)return setMode('move');G.sel=d;setMode('gadget');},'',d.op==='valkyrie'?eqIc('valk'):`<img class="bic" src="${opIcon(d.op)}" alt="">`));
+    for(const d of alive('D').filter(d=>setupGadget(d.sk||d.op)))L.push(btn(GSH[d.op]||OPS[d.op].g,`${OPS[d.op].name} · 剩 ${d.ch}`,G.mode==='gadget'&&u===d,d.ch<=0,()=>{if(G.mode==='gadget'&&G.sel===d)return setMode('move');G.sel=d;setMode('gadget');},'',d.op==='valkyrie'?eqIc('valk'):`<img class="bic" src="${opIcon(d.op)}" alt="">`));
     L.push(btn('鐵絲網',`剩 ${G.wire}`,G.mode==='wire',G.wire<=0,()=>setMode('wire')));L.push(btn('可部署盾牌',`剩 ${G.shield}`,G.mode==='shield',G.shield<=0,()=>setMode('shield'),'',eqIc('shield')));L.push(btn('防彈攝影機',`剩 ${G.bpcam}`,G.mode==='bpcam'||G.mode==='bpface',G.bpcam<=0,()=>{G.bpPend=null;if(G.mode==='bpface')G.mode='bpcam';setMode('bpcam');},'',eqIc('bpcam')));
   } else if(u.side===G.player&&u.alive){
     const ok=canAct(u),isA=G.active===u,can=k=>ok&&(!isA||canDo(u,k)),sub=(k,t)=>isA&&k!=='destroy'&&u.used.has(k)?'已用過':t;
@@ -6774,7 +6885,7 @@ function wallSolid(x,y){const cx=Math.floor(x),cy=Math.floor(y),c=cell(cx,cy);if
   const h=({hard:.4,soft:.3,reinf:.42}[c.t]||.3)/2+.02,fx=x-cx-.5,fy=y-cy-.5;if(Math.abs(fx)<=h&&Math.abs(fy)<=h)return true;
   return (Math.abs(fy)<=h&&(fx>0?wj(cell(cx+1,cy)):wj(cell(cx-1,cy))))||(Math.abs(fx)<=h&&(fy>0?wj(cell(cx,cy+1)):wj(cell(cx,cy-1))));}
 function visRays(u){const R=VR(u),f=u.fd||[0,1],a0=Math.atan2(f[1],f[0]),n=150,o=[u.x+.5,u.y+.5],pts=[],hit=[],W=u.op==='warden';
-  for(let i=0;i<=n;i++){const a=a0+(-60+120*i/n)*Math.PI/180,dx=Math.cos(a),dy=Math.sin(a);let t=0,px=o[0]+dx*R,py=o[1]+dy*R,h=false;
+  for(let i=0;i<=n;i++){const fh=u.fh||60,a=a0+(-fh+2*fh*i/n)*Math.PI/180,dx=Math.cos(a),dy=Math.sin(a);let t=0,px=o[0]+dx*R,py=o[1]+dy*R,h=false;
     while(t<R){t+=.03;const x=o[0]+dx*t,y=o[1]+dy*t,cx=Math.floor(x),cy=Math.floor(y);if(!inB(cx,cy)){px=x;py=y;break;}
       if(cx===u.x&&cy===u.y)continue;if(wallSolid(x,y)){px=x;py=y;h=true;break;}if(smokeAt(cx,cy)&&!W){px=x;py=y;break;}}
     pts.push([px,py]);hit.push(h);}
@@ -7013,9 +7124,9 @@ function renderTitle(){
   const el=$('#tmenu');if(!el)return;if(SCREEN==='rank')SCREEN='title';{const tt=$('#title');if(tt)tt.dataset.s=SCREEN;}const B=(id,label,sub,cls)=>`<button id="${id}" class="tbtn ${cls||''}"><b>${label}</b>${sub?`<span>${sub}</span>`:''}</button>`;
   let h='';if(SCREEN==='task')h=taskHTML()+B('t-back','返回','',' ghost');
   const ops=k=>cfg.picks[k].map(x=>`<img src="${opIcon(x)}" alt="${(OPC[x]||OPS[x]).name}" title="${(OPC[x]||OPS[x]).name}">`).join('');
-  if(SCREEN==='title')h=B('t-rank','線上對戰','PVP · 自動配對對手','primary')+B('t-pve','對戰電腦','PVE · 選陣營、地圖與幹員')+B('t-shop','商店','用聲望解鎖幹員')+B('t-cop','自訂幹員','即將推出')+B('t-lib','作戰檔案',`規則 · ${OPBASE.length} 名幹員圖鑑 · 成就`);
+  if(SCREEN==='title')h=B('t-rank','線上對戰','PVP · 自動配對對手','primary')+B('t-pve','對戰電腦','PVE · 選陣營、地圖與幹員')+B('t-shop','商店','用聲望解鎖幹員')+B('t-cop','自訂幹員','養成你的專屬幹員')+B('t-lib','作戰檔案',`規則 · ${OPBASE.length} 名幹員圖鑑 · 成就`);
   else if(SCREEN==='lib')h=`<h2 class="tsec">作戰檔案</h2>`+B('t-man','規則','本遊戲玩法','primary')+B('t-ops','幹員圖鑑',`共 ${OPBASE.length} 名幹員`)+B('t-ach','成就',`已解鎖 ${achCount()}/${ACH.length}`)+B('t-back','返回','',' ghost');
-  else if(SCREEN==='cop')h=`<h2 class="tsec">自訂幹員</h2><p class="tnote">打造屬於自己的幹員。功能還在設計中，敬請期待。</p>`+B('t-back','返回','',' ghost');else if(SCREEN==='rank'){if(ME.mode!=='account')h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(null,40)}<div><b>排名戰需要登入帳號</b><br><span>登入後，段位與戰績會存在這個遊戲的共用資料裡。訪客可以玩其他所有模式。</span></div></div></div>`+B('t-login','登入帳號','啟用線上身分','primary')+B('t-back','返回','',' ghost');
+  else if(SCREEN==='rank'){if(ME.mode!=='account')h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(null,40)}<div><b>排名戰需要登入帳號</b><br><span>登入後，段位與戰績會存在這個遊戲的共用資料裡。訪客可以玩其他所有模式。</span></div></div></div>`+B('t-login','登入帳號','啟用線上身分','primary')+B('t-back','返回','',' ghost');
     else{fillPicks('A');fillPicks('D');h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(ME.rating,44)}<div><span>你的段位</span><br><b>${ME.rating==null?'—':tierName(tierOf(ME.rating))}</b> <span>${ME.rating??''} 分 · ${ME.w} 勝 ${ME.l} 敗</span></div></div>
       <div class="sq"><em>進攻小隊</em>${ops('A')}<button data-edit="A">更換</button></div><div class="sq"><em>防守小隊</em>${ops('D')}<button data-edit="D">更換</button></div><span class="hint">陣營隨機分配，地圖配對後揭曉。勝利 +25 分，落敗 −20 分。</span></div>`+B('t-queue','開始配對','PVP RANK','primary')+B('t-back','返回','',' ghost');}}
   else if(SCREEN==='queue')h=`<h2 class="tsec">線上對戰</h2><div class="tqueue"><div class="ring"></div><span>搜尋對手中</span><b id="qclock">${fmtClock(Date.now()-RQ.t0)}</b><span>排隊中的玩家 <b id="qcount" style="font-size:14px">1</b></span><span>找到對手後會自動進入對戰。</span><span class="qnote">需要另一位玩家同時排隊；同一個帳號或同一個瀏覽器不會跟自己配對。</span></div>`+B('t-qcancel','取消配對','',' ghost');
@@ -7031,7 +7142,7 @@ function renderTitle(){
   const on=(id,fn)=>{const b=$('#'+id);if(b)b.onclick=e=>{if(b._sh)return;if(b.classList.contains('tbtn')){b._sh=1;shatter(b,e).then(()=>{b._sh=0;fn(e);});}else fn(e);};};
   on('t-pve',()=>{['A','D'].forEach(s=>{cfg.picks[s]=cfg.picks[s].filter(owned);});SCREEN='setup';WZ.step=0;WZ.seen=0;render();});on('t-pvp',()=>{SCREEN='pvp';NETMSG='';renderTitle();});on('t-rank',()=>{NETMSG='';rankQueue();});on('t-lib',()=>{SCREEN='lib';NETMSG='';renderTitle();});
   on('t-login',acctLogin);on('t-queue',rankQueue);on('t-qcancel',()=>{rankCancel();SCREEN='title';renderTitle();});if(SCREEN==='task')bindTask();
-  el.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openOpSelect(b.dataset.edit,renderTitle));on('t-tut',startTutorial);on('t-cop',()=>{SCREEN='cop';NETMSG='';renderTitle();});on('t-man',()=>openManual());on('t-ach',()=>openAch('ach'));on('t-ops',()=>openOpSelect(cfg.side,null,true));on('t-shop',()=>openShop());
+  el.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openOpSelect(b.dataset.edit,renderTitle));on('t-tut',startTutorial);on('t-cop',()=>{NETMSG='';openCop();});on('t-man',()=>openManual());on('t-ach',()=>openAch('ach'));on('t-ops',()=>openOpSelect(cfg.side,null,true));on('t-shop',()=>openShop());
   on('t-back',()=>{SCREEN='title';NETMSG='';renderTitle();});on('t-back2',()=>{SCREEN='pvp';NETMSG='';renderTitle();});on('t-back3',()=>{SCREEN='pvp';NETMSG='';renderTitle();});
   on('t-create',()=>{SCREEN='create';NETMSG='';renderTitle();});on('t-find',()=>{SCREEN='find';NETMSG='';if(NET)NET.list=null;renderTitle();netList();});
   on('t-go',netCreate);on('t-cancel',()=>{netLeave();SCREEN='pvp';renderTitle();});on('t-refresh',()=>{if(NET)NET.list=null;renderTitle();netList();});
@@ -7092,6 +7203,7 @@ function netOnGame(d){
 function netStartGame(guestPicks){if(RQ.q)rankLeaveQueue();SCREEN='game';
   const ks=Object.keys(MAPS);NET.map=ks[Math.floor(Math.random()*ks.length)];const m=MAPS[NET.map];cfg.map=NET.map;showMapReveal(NET.map,NET.side);
   G={map:m,grid:parseMap(m),W:m.rows[0].length,H:m.rows.length,units:[],gadgets:[],reinf:0,round:1,maxRounds:6,phaseIdx:0,phase:'setup',acts:0,active:null,sel:null,mode:'move',defuser:null,over:false,busy:false,ai:false,log:[],moves:[],cur:null,hl:null,player:NET.side,aiSite:'A',fx:null,spawn:null,net:true};
+  copPrep(false);
   const mine=cfg.picks[NET.side].slice(),theirs=(guestPicks&&guestPicks.length===5)?guestPicks:cfg.picks[NET.side==='A'?'D':'A'].slice();
   const ap=NET.side==='A'?mine:theirs,dp=NET.side==='D'?mine:theirs;
   ap.forEach((op,i)=>G.units.push(mkUnit(op,'A',i)));dp.forEach((op,i)=>G.units.push(mkUnit(op,'D',i)));
@@ -7304,10 +7416,10 @@ const WZSTEPS=[
   {t:'陣營',ok:()=>true},{t:'任務',ok:()=>true},{t:'地圖',ok:()=>true},
   {t:'幹員',ok:()=>cfg.picks[cfg.side].length===5&&cfg.picks[cfg.side].every(owned),why:'請選滿 5 名已解鎖的幹員'},
   {t:'裝備',ok:()=>true},{t:'計時',ok:()=>true},{t:'確認',ok:()=>true}];
-function wzOpDetail(c){const vars=OPCARDS.filter(v=>v.base===c.base);
+function wzOpDetail(c){c=copCard(c);const vars=OPCARDS.filter(v=>v.base===c.base);
   return `${opArt(c.id)?`<img class="art" src="${opArt(c.id)}" alt="">`:''}<div class="wzOdIn"><div class="nm"><img src="${opIcon(c.id)}" alt=""><b>${c.name}</b></div>
   <div class="hint">${c.org||''}${c.zh.role?' · '+c.zh.role:''}</div>
-  ${vars.length>1?`<div class="osVar">${vars.map((v,i)=>`<button data-wz-var="${v.id}" class="${v.id===c.id?'on':''}">卡片版本 ${i+1}</button>`).join('')}</div>`:''}
+  ${vars.length>1?`<div class="osVar">${vars.map((v,i)=>`<button data-wz-var="${v.id}" class="${v.id===c.id?'on':''}">${copSlot(v.id)!=null?COPN[i]:'卡片版本 '+(i+1)}</button>`).join('')}</div>`:''}
   <div class="g"><b>${c.zh.g||'（無特殊裝置）'}</b>${SCRIPTED.has(c.id)?'<span class="osImp ok">遊戲內已實作</span>':c.g.ab&&c.g.ab.some(a=>a.k!=='PASSIVE')?'<span class="osImp">尚未實作</span>':''}<p>${cardText(c)}</p></div>
   <div class="osW">${['1-3','4-6','7+'].map((r,i)=>`<div><span>${['近','中','遠'][i]} ${r}</span>${hexDice(c.w[i])}</div>`).join('')}</div>
   <div class="st"><span>耐力 <b>${c.st??'—'}</b></span><span>${c.run?'奔跑 <b>+'+c.run+'</b>':'不能奔跑'}</span><span>破壞力 <b>${DZN[c.dz]}</b></span>${c.g.charges?`<span>裝置 <b>${c.g.charges}</b> 次</span>`:''}</div></div>`;}
@@ -7621,16 +7733,16 @@ var RNIC='data:image/webp;base64,UklGRtYMAABXRUJQVlA4WAoAAAAQAAAARwAARwAAQUxQSFI
 const fmtN=n=>Math.round(n).toLocaleString('en-US');
 const EKEY='r6bg.eco';
 const ECO=(()=>{let e=null;try{e=JSON.parse(localStorage.getItem(EKEY)||'null');}catch(x){}
-  return Object.assign({rn:0,own:[],mx:{},day:'',dt:[],dp:{},dc:[],wk:'',wp:{},wc:[],wops:[],pveDay:'',pveEarn:0,tut:0,title:'',seen:0},e||{});})();
+  return Object.assign({rn:0,own:[],mx:{},day:'',dt:[],dp:{},dc:[],wk:'',wp:{},wc:[],wops:[],pveDay:'',pveEarn:0,tut:0,title:'',seen:0,sk:[],cop:null},e||{});})();
 function ecoSave(){ECO.ts=Date.now();try{localStorage.setItem(EKEY,JSON.stringify(ECO));}catch(e){}gaPush();}
 // ---- Google account (public site only): renown, operators, mastery, achievements and friends live in the cloud ----
 var GA={u:null,busy:false,ok:false,err:''};let gaT=0;
 function gaPack(){const {nick,avatar,usePhoto}=ME;return{v:1,ts:Date.now(),eco:JSON.parse(JSON.stringify(ECO)),got:AS.got,n:AS.n,fr:FR.list.slice(0,200),prof:{nick,avatar,usePhoto}};}
 function gaPush(now){if(!GA||!GA.u||!GA.ok||!window.R6FB)return;clearTimeout(gaT);gaT=setTimeout(()=>{R6FB.save(gaPack()).catch(e=>{GA.err='雲端存檔失敗，稍後會再試。';});},now?0:1500);}
 // first link on this device: keep the better of both; afterwards the newer save wins, but owned operators and mastery never go backwards
-function gaMerge(d,first){const e=d.eco||{},newer=(e.ts||0)>(ECO.ts||0),lrn=ECO.rn|0,lown=ECO.own.slice(),lmx=Object.assign({},ECO.mx),ltut=ECO.tut|0,lttl=ECO.title;
+function gaMerge(d,first){const e=d.eco||{},newer=(e.ts||0)>(ECO.ts||0),lrn=ECO.rn|0,lsk=(ECO.sk||[]).slice(),lown=ECO.own.slice(),lmx=Object.assign({},ECO.mx),ltut=ECO.tut|0,lttl=ECO.title;
   if(newer)Object.assign(ECO,e);
-  ECO.own=[...new Set([...(e.own||[]),...lown])];ECO.mx=Object.assign({},e.mx||{});for(const k in lmx)ECO.mx[k]=Math.max(ECO.mx[k]|0,lmx[k]|0);
+  ECO.own=[...new Set([...(e.own||[]),...lown])];ECO.sk=[...new Set([...(e.sk||[]),...lsk])];ECO.mx=Object.assign({},e.mx||{});for(const k in lmx)ECO.mx[k]=Math.max(ECO.mx[k]|0,lmx[k]|0);
   ECO.tut=Math.max(ltut,e.tut|0);if(first)ECO.rn=Math.max(lrn,e.rn|0);if(!ECO.title)ECO.title=lttl||e.title||'';
   for(const k in d.got||{})if(!AS.got[k])AS.got[k]=d.got[k];for(const k in d.n||{})AS.n[k]=Math.max(AS.n[k]|0,d.n[k]|0);
   (d.fr||[]).forEach(f=>{if(f&&f.id&&!FR.list.some(x=>x.id===f.id))FR.list.push(f);});
@@ -7848,6 +7960,7 @@ function ecoGame(w){if(!G||G._eco)return G&&G._eco;ecoRoll();const P=G.player,wi
       ECO.mx[b]=(ECO.mx[b]||0)+100+(win?60:0)+(q.k||0)*25+(q.gad||0)*10;const l1=mxLv(ECO.mx[b]);
       if(l1>l0)ups.push([OPC[b].name,l1]);});
     if(ups.length){lines.push([`熟練度升級：${ups.map(([n,l])=>n+' Lv'+l).join('、')}`,0]);const rw=[...new Set(ups.map(u=>MXREW[u[1]]).filter(Boolean))];try{achToastMsg(ups.length>1?`${ups.length} 名幹員熟練度升級`:`${ups[0][0]} 熟練度 Lv${ups[0][1]}`,rw.length?rw.join('、')+'（到設定查看）':'繼續使用這些幹員來升級');}catch(e){}}}
+  try{copEnd(lines);}catch(e){console.warn(e);}
   ecoAdd(earn);ecoSave();G._eco={earn,lines,bonus:G._bonus||[]};try{renderPlayer();}catch(e){}return G._eco;}
 function ecoBanner(){const b=$('#banner');if(!b||b.hidden||!G||!G._eco||b.querySelector('.ecoRes'))return;const e=G._eco;if(!e.lines.length)return;
   const d=document.createElement('div');d.className='ecoRes';
@@ -7884,7 +7997,7 @@ function openShop(side){SHOP.side=side||cfg.side||'A';SHOP.pg=0;SHOP.sel=null;le
     addEventListener('resize',()=>{if(!el.hidden)renderShop();});
     addEventListener('keydown',e=>{if(el.hidden||e.key!=='Escape')return;if(SHOP.sel){SHOP.sel=null;renderShopDet();}else closeShop();});}
   el.hidden=false;el.classList.remove('out');renderShop();}
-function closeShop(){const el=$('#shop');if(!el)return;el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');},180);renderPlayer();if(SCREEN==='title')renderTitle();}
+function closeShop(){const el=$('#shop');if(!el)return;el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');},180);renderPlayer();{const c=$('#cop');if(c&&!c.hidden)renderCop();}if(SCREEN==='title')renderTitle();}
 function shopCard(b){const c=OPC[b],own=owned(b),play=opPlayable(b),st=own?'own':play?'buy':'soon';
   return `<button class="shC ${st} ${c.side}" data-sb="${b}" aria-label="${esc(c.name)}"><span class="shArtW"><img class="shArt" src="${opArt(b)||opIcon(b)}" alt="" loading="lazy"></span>
     <span class="shNmRow"><img class="shIc" src="${opIcon(b)}" alt=""><span class="shNm" style="--n:${c.name.length+2}">${esc(c.name)}</span></span>
@@ -7893,8 +8006,8 @@ function renderShop(){const el=$('#shop');if(!el||el.hidden)return;const s=SHOP.
   const cnt=k=>{const a=shopAll(k);return [a.filter(owned).length,a.length];};
   el.dataset.side=s;
   el.innerHTML=`<div class="shBox">
-    <header class="shHd"><button class="shBack" id="shBack">‹ 返回</button><div class="shTt"><h2>商店</h2><span>用聲望解鎖新幹員</span></div><div class="shBal" id="shBal">${RNI}<b>${fmtN(ECO.rn)}</b></div></header>
-    <div class="shBar"><div class="shTabs" role="tablist">${['A','D'].map(k=>{const [o,n]=cnt(k);return `<button role="tab" data-ss="${k}" class="${k} ${k===s?'on':''}" aria-selected="${k===s}">${emblem(k)}<span><b>${k==='A'?'進攻方':'防守方'}</b><small>已擁有 ${o}/${n}</small></span></button>`;}).join('')}</div>
+    <header class="shHd"><button class="shBack" id="shBack">‹ 返回</button><div class="shTt"><h2>商店</h2><span>${s==='S'?'自訂幹員的技能，每個 '+fmtN(SKPRICE):'用聲望解鎖新幹員'}</span></div><div class="shBal" id="shBal">${RNI}<b>${fmtN(ECO.rn)}</b></div></header>
+    <div class="shBar"><div class="shTabs three" role="tablist">${['A','D'].map(k=>{const [o,n]=cnt(k);return `<button role="tab" data-ss="${k}" class="${k} ${k===s?'on':''}" aria-selected="${k===s}">${emblem(k)}<span><b>${k==='A'?'進攻方':'防守方'}</b><small>已擁有 ${o}/${n}</small></span></button>`;}).join('')}<button role="tab" data-ss="S" class="skTab ${s==='S'?'on':''}" aria-selected="${s==='S'}"><i class="skI"><b>✦</b></i><span><b>技能</b><small>${copSkills().filter(b=>(ECO.sk||[]).includes(b)).length}/${copSkills().length}</small></span></button></div>
       <div class="shFil">${[['all','全部'],['new','未擁有']].map(([k,t])=>`<button data-sf="${k}" class="${SHOP.filter===k?'on':''}">${t}</button>`).join('')}</div></div>
     <div class="shStage" id="shStage"><div class="shGrid" id="shGrid"></div></div>
     </div><div class="shDet" id="shDet" hidden></div>`;
@@ -7903,16 +8016,17 @@ function renderShop(){const el=$('#shop');if(!el||el.hidden)return;const s=SHOP.
   el.querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{SHOP.filter=b.dataset.sf;SHOP.pg=0;renderShop();});
   shopLayout();renderShopDet();}
 // cards are sized to fill the stage exactly; whatever does not fit goes to the next page (no scrolling)
-function shopLayout(){const stg=$('#shStage'),g=$('#shGrid');if(!stg||!g)return;const L=shopList(),top=stg.scrollTop;
+function shopLayout(){const stg=$('#shStage'),g=$('#shGrid');if(!stg||!g)return;const SK=SHOP.side==='S',L=SK?skList():shopList(),top=stg.scrollTop;
   // one long page that scrolls down; card width follows the screen
   const W=stg.clientWidth-(stg.offsetWidth-stg.clientWidth?0:0)-4,gap=W<500?10:14,target=W<500?108:stg.clientHeight<340?100:W<900?132:150;
   const cols=Math.max(2,Math.floor((W+gap)/(target+gap))),w=Math.floor((W-(cols-1)*gap)/cols),h=Math.round(w*1.42);
   g.style.gridTemplateColumns=`repeat(${cols},${w}px)`;g.style.gridAutoRows=`${h}px`;g.style.gap=gap+'px';
-  g.innerHTML=L.length?L.map(shopCard).join(''):`<div class="shEmpty"><b>這一方的幹員都買齊了</b><span>切到「全部」可以看所有幹員</span></div>`;
+  g.innerHTML=L.length?L.map(SK?skCard:shopCard).join(''):`<div class="shEmpty"><b>${SK?'技能都買齊了':'這一方的幹員都買齊了'}</b><span>切到「全部」可以看所有幹員</span></div>`;
   g.classList.toggle('empty',!L.length);
   g.querySelectorAll('[data-sb]').forEach(b=>b.onclick=()=>{SHOP.sel=b.dataset.sb;renderShopDet();});
   const pg=$('#shPg');if(pg)pg.remove();stg.scrollTop=top;}
 function renderShopDet(){const el=$('#shDet');if(!el)return;const b=SHOP.sel;if(!b){el.hidden=true;el.innerHTML='';return;}
+  if(SHOP.side==='S')return skDet(el,b);
   const c=OPC[b],own=owned(b),play=opPlayable(b),ok=ECO.rn>=OPPRICE,fx=(typeof GDX!=='undefined'&&GDX[b])?GDX[b][0]:'',m=mxInfo(b);
   const cta=own?`<div class="shCta own"><span class="shOwn"><i class="shOk">✓</i>已擁有</span><span class="shNote">熟練度 Lv${m.lv} · 可以在對戰中選他</span></div>`
     :!play?`<div class="shCta"><button class="shBuy" disabled>即將開放</button><span class="shNote">這名幹員的能力還在製作中</span></div>`
@@ -8056,7 +8170,7 @@ cv.addEventListener('click',e=>{if(!G)return;const r=cv.getBoundingClientRect();
 window.addEventListener('resize',()=>render());
 // ---------- operator select: every Operator from the core box and Year 1-5 profiles ----------
 const OPC={};OPCARDS.forEach(c=>{OPC[c.id]=c;if(/^recruit_[ad]_/.test(c.base))c.base='recruit_'+c.base[8]+'_rifle';});
-const opPlayable=b=>SCRIPTED.has(b);
+const opPlayable=b=>SCRIPTED.has(b)||copSlot(b)!=null;
 const OPBASE=[...new Set(OPCARDS.map(c=>c.base))].sort((a,b)=>(b.startsWith('recruit_')-a.startsWith('recruit_')));
 const opIcon=id=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(OPICONS[(OPC[id]||{}).icon||id]||'');
 // declared as functions so the manual (built earlier during load) can use them too
@@ -8075,7 +8189,7 @@ function openOpSelect(side,onDone,browse){OSEL.side=side;OSEL.done=onDone;OSEL.b
   if(!el){el=document.createElement('div');el.id='opsel';el.className='opsel';document.body.appendChild(el);}el.hidden=false;renderOpSelect(true);}
 function closeOpSelect(){const el=$('#opsel');if(el)el.hidden=true;if(OSEL.done)OSEL.done();}
 function renderOpSelect(anim){
-  const el=$('#opsel'),side=OSEL.side,picks=cfg.picks[side],cur=OPC[OSEL.cur]||OPCARDS[0];
+  const el=$('#opsel'),side=OSEL.side,picks=cfg.picks[side],cur=copCard(OPC[OSEL.cur]||OPCARDS[0]);
   const pickOf=b=>picks.findIndex(p=>OPC[p]&&OPC[p].base===b);
   const col=s=>`<div class="osCol ${s!==side&&!OSEL.browse?'dim':''}"><h3>${s==='A'?'攻擊方':'防守方'}</h3><div class="osGrid">${OPBASE.filter(b=>OPC[b].side===s).map(b=>{const i=s===side&&!OSEL.browse?pickOf(b):-1;
     return `<button class="osT ${cur.base===b?'cur':''} ${i>=0?'on':''} ${opPlayable(b)?'':'na'}${owned(b)?'':' lk'}" data-ob="${b}" title="${OPC[b].name}"><img src="${opIcon(b)}" alt="${OPC[b].name}">${i>=0?`<span class="n">${i+1}</span>`:''}</button>`;}).join('')}</div></div>`;
@@ -8085,7 +8199,7 @@ function renderOpSelect(anim){
   const det=`<div class="osD" ${anim?'':'style="animation:none"'}>${opArt(cur.id)?`<img class="osArt" src="${opArt(cur.id)}" alt="">`:''}<button class="osX" id="osX">‹ 返回</button>
     <div class="osInfo"><div class="osName"><b>${cur.name}</b><img src="${opIcon(cur.id)}" alt=""></div>${osEco(cur)}<div class="osOrg">${cur.org||''}${cur.real?' · '+cur.real:''}</div>
     <div class="osSide">${sideIc}<span>${cur.side==='A'?'攻擊方':'防守方'}</span>${cur.zh.role?`<span class="hint">· ${cur.zh.role}</span>`:''}<span class="osBatch">${cur.batchZh}</span></div>
-    ${vars.length>1?`<div class="osVar">${vars.map((v,i)=>`<button data-ov="${v.id}" class="${v.id===cur.id?'on':''}">卡片版本 ${i+1}</button>`).join('')}</div>`:''}
+    ${vars.length>1?`<div class="osVar">${vars.map((v,i)=>`<button data-ov="${v.id}" class="${v.id===cur.id?'on':''}">${copSlot(v.id)!=null?COPN[i]:'卡片版本 '+(i+1)}</button>`).join('')}</div>`:''}
     <div class="osG"><div class="gi"><img src="${opIcon(cur.id)}" alt=""></div><div class="gt"><b>${cur.zh.g||'（無特殊裝置）'}</b>${SCRIPTED.has(cur.id)?'<span class="osImp ok">遊戲內已實作</span>'+(typeof GDX!=='undefined'&&GDX[cur.id]?`<small class="osGd">遊戲版效果：${GDX[cur.id][0]}</small>`:''):cur.g.ab&&cur.g.ab.some(a=>a.k!=='PASSIVE')?'<span class="osImp">尚未實作，目前只有卡片數值</span>':''}<i>${cur.g.name||''}${cur.g.charges?` · 使用次數 ${cur.g.charges}`:''}</i><p>${cardText(cur)}</p>${OSEL.en&&abEn?`<p class="en">${abEn}</p>`:''}</div></div>
     <div class="osSec"><h4>武器命中骰</h4><div class="osW">${['1-3','4-6','7+'].map((r,i)=>`<div><span>RANGE ${r}<small>${['近','中','遠'][i]}</small></span>${hexDice(cur.w[i])}</div>`).join('')}</div></div>
     <div class="osSec"><h4>能力值</h4><div class="osStats"><div><b>${cur.st??'—'}</b><small>耐力（護甲）</small></div><div><b>${cur.run?'+'+cur.run:'—'}</b><small>${cur.run?'奔跑':'不能奔跑'}</small></div><div><b><span class="dzb ${cur.dz}"></span> ${DZN[cur.dz]}</b><small>破壞力</small></div><div><b>${cur.g.charges??'—'}</b><small>裝置次數</small></div></div>
@@ -8104,6 +8218,168 @@ function renderOpSelect(anim){
   el.classList.toggle('browse',OSEL.browse);el.classList.toggle('shop',!!OSEL.shop);const dn=$('#osDone');if(dn)dn.onclick=closeOpSelect;$('#osBack').onclick=closeOpSelect;$('#osEn').onclick=()=>{OSEL.en=!OSEL.en;renderOpSelect(false);};
   const x=$('#osX');if(x)x.onclick=()=>el.classList.remove('showD');{const ob=$('#osBuy');if(ob)ob.onclick=()=>{const b=cur.base;if(owned(b)||ECO.rn<OPPRICE)return;ECO.rn-=OPPRICE;ECO.own.push(b);ecoSave();try{SFX.click&&SFX.click();}catch(e){}achToastMsg(`已解鎖 ${OPC[b].name}`,"現在可以選他出戰");renderOpSelect(false);renderPlayer();};}
 }
+
+// ---------- custom operators (v91): two self-trained recruits per player; kills give points, one death starts them over ----------
+// they play as the recruit cards (rifle card = 幹員一, shotgun card = 幹員二) and only in games against the computer
+const COP_BASE=10,COP_CAP=34,COP_RT=500,SKPRICE=8000,COPN=['幹員一','幹員二'],COPART=['img/cop/f.webp','img/cop/m.webp'];
+const COPARM=[null,{hp:4,mv:6,run:5},{hp:5,mv:5,run:3},{hp:6,mv:4,run:2}],CDIEC={Y:1,O:2,R:3},CDIEA={Y:1,O:1.5,R:2},CDIEN={Y:'O',O:'R'};
+const COPG=['frag','charges','flash','smk','impact','clay','nitro','bpcam','shield'];
+const copNew=o=>({nm:'炮灰',e:0,k:0,sv:0,d:[['Y'],['Y'],['Y']],arm:1,run:0,vis:0,g:(o&&o.g)||[null,null],sk:(o&&o.sk)||null,gen:((o&&o.gen)||0)+1});
+function copAll(){if(!Array.isArray(ECO.cop)||ECO.cop.length!==2)ECO.cop=[copNew(),copNew()];ECO.cop=ECO.cop.map(c=>Object.assign(copNew(),c||{}));if(!Array.isArray(ECO.sk))ECO.sk=[];return ECO.cop;}
+const copTot=c=>Math.min(COP_CAP,COP_BASE+(c.e|0));
+const copSpent=c=>c.d.reduce((a,b)=>a+b.reduce((x,d)=>x+CDIEC[d],0),0)-3+(c.arm-1)*2+c.run+c.vis;
+const copLeft=c=>copTot(c)-copSpent(c);
+const copStat=c=>{const A=COPARM[c.arm];return {hp:A.hp,mv:A.mv,cap:A.run,run:Math.min(c.run,A.run),fov:120+5*c.vis};};
+const copSlot=id=>/^recruit_[ad]_/.test(id||'')?(/shotgun$/.test(id)?1:0):null;
+const copW=s=>[...s].reduce((a,ch)=>a+(/[\x00-\x7f]/.test(ch)?1:2),0);
+function copScore(c){const s=copStat(c),ax=[c.d.flat().reduce((a,d)=>a+CDIEA[d],0)/20*100,33,40+c.vis*10,(s.mv+s.run)/11*100,s.hp/6*100].map(v=>Math.round(Math.max(0,Math.min(100,v))));
+  const sc=Math.round(ax.reduce((a,b)=>a+b,0)/5);return {ax,sc,rk:sc>=86?'UR':sc>=73?'SSR':sc>=60?'SR':sc>=45?'R':'N'};}
+const RKC={N:'#8b9cad',R:'#5fa8ef',SR:'#b48cf0',SSR:'#e3aa3e',UR:'#e8574e'};
+// skills: any implemented operator gadget that is used from the gadget button
+const SKSKIP=new Set(['rook','montagne','tachanka','glaz','blitz','clash','doc']);
+let SKL=null;function copSkills(){if(!SKL)SKL=OPBASE.filter(b=>SCRIPTED.has(b)&&!NOBTN.has(b)&&!SKSKIP.has(b)).filter(b=>{ensureOp(b);return OPS[b].g&&OPS[b].ch>0;});return SKL;}
+const skName=b=>(OPC[b]&&OPC[b].zh.g)||OPS[b].g;
+const skText=b=>(typeof GDX!=='undefined'&&GDX[b])?GDX[b][0]:(OPS[b].gd||'');
+function copSkOn(c,side){const k=c.sk;if(!k||!ECO.sk.includes(k)||!OPC[k]||OPC[k].side!==side)return null;ensureOp(k);return k;}
+// game hooks: PvE gets the trained numbers on the recruit cards, online games keep the printed cards
+const COPDEF={};
+function copPrep(on){copAll();for(const s of ['a','d'])['rifle','shotgun'].forEach((w,i)=>{const id=`recruit_${s}_${w}`,side=s==='a'?'A':'D';if(!OPC[id])return;ensureOp(id);
+  if(!COPDEF[id])COPDEF[id]={P:{...PROF[id]},O:{...OPS[id]}};
+  if(!on){PROF[id]={...COPDEF[id].P};OPS[id]={...COPDEF[id].O};return;}
+  const c=ECO.cop[i],st=copStat(c),sk=copSkOn(c,side);
+  PROF[id]={run:st.run,st:st.hp,d:c.d.map(b=>b.join('')),dr:'低',dz:1,shield:false,card:true,cop:i};
+  OPS[id]={...COPDEF[id].O,name:c.nm,role:'自訂幹員',g:sk?OPS[sk].g:'',gd:sk?OPS[sk].gd:'',ch:sk?OPS[sk].ch:0};});}
+function copUnit(u,i){const c=ECO.cop[i],st=copStat(c);u.speed=st.mv;u.fh=st.fov/2;u.cop=i;u.nmz=c.nm;const sk=copSkOn(c,u.side);if(sk)u.sk=sk;}
+function copGear(){for(const k of cfg.picks[cfg.side]){const i=copSlot(k);if(i==null)continue;for(const g of ECO.cop[i].g)if(g&&INV[cfg.side][g])G[g]=(G[g]|0)+1;}}
+function copEnd(lines){if(!G||G.net||G.tut)return;const u=G.units.find(u=>u.side===G.player&&u.cop!=null);if(!u)return;const c=ECO.cop[u.cop],k=ST(u).k|0,t0=copTot(c);
+  c.k+=k;c.e=Math.min(COP_CAP-COP_BASE,(c.e|0)+k);const got=copTot(c)-t0;
+  if(!u.alive){lines.push([`${c.nm} 陣亡，${COPN[u.cop]}要重新取名、從頭培養`,0]);ECO.cop[u.cop]=copNew(c);}
+  else{c.sv++;lines.push([`${c.nm} 存活${k?`，擊殺 ${k}`:''}${got?`，點數 +${got}`:''}`,0]);}
+  CP.dr=null;}
+// the skill button runs the borrowed operator's gadget code
+{const _gt=gTargets;gTargets=function(u){if(!u||!u.sk)return _gt(u);const o=u.op;u.op=u.sk;try{return _gt(u);}finally{u.op=o;}};}
+{const _ug=useGadget;useGadget=async function(u,x,y){if(!u||!u.sk)return _ug(u,x,y);const o=u.op;u.op=u.sk;try{return await _ug(u,x,y);}finally{u.op=o;}};}
+{const _oa=opArt;opArt=function(id){const i=copSlot(id);return i!=null?COPART[i]:_oa(id);};}
+// card shown in operator select for the recruits: the player's own operator
+function copCard(c){const i=copSlot(c&&c.id);if(i==null)return c;const o=copAll()[i],st=copStat(o),sk=copSkOn(o,c.side);
+  return {...c,name:o.nm,org:'自訂幹員',real:'',w:o.d.map(b=>b.slice()),st:st.hp,run:st.run,dz:'Y',shield:false,up:null,
+    zh:{...c.zh,role:'自訂幹員',g:sk?skName(sk):'',x:sk?skText(sk):(o.sk?'裝備的技能屬於另一方，這一方不生效':'到「自訂幹員」頁裝備技能')},g:{...c.g,name:'',charges:sk?OPS[sk].ch:0,ab:[]}};}
+
+// ---------- custom operator page ----------
+const CP={i:0,dr:null,st:{},sheet:null,skTab:'all',skPg:0,skSel:null,edit:false};
+const cpCopy=o=>JSON.parse(JSON.stringify(o));
+function copDraft(){CP.dr=cpCopy(copAll()[CP.i]);CP.st={};}
+const cpPend=()=>copSpent(CP.dr)-copSpent(copAll()[CP.i]);
+const cpDirty=()=>Object.values(CP.st).some(a=>a&&a.length);
+function openCop(){copAll();let el=$('#cop');
+  if(!el){el=document.createElement('div');el.id='cop';el.setAttribute('role','dialog');el.setAttribute('aria-label','自訂幹員');document.body.appendChild(el);
+    addEventListener('keydown',e=>{if(el.hidden||e.key!=='Escape')return;if(CP.sheet){CP.sheet=null;renderCop();}else closeCop();});}
+  copDraft();CP.sheet=null;CP.edit=false;el.hidden=false;el.classList.remove('out');renderCop();}
+function closeCop(){const el=$('#cop');if(!el)return;el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');},180);if(SCREEN==='cop')SCREEN='title';renderTitle();}
+function cpPenta(sc){const ax=['火力','破壞力','視野','速度','裝甲'],cx=69,cy=70,R=46,pt=(i,r)=>{const a=-Math.PI/2+i*2*Math.PI/5;return [+(cx+r*Math.cos(a)).toFixed(1),+(cy+r*Math.sin(a)).toFixed(1)];};let s='';
+  for(const f of [1,.66,.33])s+=`<polygon points="${ax.map((_,i)=>pt(i,R*f).join(',')).join(' ')}" fill="${f===1?'#0e141bcc':'none'}" stroke="#2c3b4a"/>`;
+  ax.forEach((_,i)=>{const [x,y]=pt(i,R);s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2c3b4a"/>`;});
+  s+=`<polygon points="${sc.ax.map((v,i)=>pt(i,R*Math.max(.04,v/100)).join(',')).join(' ')}" fill="#e3aa3e44" stroke="#e3aa3e" stroke-width="1.5"/>`;
+  ax.forEach((t,i)=>{const [x,y]=pt(i,R+11);s+=`<text x="${x}" y="${y+3}" fill="#c9d3dc" font-size="9" text-anchor="middle">${t}</text>`;});
+  s+=`<text x="${cx}" y="${cy+2}" fill="${RKC[sc.rk]}" font-size="${sc.rk.length>2?16:20}" font-weight="700" text-anchor="middle" font-family="Saira Condensed,sans-serif">${sc.rk}</text><text x="${cx}" y="${cy+13}" fill="#8b9cad" font-size="8" text-anchor="middle" font-family="IBM Plex Mono,monospace">${sc.sc}</text>`;
+  return `<svg class="cpPenta" viewBox="0 0 138 132" role="img" aria-label="綜合評分 ${sc.rk} ${sc.sc}">${s}</svg>`;}
+const LOCKI=`<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2" fill="#687b8e"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="#687b8e" stroke-width="2.4"/></svg>`;
+const PENI=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>`;
+function cpRows(){const d=CP.dr,c=copAll()[CP.i],st=copStat(d),left=copLeft(d),nd=d.d.flat().length,can=k=>CP.st[k]&&CP.st[k].length;
+  const row=(cls,key,lb,cells,val,plus)=>`<div class="cpRow ${cls}"><div class="cpLb">${lb}</div><div class="cpCells">${cells}<span class="cpVal">${val}</span></div><button class="cpPm" data-cm="${key}" ${can(key)?'':'disabled'} aria-label="減少${lb}">−</button><button class="cpPm p" data-cp="${key}" ${plus?'':'disabled'} aria-label="增加${lb}">＋</button></div>`;
+  let h='';['近距離','中距離','遠距離'].forEach((lb,b)=>{let cs='';for(let j=0;j<5;j++){const x=d.d[b][j],pd=x&&c.d[b][j]!==x;
+      cs+=x?`<button class="cpC ${x}${pd?' pend':''}" data-up="${b},${j}" aria-label="${lb}第${j+1}顆骰${x==='R'?'':'，點一下升級'}">${CDIEN[x]?`<span class="nx ${CDIEN[x]}"></span>`:''}</button>`:'<span class="cpC"></span>';}
+    const av=d.d[b].reduce((a,x)=>a+CDIEA[x],0);
+    h+=row('dice','d'+b,lb,cs,`平均 ${+av.toFixed(1)}`,left>=1&&d.d[b].length<5&&nd<10);});
+  {let cs='';for(let j=0;j<3;j++)cs+=`<span class="cpC ${j<d.arm?'G':''}${j<d.arm&&j>=c.arm?' pend':''}"></span>`;h+=row('arm','arm','裝甲',cs,`血 ${st.hp} · ${st.mv} 步`,left>=2&&d.arm<3);}
+  {let cs='';for(let j=0;j<5;j++)cs+=j>=st.cap?`<span class="cpC cap">${LOCKI}</span>`:`<span class="cpC ${j<d.run?'B':''}${j<d.run&&j>=c.run?' pend':''}"></span>`;h+=row('spd','run','速度',cs,`奔跑 +${st.run}`,left>=1&&d.run<st.cap);}
+  {let cs='';for(let j=0;j<4;j++)cs+=`<span class="cpC ${j<d.vis?'V':''}${j<d.vis&&j>=c.vis?' pend':''}"></span>`;h+=row('vis','vis','視野',cs,`${st.fov}°`,left>=1&&d.vis<4);}
+  return h;}
+function renderCop(){const el=$('#cop');if(!el||el.hidden)return;const cs=copAll(),c=cs[CP.i];if(!CP.dr)copDraft();const d=CP.dr,sc=copScore(d),left=copLeft(d),tot=copTot(d),pend=cpPend();
+  const slot=k=>k?`<span class="cpGi">${WZI[k]||''}</span>`:'+';
+  const sk=c.sk&&ECO.sk.includes(c.sk)?c.sk:null;
+  el.innerHTML=`<div class="cpBox">
+  <div class="cpTop"><button class="cpBack" id="cpBack" aria-label="返回">‹</button><div class="cpTt"><small>CUSTOM OPERATOR</small><h2>自訂幹員</h2></div>
+    <div class="cpSw" role="tablist">${COPN.map((n,i)=>`<button role="tab" data-ci="${i}" class="${i===CP.i?'on':''}" aria-selected="${i===CP.i}">${n}</button>`).join('')}</div></div>
+  <div class="cpStage"><img class="cpArt" src="${COPART[CP.i]}" alt=""><div class="cpBig">RECRUIT</div>
+    <div class="cpId">${CP.edit?`<div class="cpEd"><input id="cpNm" value="${esc(c.nm)}" autocomplete="off" aria-label="幹員名字"><span id="cpCnt">${copW(c.nm)}/12</span></div>`
+      :`<button class="cpPen" id="cpPen" aria-label="改名">${PENI}</button><div class="cpNm">${esc(c.nm)}</div>`}<span class="cpTag">新進人員</span>
+      <div class="cpKd"><div><b>${c.k}</b><span>擊殺</span></div><div><b>${c.sv}</b><span>存活場數</span></div></div></div>
+    ${cpPenta(sc)}
+    <div class="cpKit"><div class="cpKl"><span>道具</span></div><div class="cpGs">${[0,1].map(i=>`<button class="cpSlot g ${c.g[i]?'f':''}" data-gs="${i}" aria-label="攜帶道具 ${i+1}">${slot(c.g[i])}</button>`).join('')}</div>
+      <div class="cpKl"><span>技能</span></div><button class="cpSlot s ${sk?'f':''}" id="cpSk" aria-label="技能">${sk?`<img src="${opIcon(sk)}" alt=""><span class="cpSkN">${esc(skName(sk))}</span>`:'+'}</button></div></div>
+  <div class="cpStats">${cpRows()}</div>
+  <div class="cpPbar"><div class="cpPv"><span>可用點數</span><b>${left}</b></div><div class="cpPt"><div class="cpTr"><i style="width:${(tot-pend)/COP_CAP*100}%"></i><i class="pd" style="left:${(tot-pend)/COP_CAP*100}%;width:${pend/COP_CAP*100}%"></i></div><div class="cpLg"><span>已獲得 ${tot}</span><span>上限 ${COP_CAP}</span></div></div></div>
+  <div class="cpFoot"><button class="cpBtn g" id="cpRt">重新訓練<small>${fmtN(COP_RT)} 聲望</small></button><button class="cpBtn p" id="cpOk" ${cpDirty()?'':'disabled'}>確認${pend>0?`<small>${pend} 點待確認</small>`:''}</button></div>
+  </div>${cpSheet()}`;
+  cpBind(el);}
+function cpSheet(){const s=CP.sheet;if(!s)return '';const c=copAll()[CP.i];
+  if(s.t==='g'){const o=c.g[1-s.i];
+    return `<div class="cpOv" data-ov="1"><div class="cpSheet" role="dialog" aria-label="選擇攜帶道具"><small class="e">GADGET · 道具 ${s.i+1}</small><h3>選擇攜帶道具<span>通用道具，免費</span></h3>
+      <div class="cpGrid">${COPG.map(k=>{const side=INV.A[k]?'A':'D';return `<button class="cpIt ${c.g[s.i]===k?'sel':''}" data-gk="${k}"><i class="sd ${side}"></i>${o===k?'<span class="used">已帶</span>':''}<span class="ic">${WZI[k]||''}</span>${INV[side][k][0]}</button>`;}).join('')}</div>
+      <p class="cpNote">進攻道具只在進攻時帶上，防守道具只在防守時帶上。</p>
+      <div class="cpFoot in"><button class="cpBtn g" id="cpGClr">清空</button><button class="cpBtn p" id="cpGX">完成</button></div></div></div>`;}
+  if(s.t==='rt'){const ok=ECO.rn>=COP_RT;
+    return `<div class="cpOv" data-ov="1"><div class="cpSheet" role="dialog" aria-label="重新訓練"><small class="e">RETRAIN</small><h3>重新訓練 ${esc(c.nm)}？</h3>
+      <p class="cpMsg">花 ${RNI}${fmtN(COP_RT)} 聲望，骰子、裝甲、速度、視野全部退回，已獲得的 ${copTot(c)} 點保留下來重新分配。${ok?'':`<br>你有 ${fmtN(ECO.rn)} 聲望，還差 ${fmtN(COP_RT-ECO.rn)}。`}</p>
+      <div class="cpFoot in"><button class="cpBtn g" id="cpRtNo">取消</button><button class="cpBtn p" id="cpRtYes" ${ok?'':'disabled'}>重新訓練</button></div></div></div>`;}
+  if(s.t==='s')return cpSkillPage();return '';}
+function cpSkillPage(){const L=copSkills(),own=b=>ECO.sk.includes(b),c=copAll()[CP.i];
+  const list=L.filter(b=>CP.skTab==='all'||(CP.skTab==='own'?own(b):OPC[b].side===CP.skTab)).sort((a,b)=>own(b)-own(a));
+  const per=16,pages=Math.max(1,Math.ceil(list.length/per));CP.skPg=Math.min(CP.skPg,pages-1);const pg=list.slice(CP.skPg*per,CP.skPg*per+per);
+  const sel=CP.skSel&&L.includes(CP.skSel)?CP.skSel:null;
+  return `<div class="cpFull" role="dialog" aria-label="技能收藏"><div class="cpTop"><button class="cpBack" id="cpSkBack" aria-label="返回">‹</button><div class="cpTt"><small>SKILL COLLECTION</small><h2>技能收藏</h2></div>
+    <div class="cpBal">${RNI}<b>${fmtN(ECO.rn)}</b><small>已擁有 ${L.filter(own).length} / ${L.length}</small></div></div>
+    <div class="cpTabs">${[['all','全部'],['A','進攻'],['D','防守'],['own','已擁有']].map(([k,t])=>`<button data-st="${k}" class="${CP.skTab===k?'on':''}">${t}</button>`).join('')}</div>
+    <div class="cpSg">${pg.map(b=>`<button class="cpSk ${own(b)?'own':'lock'} ${sel===b?'sel':''} ${c.sk===b&&own(b)?'eq':''}" data-sk="${b}"><i class="sd ${OPC[b].side}"></i><span class="ic"><img src="${opIcon(b)}" alt=""></span><span class="n">${esc(skName(b))}</span><span class="pr">${c.sk===b&&own(b)?'裝備中':own(b)?'已擁有':fmtN(SKPRICE)}</span></button>`).join('')||'<p class="cpNote">還沒有技能，到商店「技能」分頁購買。</p>'}</div>
+    ${pages>1?`<div class="cpPg"><button data-sp="-1" ${CP.skPg?'':'disabled'} aria-label="上一頁">‹</button><span>${CP.skPg+1} / ${pages}</span><button data-sp="1" ${CP.skPg<pages-1?'':'disabled'} aria-label="下一頁">›</button></div>`:''}
+    ${sel?`<div class="cpDet"><img src="${opIcon(sel)}" alt=""><div><b>${esc(skName(sel))}</b><small>${esc(OPC[sel].name)} · 只在${OPC[sel].side==='A'?'進攻':'防守'}時生效${OPS[sel].ch?` · ${OPS[sel].ch} 次`:''}</small><p>${skText(sel)}</p></div></div>`:`<div class="cpDet empty">點技能看說明。買過的技能可以隨時更換。</div>`}
+    <div class="cpFoot">${sel&&own(sel)?`<button class="cpBtn g" id="cpSkOff" ${c.sk?'':'disabled'}>卸下</button><button class="cpBtn p" id="cpSkEq" ${c.sk===sel?'disabled':''}>${c.sk===sel?'裝備中':'裝備'}</button>`
+      :`<button class="cpBtn g" id="cpSkShop">前往商店</button><button class="cpBtn p" id="cpSkBuy" ${sel&&ECO.rn>=SKPRICE?'':'disabled'}>${sel?(ECO.rn>=SKPRICE?`購買 ${fmtN(SKPRICE)} 聲望`:'聲望不足'):'選一個技能'}</button>`}</div></div>`;}
+function skBuy(b){if(!b||ECO.sk.includes(b)||ECO.rn<SKPRICE)return false;ECO.rn-=SKPRICE;ECO.sk.push(b);ecoSave();try{SFX.round&&SFX.round();}catch(e){}try{renderPlayer();}catch(e){}return true;}
+function cpSave(f){const cs=copAll(),c=cs[CP.i];f(c);f(CP.dr);ecoSave();renderCop();}
+function cpBind(el){const q=s=>el.querySelector(s),on=(s,f)=>{const b=q(s);if(b)b.onclick=f;},d=CP.dr,c=copAll()[CP.i],push=(k,v)=>(CP.st[k]=CP.st[k]||[]).push(cpCopy(v)),left=()=>copLeft(d);
+  on('#cpBack',closeCop);
+  el.querySelectorAll('[data-ci]').forEach(b=>b.onclick=()=>{const i=+b.dataset.ci;if(i===CP.i)return;CP.i=i;CP.edit=false;copDraft();renderCop();});
+  el.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{const k=b.dataset.cp,st=copStat(d);
+    if(k[0]==='d'){const i=+k[1];if(left()<1||d.d[i].length>=5||d.d.flat().length>=10)return;push(k,d.d[i]);d.d[i].push('Y');}
+    else if(k==='arm'){if(left()<2||d.arm>=3)return;push(k,{arm:d.arm,run:d.run});d.arm++;d.run=Math.min(d.run,COPARM[d.arm].run);}
+    else if(k==='run'){if(left()<1||d.run>=st.cap)return;push(k,d.run);d.run++;}
+    else if(k==='vis'){if(left()<1||d.vis>=4)return;push(k,d.vis);d.vis++;}
+    try{SFX.click&&SFX.click();}catch(e){}renderCop();});
+  el.querySelectorAll('[data-cm]').forEach(b=>b.onclick=()=>{const k=b.dataset.cm,s=CP.st[k];if(!s||!s.length)return;const v=s.pop();
+    if(k[0]==='d')d.d[+k[1]]=v;else if(k==='arm'){d.arm=v.arm;d.run=Math.max(d.run,v.run);}else d[k]=v;renderCop();});
+  el.querySelectorAll('[data-up]').forEach(b=>b.onclick=()=>{const [i,j]=b.dataset.up.split(',').map(Number),x=d.d[i][j];if(!CDIEN[x]||left()<1)return;push('d'+i,d.d[i]);d.d[i][j]=CDIEN[x];try{SFX.click&&SFX.click();}catch(e){}renderCop();});
+  on('#cpOk',()=>{if(!cpDirty())return;const cs=copAll();const nc={...cs[CP.i],d:cpCopy(d.d),arm:d.arm,run:Math.min(d.run,COPARM[d.arm].run),vis:d.vis};cs[CP.i]=nc;ecoSave();copDraft();try{SFX.alert&&SFX.alert();}catch(e){}renderCop();});
+  on('#cpRt',()=>{CP.sheet={t:'rt'};renderCop();});on('#cpRtNo',()=>{CP.sheet=null;renderCop();});
+  on('#cpRtYes',()=>{if(ECO.rn<COP_RT)return;ECO.rn-=COP_RT;const cs=copAll();Object.assign(cs[CP.i],{d:[['Y'],['Y'],['Y']],arm:1,run:0,vis:0});ecoSave();CP.sheet=null;copDraft();try{renderPlayer();}catch(e){}renderCop();});
+  on('#cpPen',()=>{CP.edit=true;renderCop();const i=q('#cpNm');if(i){i.focus();i.select();}});
+  {const i=q('#cpNm');if(i){const fit=()=>{let s='';for(const ch of i.value){if(copW(s+ch)>12)break;s+=ch;}if(s!==i.value)i.value=s;const n=q('#cpCnt');if(n)n.textContent=copW(s)+'/12';};
+    const done=()=>{if(!CP.edit)return;CP.edit=false;const v=i.value.trim()||'炮灰';cpSave(o=>o.nm=v);};
+    i.oninput=fit;i.onkeydown=e=>{if(e.key==='Enter')done();if(e.key==='Escape'){e.stopPropagation();CP.edit=false;renderCop();}};i.onblur=done;}}
+  el.querySelectorAll('[data-gs]').forEach(b=>b.onclick=()=>{CP.sheet={t:'g',i:+b.dataset.gs};renderCop();});
+  el.querySelectorAll('[data-gk]').forEach(b=>b.onclick=()=>{const k=b.dataset.gk,i=CP.sheet.i;cpSave(o=>{if(o.g[1-i]===k)o.g[1-i]=o.g[i];o.g[i]=k;});});
+  on('#cpGClr',()=>{const i=CP.sheet.i;cpSave(o=>{o.g[i]=null;});});on('#cpGX',()=>{CP.sheet=null;renderCop();});
+  {const ov=q('[data-ov]');if(ov)ov.onclick=e=>{if(e.target===ov){CP.sheet=null;renderCop();}};}
+  on('#cpSk',()=>{CP.sheet={t:'s'};CP.skSel=c.sk||null;CP.skPg=0;renderCop();});on('#cpSkBack',()=>{CP.sheet=null;renderCop();});
+  el.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{CP.skTab=b.dataset.st;CP.skPg=0;renderCop();});
+  el.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{CP.skPg+=+b.dataset.sp;renderCop();});
+  el.querySelectorAll('[data-sk]').forEach(b=>b.onclick=()=>{CP.skSel=b.dataset.sk;renderCop();});
+  on('#cpSkEq',()=>{const b=CP.skSel;if(ECO.sk.includes(b))cpSave(o=>o.sk=b);});on('#cpSkOff',()=>cpSave(o=>o.sk=null));
+  on('#cpSkBuy',()=>{if(skBuy(CP.skSel)){achToastMsg(`已購買技能 ${skName(CP.skSel)}`,'按「裝備」就能帶上');renderCop();}});
+  on('#cpSkShop',()=>{SHOP.sel=null;openShop('S');});}
+// shop: 技能 tab
+const skList=()=>copSkills().filter(b=>SHOP.filter==='all'||!ECO.sk.includes(b)).map((b,i)=>[b,i]).sort((x,y)=>ECO.sk.includes(x[0])-ECO.sk.includes(y[0])||x[1]-y[1]).map(x=>x[0]);
+function skCard(b){const own=ECO.sk.includes(b);return `<button class="shC shK ${own?'own':'buy'} ${OPC[b].side}" data-sb="${b}" aria-label="${esc(skName(b))}"><i class="sd ${OPC[b].side}"></i><span class="shKIc"><img src="${opIcon(b)}" alt=""></span>
+  <span class="shKNm">${esc(skName(b))}</span><span class="shKOp">${esc(OPC[b].name)}</span><span class="shTag">${own?'<i class="shOk">✓</i>已擁有':`${RNI}${fmtN(SKPRICE)}`}</span></button>`;}
+function skDet(el,b){const own=ECO.sk.includes(b),ok=ECO.rn>=SKPRICE;el.hidden=false;el.dataset.side='S';
+  el.innerHTML=`<div class="shDBox shKD" role="dialog" aria-label="${esc(skName(b))}"><button class="shX" id="shX" aria-label="關閉">✕</button>
+    <div class="shKDh"><img src="${opIcon(b)}" alt=""><div><small>${OPC[b].side==='A'?'進攻':'防守'}技能 · 來自 ${esc(OPC[b].name)}</small><h3>${esc(skName(b))}</h3></div></div>
+    <p>${skText(b)}</p><p class="shNote">裝備在自訂幹員的技能格，只在${OPC[b].side==='A'?'進攻':'防守'}時生效${OPS[b].ch?`，每場 ${OPS[b].ch} 次`:''}。買過可以隨時更換。</p>
+    ${own?`<div class="shCta own"><span class="shOwn"><i class="shOk">✓</i>已擁有</span><span class="shNote">到「自訂幹員」頁裝備</span></div>`
+      :`<div class="shCta"><div class="shPrice">${RNI}<b>${fmtN(SKPRICE)}</b></div><button class="shBuy" id="shBuy" ${ok?'':'disabled'}>${ok?'購買':'聲望不足'}</button><span class="shNote">${ok?`購買後剩 ${fmtN(ECO.rn-SKPRICE)}`:`還差 ${fmtN(SKPRICE-ECO.rn)}`}</span></div>`}</div>`;
+  el.onclick=e=>{if(e.target===el){SHOP.sel=null;renderShopDet();}};$('#shX').onclick=()=>{SHOP.sel=null;renderShopDet();};
+  const by=$('#shBuy');if(by)by.onclick=()=>{if(skBuy(b)){achToastMsg(`已購買技能 ${skName(b)}`,'到「自訂幹員」頁裝備');const bal=$('#shBal b');if(bal)bal.textContent=fmtN(ECO.rn);shopLayout();renderShopDet();}};}
 
 // ---------- round clocks: each squad gets (time per Operator x Operators in play) per round, shared by its two activation phases ----------
 const CLK_SVG={A:'<svg viewBox="0 0 48 48"><path d="M8 6l3-2 15 15-3 3zM40 6l-3-2-15 15 3 3z" opacity=".0"/><path d="M6 4h6l18 18-3 3L6 10zM42 4h-6L18 22l3 3L42 10zM14 30l4 4-6 6 2 2-3 3-2-2-3 3-2-2 3-3-2-2 3-3 2 2zm20 0l-4 4 6 6-2 2 3 3 2-2 3 3 2-2-3-3 2-2-3-3-2 2zM16 26l6 6-3 3-6-6zm16 0l-6 6 3 3 6-6z"/></svg>',
