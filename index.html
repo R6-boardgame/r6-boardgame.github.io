@@ -3802,7 +3802,7 @@ function lineCells(x0,y0,x1,y1){const dx=x1-x0,dy=y1-y0,n=Math.ceil(Math.max(Mat
 function los(x0,y0,x1,y1,located,noOps){
   for(const [x,y] of lineCells(x0,y0,x1,y1)){const c=cell(x,y);
     if(located){if((c.t==='hard'||c.t==='reinf')&&!(c&&c.mOpen))return false;if(!noOps&&G.units.some(u=>u.alive&&u.x===x&&u.y===y&&!u.hidden))return false;continue;}
-    if((blocks(c)&&!(c&&c.mOpen))||(smokeAt(x,y)&&!LOSW))return false;
+    if((blocks(c)&&!(c&&(c.mOpen||(c.t==='soft'&&c.hole))))||(smokeAt(x,y)&&!LOSW))return false;
     if(!noOps&&G.units.some(u=>u.alive&&u.x===x&&u.y===y&&!u.hidden))return false;}
   return true;
 }
@@ -5206,7 +5206,10 @@ function drawWallShadow(x,y,c){if(c.t==='bar')return;const w=c.t==='soft'?S*.3:S
 function drawWall(x,y,c){
   const f=col=>(a,b,w,h)=>{ctx.fillStyle=col;ctx.fillRect(a,b,w,h);};
   if(c.t==='hard'){armRects(x,y,S*.4,f(TEX.brick));armRects(x,y,S*.4,(a,b,w,h)=>{ctx.strokeStyle='rgba(0,0,0,.0)';});}
-  else if(c.t==='soft'){armRects(x,y,S*.3,f(FP.softEdge));armRects(x,y,S*.3-2*Math.max(2,S*.06),f(TEX.plaster));}
+  else if(c.t==='soft'){armRects(x,y,S*.3,f(FP.softEdge));armRects(x,y,S*.3-2*Math.max(2,S*.06),f(TEX.plaster));
+    if(c.hole){const r=rng(hash(x,y)*7+3),hz=wj(cell(x-1,y))||wj(cell(x+1,y))||!(wj(cell(x,y-1))||wj(cell(x,y+1))),cx=x*S+S/2,cy=y*S+S/2;ctx.save();ctx.translate(cx,cy);if(!hz)ctx.rotate(Math.PI/2);
+      ctx.fillStyle=FP.floor||'#cfc8bb';ctx.beginPath();const n=9;for(let i=0;i<=n;i++){const t=i/n*2-1;ctx.lineTo(t*S*.26,-S*.17*(.75+r()*.5));}for(let i=n;i>=0;i--){const t=i/n*2-1;ctx.lineTo(t*S*.26,S*.17*(.75+r()*.5));}ctx.closePath();ctx.fill();
+      ctx.strokeStyle='rgba(60,45,30,.6)';ctx.lineWidth=1;ctx.stroke();ctx.restore();}}
   else if(c.t==='reinf'){armRects(x,y,S*.42,f('#2c3a47'));armRects(x,y,S*.42-2,f(TEX.steel));armRects(x,y,Math.max(1.2,S*.04),f(FP.reinfIn));
     const cx=x*S+S/2,cy=y*S+S/2;ctx.fillStyle='#d9e3ec';for(const [a,b] of [[-.13,-.13],[.13,-.13],[-.13,.13],[.13,.13]]){ctx.beginPath();ctx.arc(cx+a*S,cy+b*S,Math.max(1,S*.03),0,7);ctx.fill();}
     if(c.elec&&elecVisible(x,y)){ctx.save();ctx.shadowColor=COL.elec;ctx.shadowBlur=S*.3;ctx.strokeStyle=COL.elec;ctx.lineWidth=Math.max(1.5,S*.07);ctx.beginPath();ctx.moveTo(cx-S*.38,cy);for(let i=1;i<=6;i++)ctx.lineTo(cx-S*.38+i*S*.127,cy+(i%2?-1:1)*S*.16);ctx.stroke();ctx.restore();}}
@@ -6263,13 +6266,13 @@ function buildStatic0(m){
     if(c.panel&&c.t==='reinf'&&buildPanel(g,x,y,c,WH))continue;
     if(c.mirror&&c.t==='reinf'&&buildMirror(g,x,y,c,WH))continue;
     const th={hard:.4,soft:.3,reinf:.42}[c.t],mats=M3[c.t];
+    if(c.t==='soft'&&c.hole){holeWall(g,x,y,c,th,WH,mats,M3);continue;}
     addBox(g,mats,cx,WH/2,cz,th,WH,th,cc);
     const L=.5-th/2,o=th/2+L/2;
     if(wj(cell(x+1,y)))addBox(g,mats,cx+o,WH/2,cz,L+.002,WH,th-.004,cc);
     if(wj(cell(x-1,y)))addBox(g,mats,cx-o,WH/2,cz,L+.002,WH,th-.008,cc);
     if(wj(cell(x,y+1)))addBox(g,mats,cx,WH/2,cz+o,th-.004,WH,L+.002,cc);
     if(wj(cell(x,y-1)))addBox(g,mats,cx,WH/2,cz-o,th-.008,WH,L+.002,cc);
-    if(c.t==='soft'&&c.hole){const hz=isWallC(cell(x-1,y))||isWallC(cell(x+1,y));hz?addBox(g,M3.dark,cx,WH*.55,cz,.3,.24,th+.02,cc,false):addBox(g,M3.dark,cx,WH*.55,cz,th+.02,.24,.3,cc,false);}
     if(c.t==='reinf'){const hz=isWallC(cell(x-1,y))||isWallC(cell(x+1,y));
       if(!wallDecal(g,x,y,c,th,WH))for(const k of [.3,.7]){const yy=WH*k;hz?addBox(g,M3.dark,cx,yy,cz,1,.03,th+.02,cc,false):addBox(g,M3.dark,cx,yy,cz,th+.02,.03,1,cc,false);}
       if(c.elec&&elecVisible(x,y))for(const k of [.2,.5,.8]){const yy=WH*k;hz?addBox(g,M3.elec,cx,yy,cz,1,.035,th+.05,cc,false):addBox(g,M3.elec,cx,yy,cz,th+.05,.035,1,cc,false);}}
@@ -6292,6 +6295,19 @@ function siteBadge(s){const c=document.createElement('canvas');c.width=c.height=
   g.strokeStyle='#fff';g.lineWidth=6;g.stroke();g.fillStyle='#fff';g.font='700 70px Saira Condensed, sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(s,64,68);return c;}
 function barStickerMat(){if(R3.bstk)return R3.bstk;const i=gImg('barricade');if(!i)return null;const t=new THREE.Texture(i);t.encoding=THREE.sRGBEncoding;t.anisotropy=R3.renderer.capabilities.getMaxAnisotropy();t.needsUpdate=true;return R3.bstk=new THREE.MeshStandardMaterial({map:t,roughness:.78,metalness:.05});}
 const wj=c=>isWallC(c)||!!(c&&c.wasBar);
+// a shot-through soft wall: built from thin columns around a ragged opening you can actually see through, splinters on the rim, debris below
+function holeWall(g,x,y,c,th,WH,mats,M3){const cc=[x,y],cx=x+.5,cz=y+.5,r=rng(hash(x,y)*7+3),hz=wj(cell(x-1,y))||wj(cell(x+1,y))||!(wj(cell(x,y-1))||wj(cell(x,y+1)));
+  const put=(u,yy,w,h,d,mt,sh)=>hz?addBox(g,mt||mats,cx+u,yy,cz,w,h,d??th,cc,sh):addBox(g,mt||mats,cx,yy,cz+u,d??th,h,w,cc,sh);
+  const N=22,W=1/N,yc=WH*(.5+(r()-.5)*.08),ox=(r()-.5)*.08,rx=.23+r()*.06,ry=WH*(.15+r()*.04),k=[r()*6,r()*6,r()*6],amp=.18+r()*.1;
+  const noise=(t,j)=>1+amp*(Math.sin(t*7+k[j])*.6+Math.sin(t*13+k[j]*2)*.4)+(r()-.5)*.16;
+  for(let i=0;i<N;i++){const u=-.5+W*(i+.5),t=(u-ox)/rx;
+    if(Math.abs(t)>=1){put(u,WH/2,W+.002,WH);continue;}
+    const e=Math.sqrt(1-t*t),lo=Math.max(.05,yc-ry*e*noise(t,0)),hi=Math.min(WH-.05,yc+ry*e*noise(t,1));
+    put(u,lo/2,W+.002,lo);put(u,(hi+WH)/2,W+.002,WH-hi);
+    if(r()<.55){const s=.03+r()*.05;put(u,lo-s*.3,W*.8,s,th*(.3+r()*.5),mats,false).rotation.z=(r()-.5)*.8;}
+    if(r()<.45){const s=.03+r()*.05;put(u,hi+s*.3,W*.8,s,th*(.3+r()*.5),mats,false).rotation.z=(r()-.5)*.8;}}
+  for(const sd of [-1,1])if(wj(hz?cell(x,y+sd):cell(x+sd,y))){const L=.5-th/2,o=th/2+L/2;hz?addBox(g,mats,cx,WH/2,cz+sd*o,th-.004,WH,L+.002,cc):addBox(g,mats,cx+sd*o,WH/2,cz,L+.002,WH,th-.004,cc);}
+  for(let i=0;i<7;i++){const s=.04+r()*.07,u=ox+(r()-.5)*rx*1.6,v=(r()<.5?-1:1)*(th/2+.05+r()*.25);const b=hz?addBox(g,M3.rubble||mats,cx+u,s/2,cz+v,s*1.4,s,s,null):addBox(g,M3.rubble||mats,cx+v,s/2,cz+u,s,s,s*1.4,null);b.rotation.y=r()*3;}}
 // a pair is drawn once, from its first cell, spanning both
 function pairSpan(x,y,c){if(!c.pair)return 1;{const q=cell(c.pair[0],c.pair[1]);if(q&&q.t!==c.t)return 1;}const [px,py]=c.pair;return px<x||py<y?0:2;}
 function openAxis(x,y,c){if(c.pair)return c.pair[1]===y;return wj(cell(x-1,y))||wj(cell(x+1,y))||!(wj(cell(x,y-1))||wj(cell(x,y+1)));}
@@ -7017,7 +7033,7 @@ function pin3D(x,y){const grp=new THREE.Group();grp.position.set(x+.5,0,y+.5);co
 // ---- v89: soft fog of war and the selected operator's sight fan, painted on two canvases laid over the floor ----
 const DIEV={Y:1,O:1.5,R:2};
 // rays stop on the wall itself (walls are drawn thinner than a cell, joined toward neighbouring walls), smoke stops them at the cell
-function wallSolid(x,y){const cx=Math.floor(x),cy=Math.floor(y),c=cell(cx,cy);if(!blocks(c)||c.mOpen)return false;
+function wallSolid(x,y){const cx=Math.floor(x),cy=Math.floor(y),c=cell(cx,cy);if(!blocks(c)||c.mOpen||(c.t==='soft'&&c.hole))return false;
   const h=({hard:.4,soft:.3,reinf:.42}[c.t]||.3)/2+.02,fx=x-cx-.5,fy=y-cy-.5;if(Math.abs(fx)<=h&&Math.abs(fy)<=h)return true;
   return (Math.abs(fy)<=h&&(fx>0?wj(cell(cx+1,cy)):wj(cell(cx-1,cy))))||(Math.abs(fx)<=h&&(fy>0?wj(cell(cx,cy+1)):wj(cell(cx,cy-1))));}
 function visRays(u){const R=VR(u),f=u.fd||[0,1],a0=Math.atan2(f[1],f[0]),n=150,o=[u.x+.5,u.y+.5],pts=[],hit=[],W=u.op==='warden';
