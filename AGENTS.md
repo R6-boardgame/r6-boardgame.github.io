@@ -6,7 +6,7 @@
 
 - 《Rainbow Six Siege – The Board Game》的網頁版，可對戰電腦、新手教學、自訂房間連線、排名戰、成就、商店。
 - 線上版：https://r6-boardgame.github.io/ （GitHub Pages，`main` 分支根目錄直接發佈，推上去就上線）。
-- 目前版本 v94（見 `git log`）。
+- 目前版本 v95（見 `git log`）。
 - 使用者要求：PR 做完、測完就直接合併上線，不用再問。
 
 ## 檔案結構
@@ -108,6 +108,7 @@
 - v92：自訂幹員轉職。`WPN`（mg 機槍／sh 盾牌／sg 散彈／rf 步槍／sn 狙擊／smg 衝鋒）各有隱藏條件 `trig`，按「確認」後新達成的那個（`WORD` 順序，機槍優先）跳轉職框（`CP.sheet={t:'w'}`：圖、專屬圖示、說明、異動、退回點數），轉職用 `wApply` 套上限（`bMax`/`bNoR`/`runCap`，多的骰子從弱的退）。存在 `c.w`，重新訓練與陣亡清掉。男生轉職圖 `img/cop/m_<w>.webp`（盾牌和女生沿用原圖，`copArt`）。效果：機槍三段各多 1 顆免費黃骰（`copDice`，每段上限 7）；盾牌受傷 −2、不能跑；散彈 dz 2、隔牆射擊直接打掉軟牆；步槍 180° + 穩定射擊（`askPickDie`，射擊後點一顆骰子重擲）；狙擊 `u.vr=14`（`VR` 先看 `u.vr`）；衝鋒槍第二槍（`canDo` 放行、`u._s2`、`u._half` 時 `shotPool` 擲一半）。職業限定技能 `SKCLS`/`skFit`（可買，不符時圖示壓「職業不符」、不能裝）。Glaz 翻轉瞄具開放（限狙擊手）：`UG.glaz` 切換 `u.pd`（中遠骰互換）與視野 180°/10 格，再按切回。女生轉職圖 `img/cop/f_<w>.webp`。職業技能 `CSK`（每回合 1 次，行動欄按鈕，`useCsk`）：機槍「架槍」（1 行動，`u.mgOw`：不能再移動、不結束行動，整個視野都算掩護射擊，`riposte` 跳過半平面判定）、步槍「精準射擊」（免費，`u.aim` 下一槍掩護 0）、狙擊「熱感瞄準」（1 行動，`heat` 模式選方向，`heatScan` 把扇形內敵人記成無名標記 `G.heat`／`heatPins`，到回合結束）、衝鋒「衝刺」（1 行動，移動點補滿，`u.noShoot`）；盾牌「盾牌猛擊」（1 行動，`bash` 模式選方向，`shieldBash`：衝兩格、打第三格，撞破軟牆路障、撞爆掩護 `wreckCover`，撞人 2 傷，背後是牆再 1 傷暈眩，背後有人 1 傷暈眩）、散彈「榴彈發射」（1 行動，`gl` 模式用投擲範圍，`grenadeLaunch`：3×3 兩傷敵我都算，鐵牆與轉角柱 `pillarC` 以外全毀）。被炸毀的家具記在 `G.propGone`（`propOn` 決定 2D/3D 畫不畫）。Buck 限步槍。技能收藏頁改成一頁捲動，卡片和商店顯示次數與行動點（`skUse`）。道具模型照參考圖重做：Frost 捕獸夾、Mute 干擾器、Maestro 邪眼（`evilEye3D`）、Jäger 主動防禦系統改成佈防時裝在牆上的道具 `ads`（`ads3D`，每台攔 2 次，`catchThrow` 看道具 3 格內）；邪眼和 ADS 放置跟防彈攝影機一樣選牆（`wallGadget`、`G.bpEye` 走 `bpface`，`g.wall`）。
 - v93：商店技能詳情框重排（`skDet`：`.shDBox.shKD` 改成直排卡片，標籤列 `.shKDm` 顯示次數、行動點、職業限制，說明按〔被動〕〔行動〕分段）。
 - v94：軟牆彈孔改成真的洞：`holeWall` 用細柱子圍出不規則開口（`rng(hash)` 決定形狀），邊緣碎片、地上碎屑；2D 也畫出破口。`los`／`wallSolid` 把 `c.hole` 的軟牆當成可看穿（跟打開的黑鏡一樣），所以隔著彈孔看得到、打得到（仍算輕型掩護 1）。
+- v95：Alibi 改成 Prisma 投影分身（佈防／行動，2 次）：`GT.alibi` 3 格內空格，放下後進 `pdir` 模式選 8 方向（`G.pdir` 存 `pid`，`pdirG()`）。投影是 `type:'prisma'` 道具，`projU(g)` 做出跟本體一樣的假幹員給 `shootables`／`shootUnit`（`t.proj`：中彈就 `prismaBreak`，不扣血）。進攻方看得到就擋路（`reach`），穿過、C4、破片／衝擊（`GSTR.prisma`）、集束、闊刀、榴彈、EMP、盾牌猛擊都會打散。3D 用 `unit3D(projU(g))`＋複製材質，自己半透明（`figAlpha`）、敵人看實心；消失用 `prismaVanish` 原姿勢閃爍淡出不倒下。拿掉舊的開場多 2 個誘餌。
 
 ## 尚未完成 / 等使用者回覆
 
