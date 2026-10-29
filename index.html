@@ -1953,7 +1953,14 @@ body.hasClk #tracker .seg{display:none}
 .shKIc{width:58%;aspect-ratio:1;display:grid;place-items:center}.shKIc img{width:100%;height:100%}
 .shKNm{font-weight:700;font-size:13px;text-align:center;line-height:1.2;padding:0 4px}.shKOp{font-size:10.5px;color:#8193a3}
 .shK.own .shKIc{opacity:.6}
-.shKD{position:relative;padding:18px 18px 16px;max-width:440px;width:calc(100% - 32px);background:linear-gradient(180deg,#1b2733,#121a22);border:1px solid color-mix(in srgb,var(--accent) 60%,transparent)}
+.shDBox.shKD{display:flex;flex-direction:column;gap:12px;width:min(440px,calc(100% - 32px));height:auto;max-height:calc(100% - 24px);overflow-y:auto;padding:22px 18px 18px;background:linear-gradient(180deg,#1b2733,#121a22);border:1px solid color-mix(in srgb,var(--accent) 60%,transparent);clip-path:none}
+.shKD .shX{left:auto;right:10px;top:10px;width:34px;height:34px}
+.shKD .shKDh{padding-right:40px}.shKDi{flex:none;width:64px;height:64px;display:grid;place-items:center;background:#0b1016;border:1px solid var(--ln)}
+.shKD .shKDh small{display:flex;align-items:center;gap:6px;font-size:12px}.shKD .shKDh .sd{width:7px;height:7px;border-radius:50%;background:var(--atk)}.shKD.D .shKDh .sd{background:var(--def)}
+.shKDm{display:flex;flex-wrap:wrap;gap:6px}.shKDm span{font:600 12px/1 var(--mono);padding:6px 8px;background:#0b1016;border:1px solid var(--ln);color:#e3aa3e}.shKDm span.w{border-color:#e8574e;color:#ff8a80}
+.shKDt{display:flex;flex-direction:column;gap:8px}.shKD .shKDt p{margin:0;font-size:14px;line-height:1.6;color:#d4dde5}
+.shKDt b{display:inline-block;font-size:11px;padding:1px 6px;margin-right:6px;background:var(--accent);color:#15110a;vertical-align:1px}
+.shKD p.shKDn{margin:0;font-size:12px;color:#8193a3}.shKD .shCta{margin-top:auto}.shKD .shBuy{min-width:140px}
 .shKD .shKDh{display:flex;gap:12px;align-items:center}.shKD .shKDh img{width:64px;height:64px}.shKD h3{margin:2px 0 0;font-family:var(--display);font-size:26px}.shKD small{color:#8193a3}
 .shKD p{color:#c9d3dc;line-height:1.6}
 </style>
@@ -8573,10 +8580,12 @@ function cpBind(el){const q=s=>el.querySelector(s),on=(s,f)=>{const b=q(s);if(b)
 const skList=()=>copSkills().filter(b=>SHOP.filter==='all'||!ECO.sk.includes(b)).map((b,i)=>[b,i]).sort((x,y)=>ECO.sk.includes(x[0])-ECO.sk.includes(y[0])||x[1]-y[1]).map(x=>x[0]);
 function skCard(b){const own=ECO.sk.includes(b);return `<button class="shC shK ${own?'own':'buy'} ${OPC[b].side}" data-sb="${b}" aria-label="${esc(skName(b))}"><i class="sd ${OPC[b].side}"></i><span class="shKIc"><img src="${opIcon(b)}" alt=""></span>
   <span class="shKNm">${esc(skName(b))}</span><span class="shKOp">${esc(OPC[b].name)}${SKCLS[b]?` · 限${WPN[SKCLS[b]].t}`:''}</span><span class="shKUse">${skUse(b)}</span><span class="shTag">${own?'<i class="shOk">✓</i>已擁有':`${RNI}${fmtN(SKPRICE)}`}</span></button>`;}
-function skDet(el,b){const own=ECO.sk.includes(b),ok=ECO.rn>=SKPRICE;el.hidden=false;el.dataset.side='S';
-  el.innerHTML=`<div class="shDBox shKD" role="dialog" aria-label="${esc(skName(b))}"><button class="shX" id="shX" aria-label="關閉">✕</button>
-    <div class="shKDh"><img src="${opIcon(b)}" alt=""><div><small>${OPC[b].side==='A'?'進攻':'防守'}技能 · 來自 ${esc(OPC[b].name)}</small><h3>${esc(skName(b))}</h3></div></div>
-    <p>${skText(b)}</p><p class="shKUse big">${skUse(b,1)}</p><p class="shNote">裝備在自訂幹員的技能格${SKCLS[b]?`，只有${WPN[SKCLS[b]].t}能裝備`:''}。買過可以隨時更換。</p>
+function skDet(el,b){const own=ECO.sk.includes(b),ok=ECO.rn>=SKPRICE,n=OPS[b].ch,sd=OPC[b].side;el.hidden=false;el.dataset.side='S';
+  const tags=[n>50?'次數無限':`每場 ${n} 次`,'1 行動點',...(setupGadget(b)?['佈防時免費']:[])].map(t=>`<span>${t}</span>`).join('')+(SKCLS[b]?`<span class="w">限${WPN[SKCLS[b]].t}</span>`:'');
+  const txt=String(skText(b)).split(/(?=〔)/).map(t=>{const m=t.match(/^〔(.+?)〕\s*(.*)$/s);return m?`<p><b>${m[1]}</b>${m[2]}</p>`:`<p>${t}</p>`;}).join('');
+  el.innerHTML=`<div class="shDBox shKD ${sd}" role="dialog" aria-label="${esc(skName(b))}"><button class="shX" id="shX" aria-label="關閉">✕</button>
+    <div class="shKDh"><span class="shKDi"><img src="${opIcon(b)}" alt=""></span><div><small><i class="sd ${sd}"></i>${sd==='A'?'進攻':'防守'}技能 · ${esc(OPC[b].name)}</small><h3>${esc(skName(b))}</h3></div></div>
+    <div class="shKDm">${tags}</div><div class="shKDt">${txt}</div><p class="shKDn">裝備在自訂幹員的技能格，買過可以隨時更換。</p>
     ${own?`<div class="shCta own"><span class="shOwn"><i class="shOk">✓</i>已擁有</span><span class="shNote">到「自訂幹員」頁裝備</span></div>`
       :`<div class="shCta"><div class="shPrice">${RNI}<b>${fmtN(SKPRICE)}</b></div><button class="shBuy" id="shBuy" ${ok?'':'disabled'}>${ok?'購買':'聲望不足'}</button><span class="shNote">${ok?`購買後剩 ${fmtN(ECO.rn-SKPRICE)}`:`還差 ${fmtN(SKPRICE-ECO.rn)}`}</span></div>`}</div>`;
   el.onclick=e=>{if(e.target===el){SHOP.sel=null;renderShopDet();}};$('#shX').onclick=()=>{SHOP.sel=null;renderShopDet();};
