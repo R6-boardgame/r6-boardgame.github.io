@@ -6,7 +6,7 @@
 
 - 《Rainbow Six Siege – The Board Game》的網頁版，可對戰電腦、新手教學、自訂房間連線、排名戰、成就、商店。
 - 線上版：https://r6-boardgame.github.io/ （GitHub Pages，`main` 分支根目錄直接發佈，推上去就上線）。
-- 目前版本 v93（見 `git log`）。
+- 目前版本 v94（見 `git log`）。
 - 使用者要求：PR 做完、測完就直接合併上線，不用再問。
 
 ## 檔案結構
@@ -50,7 +50,7 @@
 1. 直接改 `index.html`（從現在起它就是唯一原始碼）。
 2. 本機測試：`python3 -m http.server` 後開 `http://localhost:8000/`。至少測兩種尺寸：**手機直式 390×844** 與 **桌機 1400×900**。
 3. 自動化測試建議用 Playwright：開頁 → `#t-pve` 進入對戰電腦 → 可在 `page.evaluate` 裡直接呼叫全域函式（例如 `WZ.step=2;renderWiz()` 跳到選地圖），截圖確認並收集 `pageerror`，必須沒有錯誤。
-4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v94）。
+4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v95）。
 
 ### 舊流程說明（只是背景，不需要照做）
 
@@ -107,6 +107,7 @@
 - v91：自訂幹員第一版（規格見 Claude Doc「自訂幹員規格」）。首頁「自訂幹員」開 `#cop` 頁（`openCop`/`renderCop`）：兩名幹員（幹員一女 `img/cop/f.webp`、幹員二男 `img/cop/m.webp`），存在 `ECO.cop[0/1]`（`nm/e/k/sv/d/arm/run/vis/g/sk`）。點數 = 10 + 擊殺（上限 34），骰子三段各 1 顆免費黃骰、每段 ≤5、合計 ≤10，點骰子升級 Y→O→R；裝甲 1～3 級（血 4/5/6、步數 6/5/4、奔跑上限 5/3/2，超過自動退回）；視野 120°+5°/點（最多 4 點）。「＋」新增的格子閃爍，「確認」才存；每列「−」退回該列上一步（`CP.st`）。五邊形與 N/R/SR/SSR/UR 用 `copScore`。重新訓練 500 聲望。攜帶道具 2 格（通用道具，攻守都能用：同一方的加進全隊數量 `copGear`，另一方的放在幹員身上 `u.gi`，用 `giBorrow` 暫借共用計數；闊刀、防彈攝影機、盾牌的 side 改成跟放的人）；技能格開技能收藏頁（技能攻守都能用），技能 8000 聲望（`ECO.sk`，商店多「技能」分頁 `SHOP.side==='S'`）。遊戲內：新進人員卡片＝自訂幹員（rifle 卡＝幹員一、shotgun 卡＝幹員二，選角頁「卡片版本」改成「幹員一／幹員二」，`copCard`），只在對戰電腦套用（`copPrep(true)`；線上 `copPrep(false)` 還原卡片數值）。每名幹員可有自己的視野角 `u.fh` 與技能 `u.sk`（`gTargets`/`useGadget` 外包一層暫時把 `u.op` 換成技能幹員）。結算 `copEnd`：擊殺加點；陣亡就重置成「炮灰」（技能與道具保留），中途離開不算陣亡。轉職武器還沒做。
 - v92：自訂幹員轉職。`WPN`（mg 機槍／sh 盾牌／sg 散彈／rf 步槍／sn 狙擊／smg 衝鋒）各有隱藏條件 `trig`，按「確認」後新達成的那個（`WORD` 順序，機槍優先）跳轉職框（`CP.sheet={t:'w'}`：圖、專屬圖示、說明、異動、退回點數），轉職用 `wApply` 套上限（`bMax`/`bNoR`/`runCap`，多的骰子從弱的退）。存在 `c.w`，重新訓練與陣亡清掉。男生轉職圖 `img/cop/m_<w>.webp`（盾牌和女生沿用原圖，`copArt`）。效果：機槍三段各多 1 顆免費黃骰（`copDice`，每段上限 7）；盾牌受傷 −2、不能跑；散彈 dz 2、隔牆射擊直接打掉軟牆；步槍 180° + 穩定射擊（`askPickDie`，射擊後點一顆骰子重擲）；狙擊 `u.vr=14`（`VR` 先看 `u.vr`）；衝鋒槍第二槍（`canDo` 放行、`u._s2`、`u._half` 時 `shotPool` 擲一半）。職業限定技能 `SKCLS`/`skFit`（可買，不符時圖示壓「職業不符」、不能裝）。Glaz 翻轉瞄具開放（限狙擊手）：`UG.glaz` 切換 `u.pd`（中遠骰互換）與視野 180°/10 格，再按切回。女生轉職圖 `img/cop/f_<w>.webp`。職業技能 `CSK`（每回合 1 次，行動欄按鈕，`useCsk`）：機槍「架槍」（1 行動，`u.mgOw`：不能再移動、不結束行動，整個視野都算掩護射擊，`riposte` 跳過半平面判定）、步槍「精準射擊」（免費，`u.aim` 下一槍掩護 0）、狙擊「熱感瞄準」（1 行動，`heat` 模式選方向，`heatScan` 把扇形內敵人記成無名標記 `G.heat`／`heatPins`，到回合結束）、衝鋒「衝刺」（1 行動，移動點補滿，`u.noShoot`）；盾牌「盾牌猛擊」（1 行動，`bash` 模式選方向，`shieldBash`：衝兩格、打第三格，撞破軟牆路障、撞爆掩護 `wreckCover`，撞人 2 傷，背後是牆再 1 傷暈眩，背後有人 1 傷暈眩）、散彈「榴彈發射」（1 行動，`gl` 模式用投擲範圍，`grenadeLaunch`：3×3 兩傷敵我都算，鐵牆與轉角柱 `pillarC` 以外全毀）。被炸毀的家具記在 `G.propGone`（`propOn` 決定 2D/3D 畫不畫）。Buck 限步槍。技能收藏頁改成一頁捲動，卡片和商店顯示次數與行動點（`skUse`）。道具模型照參考圖重做：Frost 捕獸夾、Mute 干擾器、Maestro 邪眼（`evilEye3D`）、Jäger 主動防禦系統改成佈防時裝在牆上的道具 `ads`（`ads3D`，每台攔 2 次，`catchThrow` 看道具 3 格內）；邪眼和 ADS 放置跟防彈攝影機一樣選牆（`wallGadget`、`G.bpEye` 走 `bpface`，`g.wall`）。
 - v93：商店技能詳情框重排（`skDet`：`.shDBox.shKD` 改成直排卡片，標籤列 `.shKDm` 顯示次數、行動點、職業限制，說明按〔被動〕〔行動〕分段）。
+- v94：軟牆彈孔改成真的洞：`holeWall` 用細柱子圍出不規則開口（`rng(hash)` 決定形狀），邊緣碎片、地上碎屑；2D 也畫出破口。`los`／`wallSolid` 把 `c.hole` 的軟牆當成可看穿（跟打開的黑鏡一樣），所以隔著彈孔看得到、打得到（仍算輕型掩護 1）。
 
 ## 尚未完成 / 等使用者回覆
 
