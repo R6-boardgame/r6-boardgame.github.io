@@ -8240,7 +8240,7 @@ const SKSKIP=new Set(['rook','montagne','tachanka','glaz','blitz','clash','doc']
 let SKL=null;function copSkills(){if(!SKL)SKL=OPBASE.filter(b=>SCRIPTED.has(b)&&!NOBTN.has(b)&&!SKSKIP.has(b)).filter(b=>{ensureOp(b);return OPS[b].g&&OPS[b].ch>0;});return SKL;}
 const skName=b=>(OPC[b]&&OPC[b].zh.g)||OPS[b].g;
 const skText=b=>(typeof GDX!=='undefined'&&GDX[b])?GDX[b][0]:(OPS[b].gd||'');
-function copSkOn(c,side){const k=c.sk;if(!k||!ECO.sk.includes(k)||!OPC[k]||OPC[k].side!==side)return null;ensureOp(k);return k;}
+function copSkOn(c,side){const k=c.sk;if(!k||!ECO.sk.includes(k)||!OPC[k])return null;ensureOp(k);return k;}
 // game hooks: PvE gets the trained numbers on the recruit cards, online games keep the printed cards
 const COPDEF={};
 function copPrep(on){copAll();for(const s of ['a','d'])['rifle','shotgun'].forEach((w,i)=>{const id=`recruit_${s}_${w}`,side=s==='a'?'A':'D';if(!OPC[id])return;ensureOp(id);
@@ -8263,7 +8263,7 @@ function copEnd(lines){if(!G||G.net||G.tut)return;const u=G.units.find(u=>u.side
 // card shown in operator select for the recruits: the player's own operator
 function copCard(c){const i=copSlot(c&&c.id);if(i==null)return c;const o=copAll()[i],st=copStat(o),sk=copSkOn(o,c.side);
   return {...c,name:o.nm,org:'自訂幹員',real:'',w:o.d.map(b=>b.slice()),st:st.hp,run:st.run,dz:'Y',shield:false,up:null,
-    zh:{...c.zh,role:'自訂幹員',g:sk?skName(sk):'',x:sk?skText(sk):(o.sk?'裝備的技能屬於另一方，這一方不生效':'到「自訂幹員」頁裝備技能')},g:{...c.g,name:'',charges:sk?OPS[sk].ch:0,ab:[]}};}
+    zh:{...c.zh,role:'自訂幹員',g:sk?skName(sk):'',x:sk?skText(sk):'到「自訂幹員」頁裝備技能'},g:{...c.g,name:'',charges:sk?OPS[sk].ch:0,ab:[]}};}
 
 // ---------- custom operator page ----------
 const CP={i:0,dr:null,st:{},sheet:null,skTab:'all',skPg:0,skSel:null,edit:false};
@@ -8333,7 +8333,7 @@ function cpSkillPage(){const L=copSkills(),own=b=>ECO.sk.includes(b),c=copAll()[
     <div class="cpTabs">${[['all','全部'],['A','進攻'],['D','防守'],['own','已擁有']].map(([k,t])=>`<button data-st="${k}" class="${CP.skTab===k?'on':''}">${t}</button>`).join('')}</div>
     <div class="cpSg">${pg.map(b=>`<button class="cpSk ${own(b)?'own':'lock'} ${sel===b?'sel':''} ${c.sk===b&&own(b)?'eq':''}" data-sk="${b}"><i class="sd ${OPC[b].side}"></i><span class="ic"><img src="${opIcon(b)}" alt=""></span><span class="n">${esc(skName(b))}</span><span class="pr">${c.sk===b&&own(b)?'裝備中':own(b)?'已擁有':fmtN(SKPRICE)}</span></button>`).join('')||'<p class="cpNote">還沒有技能，到商店「技能」分頁購買。</p>'}</div>
     ${pages>1?`<div class="cpPg"><button data-sp="-1" ${CP.skPg?'':'disabled'} aria-label="上一頁">‹</button><span>${CP.skPg+1} / ${pages}</span><button data-sp="1" ${CP.skPg<pages-1?'':'disabled'} aria-label="下一頁">›</button></div>`:''}
-    ${sel?`<div class="cpDet"><img src="${opIcon(sel)}" alt=""><div><b>${esc(skName(sel))}</b><small>${esc(OPC[sel].name)} · 只在${OPC[sel].side==='A'?'進攻':'防守'}時生效${OPS[sel].ch?` · ${OPS[sel].ch} 次`:''}</small><p>${skText(sel)}</p></div></div>`:`<div class="cpDet empty">點技能看說明。買過的技能可以隨時更換。</div>`}
+    ${sel?`<div class="cpDet"><img src="${opIcon(sel)}" alt=""><div><b>${esc(skName(sel))}</b><small>${esc(OPC[sel].name)} · 攻守都能用${OPS[sel].ch?` · ${OPS[sel].ch} 次`:''}</small><p>${skText(sel)}</p></div></div>`:`<div class="cpDet empty">點技能看說明。買過的技能可以隨時更換。</div>`}
     <div class="cpFoot">${sel&&own(sel)?`<button class="cpBtn g" id="cpSkOff" ${c.sk?'':'disabled'}>卸下</button><button class="cpBtn p" id="cpSkEq" ${c.sk===sel?'disabled':''}>${c.sk===sel?'裝備中':'裝備'}</button>`
       :`<button class="cpBtn g" id="cpSkShop">前往商店</button><button class="cpBtn p" id="cpSkBuy" ${sel&&ECO.rn>=SKPRICE?'':'disabled'}>${sel?(ECO.rn>=SKPRICE?`購買 ${fmtN(SKPRICE)} 聲望`:'聲望不足'):'選一個技能'}</button>`}</div></div>`;}
 function skBuy(b){if(!b||ECO.sk.includes(b)||ECO.rn<SKPRICE)return false;ECO.rn-=SKPRICE;ECO.sk.push(b);ecoSave();try{SFX.round&&SFX.round();}catch(e){}try{renderPlayer();}catch(e){}return true;}
@@ -8375,7 +8375,7 @@ function skCard(b){const own=ECO.sk.includes(b);return `<button class="shC shK $
 function skDet(el,b){const own=ECO.sk.includes(b),ok=ECO.rn>=SKPRICE;el.hidden=false;el.dataset.side='S';
   el.innerHTML=`<div class="shDBox shKD" role="dialog" aria-label="${esc(skName(b))}"><button class="shX" id="shX" aria-label="關閉">✕</button>
     <div class="shKDh"><img src="${opIcon(b)}" alt=""><div><small>${OPC[b].side==='A'?'進攻':'防守'}技能 · 來自 ${esc(OPC[b].name)}</small><h3>${esc(skName(b))}</h3></div></div>
-    <p>${skText(b)}</p><p class="shNote">裝備在自訂幹員的技能格，只在${OPC[b].side==='A'?'進攻':'防守'}時生效${OPS[b].ch?`，每場 ${OPS[b].ch} 次`:''}。買過可以隨時更換。</p>
+    <p>${skText(b)}</p><p class="shNote">裝備在自訂幹員的技能格，攻守都能用${OPS[b].ch?`，每場 ${OPS[b].ch} 次`:''}。買過可以隨時更換。</p>
     ${own?`<div class="shCta own"><span class="shOwn"><i class="shOk">✓</i>已擁有</span><span class="shNote">到「自訂幹員」頁裝備</span></div>`
       :`<div class="shCta"><div class="shPrice">${RNI}<b>${fmtN(SKPRICE)}</b></div><button class="shBuy" id="shBuy" ${ok?'':'disabled'}>${ok?'購買':'聲望不足'}</button><span class="shNote">${ok?`購買後剩 ${fmtN(ECO.rn-SKPRICE)}`:`還差 ${fmtN(SKPRICE-ECO.rn)}`}</span></div>`}</div>`;
   el.onclick=e=>{if(e.target===el){SHOP.sel=null;renderShopDet();}};$('#shX').onclick=()=>{SHOP.sel=null;renderShopDet();};
