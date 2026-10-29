@@ -6799,14 +6799,16 @@ function visFx3D(){const play=G.phase==='play'&&!G.over;
   const pk=[sel.id,sel.x,sel.y,(sel.fd||[]).join(','),G._wv||0,key,R3.wall].join('|');if(pu.key===pk&&R3.glowG)return;pu.key=pk;
   const S=pu.S,c=pu.ctx,r=visRays(sel),[ox,oy]=r.o;c.clearRect(0,0,pu.cv.width,pu.cv.height);
   if(R3.glowG){R3.scene.remove(R3.glowG);R3.glowG.traverse(o=>{if(o.geometry)o.geometry.dispose();});}R3.glowG=glowRibbons(r);R3.scene.add(R3.glowG);
-  const ev=PROF[sel.op].d.map(b=>[...b].reduce((a,ch)=>a+(DIEV[ch.toUpperCase()]||0),0)),lv=ev.map(e=>Math.max(0,Math.min(1,(e-2)/5)));
-  const al=d=>{const cs=[1.75,5,(6.5+r.R)/2];let v;if(d<=cs[0])v=lv[0];else if(d<=cs[1]){let t=(d-cs[0])/(cs[1]-cs[0]);t=t*t*(3-2*t);v=lv[0]+(lv[1]-lv[0])*t;}else if(d<=cs[2]){let t=(d-cs[1])/(cs[2]-cs[1]);t=t*t*(3-2*t);v=lv[1]+(lv[2]-lv[1])*t;}else v=lv[2];
-    return (.14+.5*v)*(d<r.R-2?1:Math.max(0,(r.R+.5-d)/2.5));};
+  const ev=PROF[sel.op].d.map(b=>[...b].reduce((a,ch)=>a+(DIEV[ch.toUpperCase()]||0),0)),rk=[...new Set(ev)].sort((a,b)=>a-b),lv=ev.map(e=>rk.length<2?.5:rk.indexOf(e)/(rk.length-1));
+  // three flat bands (1–3, 4–6, 7+) with only a short blend at 3.5 and 6.5, faint fade at the very end
+  const al=d=>{const sm=(e,w)=>{const t=Math.max(0,Math.min(1,(d-e+w)/(2*w)));return t*t*(3-2*t);};const a=sm(3.5,.12),b=sm(6.5,.12);
+    const v=lv[0]+(lv[1]-lv[0])*a+(lv[2]-lv[1])*b;return (.13+.36*v)*Math.max(0,Math.min(1,(r.R+.5-d)/.6));};
   const poly=()=>{c.beginPath();c.moveTo(ox*S,oy*S);for(const [x,y] of r.pts)c.lineTo(x*S,y*S);c.closePath();};
   c.save();poly();c.clip();
-  const lg=c.createRadialGradient(ox*S,oy*S,0,ox*S,oy*S,r.R*S);lg.addColorStop(0,'rgba(255,236,200,.22)');lg.addColorStop(1,'rgba(255,236,200,0)');c.fillStyle=lg;c.fillRect(0,0,pu.cv.width,pu.cv.height);
-  const g=c.createRadialGradient(ox*S,oy*S,0,ox*S,oy*S,(r.R+.5)*S);for(let i=0;i<=24;i++){const d=(r.R+.5)*i/24;g.addColorStop(i/24,`rgba(232,52,40,${al(d).toFixed(3)})`);}
-  c.fillStyle=g;c.fillRect(0,0,pu.cv.width,pu.cv.height);c.restore();
+  const lg=c.createRadialGradient(ox*S,oy*S,0,ox*S,oy*S,r.R*S);lg.addColorStop(0,'rgba(255,236,200,.12)');lg.addColorStop(1,'rgba(255,236,200,0)');c.fillStyle=lg;c.fillRect(0,0,pu.cv.width,pu.cv.height);
+  const g=c.createRadialGradient(ox*S,oy*S,0,ox*S,oy*S,(r.R+.5)*S);for(let i=0;i<=160;i++){const d=(r.R+.5)*i/160;g.addColorStop(i/160,`rgba(232,52,40,${al(d).toFixed(3)})`);}
+  c.fillStyle=g;c.fillRect(0,0,pu.cv.width,pu.cv.height);
+  c.globalCompositeOperation='destination-out';c.beginPath();c.arc(ox*S,oy*S,S*.42,0,Math.PI*2);c.fill();c.globalCompositeOperation='source-over';c.strokeStyle='rgba(255,220,200,.55)';c.lineWidth=S*.05;for(const b of [3.5,6.5])if(b<r.R){c.beginPath();c.arc(ox*S,oy*S,b*S,0,Math.PI*2);c.stroke();}c.restore();
   c.save();poly();c.strokeStyle='rgba(255,226,190,.22)';c.lineWidth=S*.04;c.stroke();c.restore();
   // walls caught by the fan glow
   c.save();c.lineCap='round';c.lineJoin='round';c.strokeStyle='rgba(255,214,110,.95)';c.shadowColor='rgba(255,200,90,1)';c.shadowBlur=S*.5;c.lineWidth=S*.09;
