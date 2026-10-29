@@ -6,7 +6,7 @@
 
 - 《Rainbow Six Siege – The Board Game》的網頁版，可對戰電腦、新手教學、自訂房間連線、排名戰、成就、商店。
 - 線上版：https://r6-boardgame.github.io/ （GitHub Pages，`main` 分支根目錄直接發佈，推上去就上線）。
-- 目前版本 v86（見 `git log`）。
+- 目前版本 v87（見 `git log`）。
 
 ## 檔案結構
 
@@ -49,7 +49,7 @@
 1. 直接改 `index.html`（從現在起它就是唯一原始碼）。
 2. 本機測試：`python3 -m http.server` 後開 `http://localhost:8000/`。至少測兩種尺寸：**手機直式 390×844** 與 **桌機 1400×900**。
 3. 自動化測試建議用 Playwright：開頁 → `#t-pve` 進入對戰電腦 → 可在 `page.evaluate` 裡直接呼叫全域函式（例如 `WZ.step=2;renderWiz()` 跳到選地圖），截圖確認並收集 `pageerror`，必須沒有錯誤。
-4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v87）。
+4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v88）。
 
 ### 舊流程說明（只是背景，不需要照做）
 
@@ -98,6 +98,7 @@
 - v84：進攻方踩到鐵絲網扣 1 血並結束啟動；破壞可重複使用（`canDo` 對 destroy 不看 used，只花行動點），鐵絲網仍要相鄰（`isBP`）。電腦防守方部署時隨機用 5 次調整場景（封鐵牆 `rfR`、移攝影機 `moved`、拆路障 `unbar`），寫在 `autoDefSetup`。
 - v85：防守方部署階段把所有防守幹員的部署道具都列成按鈕（顯示幹員名與剩餘數），點了會自動切到那名幹員進入放置模式，不用先選幹員。
 - v86：Kapkan 入口引爆裝置只能放門窗，改成只有防守方看得到的發光紅線（路障兩面都看得到）；進攻方經過就爆炸、擲 1～2 點傷害，進攻方看不到也點不到，但 Thatcher EMP 等技能可摧毀。
+- v87：開場先有登入頁（Google／訪客）；首頁「新手教學」換成「自訂幹員」（即將推出）。第一次進來走腳本式教學：招呼語 → 引導選進攻、人質、銀行 → Ash 一打二電腦（固定步驟、聚光遮罩、可跳過）→ 回主頁引導到作戰檔案的規則。網址加 ?tutorial 可重看。教學程式在 scratchpad v22/tu/。
 
 ## 尚未完成 / 等使用者回覆
 

@@ -665,6 +665,41 @@ body[data-scr="setup"] header.top{visibility:hidden}
 .tqueue .ring{width:74px;height:74px;border-radius:50%;border:3px solid rgba(227,170,62,.25);border-top-color:var(--accent);animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .tqueue b{font:700 30px/1 var(--mono)}.tqueue span{color:#c7d1da;font-size:13px}
+/* v87: login screen and first-run tutorial spotlight */
+.login{position:fixed;inset:0;z-index:9500;display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));background:#06090d;transition:opacity .4s}
+.login.out{opacity:0;pointer-events:none}
+.lgBg{position:absolute;inset:0;background:center/cover no-repeat;filter:brightness(.4) saturate(.9);transform:scale(1.04)}
+.login::after{content:'';position:absolute;inset:0;background:radial-gradient(90% 70% at 50% 40%,rgba(6,9,13,.15),rgba(6,9,13,.9));pointer-events:none}
+.lgBox{position:relative;z-index:1;width:min(420px,100%);display:flex;flex-direction:column;align-items:center;gap:26px}
+.lgLogo{display:flex;flex-direction:column;align-items:center;gap:10px}
+.lgR6{width:min(260px,64vw);height:auto}
+.lgLg{display:flex;align-items:center;gap:12px}.lgSix{width:60px;height:auto}
+.lgLg small{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--accent)}
+.lgLg h1{margin:2px 0 0;font-family:var(--display);font-size:30px;line-height:1.05;letter-spacing:.06em;color:#fff}
+.lgBtns{width:100%;display:flex;flex-direction:column;gap:12px}
+.lgBtn{display:flex;align-items:center;gap:14px;width:100%;min-height:70px;padding:10px 18px;text-align:left;background:rgba(14,20,27,.88);border:1px solid rgba(255,255,255,.18);border-radius:0;color:#fff;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
+.lgBtn b{display:block;font-size:17px;letter-spacing:.02em}.lgBtn small{display:block;font-size:12.5px;color:#a9b6c2;margin-top:3px;font-weight:400}
+.lgBtn.g{border-color:var(--accent);background:linear-gradient(90deg,rgba(227,170,62,.24),rgba(14,20,27,.9) 70%)}
+.lgIc{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#fff;color:#4285f4;font:700 20px/1 Arial,sans-serif;font-style:normal}
+.lgBtn:not(.g) .lgIc{background:#2a3642;color:#dfe7ee;font-size:16px}
+.lgBtn:disabled{opacity:.55}
+.lgErr{min-height:1.2em;margin:0;color:var(--danger);font-size:13px;text-align:center}
+@media (orientation:landscape) and (max-height:520px){.lgBox{flex-direction:row;width:min(780px,100%);gap:32px}.lgLogo,.lgBtns{flex:1}}
+#tuO{position:fixed;inset:0;z-index:9000;pointer-events:none}#tuO *{box-sizing:border-box}
+#tuO .tuM{position:fixed;background:rgba(3,6,9,.74);pointer-events:auto}
+#tuO.clear .tuM{background:transparent}
+#tuO .tuB{position:fixed;pointer-events:auto}
+#tuO .tuR{position:fixed;border:2px solid #ffc850;border-radius:6px;box-shadow:0 0 0 3px rgba(255,200,80,.35),0 0 24px 6px rgba(255,190,70,.45);animation:tuRing 1.2s ease-in-out infinite;pointer-events:none}
+@keyframes tuRing{50%{box-shadow:0 0 0 6px rgba(255,200,80,.15),0 0 34px 12px rgba(255,190,70,.28)}}
+#tuO .tuD{position:fixed;width:min(360px,calc(100vw - 24px));padding:12px 14px 14px;background:linear-gradient(180deg,#141d26,#0b1117);border:1px solid rgba(227,170,62,.75);box-shadow:0 14px 36px rgba(0,0,0,.6);color:#e8eef3;pointer-events:auto;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+#tuO .tuH{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+#tuO .tuH small{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--accent)}
+#tuO .tuH button{padding:5px 11px;font-size:12.5px;min-height:0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.3);color:#d3dce4}
+#tuO .tuT{display:block;font-family:var(--display);font-size:21px;letter-spacing:.04em;color:#fff}
+#tuO .tuD p{margin:4px 0 0;font-size:14.5px;line-height:1.55}
+#tuO .tuD .primary{margin-top:12px;width:100%;min-height:42px;font-size:16px;justify-content:center;text-align:center}
+#tuO.big .tuD{width:min(460px,calc(100vw - 24px));padding:16px 18px 18px}#tuO.big .tuD p{font-size:16px;line-height:1.75}
+
 /* tutorial card: centred over the board, with the next thing to press glowing */
 .tutbox{left:calc((100% - 350px)/2)!important;top:70px!important;bottom:auto!important;transform:translateX(-50%);width:min(560px,calc(100% - 400px))!important;border-width:2px!important;box-shadow:0 0 0 1px rgba(227,170,62,.3),0 0 40px rgba(227,170,62,.18),0 18px 40px rgba(0,0,0,.6)!important;text-align:center}
 .tutbox h3{font-size:20px!important}.tutbox p{font-size:14.5px!important}.tutbox .tuthead{text-align:left}
@@ -3818,6 +3853,7 @@ function askReroll(hits){return new Promise(res=>{const el=document.createElemen
 async function shootUnit(sh,t,ow){
   const {d,b,p,pool}=shotPool(sh,t),tw=thruWall(sh,t);if(tw){if(!sh.spotted)log(`${nm(sh)} 隔牆開火，位置被標記`,'ks');sh.spotted=1;sh.wmark=1;}else if(sh.hidden)reveal(sh,ow?'還擊時':'開火時');
   let idx=[...pool].map(()=>Math.floor(Math.random()*6)),rolls=[...pool].map((ch,i)=>DIE[ch.toUpperCase()][idx[i]]),sum=rolls.reduce((a,c)=>a+c,0),hits=Math.max(0,sum-p);
+  if(G.tut2){const w=tuRigW(sh,t);if(w!=null){idx=tuRig(pool,p,w);rolls=[...pool].map((ch,i)=>DIE[ch.toUpperCase()][idx[i]]);sum=rolls.reduce((a,c)=>a+c,0);hits=Math.max(w,sum-p);}}
   sh.fd=[Math.sign(t.x-sh.x),Math.sign(t.y-sh.y)];
   let dice=[...pool].map((ch,i)=>`<i class="die${ch>'Z'?' bolt':''}" style="background:${DIEC[ch.toUpperCase()]}">${rolls[i]}</i>`).join('');
   const cine=await shotCam(sh,t);if(!cine)aimCam(sh,[t],1);const si=await shotIntro(sh,t,G.ai||ow,cine);
@@ -3889,7 +3925,7 @@ function checkWin(){
   if(G.over||G._boom)return;
   if(G.defuser&&G.defuser.by&&!dfU()){G.units.forEach(x=>{if(!x.alive)x.defusing=false;});G.defuser.by=null;log('拆彈中斷！','ka');if(G.defuser.timer<=0)return bombBoom();}
   if(!alive('A').length){if(G.defuser&&alive('D').length){if(!G._aDead){G._aDead=1;log('進攻方全員陣亡，但拆彈器還在運作，必須拆除！','ks');bigNote('進攻方全滅','拆彈器還在運作，必須拆除','bomb',2400);}return;}return finish('D','進攻方全員陣亡');}
-  if(!alive('D').length)return finish('A','防守方全員陣亡');
+  if(!alive('D').length&&!G.tut2)return finish('A','防守方全員陣亡');
 }
 function showAnalysis(w,why){if(!G||!G.over||G.tut)return;let o=$('#anal');if(o)o.remove();o=document.createElement('div');o.id='anal';o.setAttribute('role','dialog');o.setAttribute('aria-label','戰鬥分析');
   const pct=(a,b)=>b?Math.round(a/b*100)+'%':'–',sc=u=>{const s=ST(u);return s.dmg+s.k*3+s.gad;};
@@ -3908,7 +3944,7 @@ function showAnalysis(w,why){if(!G||!G.over||G.tut)return;let o=$('#anal');if(o)
   $('#anHome').onclick=()=>{o.remove();$('#banner').hidden=true;goTitle();};
   o.querySelectorAll('.anFr').forEach(b=>b.onclick=()=>frTap(b));
   if($('#anAgain'))$('#anAgain').onclick=()=>{o.remove();$('#banner').hidden=true;newGame();};}
-function finish(w,why){
+function finish(w,why){if(G&&G.tut2)return tuFinish(w,why);
   try{achFinish(w);}catch(e){console.warn(e);}
   G.over=true;G.busy=false;G.active=null;G.win=w;G.why=why;SFX.music(-1);SFX.win(w===G.player);
   if(!(NET&&NET.applying))log(`${w==='A'?'進攻方':'防守方'}勝利：${why}`,'ks');
@@ -4247,7 +4283,7 @@ function endPhase(){
   if(G.phaseIdx>=4){
     G.phaseIdx=0;
     if(G.round>=G.maxRounds&&!G.defuser){render();return finish('D',G.mission==='hostage'?'時間耗盡，人質沒有被救出':'時間耗盡，進攻方沒有完成任務');}
-    G.round++;G.units.forEach(u=>{u._k=0;u.activated=false;u.spotted=0;u.wmark=0;u.owHit=null;u.stun=false;if(u.defusing&&u.alive)u.activated=true;});G.gadgets.forEach(g=>{if(g.type==='smk')g.alive=false;});
+    G.round++;G.units.forEach(u=>{u._k=0;u.activated=false;if(!(G.tut2&&u.side==='D')){u.spotted=0;u.wmark=0;}u.owHit=null;u.stun=false;if(u.defusing&&u.alive)u.activated=true;});G.gadgets.forEach(g=>{if(g.type==='smk')g.alive=false;});
     log(`—— 第 ${G.round} 輪開始 ——`,'ks');SFX.round();bigNote(`第 ${G.round} 輪`,G.round===G.maxRounds?'最後一輪':`共 ${G.maxRounds} 輪`,'r',1300);if(G.clock)clockReset();
   }
   startPhase();
@@ -4257,9 +4293,9 @@ function startPhase(){
   const s=curSide();
   if(!unspent(s).length||(G.clock&&G.clock[s]<=0)){render();return setTimeout(endPhase,50);}
   if(G.net&&s!==G.player){G.ai=false;G.busy=false;G.sel=null;render();return;}
-  if(G.tut&&s!==G.player){log('防守方階段（教學中防守方不行動）','kd');render();return setTimeout(endPhase,400);}
+  if(G.tut2&&s!==G.player)return tuDPhase();if(G.tut&&s!==G.player){log('防守方階段（教學中防守方不行動）','kd');render();return setTimeout(endPhase,400);}
   if(s!==G.player){G.ai=true;render();setTimeout(runAI,350);}
-  else{G.ai=false;G.busy=false;G.sel=null;G.mode='move';render();}
+  else{G.ai=false;G.busy=false;G.sel=null;G.mode='move';if(G.tut2)tuAPhase();render();}
 }
 
 // ---------- AI ----------
@@ -4560,7 +4596,7 @@ async function act(fn){G.busy=true;render();try{await fn();}finally{G.busy=false
   revealCheck();
 }
 async function onCell(x,y){
-  if(!G||G.over||G.busy)return;
+  if(!G||G.over||G.busy)return;if(TU&&TU.ph==='game'){const q=tuCellOK(x,y);if(!q)return;x=q[0];y=q[1];}
   if(G.mode==='shdir'&&G.shdir){const g=G.shdir;if(adj4(g.x,g.y).some(([a,b])=>a===x&&b===y)){g.dir=[x-g.x,y-g.y];log(`盾牌正面朝${dirName(g.dir)}，只擋這一側的半圓`,'kd');G.shdir=null;G.mode=G.phase==='setup'&&G.shield>0?'shield':'move';render();}return;}
   if(G.mode==='owq')return owqTap(x,y);
   const u=G.sel,c=cell(x,y),k=`${x},${y}`;
@@ -6828,9 +6864,9 @@ function renderTitle(){
   const el=$('#tmenu');if(!el)return;if(SCREEN==='rank')SCREEN='title';{const tt=$('#title');if(tt)tt.dataset.s=SCREEN;}const B=(id,label,sub,cls)=>`<button id="${id}" class="tbtn ${cls||''}"><b>${label}</b>${sub?`<span>${sub}</span>`:''}</button>`;
   let h='';if(SCREEN==='task')h=taskHTML()+B('t-back','返回','',' ghost');
   const ops=k=>cfg.picks[k].map(x=>`<img src="${opIcon(x)}" alt="${(OPC[x]||OPS[x]).name}" title="${(OPC[x]||OPS[x]).name}">`).join('');
-  if(SCREEN==='title')h=B('t-rank','線上對戰','PVP · 自動配對對手','primary')+B('t-pve','對戰電腦','PVE · 選陣營、地圖與幹員')+B('t-shop','商店','用聲望解鎖幹員')+B('t-tut','新手教學','第一次玩從這裡開始')+B('t-lib','作戰檔案',`規則 · ${OPBASE.length} 名幹員圖鑑 · 成就`);
+  if(SCREEN==='title')h=B('t-rank','線上對戰','PVP · 自動配對對手','primary')+B('t-pve','對戰電腦','PVE · 選陣營、地圖與幹員')+B('t-shop','商店','用聲望解鎖幹員')+B('t-cop','自訂幹員','即將推出')+B('t-lib','作戰檔案',`規則 · ${OPBASE.length} 名幹員圖鑑 · 成就`);
   else if(SCREEN==='lib')h=`<h2 class="tsec">作戰檔案</h2>`+B('t-man','規則','本遊戲玩法','primary')+B('t-ops','幹員圖鑑',`共 ${OPBASE.length} 名幹員`)+B('t-ach','成就',`已解鎖 ${achCount()}/${ACH.length}`)+B('t-back','返回','',' ghost');
-  else if(SCREEN==='rank'){if(ME.mode!=='account')h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(null,40)}<div><b>排名戰需要登入帳號</b><br><span>登入後，段位與戰績會存在這個遊戲的共用資料裡。訪客可以玩其他所有模式。</span></div></div></div>`+B('t-login','登入帳號','啟用線上身分','primary')+B('t-back','返回','',' ghost');
+  else if(SCREEN==='cop')h=`<h2 class="tsec">自訂幹員</h2><p class="tnote">打造屬於自己的幹員。功能還在設計中，敬請期待。</p>`+B('t-back','返回','',' ghost');else if(SCREEN==='rank'){if(ME.mode!=='account')h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(null,40)}<div><b>排名戰需要登入帳號</b><br><span>登入後，段位與戰績會存在這個遊戲的共用資料裡。訪客可以玩其他所有模式。</span></div></div></div>`+B('t-login','登入帳號','啟用線上身分','primary')+B('t-back','返回','',' ghost');
     else{fillPicks('A');fillPicks('D');h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(ME.rating,44)}<div><span>你的段位</span><br><b>${ME.rating==null?'—':tierName(tierOf(ME.rating))}</b> <span>${ME.rating??''} 分 · ${ME.w} 勝 ${ME.l} 敗</span></div></div>
       <div class="sq"><em>進攻小隊</em>${ops('A')}<button data-edit="A">更換</button></div><div class="sq"><em>防守小隊</em>${ops('D')}<button data-edit="D">更換</button></div><span class="hint">陣營隨機分配，地圖配對後揭曉。勝利 +25 分，落敗 −20 分。</span></div>`+B('t-queue','開始配對','PVP RANK','primary')+B('t-back','返回','',' ghost');}}
   else if(SCREEN==='queue')h=`<h2 class="tsec">線上對戰</h2><div class="tqueue"><div class="ring"></div><span>搜尋對手中</span><b id="qclock">${fmtClock(Date.now()-RQ.t0)}</b><span>排隊中的玩家 <b id="qcount" style="font-size:14px">1</b></span><span>找到對手後會自動進入對戰。</span><span class="qnote">需要另一位玩家同時排隊；同一個帳號或同一個瀏覽器不會跟自己配對。</span></div>`+B('t-qcancel','取消配對','',' ghost');
@@ -6846,7 +6882,7 @@ function renderTitle(){
   const on=(id,fn)=>{const b=$('#'+id);if(b)b.onclick=e=>{if(b._sh)return;if(b.classList.contains('tbtn')){b._sh=1;shatter(b,e).then(()=>{b._sh=0;fn(e);});}else fn(e);};};
   on('t-pve',()=>{['A','D'].forEach(s=>{cfg.picks[s]=cfg.picks[s].filter(owned);});SCREEN='setup';WZ.step=0;WZ.seen=0;render();});on('t-pvp',()=>{SCREEN='pvp';NETMSG='';renderTitle();});on('t-rank',()=>{NETMSG='';rankQueue();});on('t-lib',()=>{SCREEN='lib';NETMSG='';renderTitle();});
   on('t-login',acctLogin);on('t-queue',rankQueue);on('t-qcancel',()=>{rankCancel();SCREEN='title';renderTitle();});if(SCREEN==='task')bindTask();
-  el.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openOpSelect(b.dataset.edit,renderTitle));on('t-tut',startTutorial);on('t-man',()=>openManual());on('t-ach',()=>openAch('ach'));on('t-ops',()=>openOpSelect(cfg.side,null,true));on('t-shop',()=>openShop());
+  el.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openOpSelect(b.dataset.edit,renderTitle));on('t-tut',startTutorial);on('t-cop',()=>{SCREEN='cop';NETMSG='';renderTitle();});on('t-man',()=>openManual());on('t-ach',()=>openAch('ach'));on('t-ops',()=>openOpSelect(cfg.side,null,true));on('t-shop',()=>openShop());
   on('t-back',()=>{SCREEN='title';NETMSG='';renderTitle();});on('t-back2',()=>{SCREEN='pvp';NETMSG='';renderTitle();});on('t-back3',()=>{SCREEN='pvp';NETMSG='';renderTitle();});
   on('t-create',()=>{SCREEN='create';NETMSG='';renderTitle();});on('t-find',()=>{SCREEN='find';NETMSG='';if(NET)NET.list=null;renderTitle();netList();});
   on('t-go',netCreate);on('t-cancel',()=>{netLeave();SCREEN='pvp';renderTitle();});on('t-refresh',()=>{if(NET)NET.list=null;renderTitle();netList();});
@@ -7178,7 +7214,7 @@ function renderWiz(){let el=$('#wiz');const keep=[...(el?el.querySelectorAll('.w
   el.querySelectorAll('[data-wz-go]').forEach(b=>b.onclick=()=>{WZ.ret=st===WZSTEPS.length-1&&b.closest('.wzSum')?st:null;go(+b.dataset.wzGo);});
   el.querySelectorAll('[data-wz-side]').forEach(b=>b.onclick=()=>twice('side'+b.dataset.wzSide,()=>{if(cfg.side!==b.dataset.wzSide){cfg.side=b.dataset.wzSide;WZ.cur=null;WZ.seen=Math.min(WZ.seen,2);}if(R3)render();},pick));
   el.querySelectorAll('[data-wz-mis]').forEach(b=>b.onclick=()=>twice('mis'+b.dataset.wzMis,()=>{cfg.mission=b.dataset.wzMis;},pick));
-  el.querySelectorAll('[data-wz-map]').forEach(b=>b.onclick=()=>twice('map'+b.dataset.wzMap,()=>{cfg.map=b.dataset.wzMap;render();},pick));
+  el.querySelectorAll('[data-wz-map]').forEach(b=>b.onclick=()=>twice('map'+b.dataset.wzMap,()=>{cfg.map=b.dataset.wzMap;render();},()=>{if(TU&&TU.ph==='pre'&&b.dataset.wzMap==='bank')return tuGame();pick();}));
   el.querySelectorAll('[data-tm]').forEach(b=>b.onclick=()=>twice('tm'+b.dataset.tm,()=>{cfg.timer=+b.dataset.tm;},pick));
   {const a=WZ.arm&&el.querySelector({side:'[data-wz-side="'+cfg.side+'"]',mis:'[data-wz-mis="'+cfg.mission+'"]',map:'[data-wz-map="'+cfg.map+'"]',tm:'[data-tm="'+(cfg.timer||0)+'"]'}[(WZ.arm.match(/^(side|mis|map|tm)/)||[])[1]]);if(a)a.classList.add('armed');}
   {const p=cfg.picks[cfg.side],od=$('#wzOd');
@@ -7468,6 +7504,156 @@ function gaBind(){const g=$('#psGoogle');if(g)g.onclick=()=>{GA.busy=true;GA.err
       GA.err=/popup-closed|cancelled-popup/.test(c)?'':/unauthorized-domain/.test(c)?'這個網址還沒加進 Firebase 的授權網域。':/network/.test(c)?'網路連不上 Google，請稍後再試。':'登入失敗（'+(c||'未知錯誤')+'）';renderSettings();});};
   const o=$('#psGout');if(o)o.onclick=()=>{clearTimeout(gaT);if(GA.ok)R6FB.save(gaPack()).catch(()=>{}).then(()=>R6FB.signOut());else R6FB.signOut();};}
 if(window.R6FB)R6FB.onUser(u=>{gaOn(u);});
+
+// ---------- v87: login screen, then a first-run scripted tutorial (Ash alone vs two AI defenders, Bank, hostage) ----------
+const TU2K='r6bg.tut2';let TU2MEM=false;
+const tuSeen=()=>{if(TU2MEM)return true;if(/tutorial/.test(location.search+location.hash))return false;try{return localStorage.getItem(TU2K)==='1';}catch(e){return false;}};
+function tuMark(){TU2MEM=true;try{localStorage.setItem(TU2K,'1');}catch(e){}}
+const LG={busy:false,want:false};
+function loginShow(){if($('#login'))return;const el=document.createElement('div');el.id='login';el.className='login';el.setAttribute('role','dialog');el.setAttribute('aria-label','登入');
+  el.innerHTML=`<div class="lgBg" style="background-image:url(${LOBBY.bg})"></div><div class="lgBox"><div class="lgLogo"><img class="lgR6" src="${LOBBY.r6}" alt="Tom Clancy's Rainbow Six Siege"><div class="lgLg"><img class="lgSix" src="${LOBBY.logo}" alt="6"><div><small>THE BOARDGAME</small><h1>虹彩六號<br>戰術桌遊</h1></div></div></div>
+    <div class="lgBtns"><button class="lgBtn g" id="lgG"><i class="lgIc">G</i><span><b>使用 Google 登入</b><small>進度存到雲端，換裝置也能接著玩</small></span></button>
+    <button class="lgBtn" id="lgGuest"><i class="lgIc">訪</i><span><b>以訪客身分進入</b><small>進度只存在這台裝置</small></span></button><p class="lgErr" id="lgErr" role="status"></p></div></div>`;
+  document.body.appendChild(el);$('#lgGuest').onclick=()=>loginDone('guest');$('#lgG').onclick=lgGoogle;lgState();}
+function lgErr(t){const e=$('#lgErr');if(e)e.textContent=t||'';}
+function lgState(){const b=$('#lgG');if(!b)return;const fb=window.R6FB,u=fb&&fb.user&&fb.user(),B=b.querySelector('b'),S=b.querySelector('small');
+  if(!fb){b.disabled=true;S.textContent='只能在公開網站 r6-boardgame.github.io 使用';return;}
+  b.disabled=LG.busy;if(LG.busy){B.textContent='登入中…';return;}
+  if(u){B.textContent='以 Google 帳號繼續';S.textContent=u.name||u.email||'已登入';}else{B.textContent='使用 Google 登入';S.textContent='進度存到雲端，換裝置也能接著玩';}}
+function lgGoogle(){const fb=window.R6FB;if(!fb)return;if(fb.user&&fb.user())return loginDone('google');
+  LG.busy=true;LG.want=true;lgErr('');lgState();
+  fb.signIn().then(()=>{LG.busy=false;if(fb.user&&fb.user())loginDone('google');else lgState();}).catch(e=>{const c=(e&&e.code)||'';LG.busy=false;LG.want=false;
+    lgErr(/popup-closed|cancelled-popup/.test(c)?'':/unauthorized-domain/.test(c)?'這個網址還沒加進 Firebase 的授權網域。':/network/.test(c)?'網路連不上 Google，請稍後再試。':'登入失敗（'+(c||'未知錯誤')+'）');lgState();});}
+if(window.R6FB)R6FB.onUser(u=>{lgState();if(LG.want&&u)loginDone('google');});
+function loginDone(how){LG.want=false;const el=$('#login');if(!el||el.classList.contains('out'))return;
+  if(how==='guest'&&window.R6FB&&R6FB.user&&R6FB.user()){clearTimeout(gaT);(GA.ok?R6FB.save(gaPack()).catch(()=>{}):Promise.resolve()).then(()=>R6FB.signOut()).catch(()=>{});}
+  el.classList.add('out');setTimeout(()=>el.remove(),450);
+  if(!tuSeen())setTimeout(tuStart,380);}
+setTimeout(loginShow,0);
+
+let TU=null;
+const tuU=k=>G&&G.units.find(u=>u.tu===k);
+const tuAt=(u,x,y)=>!!u&&u.x===x&&u.y===y;
+const tuCam=(x,y)=>G.gadgets.some(g=>g.alive&&g.type==='cam'&&g.x===x&&g.y===y);
+const tuMode=m=>!!G&&G.mode===m;
+const tuScan=()=>!!(G.hostage&&G.hostage.known);
+const TU_PRE=[
+  {t:'歡迎',d:'歡迎到來，此遊戲由一個收不到虹彩桌遊的絕望爸爸製作，規則參考原版但有自行修改和加入其他元素，如果你也喜歡，我們就一起打槍吧。',next:'下一步',big:1},
+  {t:'對戰電腦',d:'先跟電腦打一場，熟悉玩法。點「對戰電腦」。',el:'#t-pve',ok:()=>SCREEN==='setup'&&!!$('#wiz')&&!$('#wiz').hidden},
+  {t:'選擇陣營',d:'選「進攻方」。點第一下看說明，再點一下確定。',el:'[data-wz-side="A"]',ok:()=>WZ.step>=1},
+  {t:'選擇任務',d:'任務選「人質」，一樣點兩下確定。',el:'[data-wz-mis="hostage"]',ok:()=>WZ.step>=2},
+  {t:'選擇地圖',d:'地圖選「銀行」，點兩下確定。',el:'[data-wz-map="bank"]',ok:()=>!!(G&&G.tut2)}];
+const TU_GAME=[
+  {t:'任務簡報',d:'這是教學關卡：你只帶 Ash 一個人，對手是兩名電腦防守方，躲在不同房間。目標是擊敗他們，並把人質救出銀行。',next:'出發'},
+  {t:'打掉戶外攝影機',d:'屋外這台攝影機會拍到靠近的進攻方。先按「破壞」。',btn:'破壞',ok:()=>tuMode('destroy')||!tuCam(15,3)},
+  {t:'打掉戶外攝影機',d:'再點亮起的攝影機，把它打掉。',cell:[15,3],req:()=>tuMode('destroy'),ok:()=>!tuCam(15,3)},
+  {t:'破門進入屋內',d:'門上有木板路障。再按一次「破壞」，這個行動同一次啟動可以重複使用。',btn:'破壞',ok:()=>tuMode('destroy')||cell(13,5).t==='floor'},
+  {t:'破門進入屋內',d:'點亮起的門，把路障打掉。',cell:[13,5],req:()=>tuMode('destroy'),ok:()=>cell(13,5).t==='floor'},
+  {t:'破門進入屋內',d:'門開了。點亮起的格子走進屋內，每次啟動有 5 點移動。',cell:[13,7],ok:()=>tuAt(tuU('ash'),13,7)},
+  {t:'被屋內攝影機照到',d:'屋內的攝影機拍到你了！被拍到的幹員會被標記位置，防守方隔著牆也能瞄準你。',cell:[12,9],look:1,next:'下一步'},
+  {t:'結束階段',d:'兩個行動都用完了。按「結束階段」，換防守方行動。',el:'#endphase',ok:()=>TU.dph>=1},
+  {t:'被穿牆攻擊',d:'防守方隔著牆朝你開火！牆面替你擋掉了 2 點傷害。不過他一開槍，自己的位置也被標記了。',cell:[10,7],look:1,wait:()=>TU.shot,next:'換我行動',go:()=>{if(G&&G.tut2)endPhase();}},
+  {t:'破壞攝影機',d:'先把屋內的攝影機打掉，免得一直被標記。按「破壞」。',btn:'破壞',wait:()=>TU.aph>=2&&!G.busy,ok:()=>tuMode('destroy')||!tuCam(12,9)},
+  {t:'破壞攝影機',d:'點亮起的攝影機。',cell:[12,9],req:()=>tuMode('destroy'),ok:()=>!tuCam(12,9)},
+  {t:'移動',d:'走到亮起的格子，貼近剛剛開槍的敵人那面牆。',cell:[12,8],ok:()=>tuAt(tuU('ash'),12,8)},
+  {t:'穿牆回擊',d:'被標記的敵人隔著牆也能射擊。按「射擊」。',btn:'射擊',ok:()=>tuMode('shoot')||tuU('d1').hp<2},
+  {t:'穿牆回擊',d:'點被標記的敵人。隔牆射擊一樣會被牆面扣 2 點。',cell:[10,7],req:()=>tuMode('shoot'),ok:()=>tuU('d1').hp<2},
+  {t:'結束階段',d:'按「結束階段」。防守方這次不會再動，接著進入第 2 輪。',el:'#endphase',ok:()=>TU.aph>=3},
+  {t:'無人機探索',d:'人質在哪裡？先派無人機偵查。按「無人機」。',btn:'無人機',wait:()=>!G.busy,ok:()=>tuMode('drone')||!!dmOf()||tuScan()},
+  {t:'無人機探索',d:'點亮起的格子放下無人機。',cell:[13,9],req:()=>tuMode('drone'),ok:()=>!!dmOf()||tuScan()},
+  {t:'無人機探索',d:'無人機可以鑽過門縫。點亮起的格子，開進隔壁房間。',cell:[15,9],ok:()=>{const d=dmOf();return !!(d&&d.x===15&&d.y===9)||tuScan();}},
+  {t:'無人機探索',d:'按「結束移動並掃描」，掃描整個房間。',btn:'結束移動並掃描',ok:tuScan},
+  {t:'找到人質',d:'無人機找到了人質，也標記了房裡的第二名防守方。',cell:[15,6],look:1,wait:()=>!G.busy,next:'下一步'},
+  {t:'擊敗一位',d:'先解決隔壁的敵人。按「射擊」。',btn:'射擊',ok:()=>tuMode('shoot')||!tuU('d1').alive},
+  {t:'擊敗一位',d:'點被標記的敵人。',cell:[10,7],req:()=>tuMode('shoot'),ok:()=>!tuU('d1').alive},
+  {t:'結束階段',d:'按「結束階段」。',el:'#endphase',ok:()=>TU.aph>=4},
+  {t:'進入人質房間',d:'走進亮起的格子，進入人質所在的房間。',cell:[15,7],wait:()=>!G.busy,ok:()=>tuAt(tuU('ash'),15,7)},
+  {t:'閃光彈',d:'房裡還有一名防守方。按「閃光彈」把他震暈。',btn:'閃光彈',ok:()=>tuMode('flash')||!!tuU('d2').stun},
+  {t:'閃光彈',d:'點敵人所在的格子。被震暈的幹員射擊只能擲兩顆黃骰。',cell:[18,9],req:()=>tuMode('flash'),ok:()=>!!tuU('d2').stun},
+  {t:'擊倒第二位',d:'趁他暈眩，按「射擊」。',btn:'射擊',ok:()=>tuMode('shoot')||!tuU('d2').alive},
+  {t:'擊倒第二位',d:'點敵人。',cell:[18,9],req:()=>tuMode('shoot'),ok:()=>!tuU('d2').alive},
+  {t:'結束階段',d:'兩名防守方都倒下了。按「結束階段」。',el:'#endphase',ok:()=>TU.aph>=5},
+  {t:'Ash 技能破牆',d:'用 Ash 的破牆彈在北牆開一條近路。按 Ash 的技能「破牆彈」。',el:'.ocGB',wait:()=>!G.busy,ok:()=>tuMode('gadget')||!!cell(15,5).breach},
+  {t:'Ash 技能破牆',d:'點亮起的牆。',cell:[15,5],req:()=>tuMode('gadget'),ok:()=>!!cell(15,5).breach},
+  {t:'帶出人質',d:'按「護送人質」，人質會跟著 Ash 走。',btn:'護送人質',wait:()=>!G.busy,ok:()=>!!(G.hostage&&G.hostage.by)},
+  {t:'逃離',d:'直接從破口出去：點亮起的出生區格子。',cell:[14,4],wait:()=>!G.busy,ok:()=>G.over},
+  {t:'教學完成',d:'你救出了人質！點「回主頁」。',el:'#menu'}];
+const TU_POST=[
+  {t:'作戰檔案',d:'最後帶你看規則。點「作戰檔案」。',el:'#t-lib',ok:()=>SCREEN==='lib'},
+  {t:'規則',d:'點「規則」。',el:'#t-man',ok:()=>{const m=$('#manual');return !!m&&!m.hidden;}},
+  {t:'準備實戰',d:'這就是本遊戲的規則。下一場就是實戰，會以這份規則為主。',free:1,next:'知道了',go:()=>tuEnd()}];
+const tuSteps=()=>TU.ph==='pre'?TU_PRE:TU.ph==='game'?TU_GAME:TU_POST;
+const tuStep=()=>tuSteps()[TU.i];
+function tuStart(){if(TU)return;TU={ph:'pre',i:0,ent:-1,aph:0,dph:0,shot:false,dk:''};tuLoop();}
+function tuEnd(skip){tuMark();const o=$('#tuO');if(o)o.remove();const was=TU;TU=null;
+  if(skip&&was&&was.ph!=='post'){if(G&&G.tut2){G=null;$('#banner').hidden=true;}const w=$('#wiz');if(w)w.hidden=true;goTitle();}}
+function tuLoop(){if(!TU)return;try{tuFrame();}catch(e){console.warn(e);}setTimeout(tuLoop,70);}
+function tuAdvance(){const L=tuSteps();let n=0;
+  while(TU.i<L.length&&n++<10){const s=L[TU.i];if(s.wait&&!s.wait())break;if(s.ok&&s.ok()){TU.i++;continue;}if(s.req&&!s.req()&&TU.i>0){TU.i--;continue;}break;}}
+// a tap that lands on a wall or prop right next to the highlighted space still counts as that space
+const tuCellOK=(x,y)=>{const s=TU&&tuStep();return s&&s.cell&&!s.look&&cheb(x,y,s.cell[0],s.cell[1])<=1?s.cell:null;};
+function tuVis(e){const r=e.getBoundingClientRect();if(r.width<3||r.height<3||r.bottom<0||r.top>innerHeight||r.right<0||r.left>innerWidth)return false;const cs=getComputedStyle(e);return cs.visibility!=='hidden'&&cs.display!=='none';}
+function tuFind(sel){return [...document.querySelectorAll(sel)].find(e=>!e.closest('#tuO')&&tuVis(e))||null;}
+function tuBtn(lb){const f=L=>L.find(b=>!b.disabled&&tuVis(b)&&b.getBoundingClientRect().height>=24&&(b.textContent||'').replace(/\s+/g,'').startsWith(lb));
+  return f([...document.querySelectorAll('#acts button,#actsR button')])||f([...document.querySelectorAll('.panel button')]);}
+function tuCellRect(x,y){if(typeof R3==='undefined'||!R3||!R3.camera||!R3.renderer){const f=$('#frame');return f?f.getBoundingClientRect():null;}
+  const cam=R3.camera,r=R3.renderer.domElement.getBoundingClientRect();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;cam.updateMatrixWorld();
+  for(const [a,b,h] of [[x,y,0],[x+1,y,0],[x,y+1,0],[x+1,y+1,0],[x+.5,y+.5,1.1]]){const q=new THREE.Vector3(a,h,b).project(cam);if(q.z>1)continue;
+    const sx=r.left+(q.x+1)/2*r.width,sy=r.top+(1-q.y)/2*r.height;x0=Math.min(x0,sx);x1=Math.max(x1,sx);y0=Math.min(y0,sy);y1=Math.max(y1,sy);}
+  if(x0>x1)return null;const cx=(x0+x1)/2,cy=(y0+y1)/2,w=Math.max(46,x1-x0),h=Math.max(46,y1-y0);return {left:cx-w/2,top:cy-h/2,right:cx+w/2,bottom:cy+h/2};}
+function tuRect(s){const e=s.el?tuFind(s.el):s.btn?tuBtn(s.btn):null;if(e)return e.getBoundingClientRect();if(s.cell)return tuCellRect(s.cell[0],s.cell[1]);return null;}
+function tuDom(){let o=$('#tuO');if(o)return o;o=document.createElement('div');o.id='tuO';
+  o.innerHTML='<div class="tuM"></div><div class="tuM"></div><div class="tuM"></div><div class="tuM"></div><div class="tuB"></div><div class="tuR"></div><div class="tuD" role="dialog" aria-live="polite"></div>';document.body.appendChild(o);
+  o.querySelector('.tuD').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!TU)return;if(b.dataset.k==='skip')return tuEnd(true);
+    if(b.dataset.k==='next'){const s=tuStep();TU.i++;if(s&&s.go)s.go();}});return o;}
+const tuPx=(e,l,t,w,h)=>{e.style.left=l+'px';e.style.top=t+'px';e.style.width=Math.max(0,w)+'px';e.style.height=Math.max(0,h)+'px';};
+function tuFrame(){tuAdvance();const o=tuDom(),s=tuStep(),M=o.querySelectorAll('.tuM'),B=o.querySelector('.tuB'),R=o.querySelector('.tuR'),D=o.querySelector('.tuD'),W=innerWidth,H=innerHeight;
+  const busy=TU.ph==='game'&&(!G||G.busy||!!document.querySelector('.sintro,.rerollAsk'))||(s&&s.wait&&!s.wait())||!!$('#login');
+  const hide=()=>{R.style.display='none';D.style.display='none';tuPx(B,0,0,0,0);};
+  if(!s){o.style.display='none';return;}o.style.display='';
+  if(busy){o.classList.add('clear');tuPx(M[0],0,0,W,H);for(let i=1;i<4;i++)tuPx(M[i],0,0,0,0);hide();return;}
+  o.classList.remove('clear');o.classList.toggle('big',!!s.big);o.classList.toggle('free',!!s.free);
+  if(TU.ent!==TU.ph+TU.i){TU.ent=TU.ph+TU.i;if(s.cell&&G&&G.tut2){const a=tuU('ash');if(a&&a.alive)try{aimCam(a,[s.cell],1);}catch(e){}}}
+  const k=TU.ph+TU.i;if(TU.dk!==k){TU.dk=k;const L=tuSteps(),n=L.length;
+    D.innerHTML=`<div class="tuH"><small>新手教學</small><button data-k="skip">跳過教學</button></div><b class="tuT">${s.t}</b><p>${s.d}</p>${s.next?`<button class="primary" data-k="next">${s.next}</button>`:''}`;}
+  D.style.display='';
+  const r=s.free?null:tuRect(s);
+  if(s.free){for(const m of M)tuPx(m,0,0,0,0);R.style.display='none';tuPx(B,0,0,0,0);}
+  else if(r){const P=6,l=Math.max(0,r.left-P),t=Math.max(0,r.top-P),rr=Math.min(W,r.right+P),b=Math.min(H,r.bottom+P);
+    tuPx(M[0],0,0,W,t);tuPx(M[1],0,b,W,H-b);tuPx(M[2],0,t,l,b-t);tuPx(M[3],rr,t,W-rr,b-t);
+    R.style.display='';tuPx(R,l,t,rr-l,b-t);if(s.next||s.look)tuPx(B,l,t,rr-l,b-t);else tuPx(B,0,0,0,0);}
+  else{tuPx(M[0],0,0,W,H);for(let i=1;i<4;i++)tuPx(M[i],0,0,0,0);R.style.display='none';tuPx(B,0,0,0,0);}
+  const dw=D.offsetWidth,dh=D.offsetHeight;let top,left;
+  if(s.free){left=(W-dw)/2;top=H-dh-14;}
+  else if(r){const cx=(r.left+r.right)/2;left=Math.min(Math.max(10,cx-dw/2),W-dw-10);
+    if(H-r.bottom-10>=dh+16)top=r.bottom+14;else if(r.top-10>=dh+16)top=r.top-dh-14;else top=Math.max(10,Math.min(H-dh-10,r.bottom+14));}
+  else{left=(W-dw)/2;top=(H-dh)/2;}
+  D.style.left=Math.round(left)+'px';D.style.top=Math.round(top)+'px';}
+function tuGame(){const w=$('#wiz');if(w)w.hidden=true;$('#banner').hidden=true;cfg.side='A';cfg.mission='hostage';cfg.map='bank';
+  const m=MAPS.bank;
+  G={map:m,grid:parseMap(m),W:m.rows[0].length,H:m.rows.length,units:[],gadgets:[],reinf:0,drones:1,wire:0,charges:0,frag:0,flash:1,smk:0,clay:0,impact:0,nitro:0,shield:0,bpcam:0,decoys:[],mission:'hostage',hostage:{x:15,y:6,by:null},round:1,maxRounds:99,phaseIdx:0,phase:'play',acts:0,active:null,sel:null,mode:'move',defuser:null,over:false,busy:false,ai:false,log:[],moves:[],cur:null,hl:null,player:'A',aiSite:'A',fx:null,spawn:0,tut2:true};
+  G.grid[5][13].kind='door';{const c=G.grid[9][14];c.t='floor';c.opened=true;c.wasBar=true;}
+  const a=mkUnit('ash','A',0);a.x=14;a.y=4;a.tu='ash';G.units.push(a);
+  [['mute',10,7,'d1'],['smoke',18,9,'d2']].forEach(([op,x,y,k],i)=>{const u=mkUnit(op,'D',i);u.x=x;u.y=y;u.anchor=[x,y];u.hp=u.max=2;u.tu=k;G.units.push(u);});
+  G.gadgets.push({type:'cam',x:15,y:3,side:'D',alive:true,fixed:true},{type:'cam',x:12,y:9,side:'D',alive:true,fixed:true});
+  Object.assign(TU,{ph:'game',i:0,ent:-1,aph:0,dph:0,shot:false,rig:null});
+  setTimeout(()=>{try{preloadShots();}catch(e){}},400);
+  log('新手教學：跟著畫面上的提示操作。','ks');log('—— 第 1 輪開始 ——','ks');
+  try{if(R3)setView('angle');}catch(e){}startPhase();}
+function tuAPhase(){if(!TU)return;TU.aph++;const a=tuU('ash');if(a&&a.alive)G.sel=a;alive('D').forEach(u=>u.overwatch=false);}
+async function tuDPhase(){if(!TU)return;TU.dph++;G.ai=true;G.busy=true;G.sel=null;render();await sleep(900);if(!G||!G.tut2||!TU)return;
+  if(TU.dph===1){const d=tuU('d1'),a=tuU('ash');if(d&&d.alive&&a&&a.alive){TU.rig=1;try{await shootUnit(d,a);}finally{TU.rig=null;}}
+    G.busy=false;G.ai=false;TU.shot=true;render();return;}
+  log('防守方按兵不動','kd');G.busy=false;G.ai=false;render();setTimeout(()=>{if(G&&G.tut2&&!G.over&&curSide()==='D')endPhase();},500);}
+function tuRigW(sh,t){if(!TU)return null;if(TU.rig!=null)return TU.rig;if(sh.side!=='A')return null;return t.tu==='d1'&&t.hp===2?1:t.hp;}
+function tuRig(pool,p,w){const C=[...pool].map(ch=>DIE[ch.toUpperCase()]),n=C.length;let best=null,bd=1e9;
+  const rec=(i,acc,idx)=>{if(i===n){const h=Math.max(0,acc-p),d=h>=w?h-w:100+w-h;if(d<bd){bd=d;best=idx.slice();}return;}for(let f=0;f<6;f++){idx.push(f);rec(i+1,acc+C[i][f],idx);idx.pop();}};
+  rec(0,0,[]);return best;}
+function tuFinish(w,why){G.over=true;G.busy=false;G.active=null;G.win=w;G.why=why;SFX.music(-1);SFX.win(true);log('教學完成：'+why,'ks');
+  const b=$('#banner');b.hidden=false;b.classList.add('bwin');b.classList.remove('blose');
+  b.innerHTML=`<h2 class="a">教學完成</h2><p>人質已安全撤離！你學會了破壞、移動、穿牆射擊、無人機、閃光彈和幹員技能。</p><div class="row"><button class="primary" id="menu">回主頁</button></div>`;
+  $('#menu').onclick=()=>{b.hidden=true;G=null;if(TU){TU.ph='post';TU.i=0;}goTitle();};render();}
+
 // the launch roster (core box, recruits included) is free; every later operator costs renown
 const PAIDCORE=new Set(['flores','thunderbird']);
 const owned=b=>{const c=OPC[b];const k=c?c.base:b;return !OPC[k]||(OPC[k].batch==='core'&&!PAIDCORE.has(k))||ECO.own.includes(k);};
@@ -7644,7 +7830,7 @@ function stunFx(t){if(!R3||!R3.figs||!G)return;for(const id in R3.figs){const f=
 // end of your phase: every operator that is not on overwatch yet picks a facing, one by one
 function owqNext(){const u=G.owq&&G.owq[0];if(!u)return;G.sel=u;G.mode='owq';render();
   bigNote(`${OPS[u.op].name} 選監視方向`,`點角色旁的箭頭${G.owq.length>1?`（還有 ${G.owq.length-1} 名）`:''}`,u.side==='A'?'a':'d',1400);}
-function owqStart(s){if(G.over||s!==G.player||G.tut||G.owqDone||(G.clock&&G.clock[s]<=0))return false;if(G.active)endAct(G.active);
+function owqStart(s){if(G.over||s!==G.player||G.tut||G.tut2||G.owqDone||(G.clock&&G.clock[s]<=0))return false;if(G.active)endAct(G.active);
   const q=alive(s).filter(u=>u.x>=0&&!u.overwatch&&(u.activated||u===G.active));if(!q.length)return false;G.owq=q;G.busy=false;owqNext();return true;}
 function owqTap(x,y){const u=G.owq&&G.owq[0];if(!u)return;if(!adj4(u.x,u.y).some(([a,b])=>a===x&&b===y))return render();
   overwatch(u,false,[x-u.x,y-u.y]);G.owq.shift();if(G.owq.length)return owqNext();G.owq=null;G.mode='move';G.sel=null;G.owqDone=true;endPhase();}
