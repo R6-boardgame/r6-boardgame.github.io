@@ -4167,6 +4167,20 @@ function bpCam3D(gd,grp){const [dx,dy]=gd.wall,wc=cell(gd.x+dx,gd.y+dy),th={hard
   const d=mk(HSPH3,gm('bpdome',()=>std(0x15191d,{metalness:.3,roughness:.12})),[.11,.08,.11],0,0,.025);d.rotation.x=Math.PI/2;
   mk(SPH3,gm('lens',()=>new THREE.MeshStandardMaterial({color:0xe8574e,emissive:0xe8574e,emissiveIntensity:1.2})),[.035,.035,.035],0,0,.1);
   const sp=new THREE.Sprite(camBadge());sp.scale.set(.7,.7,1);sp.position.set(sg.position.x,WH+.45,sg.position.z);sp.renderOrder=11;grp.add(sp);}
+// wall-mounted defender gadgets (Evil Eye, ADS) pick their wall like the bulletproof camera
+function wallGadget(u,x,y,type,label,extra){let w=G._eyeW;if(!w){const cs=bpCands(x,y);if(cs.length>1&&G.phase==='setup'&&G.player==='D'&&!G.ai){u.ch++;G.bpPend=cs;G.bpEye=u;G.mode='bpface';bigNote('選一面牆',`點發光的牆，${label}會裝在那一面`,'d',1600);return;}w=cs[0];}
+  if(w){x=w.x;y=w.y;}G.gadgets.push({type,x,y,side:'D',alive:true,wall:w?[w.w[0]-x,w.w[1]-y]:null,...(extra||{})});}
+// Jäger's ADS: four suction feet on the wall, a hub with the turret and two charge cells
+function ads3D(gd,grp){const sg=new THREE.Group();grp.add(sg);const in_=new THREE.Group();sg.add(in_);
+  const mk=(geo,mat,s,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.scale.set(...s);m.position.set(x,y,z);m.castShadow=true;in_.add(m);return m;};
+  if(gd.wall){const [dx,dy]=gd.wall,wc=cell(gd.x+dx,gd.y+dy),th={hard:.4,soft:.3,reinf:.42}[wc&&wc.t]||.4,WH=WALLH[R3.wall]||1.45;
+    sg.position.set(dx*(1-th/2-.02),Math.max(.3,WH*.62),dy*(1-th/2-.02));sg.rotation.y=Math.atan2(-dx,-dy);in_.rotation.x=Math.PI/2;}
+  const D=gm('adsd',()=>std(0x26292d,{metalness:.55,roughness:.4})),A=gm('adsa',()=>std(0x2f4a35,{metalness:.5,roughness:.5})),O=gm('adso',()=>std(0xd88a2a,{metalness:.3,roughness:.5})),H=gm('adsh',()=>std(0x8d9398,{metalness:.75,roughness:.3}));
+  for(let k=0;k<4;k++){const a=(k+.5)/4*Math.PI*2,cx=Math.cos(a)*.15,cz=Math.sin(a)*.15;
+    mk(CYL3,O,[.07,.008,.07],cx,.005,cz);mk(CYL3,D,[.066,.03,.066],cx,.023,cz);mk(BOX3,D,[.075,.018,.075],cx,.045,cz).rotation.y=a;mk(BOX3,A,[.15,.02,.026],cx/2,.055,cz/2).rotation.y=-a;}
+  mk(CYL3,H,[.055,.045,.055],0,.065,0);mk(BOX3,D,[.06,.07,.05],0,.12,0);
+  grp.userData.blink=mk(SPH3,gm('adsl',()=>new THREE.MeshStandardMaterial({color:0xff3b30,emissive:0xff3b30,emissiveIntensity:1.6})),[.018,.018,.018],0,.16,0);
+  for(const s of [-1,1]){const c=mk(CYL3,D,[.024,.1,.024],s*.12,.09,-.02);c.rotation.z=Math.PI/2;}}
 // Maestro's Evil Eye: green armoured base, white dome with a black visor; mounted on a wall like the bulletproof camera
 function evilEye3D(gd,grp){const G0=gm('eyeg',()=>std(0x4a5a2a,{metalness:.35,roughness:.6})),Wd=gm('eyew',()=>std(0xe6e6e2,{metalness:.25,roughness:.45})),V=gm('eyev',()=>std(0x0b0c0e,{metalness:.6,roughness:.08})),M=gm('eyem',()=>std(0x8d9398,{metalness:.8,roughness:.3}));
   const sg=new THREE.Group();grp.add(sg);const mk=(geo,mat,s,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.scale.set(...s);m.position.set(x,y,z);m.castShadow=true;sg.add(m);return m;};
@@ -4263,7 +4277,7 @@ async function doShoot(u,tg){
 }
 const GNAME={trax:'Trax 尖刺',argus:'Argus 攝影機',eye:'邪眼攝影機',kona:'Kóna 治療站',mat:'捕獸夾',gu:'蠱毒地雷',grz:'震盪地雷',claw:'Rtila 電爪',magnet:'Mag-NET',banshee:'Banshee',cam:'攝影機',jammer:'訊號干擾器',drone:'無人機',wire:'鐵絲網',shield:'可部署盾牌',trap:'陷阱',ced:'電擊線',clay:'闊刀地雷'};
 // strength of each gadget (S1 light, S2 medium); bulletproof ones only fall to an adjacent operator or a gadget
-const GSTR={trax:1,argus:1,eye:2,kona:1,mat:1,gu:1,grz:1,claw:1,magnet:1,banshee:2,cam:1,jammer:1,drone:1,wire:1,shield:2,trap:1,ced:1,clay:1};
+const GSTR={ads:1,trax:1,argus:1,eye:2,kona:1,mat:1,gu:1,grz:1,claw:1,magnet:1,banshee:2,cam:1,jammer:1,drone:1,wire:1,shield:2,trap:1,ced:1,clay:1};
 const isBP=g=>g.type==='wire'||g.type==='shield'||g.type==='eye'||g.type==='banshee'||(g.type==='cam'&&g.bp);
 async function blastDestroy(x,y,d){ // free Destroy from a gadget with rating d at one space
   const c=cell(x,y);if(!c)return;
@@ -4483,6 +4497,44 @@ async function heatScan(u,v){if(u.csk===G.round)return;u.csk=G.round;useAct(u,'c
   G.heat=(G.heat||[]).filter(h=>h.r===G.round).concat(found.map(e=>({x:e.x,y:e.y,r:G.round,side:u.side})));
   G.scanFx={cells,until:performance.now()+1400,c:0xff7a2e};
   log(`${nm(u)} 熱感瞄準${dirName(f)}方：${found.length?`發現 ${found.length} 個熱源`:'沒有熱源'}`,u.side==='A'?'ka':'kd');G.mode='move';render();await afterAct(u);}
+// shield bash: dash up to two cells, the hit reaches the third
+async function shieldBash(u,v){if(u.csk===G.round)return;u.csk=G.round;useAct(u,'cls');note(u,'盾牌猛擊');DMGBY=u;const s=u.side==='A'?'ka':'kd';
+  const f=Math.abs(v[0])>=Math.abs(v[1])?[Math.sign(v[0])||1,0]:[0,Math.sign(v[1])];u.fd=f.slice();if(R3&&R3.figs&&R3.figs[u.id])R3.figs[u.id].face=Math.atan2(f[0],f[1]);
+  let what='';
+  for(let i=1;i<=3;i++){const x=u.x+f[0],y=u.y+f[1],c=cell(x,y);if(!c){what='';break;}
+    const t=G.units.find(e=>e.alive&&e.x===x&&e.y===y);
+    if(t){if(t.side!==u.side)what=await bashHit(u,t,f);break;}
+    if(blocks(c)){if(c.t==='soft'||c.t==='bar'){destroyCell(x,y);what=c.kind?'撞破路障':'撞破軟牆';}break;}
+    const sg=G.gadgets.find(g=>g.alive&&g.x===x&&g.y===y&&g.type==='shield');
+    if(sg){sg.alive=false;what='撞爆可部署盾牌';break;}
+    if(c.obst&&!c.stand){wreckCover(x,y);what='撞爆掩護';break;}
+    if(i===3)break;u.x=x;u.y=y;}
+  G.scanFx={cells:[[u.x+f[0],u.y+f[1]]],until:performance.now()+700,c:0xffc84a};
+  log(`${nm(u)} 盾牌猛擊${what?'，'+what:''}`,s);G.mode='move';render();await afterAct(u);}
+async function bashHit(u,t,f){const bx=t.x+f[0],by=t.y+f[1],bc=cell(bx,by),wall=!bc||blocks(bc),o=G.units.find(e=>e.alive&&e!==t&&e.x===bx&&e.y===by);
+  if(t.hidden)reveal(t,'被撞到，');await damage(t,2,'盾牌猛擊');let m=`撞到 ${nm(t)}（2 傷`;
+  if(wall&&t.alive){await damage(t,1,'夾擊');stunU(t);m+='，夾在牆邊再 1 傷並暈眩';}
+  m+='）';if(o){await damage(o,1,'盾牌猛擊');stunU(o);m+=`，連後面的 ${nm(o)} 也受 1 傷並暈眩`;}return m;}
+// grenade launcher: 2 damage in 3x3; everything but reinforced walls and corner pillars is wrecked
+const pillarC=(x,y)=>{const c=cell(x,y),w=(a,b)=>{const d=cell(a,b);return !!d&&isWallC(d);};return !!c&&c.t==='hard'&&(w(x-1,y)||w(x+1,y))&&(w(x,y-1)||w(x,y+1));};
+async function grenadeLaunch(u,x,y){if(u.csk===G.round)return;u.csk=G.round;useAct(u,'cls');note(u,'榴彈發射');DMGBY=u;aimCam(u,[[x,y]]);const s=u.side==='A'?'ka':'kd';
+  if(catchThrow(u,x,y)){G.mode='move';render();await afterAct(u);return;}
+  const area=blastArea(x,y);SFX.boom();G.scanFx={cells:area,until:performance.now()+900,c:0xff7a2a};
+  log(`${nm(u)} 發射榴彈`,s);if(hostHarm(area,u.side,'榴彈'))return;
+  for(const [i,j] of area){const c=cell(i,j);if(!c)continue;
+    if(['soft','bar','hard'].includes(c.t)&&!pillarC(i,j))destroyCell(i,j);
+    if(c.obst)wreckCover(i,j);
+    for(const g of G.gadgets)if(g.alive&&g.x===i&&g.y===j&&!['smk','gas','fire'].includes(g.type)){g.alive=false;if(g.type==='clay')await clayBoom(g);if(g.volcan)await ignite(g.x,g.y);}}
+  for(const a of G.units.filter(a=>a.alive&&a.x>=0&&area.some(([i,j])=>i===a.x&&j===a.y))){if(a.hidden)reveal(a,'被榴彈炸到，');await damage(a,2,'榴彈');}
+  G.mode='move';render();await afterAct(u);}
+// a wrecked prop stops being cover and is no longer drawn
+function propCells(m,p){const [k,px,py,w,h]=p;if(k==='arc'||k==='cstairs')return arcCells(p[1],p[2],p[3],p[4],p[5]);const cx=m.tl?px+w/2:px,cy=m.tl?py+h/2:py,pad=m.tl?.3:.15,o=[];
+  for(let y=Math.floor(cy-h/2);y<=Math.floor(cy+h/2);y++)for(let x=Math.floor(cx-w/2);x<=Math.floor(cx+w/2);x++)if(Math.abs(x+.5-cx)<=w/2+pad&&Math.abs(y+.5-cy)<=h/2+pad)o.push([x,y]);return o;}
+function wreckCover(x,y){const m=G.map;let n=0;
+  (m.props||[]).forEach((p,i)=>{if(!OBSTK.has(p[0])||(G.propGone&&G.propGone.has(i)))return;const cs=propCells(m,p);if(!cs.some(([a,b])=>a===x&&b===y))return;
+    (G.propGone||(G.propGone=new Set())).add(i);n++;for(const [a,b] of cs){const c=cell(a,b);if(c){c.obst=false;c.tall=false;c.stand=0;}}});
+  const c=cell(x,y);if(c&&c.obst){c.obst=false;c.tall=false;c.stand=0;n++;}if(n){G._wv=(G._wv||0)+1;if(R3)R3.sig='';}return n>0;}
+const propOn=i=>!(G&&G.propGone&&G.propGone.has(i));
 const heatPins=()=>(G&&G.heat||[]).filter(h=>h.r===G.round&&h.side===G.player&&!G.units.some(e=>e.alive&&e.x===h.x&&e.y===h.y&&e.side!==G.player&&seenBy(G.player,e)));
 function sprint(u){note(u,'奔跑');useAct(u,'run');u.mp+=u.run;}
 
@@ -4810,7 +4862,8 @@ function curTargets(){if(G&&G.mode==='bpface'&&G.bpPend)return G.bpPend.map(p=>p
     case 'decoy':return [...decoyReach(u).keys()].map(i=>[i%G.W,(i/G.W)|0]);
     case 'drone':return droneTargets(u);
     case 'dronemove':{const d=dmOf();return d?[...droneReach(u,d).keys()].filter(i=>i!==d.y*G.W+d.x).map(i=>[i%G.W,(i/G.W)|0]):[];}
-    case 'owdir':case 'owq':case 'heat':return adj4(u.x,u.y);
+    case 'owdir':case 'owq':case 'heat':case 'bash':return adj4(u.x,u.y);
+    case 'gl':return throwTargets(u);
     case 'face':return adj8all(u.x,u.y);
     case 'frag':case 'flash':case 'smk':case 'nitro':return throwTargets(u);
     case 'impact':return impactTargets(u);
@@ -4883,6 +4936,8 @@ async function onCell(x,y){
       else if(mode==='dronemove')await droneStep(u,x,y);
       else if(mode==='owdir')overwatch(u,false,[x-u.x,y-u.y]);
       else if(mode==='heat')await heatScan(u,[x-u.x,y-u.y]);
+      else if(mode==='bash')await shieldBash(u,[x-u.x,y-u.y]);
+      else if(mode==='gl')await grenadeLaunch(u,x,y);
       else if(['frag','flash','smk','impact','nitro'].includes(mode))await giBorrow(u,mode,()=>throwGadget(u,mode,x,y));
       else if(mode==='wire'||mode==='shield'||mode==='bpcam')await giBorrow(u,mode,()=>deployGadget(u,mode,x,y));
     });
@@ -5217,7 +5272,7 @@ function drawMap(m,floorOnly){
   // parking bay lines outside
   ctx.strokeStyle='rgba(230,230,210,.35)';ctx.lineWidth=Math.max(1,S*.05);
   for(const z of m.spawns)for(const [x,y] of z.cells){ctx.strokeRect(x*S+S*.12,y*S+S*.12,S*.76,S*.76);}
-  if(!floorOnly)(m.props||[]).forEach(drawProp);
+  if(!floorOnly)(m.props||[]).forEach((p,i)=>{if(propOn(i))drawProp(p,i);});
   ctx.strokeStyle=FP.siteLine;ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.beginPath();
   for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++){const s=G.grid[y][x].site;if(!s)continue;const o=(a,b)=>(cell(a,b)||{}).site!==s;
     if(o(x,y-1)){ctx.moveTo(x*S,y*S+1);ctx.lineTo(x*S+S,y*S+1);}if(o(x,y+1)){ctx.moveTo(x*S,y*S+S-1);ctx.lineTo(x*S+S,y*S+S-1);}
@@ -5461,7 +5516,7 @@ let socT=0;function socialPush(){gaPush();if(!SOC_ID||ME.mode!=='account')return
 var LOSW=false,LOSD=false,SHOTP=null,DRONEANY=false;
 var NOLOC=new Set(['nokk','iana','vigil']);
 var NOBTN=new Set(['blackbeard','jager','vigil','nokk','iana','warden','alibi','aruni','castle','thunderbird','maestro','kaid','goyo','wamai','melusi']);
-var SETUPOPS=['castle','thunderbird','frost','lesion','ela','mira','maestro','kaid','goyo','wamai','melusi'];
+var SETUPOPS=['jager','castle','thunderbird','frost','lesion','ela','mira','maestro','kaid','goyo','wamai','melusi'];
 var BRK={buck:1,hibana:1,ace:1,maverick:1,oryx:1},BRKR={hibana:1,ace:1,maverick:1};
 var GDX={
  blitz:['〔行動〕閃光盾：選相鄰一格，該房間內除了 Blitz 以外的所有幹員都被震暈（擲骰只剩兩顆黃骰，到這一輪結束）。',2],
@@ -5470,7 +5525,7 @@ var GDX={
  flores:['〔行動〕RCE-Ratero 無人機：開到 5 格內，在落點和相鄰四格做中型破壞，站在這些格子的幹員各受一顆橙骰傷害。',2],
  castle:['〔佈防〕裝甲板：把一道門或窗的路障換成加固牆。',2],
  pulse:['〔行動〕心跳感測器：標記 6 格內一名進攻方；如果他已被標記且在 3 格內，改成隔牆射擊他（算輕型掩護）。',3],
- jager:['〔反應〕主動防禦系統：進攻方把投擲道具丟到 Jäger 3 格內時自動攔截，道具作廢。',2],
+ jager:['〔佈防〕主動防禦系統：裝在牆上（跟防彈攝影機一樣選牆）；進攻方把投擲道具丟到它 3 格內時自動攔截，道具作廢，每台可攔 2 次。',2],
  thunderbird:['〔佈防〕Kóna 治療站：放在室內；同一房間裡的任何幹員每次受傷少 1 點。',3],
  buck:['〔行動〕萬能鑰匙：打穿 4 格內看得到的一面軟牆或路障。',3],
  blackbeard:['〔反應〕步槍護盾：被射中時自動擋下最多 2 傷。',2],
@@ -5532,8 +5587,8 @@ var entryCells=()=>allCells().filter(([x,y])=>{const c=cell(x,y);return c.t==='f
 function catchThrow(u,x,y){if(u.side!=='A')return false;
   const mg=G.gadgets.find(g=>g.alive&&g.type==='magnet'&&inRoomOf(g,x,y,3));
   if(mg){log(`${nm(u)} 丟出的道具被 Wamai 的 Mag-NET 吸走了`,'kd');G.fx={x0:u.x,y0:u.y,x1:mg.x,y1:mg.y,until:performance.now()+400,c:COL.def};return true;}
-  const j=G.units.find(a=>a.alive&&a.op==='jager'&&a.ch>0&&a.x>=0&&cheb(a.x,a.y,x,y)<=3);
-  if(j){j.ch--;log(`Jäger 的主動防禦系統攔截了 ${nm(u)} 丟出的道具（剩 ${j.ch}）`,'kd');G.fx={x0:j.x,y0:j.y,x1:x,y1:y,until:performance.now()+400,c:COL.def};return true;}
+  const j=G.gadgets.find(g=>g.alive&&g.type==='ads'&&(g.n|0)>0&&!jammed(g.x,g.y)&&cheb(g.x,g.y,x,y)<=3);
+  if(j){j.n--;log(`Jäger 的主動防禦系統攔截了 ${nm(u)} 丟出的道具（這台剩 ${j.n} 次）`,'kd');G.fx={x0:j.x,y0:j.y,x1:x,y1:y,until:performance.now()+400,c:COL.def};return true;}
   return false;}
 function dmgMod(u,n){if(n>0&&G.gadgets.some(g=>g.alive&&g.type==='kona'&&inRoomOf(g,u.x,u.y,3))){log(`Kóna 治療站讓 ${nm(u)} 少受 1 傷`,'ks');n--;}return n;}
 function onKill(u){const by=DMGBY;if(by&&by.op==='caveira'&&u.side==='A'){alive('A').filter(a=>a!==u).forEach(locU);log('Caveira 審訊完畢，所有進攻方的位置都被標記','kd');}}
@@ -5602,7 +5657,7 @@ var GT={
  melusi:(u,s)=>s?allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y)):[],
  zero:u=>thrown(u).filter(([x,y])=>cell(x,y).indoor&&!gadgetAt(x,y)),
  oryx:u=>u.rnd===G.round?[]:adj4(u.x,u.y).filter(([x,y])=>cell(x,y).t==='soft'&&!unitAt(x,y)),
- blackbeard:()=>[],jager:()=>[],vigil:()=>[],nokk:()=>[],iana:()=>[],warden:()=>[],alibi:()=>[],aruni:()=>[],
+ blackbeard:()=>[],jager:(u,s)=>s?allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y)):[],vigil:()=>[],nokk:()=>[],iana:()=>[],warden:()=>[],alibi:()=>[],aruni:()=>[],
 };
 var PLACE={
  castle:(u,x,y)=>{const c=cell(x,y);c.t='reinf';c.panel=true;G._wv=(G._wv||0)+1;if(R3)R3.sig='';},
@@ -5611,6 +5666,7 @@ var PLACE={
  lesion:(u,x,y)=>G.gadgets.push({type:'gu',x,y,side:'D',alive:true}),
  ela:(u,x,y)=>G.gadgets.push({type:'grz',x,y,side:'D',alive:true}),
  mira:(u,x,y)=>{const c=cell(x,y);c.t='reinf';c.mirror=true;G._wv=(G._wv||0)+1;G.gadgets.push({type:'mirror',x,y,side:'D',alive:true,mi:mirIn(u,x,y)});if(R3)R3.sig='';},
+ jager:(u,x,y)=>wallGadget(u,x,y,'ads','主動防禦系統',{n:2}),
  maestro:(u,x,y)=>{let w=G._eyeW;if(!w){const cs=bpCands(x,y);if(cs.length>1&&G.phase==='setup'&&G.player==='D'&&!G.ai){u.ch++;G.bpPend=cs;G.bpEye=u;G.mode='bpface';bigNote('選一面牆','點發光的牆，邪眼會裝在那一面','d',1600);return;}w=cs[0];}
    if(w){x=w.x;y=w.y;}G.gadgets.push({type:'eye',x,y,side:'D',alive:true,wall:w?[w.w[0]-x,w.w[1]-y]:null});},
  kaid:(u,x,y)=>G.gadgets.push({type:'claw',x,y,side:'D',alive:true}),
@@ -5674,6 +5730,7 @@ var SAI={
  lesion:(u,rooms,rs)=>pickC(GT.lesion(u,true).filter(([x,y])=>adj4(x,y).some(([a,b])=>cell(a,b).t==='bar'||cell(a,b).t==='soft'))),
  ela:(u,rooms,rs)=>pickC(GT.ela(u,true).filter(([x,y])=>adj4(x,y).some(([a,b])=>cell(a,b).t==='bar'))),
  mira:(u,rooms,rs)=>pickC(GT.mira(u,true).filter(([x,y])=>adj4(x,y).some(([a,b])=>rs.has(b*G.W+a)))),
+ jager:(u,rooms,rs)=>pickC(GT.jager(u,true).filter(([x,y])=>rs.has(y*G.W+x)&&!G.gadgets.some(g=>g.alive&&g.type==='ads'&&inRoomOf(g,x,y)))),
  maestro:(u,rooms,rs)=>pickC(GT.maestro(u,true).filter(([x,y])=>!rs.has(y*G.W+x)&&!G.gadgets.some(g=>g.alive&&g.type==='eye'&&inRoomOf(g,x,y)))),
  kaid:(u,rooms,rs)=>pickC(GT.kaid(u,true).filter(([x,y])=>rs.has(y*G.W+x)))||pickC(GT.kaid(u,true)),
  goyo:(u,rooms,rs)=>pickC(GT.goyo(u,true).filter(([x,y])=>rs.has(y*G.W+x)&&adj4(x,y).some(([a,b])=>cell(a,b).t==='bar'))),
@@ -5747,7 +5804,7 @@ function render(){try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{
   }
   if(!G.over)for(const u of G.units)if(u.alive&&u.x>=0&&u.side!==G.player&&u.spotted>0&&!vis.has(u.id)){const cx=u.x*S+S/2,cy=u.y*S+S/2;ctx.fillStyle=COL.danger;ctx.beginPath();ctx.arc(cx,cy-S*.08,S*.2,Math.PI*.8,Math.PI*2.2);ctx.lineTo(cx,cy+S*.32);ctx.closePath();ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy-S*.08,S*.07,0,7);ctx.fill();}
   if(!G.over)for(const h of heatPins()){const cx=h.x*S+S/2,cy=h.y*S+S/2;ctx.fillStyle='#ff7a2e';ctx.beginPath();ctx.arc(cx,cy-S*.08,S*.2,Math.PI*.8,Math.PI*2.2);ctx.lineTo(cx,cy+S*.32);ctx.closePath();ctx.fill();ctx.fillStyle='#fff';ctx.font=`700 ${S*.24|0}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('?',cx,cy-S*.08);}
-  if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat')&&G.sel&&G.sel.x>=0){const u=G.sel;ctx.fillStyle='#ffc84a';for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const cx=(u.x+.5+dx*.75)*S,cy=(u.y+.5+dy*.75)*S,px=-dy,py=dx;ctx.beginPath();ctx.moveTo(cx+dx*S*.22,cy+dy*S*.22);ctx.lineTo(cx-dx*S*.1+px*S*.2,cy-dy*S*.1+py*S*.2);ctx.lineTo(cx-dx*S*.1-px*S*.2,cy-dy*S*.1-py*S*.2);ctx.closePath();ctx.fill();}}
+  if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash')&&G.sel&&G.sel.x>=0){const u=G.sel;ctx.fillStyle='#ffc84a';for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const cx=(u.x+.5+dx*.75)*S,cy=(u.y+.5+dy*.75)*S,px=-dy,py=dx;ctx.beginPath();ctx.moveTo(cx+dx*S*.22,cy+dy*S*.22);ctx.lineTo(cx-dx*S*.1+px*S*.2,cy-dy*S*.1+py*S*.2);ctx.lineTo(cx-dx*S*.1-px*S*.2,cy-dy*S*.1-py*S*.2);ctx.closePath();ctx.fill();}}
   if(G.fx&&performance.now()<G.fx.until){ctx.strokeStyle=G.fx.c;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(G.fx.x0*S+S/2,G.fx.y0*S+S/2);ctx.lineTo(G.fx.x1*S+S/2,G.fx.y1*S+S/2);ctx.stroke();setTimeout(()=>G&&G.fx&&performance.now()>=G.fx.until&&(G.fx=null,render()),520);}
   ctx.restore();
 }
@@ -5876,7 +5933,7 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
     if(o.g&&!NOBTN.has(u.op)){const t=gTargets(u);const none=t!=='self'&&!t.length;
       GB=btn(GSH[u.op]||o.g,'',G.mode==='gadget',!can('special')||u.ch<=0||none,t==='self'?wrap(()=>useGadget(u)):tmode('gadget',t));GB.self=t==='self';}
     if(u.w&&CSK[u.w]){const K=CSK[u.w],used=u.csk===G.round,free=K.ap==='免費',dis=!ok||used||(isA&&!free&&!canDo(u,'cls'))||(u.w==='rf'&&u.aim);
-      L.push(btn(K.n,used?'本回合已用':`${K.ap} · 每回合 1 次`,G.mode==='heat',dis,u.w==='sn'?()=>{if(G.mode==='heat')return setMode('move');if(commit(u))setMode('heat');}:wrap(()=>useCsk(u)),'',`<span class="bic csk">${WPN[u.w].ic}</span>`));}
+      const md=CSKM[u.w];L.push(btn(K.n,used?'本回合已用':`${K.ap} · 每回合 1 次`,!!md&&G.mode===md,dis||(md==='gl'&&!throwTargets(u).length),md?()=>{if(G.mode===md)return setMode('move');if(commit(u))setMode(md);}:wrap(()=>useCsk(u)),'',`<span class="bic csk">${WPN[u.w].ic}</span>`));}
     const tac=(m,label,n,list)=>n>0&&L.push(btn(label,sub('tactical',`戰術 · 剩 ${n}`),G.mode===m,!can('tactical')||n<=0||!list.length,tmode(m,list),'',eqIc(m)));
     if(u.side==='A'){
       tac('drone','無人機',G.drones,G.drones>0?droneTargets(u):[]);
@@ -6210,7 +6267,7 @@ function buildStatic0(m){
       if(!wallDecal(g,x,y,c,th,WH))for(const k of [.3,.7]){const yy=WH*k;hz?addBox(g,M3.dark,cx,yy,cz,1,.03,th+.02,cc,false):addBox(g,M3.dark,cx,yy,cz,th+.02,.03,1,cc,false);}
       if(c.elec&&elecVisible(x,y))for(const k of [.2,.5,.8]){const yy=WH*k;hz?addBox(g,M3.elec,cx,yy,cz,1,.035,th+.05,cc,false):addBox(g,M3.elec,cx,yy,cz,th+.05,.035,1,cc,false);}}
   }
-  (m.props||[]).forEach((p,i)=>buildProp(g,p,i));envTune(g);
+  (m.props||[]).forEach((p,i)=>{if(propOn(i))buildProp(g,p,i);});envTune(g);
   {// wall lamps: up to 6, spread across the building, on the room side of a hard wall
     const cand=[];for(let y=1;y<G.H-1;y++)for(let x=1;x<G.W-1;x++){const c=G.grid[y][x];if(c.t!=='hard')continue;
       for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]){const n=G.grid[y+dy]&&G.grid[y+dy][x+dx];if(n&&n.indoor&&!['hard','soft','reinf','bar'].includes(n.t)&&!n.obst){cand.push([x,y,dx,dy]);break;}}}
@@ -6710,6 +6767,7 @@ function g3x(gd,add,grp){const em=(k,c,i=1.4)=>gm(k,()=>new THREE.MeshStandardMa
     im.castShadow=true;im.receiveShadow=true;grp.add(im);
     const ring=new THREE.LineLoop(gm('traxr',()=>new THREE.BufferGeometry().setFromPoints([[-1.5,-1.5],[1.5,-1.5],[1.5,1.5],[-1.5,1.5]].map(([a,b])=>new THREE.Vector3(a,.04,b)))),gm('traxl',()=>new THREE.LineDashedMaterial({color:0xef7f3e,dashSize:.2,gapSize:.15})));ring.computeLineDistances();grp.add(ring);return true;}
   case 'eye':{evilEye3D(gd,grp);return true;}
+  case 'ads':{ads3D(gd,grp);return true;}
   case 'argus':case 'eye_old':{const big=gd.type==='eye';add(CYL3,gm('agp',()=>std(0x2a2f35,{metalness:.5})),[.03,big?1.1:.6,.03],0,big?.55:.3,0);
     add(SPH3,gm(big?'eyeb':'argb',()=>std(big?0x111316:0x30353a,{metalness:.4,roughness:.3})),big?[.16,.16,.16]:[.1,.1,.1],0,big?1.15:.64,0);
     grp.userData.blink=add(SPH3,em(big?'eyel':'argl',big?0xff3030:0xef7f3e),[.05,.05,.05],0,big?1.15:.64,big?.14:.09);return true;}
@@ -6724,15 +6782,8 @@ function g3x(gd,add,grp){const em=(k,c,i=1.4)=>gm(k,()=>new THREE.MeshStandardMa
     return true;}
   case 'gu':{add(SPH3,gm('gu',()=>std(0x2f3a2a,{roughness:.6})),[.07,.07,.07],0,.07,0);grp.userData.blink=add(SPH3,em('gul',0x6aff6a),[.02,.02,.02],0,.14,0);return true;}
   case 'grz':{add(CYL3,gm('grz',()=>std(0x2a2f35,{metalness:.5})),[.11,.05,.11],0,.03,0);grp.userData.blink=add(SPH3,em('grzl',0xff3b30),[.025,.025,.025],0,.07,0);return true;}
-  case 'claw':{// Kaid's Electroclaw: four suction-cup feet on green arms, a hub with the turret head and two charge cells
-    const D=gm('clawd',()=>std(0x26292d,{metalness:.55,roughness:.4})),A=gm('clawa',()=>std(0x2f4a35,{metalness:.5,roughness:.5})),O=gm('clawo',()=>std(0xd88a2a,{metalness:.3,roughness:.5})),H=gm('clawh',()=>std(0x8d9398,{metalness:.75,roughness:.3}));
-    for(let k=0;k<4;k++){const a=(k+.5)/4*Math.PI*2,cx=Math.cos(a)*.17,cz=Math.sin(a)*.17;
-      add(CYL3,O,[.085,.008,.085],cx,.006,cz);add(CYL3,D,[.08,.035,.08],cx,.026,cz);add(BOX3,D,[.09,.02,.09],cx,.052,cz).rotation.y=a;
-      add(BOX3,A,[.17,.022,.03],cx/2,.06,cz/2).rotation.y=-a;}
-    add(CYL3,H,[.065,.05,.065],0,.07,0);add(BOX3,D,[.07,.08,.06],0,.13,0);
-    grp.userData.blink=add(SPH3,em('clawl',0xff3b30,1.6),[.022,.022,.022],0,.18,0);
-    for(const s of [-1,1]){const c=add(CYL3,D,[.028,.12,.028],s*.14,.1,-.02);c.rotation.z=Math.PI/2;}
-    return true;}
+  case 'claw':{add(CYL3,gm('claw',()=>std(0x2a2f35,{metalness:.5})),[.16,.04,.16],0,.02,0);grp.userData.blink=add(SPH3,em('clawl',0xffd84a,1.6),[.035,.035,.035],0,.07,0);
+    const m=gm('clawp',()=>std(0x9aa3aa,{metalness:.8,roughness:.3}));for(let k=0;k<4;k++){const a=k/4*Math.PI*2;add(BOX3,m,[.02,.02,.16],Math.cos(a)*.12,.03,Math.sin(a)*.12).rotation.y=-a;}return true;}
   case 'magnet':{add(CYL3,gm('mag',()=>std(0x3a3f45,{metalness:.6})),[.16,.06,.16],0,.04,0);const r=add(new THREE.TorusGeometry(.17,.012,6,24),em('magl',0x4aa8e2,1.2),[1,1,1],0,.08,0);r.rotation.x=Math.PI/2;return true;}
   case 'banshee':{add(BOX3,gm('ban',()=>std(0x1d2026,{metalness:.4})),[.24,.24,.12],0,.12,0);add(CYL3,gm('banh',()=>std(0x30353c,{metalness:.5})),[.08,.08,.08],0,.14,.08).rotation.x=Math.PI/2;
     grp.userData.blink=add(SPH3,em('banl',0x4aa8e2),[.03,.03,.03],0,.27,0);return true;}
@@ -7138,7 +7189,7 @@ function update3D(){
   if(G.phase==='play'&&!G.over){for(const u of G.units)if(u.alive&&u.x>=0&&u.side!==G.player&&u.spotted>0&&!vis.has(u.id))dg.add(pin3D(u.x,u.y));
     if(G.player==='D')for(const k of G.decoys||[])if(k.alive)dg.add(token3D(k.x,k.y,true));
     for(const h of heatPins())dg.add(pin3D(h.x,h.y));}
-  if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='face')&&G.sel&&G.sel.x>=0&&G.phase==='play')dg.add(owArrows(G.sel,G.mode==='face'?[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]:null));else R3.owA=null;
+  if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash'||G.mode==='face')&&G.sel&&G.sel.x>=0&&G.phase==='play')dg.add(owArrows(G.sel,G.mode==='face'?[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]:null));else R3.owA=null;
   if(G.phase==='setup'&&G.player==='A')G.map.spawns.forEach((z,i)=>dg.add(spawn3D(z,i,i===G.spawn||G.spawn==null)));
   if(G.hostage&&hostSeen())dg.add(hostage3D(G.hostage));
   if(G.mission!=='hostage'&&GIMG.bomb)for(const s of ['A','B']){if(R3.siteMap!==G.map){R3.siteMap=G.map;R3.siteC={};}const cs=R3.siteC,key=s;if(!cs[key]){const L=[];for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++)if(G.grid[y][x].site===s&&!G.grid[y][x].obst)L.push([x,y]);
@@ -8330,10 +8381,13 @@ const WPN={
   smg:{n:'衝鋒槍',t:'衝鋒槍手',en:'RUSHER',ic:WSVG('<path d="M10 14l10 10-10 10"/><path d="M24 14l10 10-10 10"/>'),
     trig:c=>c.run>=5,fx:'每回合可以開兩槍。第二槍擲一半的骰子（從紅骰開始捨棄，至少留 1 顆）。'}};
 // class skills (職業技能): one use per round, button in the action panel
-const CSK={mg:{n:'架槍',ap:'1 行動',d:'原地架好機槍，這回合不能再移動。直到你下次行動前，進入視野的每名敵人都會被掃射一次（整個視野都算，不用選方向）。剩下的行動點可以照常射擊。'},
+const CSK={mg:{n:'架槍',ap:'1 行動',d:'原地架好機槍，這回合不能再移動。直到你下次行動前，進入視野的每名敵人都會被掃射一次。剩下的行動點可以照常射擊。'},
   rf:{n:'精準射擊',ap:'免費',d:'下一次射擊無視掩護減傷。'},
   sn:{n:'熱感瞄準',ap:'1 行動',d:'選一個方向，視野範圍內隔著牆也能看到敵人的位置（看不出是誰），標記留到這回合結束。'},
-  smg:{n:'衝刺',ap:'1 行動',d:'移動點補滿，可以再走一次，但這回合不能再射擊。'}};
+  smg:{n:'衝刺',ap:'1 行動',d:'移動點補滿，可以再走一次，但這回合不能再射擊。'},
+  sh:{n:'盾牌猛擊',ap:'1 行動',d:'朝一個方向衝刺兩格，攻擊到第三格。撞到軟牆或路障會撞破，撞到掩護會撞爆。撞到敵人固定 2 傷；敵人背後是牆，再 1 傷並暈眩；敵人背後還有人，那個人也受 1 傷並暈眩。'},
+  sg:{n:'榴彈發射',ap:'1 行動',d:'對 3×3 範圍造成 2 傷，敵我都會受傷。範圍內除了鐵牆和轉角柱，牆、路障、掩護和道具全部炸毀。'}};
+const CSKM={sn:'heat',sh:'bash',sg:'gl'};
 const WORD=['mg','sh','sg','rf','sn','smg'],WART={rf:1,sn:1,sg:1,mg:1,smg:1},RANKD={R:3,O:2,Y:1};
 const bMax=(c,b)=>{const l=WPN[c.w]&&WPN[c.w].lim&&WPN[c.w].lim[b];return l?l.max:c.w==='mg'?7:5;};
 const bNoR=(c,b)=>{const l=WPN[c.w]&&WPN[c.w].lim&&WPN[c.w].lim[b];return !!(l&&l.noR);};
