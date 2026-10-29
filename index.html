@@ -3786,6 +3786,13 @@ const cedAt=(x,y)=>G.gadgets.some(g=>g.alive&&g.type==='ced'&&cheb(g.x,g.y,x,y)<
 const canDo=(u,k)=>u.ap>0&&!(k==='shoot'&&u.noShoot)&&(k==='destroy'||!u.used.has(k)||(k==='shoot'&&u.w==='smg'&&!u._s2));
 function useAct(u,k){if(k==='tactical'||k==='special')G._ghCap={u,msgs:[],name:''};u.ap--;u.used.add(k);if(u.hidden&&k!=='run')reveal(u,'行動時');}
 const decoyOf=u=>(G.decoys||[]).find(k=>k.alive&&k.owner===u.id);
+// Alibi's Prisma: holograms that look exactly like her (the owner sees them faded); a shot, a blast, a gadget-clearing skill or walking into one makes it flicker out
+const prismaAt=(x,y)=>G.gadgets.find(g=>g.alive&&g.type==='prisma'&&g.x===x&&g.y===y);
+function projU(g){const o=G.units.find(a=>a.id===g.owner)||{op:'alibi',side:'D',hp:3,max:3};return {...o,hp:o.alive===false?o.max:o.hp,id:g.pid,x:g.x,y:g.y,fd:g.fd,alive:true,hidden:false,spotted:0,overwatch:false,stun:false,exp:null,proj:g};}
+const projSeen=(g,side)=>side==='D'||G.over||(G.phase==='play'&&seenBy(side,projU(g)));
+const pdirG=()=>G&&G.pdir&&G.gadgets.find(g=>g.alive&&g.pid===G.pdir);
+function prismaBreak(g,why){if(!g||!g.alive)return;g.alive=false;log(`${why}，那只是 Alibi 的投影分身，閃了幾下就消失了`,'ks');render();}
+function prismaHit(cells,why){for(const [x,y] of cells){const g=prismaAt(x,y);if(g)prismaBreak(g,why);}}
 function decoyReach(u){const k=decoyOf(u);if(!k)return new Map();const mp=G.active===u?u.mp:u.speed,m=reach({...u,x:k.x,y:k.y,mp});
   for(const [i,v] of [...m])if(v.d<=0||v.pass||unitAt(i%G.W,(i/G.W)|0)||(G.decoys||[]).some(o=>o.alive&&o.x===i%G.W&&o.y===((i/G.W)|0)))m.delete(i);return m;}
 async function moveDecoy(u,x,y){const k=decoyOf(u),n=decoyReach(u).get(y*G.W+x);if(!k||!n)return;u.mp-=n.d;k.x=x;k.y=y;note(u,'移動誘餌');render();await sleep(80);revealCheck();}
@@ -4034,7 +4041,7 @@ async function shootUnit(sh,t,ow){
   render(); await sleep(G.ai?320:160);
   ST(sh).shots++;if(hits)ST(sh).hits++;
   if(hits&&t.op==='blackbeard'&&t.ch>0){const c=Math.min(2,hits);hits-=c;t.ch--;log(`${nm(t)} 的步槍護盾擋下 ${c} 傷（剩 ${t.ch}）`,t.side==='A'?'ka':'kd');}
-  DMGBY=sh;if(hits)await damage(t,hits);DMGBY=null;
+  DMGBY=sh;if(t.proj)prismaBreak(t.proj,`子彈直接穿過了 ${nm(sh)} 瞄準的目標`);else if(hits)await damage(t,hits);DMGBY=null;
   {const dr=lineCells(sh.x,sh.y,t.x,t.y).filter(([x,y])=>{const c=cell(x,y);return c&&c.t==='bar'&&c.kind==='door';});
    if(dr.length){const bm=SFX.boom;SFX.boom=()=>{};try{for(const [x,y] of dr)if(cell(x,y).t==='bar')destroyCell(x,y);}finally{SFX.boom=bm;}SFX.hit();
      log(`子彈打穿了門路障，門已經被打爛（之後從這裡穿過不再有掩護）`,'ks');render();}}
@@ -4044,7 +4051,7 @@ async function shootUnit(sh,t,ow){
      if(holed)log(`子彈在牆上打出破洞（之後穿過這面牆射擊只扣 1）`,'ks');
      if(out)log(`牆被打穿崩掉了，現在可以通過，也不再提供掩護`,'ks');render();}}
   if(hits&&!t.alive){sh._k=(sh._k||0)+1;if(sh._k>=2)bigNote(['','','雙殺','三殺','四殺','王牌'][Math.min(5,sh._k)]+'！',`${OPS[sh.op].name}`,sh.side==='A'?'a':'d',1700);}
-  if(t.alive){if(!t.spotted)log(`${nm(t)} 被標記位置（到回合結束）`,'ks');t.spotted=1;if(tw)t.wmark=1;else if(t.hidden)reveal(t,'中彈後');}
+  if(t.alive&&!t.proj){if(!t.spotted)log(`${nm(t)} 被標記位置（到回合結束）`,'ks');t.spotted=1;if(tw)t.wmark=1;else if(t.hidden)reveal(t,'中彈後');}
   if(cine){await sleep(t.alive?650:1100);}diceHide();shotCamEnd();
 }
 // screen boxes (feet point and body height in px) of the two fighters, seen from the close-up camera
@@ -4271,6 +4278,7 @@ function shootables(u){
   const o=[];LOSW=u.op==='warden';LOSD=u.side==='D';try{return shootables0(u,o);}finally{LOSW=false;LOSD=false;}}
 function shootables0(u,o){
   for(const e of G.units)if(e.alive&&e.side!==u.side&&e.x>=0&&(!e.hidden||e.spotted>0)&&((G.tut2?los(u.x,u.y,e.x,e.y):inSight(u,e))||(e.spotted>0&&(G.tut2||inFan(u,e.x,e.y))&&los(u.x,u.y,e.x,e.y,true))))o.push({kind:'unit',t:e,x:e.x,y:e.y});
+  if(u.side==='A')for(const g of G.gadgets)if(g.alive&&g.type==='prisma'&&(G.tut2?los(u.x,u.y,g.x,g.y):inSight(u,g)))o.push({kind:'unit',t:projU(g),x:g.x,y:g.y});
   {const k=o.filter(a=>!o.some(b=>b!==a&&sameRay(u,a,b)&&cheb(u.x,u.y,b.x,b.y)<cheb(u.x,u.y,a.x,a.y)));o.length=0;o.push(...k);}
   return o;
 }
@@ -4284,7 +4292,7 @@ async function doShoot(u,tg){
 }
 const GNAME={trax:'Trax 尖刺',argus:'Argus 攝影機',eye:'邪眼攝影機',kona:'Kóna 治療站',mat:'捕獸夾',gu:'蠱毒地雷',grz:'震盪地雷',claw:'Rtila 電爪',magnet:'Mag-NET',banshee:'Banshee',cam:'攝影機',jammer:'訊號干擾器',drone:'無人機',wire:'鐵絲網',shield:'可部署盾牌',trap:'陷阱',ced:'電擊線',clay:'闊刀地雷'};
 // strength of each gadget (S1 light, S2 medium); bulletproof ones only fall to an adjacent operator or a gadget
-const GSTR={ads:1,trax:1,argus:1,eye:2,kona:1,mat:1,gu:1,grz:1,claw:1,magnet:1,banshee:2,cam:1,jammer:1,drone:1,wire:1,shield:2,trap:1,ced:1,clay:1};
+const GSTR={prisma:1,ads:1,trax:1,argus:1,eye:2,kona:1,mat:1,gu:1,grz:1,claw:1,magnet:1,banshee:2,cam:1,jammer:1,drone:1,wire:1,shield:2,trap:1,ced:1,clay:1};
 const isBP=g=>g.type==='wire'||g.type==='shield'||g.type==='eye'||g.type==='banshee'||(g.type==='cam'&&g.bp);
 async function blastDestroy(x,y,d){ // free Destroy from a gadget with rating d at one space
   const c=cell(x,y);if(!c)return;
@@ -4294,7 +4302,7 @@ const blastArea=(x,y)=>[[x,y],...adj8(x,y)];
 function hostHarm(area,side,why){const h=G&&G.hostage;if(!h||G.over||G.mission!=='hostage'||!side||!area.some(([i,j])=>i===h.x&&j===h.y))return false;if(side===G.player&&!G.net||(G.net&&side===G.player)){G._hk=1;AS.n.hk=(AS.n.hk||0)+1;}
   SFX.siren();log(`${why}波及人質，人質死亡`,'kd');bigNote('人質死亡',`${side==='A'?'進攻方':'防守方'}的${why}傷到了人質`,side==='A'?'d':'a',2600);
   finish(side==='A'?'D':'A',`${side==='A'?'進攻方':'防守方'}的${why}害死了人質`);return true;}
-async function clayBoom(g){SFX.boom();g.alive=false;if(hostHarm(blastArea(g.x,g.y),g.side||'A','闊刀地雷'))return;G.fx={x0:g.x,y0:g.y,x1:g.x,y1:g.y,until:performance.now()+500,c:COL.danger};
+async function clayBoom(g){SFX.boom();g.alive=false;prismaHit(blastArea(g.x,g.y),'闊刀地雷炸開');if(hostHarm(blastArea(g.x,g.y),g.side||'A','闊刀地雷'))return;G.fx={x0:g.x,y0:g.y,x1:g.x,y1:g.y,until:performance.now()+500,c:COL.danger};
   for(const a of G.units.filter(a=>a.alive&&a.x>=0&&blastArea(g.x,g.y).some(([i,j])=>i===a.x&&j===a.y))){const r=DIE.R[Math.floor(Math.random()*6)]+DIE.R[Math.floor(Math.random()*6)];if(r)await damage(a,r,'闊刀地雷');}}
 // Destroy: adjacent barricades, or enemy gadgets in line of sight (low strength)
 function destroyTargets(u){const lv=PROF[u.op].dz||1,o=within(u.x,u.y,14).filter(([x,y])=>{const c=cell(x,y);if(!(c.t==='bar'||(c.t==='soft'&&lv>=2)))return false;return cheb(u.x,u.y,x,y)<=1||los(u.x,u.y,x,y,false,true);});
@@ -4354,7 +4362,7 @@ async function useGadget(u,x,y){ST(u).gad++;DMGBY=u;if(x!=null)aimCam(u,[[x,y]])
     case 'thatcher':{let n=0;for(const g of G.gadgets)if(g.alive&&!['gas','fire','mat','gu'].includes(g.type)&&g.side==='D'&&cheb(g.x,g.y,x,y)<=2){g.alive=false;n++;}
       for(const [i,j] of within(x,y,2))if(cell(i,j).elec){cell(i,j).elec=false;n++;}
       log(`${nm(u)} 的 EMP 癱瘓了 ${n} 個防守道具`,side);break;}
-    case 'fuze':{log(`${nm(u)} 引爆集束炸彈`,side);if(hostHarm(within(x,y,1),u.side,'集束炸彈'))break;const hit=G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,x,y)<=1);
+    case 'fuze':{log(`${nm(u)} 引爆集束炸彈`,side);prismaHit(within(x,y,1),'集束炸彈炸開');if(hostHarm(within(x,y,1),u.side,'集束炸彈'))break;const hit=G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,x,y)<=1);
       for(const a of hit){a.spotted=1;await damage(a,1,'集束炸彈');}break;}
     case 'lion':alive('D').filter(d=>!NOLOC.has(d.op)).forEach(d=>{d.spotted=1;d.hidden=false;});(G.decoys||[]).forEach(k=>k.alive=false);log(`${nm(u)} 啟動 EE-ONE-D，所有防守方被標記到回合結束！`,side);break;
     case 'mute':G.gadgets.push({type:'jammer',x,y,side:'D',alive:true});if(pub(u))log(`${nm(u)} 放置了訊號干擾器`,side);break;
@@ -4440,6 +4448,7 @@ async function throwGadget(u,kind,x,y){ST(u).gad++;DMGBY=u;aimCam(u,[[x,y]]);
   if(kind==='frag'||kind==='nitro'){const fr=kind==='frag';G[kind]--;note(u,fr?'破片手榴彈':'C4 遙控炸藥');log(`${nm(u)} ${fr?'丟出破片手榴彈':'引爆 C4 遙控炸藥'}`,side);
     if(hostHarm(area,u.side,fr?'破片手榴彈':'C4')){SFX.boom();return;}
     const hit=G.units.filter(inA);if(!fr||!hit.length)SFX.boom();G.scanFx={cells:area,until:performance.now()+900,c:0xff7a2a};if(fr)for(const [i,j] of area)await blastDestroy(i,j,1);
+    if(!fr)prismaHit(area,'C4 炸開');
     for(const a of hit){if(!a.alive)continue;const ctr=a.x===x&&a.y===y;let r;if(fr){const idx=[...Array(ctr?2:1)].map(()=>Math.floor(Math.random()*6));r=idx.reduce((t,i)=>t+DIE.Y[i],0);await fragShow(u,a,ctr?'YY':'Y',idx,r,ctr);}else r=roll('O',ctr?2:1);if(r)await damage(a,r,fr?'破片':'C4');}if(fr&&hit.length){diceHide();shotCamEnd();}}
   else if(kind==='impact'){G.impact--;note(u,'衝擊手榴彈');const c=cell(x,y),w=c.t==='soft'?'軟牆':c.t==='bar'?(c.kind==='window'?'窗戶路障':'門路障'):'道具';await blastDestroy(x,y,2);log(`${nm(u)} 的衝擊手榴彈炸掉了${w}`,side);}
   else if(kind==='flash'){SFX.flash();G.flash--;note(u,'閃光彈');let n=0;for(const a of G.units)if(inA(a)){stunU(a);if(a.hidden)reveal(a,'被閃光彈');n++;}
@@ -4511,6 +4520,7 @@ async function shieldBash(u,v){if(u.csk===G.round)return;u.csk=G.round;useAct(u,
   for(let i=1;i<=3;i++){const x=u.x+f[0],y=u.y+f[1],c=cell(x,y);if(!c){what='';break;}
     const t=G.units.find(e=>e.alive&&e.x===x&&e.y===y);
     if(t){if(t.side!==u.side)what=await bashHit(u,t,f);break;}
+    if(u.side==='A'){const pz=prismaAt(x,y);if(pz){prismaBreak(pz,'盾牌撞了上去');what='撞散投影';}}
     if(blocks(c)){if(c.t==='soft'||c.t==='bar'){destroyCell(x,y);what=c.kind?'撞破路障':'撞破軟牆';}break;}
     const sg=G.gadgets.find(g=>g.alive&&g.x===x&&g.y===y&&g.type==='shield');
     if(sg){sg.alive=false;what='撞爆可部署盾牌';break;}
@@ -4618,8 +4628,9 @@ function reach(u){ECU=u; // cheapest walkable spaces within the remaining moveme
     for(const [nx,ny] of adj8(x,y)){const k=ny*W+nx;const c=cell(nx,ny);if(blocks(c)||c.tall||shieldAt(nx,ny))continue;
       const nd=d+enterCost(nx,ny,x,y);if(nd>u.mp||(m.has(k)&&m.get(k).d<=nd))continue;
       const o=unitAt(nx,ny);if(o&&o.side!==u.side&&vis.has(o.id))continue;
+      if(u.side==='A'){const pz=prismaAt(nx,ny);if(pz&&projSeen(pz,'A'))continue;}
       m.set(k,{d:nd,p:y*W+x});q.push([nx,ny,nd]);}}
-  for(const [k] of m){const o=unitAt(k%W,(k/W)|0);if((o&&o!==u&&o.side===u.side)||(cell(k%W,(k/W)|0).obst&&!cell(k%W,(k/W)|0).stand))m.get(k).pass=true;} // may pass squadmates and climb over furniture, not stop there
+  for(const [k] of m){const o=unitAt(k%W,(k/W)|0);if((o&&o!==u&&o.side===u.side)||(u.side==='D'&&prismaAt(k%W,(k/W)|0))||(cell(k%W,(k/W)|0).obst&&!cell(k%W,(k/W)|0).stand))m.get(k).pass=true;} // may pass squadmates and climb over furniture, not stop there
   return m;
 }
 function pathFrom(m,x,y){const W=G.W,p=[];let k=y*W+x;while(k>=0&&m.has(k)){p.unshift([k%W,(k/W)|0]);k=m.get(k).p;}return p.slice(1);}
@@ -4852,6 +4863,7 @@ function startPlay(){if(G&&!G.reroll)G.reroll={A:0,D:0};try{playStartHooks();}ca
 
 // ---------- player input ----------
 function curTargets(){if(G&&G.mode==='bpface'&&G.bpPend)return G.bpPend.map(p=>p.w);
+  if(G.mode==='pdir'){const g=pdirG();return g?adj8all(g.x,g.y):[];}
   if(G.mode==='shdir'&&G.shdir)return adj4(G.shdir.x,G.shdir.y);
   const u=G.sel;if(!u)return [];
   if(G.phase==='setup'){
@@ -4895,6 +4907,7 @@ function commit(u){
 }
 async function act(fn){G.busy=true;render();try{await fn();}finally{G.busy=false;}
   if(G.over)return render();
+  if(pdirG()){G.mode='pdir';revealCheck();return render();}
   if(dmOf()&&curSide()===G.player){G.mode='dronemove';return render();}
   const u=G.active;
   if(u&&((u.overwatch&&!u.mgOw)||!u.alive||(u.ap<=0&&u.mp<=0)))playerAfterAct();else{G.mode='move';render();}
@@ -4904,6 +4917,8 @@ async function onCell(x,y){
   if(!G||G.over||G.busy)return;if(TU&&TU.ph==='game'){const q=tuCellOK(x,y);if(!q)return;x=q[0];y=q[1];}
   if(G.mode==='shdir'&&G.shdir){const g=G.shdir;if(adj4(g.x,g.y).some(([a,b])=>a===x&&b===y)){g.dir=[x-g.x,y-g.y];log(`盾牌正面朝${dirName(g.dir)}，只擋這一側的半圓`,'kd');G.shdir=null;G.mode=G.phase==='setup'&&G.shield>0?'shield':'move';render();}return;}
   if(G.mode==='owq')return owqTap(x,y);
+  if(G.mode==='pdir'){const g=pdirG();if(g&&adj8all(g.x,g.y).some(([a,b])=>a===x&&b===y)){g.fd=[x-g.x,y-g.y];G.pdir=null;const a=G.units.find(q=>q.id===g.owner);
+    G.mode=G.phase==='setup'&&a&&a.ch>0?'gadget':'move';if(G.phase==='play'&&a&&G.active===a&&a.ap<=0&&a.mp<=0)playerAfterAct();}else if(!g){G.pdir=null;G.mode='move';}return render();}
   if(G.mode==='face'){const f=G.sel;G.mode='move';if(f&&adj8all(f.x,f.y).some(([a,b])=>a===x&&b===y)){f.fd=[x-f.x,y-f.y];revealCheck();camDiscover();}return render();}
   const u=G.sel,c=cell(x,y),k=`${x},${y}`;
   if(G.phase==='setup'&&G.mode==='bpface'&&G.bpEye){const h=(G.bpPend||[]).find(p=>p.w[0]===x&&p.w[1]===y),e=G.bpEye;G.bpPend=null;G.bpEye=null;G.mode='move';if(h){G._eyeW=h;try{await useGadget(e,h.x,h.y);}finally{G._eyeW=null;}}if(e.ch>0){G.sel=e;G.mode='gadget';}return render();}
@@ -4917,7 +4932,7 @@ async function onCell(x,y){
     if((G.mode==='move'||G.mode==='decoy')&&o&&o.side==='D'){G.sel=o;G.mode='move';return render();}
     if(!inT||!u)return;
     if(G.mode==='move'){const was=u.x<0;u.x=x;u.y=y;u.anchor=[x,y];if(was)nextUnplaced();}
-    else if(G.mode==='gadget'){await useGadget(u,x,y);if(u.ch<=0)G.mode='move';}
+    else if(G.mode==='gadget'){await useGadget(u,x,y);if(pdirG())G.mode='pdir';else if(u.ch<=0)G.mode='move';}
     else if(G.mode==='wire'||G.mode==='shield'||G.mode==='bpcam'){await deployGadget(u,G.mode,x,y);if(G.mode!=='shdir'&&G.mode!=='bpface'&&!G[G.mode])G.mode='move';}
     else if(G.mode==='decoy'){const k=decoyOf(u);if(k){k.x=x;k.y=y;}G.mode='move';}
     else if(G.mode==='rearr'){G.rearr=G.rearr??5;const cg=G.gadgets.find(g=>g.alive&&g.type==='cam'&&g.fixed&&g.x===x&&g.y===y);
@@ -4953,6 +4968,7 @@ async function onCell(x,y){
   if(G.mode==='move'&&u&&u.side===G.player&&G.gadgets.some(g=>g.alive&&CAMT.includes(g.type)&&g.side!==u.side&&g.x===x&&g.y===y)){
     if(camClicks(u).some(([a,b])=>a===x&&b===y)&&commit(u))return act(async()=>{await doDestroy(u,x,y);});
     if(canAct(u)){bigNote('打不到這台攝影機',(G.active===u&&!canDo(u,'destroy'))?'這次啟動已經用過破壞':'要有視線、在 14 格內；防彈攝影機要站在旁邊','warn',1500);return render();}}
+  {const pz=prismaAt(x,y);if(pz&&u&&u.side==='A'&&u.side===G.player&&G.mode==='move'&&canAct(u)&&(G.active!==u||canDo(u,'shoot'))&&projSeen(pz,'A')){const tg=shootables(u).find(t=>t.t.proj===pz);if(tg&&commit(u))return act(async()=>{await doShoot(u,tg);});}}
   const o=unitAt(x,y);
   if(o&&o.side!==G.player&&u&&u.side===G.player&&G.mode==='move'&&canAct(u)&&(G.active!==u||canDo(u,'shoot'))&&shootables(u).some(t=>t.t===o)&&commit(u)){
     return act(async()=>{await doShoot(u,shootables(u).find(t=>t.t===o));});
@@ -5525,8 +5541,8 @@ let socT=0;function socialPush(){gaPush();if(!SOC_ID||ME.mode!=='account')return
 // ===== remaining operators: gadgets in the simplified digital rules =====
 var LOSW=false,LOSD=false,SHOTP=null,DRONEANY=false;
 var NOLOC=new Set(['nokk','iana','vigil']);
-var NOBTN=new Set(['blackbeard','jager','vigil','nokk','iana','warden','alibi','aruni','castle','thunderbird','maestro','kaid','goyo','wamai','melusi']);
-var SETUPOPS=['jager','castle','thunderbird','frost','lesion','ela','mira','maestro','kaid','goyo','wamai','melusi'];
+var NOBTN=new Set(['blackbeard','jager','vigil','nokk','iana','warden','aruni','castle','thunderbird','maestro','kaid','goyo','wamai','melusi']);
+var SETUPOPS=['alibi','jager','castle','thunderbird','frost','lesion','ela','mira','maestro','kaid','goyo','wamai','melusi'];
 var BRK={buck:1,hibana:1,ace:1,maverick:1,oryx:1},BRKR={hibana:1,ace:1,maverick:1};
 var GDX={
  blitz:['〔行動〕閃光盾：選相鄰一格，該房間內除了 Blitz 以外的所有幹員都被震暈（擲骰只剩兩顆黃骰，到這一輪結束）。',2],
@@ -5556,7 +5572,7 @@ var GDX={
  maverick:['〔行動〕突破噴槍：安靜燒穿相鄰的一面軟牆或加固牆（通電或被干擾時不行）。',2],
  nomad:['〔行動〕Airjab：把 6 格內看得到的一名敵人推到旁邊離 Nomad 最遠的空格。',3],
  maestro:['〔佈防〕邪眼攝影機：放在室內（防彈）；進攻方每次啟動第一次走進或停在該房間，會被標記並受一顆黃骰傷害。',2],
- alibi:['〔被動〕Prisma：對戰開始時多放 2 個假的隱藏標記。',0],
+ alibi:['〔佈防／行動〕Prisma 投影分身：在自己 3 格內放一個跟 Alibi 一模一樣的投影，再選它面向哪裡（最多 2 個）。你看到的是半透明的；進攻方看到的就是 Alibi，可以對它開槍。中彈、被炸、被清道具的技能波及或有人穿過時，投影會在原地閃爍消失。',2],
  clash:['〔行動〕CCE 電擊盾：3 格內看得到的一名進攻方被震暈並受一顆黃骰傷害。〔被動〕重型掩護時最多抵銷 4 傷。',2],
  kaid:['〔佈防〕Rtila 電爪：放在門窗內側；進攻方走進那格會被震暈並受 1 傷，無人機也開不過去。',2],
  gridlock:['〔行動〕Trax 尖刺：丟到 6 格內；防守方走進尖刺或旁邊一格受 1 傷，並立刻結束啟動。',2],
@@ -5607,8 +5623,7 @@ function finkaSave(u){if(u.side!=='A')return false;const f=G.units.find(a=>a.ali
 function mozzieFeed(){const m=G.units.find(a=>a.alive&&a.op==='mozzie');if(m&&m.ch<3){m.ch++;log('Mozzie 劫持了一台無人機','kd');}}
 function playStartHooks(){if(G._psh)return;G._psh=true;
   const m=G.units.find(a=>a.op==='mozzie');if(m&&G.drones>0){G.drones--;m.ch=1;}
-  const al=G.units.find(a=>a.op==='alibi'&&a.x>=0);if(al&&G.decoys){const ind=shuffle(allCells().filter(([x,y])=>setupIndoor(x,y)&&!unitAt(x,y)&&!G.decoys.some(k=>k.alive&&k.x===x&&k.y===y)));
-    for(let i=0;i<2&&ind[i];i++)G.decoys.push({x:ind[i][0],y:ind[i][1],alive:true,owner:al.id});}}
+}
 async function ignite(x,y,by){G.gadgets.push({type:'fire',x,y,side:'D',alive:true,life:2});SFX.boom();log(`${coord(x,y)} 一帶起火了`,'ks');if(hostHarm(within(x,y,1),by||'D','火焰'))return;
   for(const a of G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,x,y)<=1)){a.burned=true;const r=die1('O');if(r)await damage(a,r,'火焰');}}
 var objRoom=(x,y)=>{if(!G._obj||G._obj.wv!==(G._wv||0)){const s=new Set();for(const [i,j] of allCells()){const c=cell(i,j);if(c.site)roomCells(i,j).forEach(k=>s.add(k));}
@@ -5616,6 +5631,7 @@ var objRoom=(x,y)=>{if(!G._obj||G._obj.wv!==(G._wv||0)){const s=new Set();for(co
 async function stepHooks(u,x,y,px,py){
   const hurt=async(n,why)=>{if(n>0)await damage(u,n,why);return u.alive&&!G.over;};
   if(u.side==='A'){
+    {const pz=prismaAt(x,y);if(pz)prismaBreak(pz,`${nm(u)} 直接穿過了眼前的 Alibi`);}
     const mat=gadgetAt(x,y,'mat');if(mat){mat.alive=false;log(`${nm(u)} 踩到 Frost 的捕獸夾！`,'kd');u.mp=0;u.ap=0;if(!(await hurt(2,'捕獸夾')))return false;}
     const gu=gadgetAt(x,y,'gu');if(gu){gu.alive=false;locU(u);log(`${nm(u)} 踩到 Lesion 的蠱毒地雷，被標記`,'kd');if(!(await hurt(1,'蠱毒')))return false;}
     const gz=G.gadgets.find(g=>g.alive&&g.type==='grz'&&cheb(g.x,g.y,x,y)<=1);if(gz){gz.alive=false;stunU(u);log(`${nm(u)} 觸發 Ela 的震盪地雷，被震暈`,'kd');}
@@ -5667,9 +5683,11 @@ var GT={
  melusi:(u,s)=>s?allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y)):[],
  zero:u=>thrown(u).filter(([x,y])=>cell(x,y).indoor&&!gadgetAt(x,y)),
  oryx:u=>u.rnd===G.round?[]:adj4(u.x,u.y).filter(([x,y])=>cell(x,y).t==='soft'&&!unitAt(x,y)),
- blackbeard:()=>[],jager:(u,s)=>s?allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y)):[],vigil:()=>[],nokk:()=>[],iana:()=>[],warden:()=>[],alibi:()=>[],aruni:()=>[],
+ blackbeard:()=>[],jager:(u,s)=>s?allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y)):[],vigil:()=>[],nokk:()=>[],iana:()=>[],warden:()=>[],aruni:()=>[],
+ alibi:u=>u.x<0?[]:within(u.x,u.y,3).filter(([x,y])=>{const c=cell(x,y);return !blocks(c)&&!c.tall&&!(c.obst&&!c.stand)&&!shieldAt(x,y)&&!unitAt(x,y)&&!gadgetAt(x,y);}),
 };
 var PLACE={
+ alibi:(u,x,y)=>{const v=[Math.sign(x-u.x),Math.sign(y-u.y)],g={type:'prisma',x,y,side:'D',alive:true,owner:u.id,pid:'pz'+(G.pzN=(G.pzN||0)+1),fd:v[0]||v[1]?v:(u.fd||[0,1]).slice()};G.gadgets.push(g);return g;},
  castle:(u,x,y)=>{const c=cell(x,y);c.t='reinf';c.panel=true;G._wv=(G._wv||0)+1;if(R3)R3.sig='';},
  thunderbird:(u,x,y)=>G.gadgets.push({type:'kona',x,y,side:'D',alive:true}),
  frost:(u,x,y)=>G.gadgets.push({type:'mat',x,y,side:'D',alive:true}),
@@ -5691,6 +5709,7 @@ function twShock(u,x,y){const R=cell(x,y).indoor?roomCells(x,y):new Set(within(x
   log(`${nm(u)} 的電擊無人機擲出 ${r}，摧毀了 ${n} 個電子道具`,'ka');if(n&&u.side===G.player)bigNote('電擊無人機',`摧毀 ${n} 個電子道具`,'a',1300);}
 async function droneLike(u,x,y,f){G.gadgets.push({type:'drone',x,y,side:u.side,alive:true,own:u.op});const room=roomOrArea(x,y).filter(([a,b])=>cheb(a,b,x,y)<=4);await f(room);render();}
 var UG={
+ alibi:async(u,x,y,s)=>{const g=PLACE.alibi(u,x,y);if(u.side===G.player&&!G.ai){G.pdir=g.pid;bigNote('選投影的面向','點投影旁邊的箭頭','d',1400);}if(u.side===G.player)log(`${nm(u)} 放出一個 Prisma 投影分身`,s);},
  blitz:async(u,x,y,s)=>{SFX.flash();let n=0;for(const a of G.units)if(a.alive&&a!==u&&cheb(a.x,a.y,x,y)<=2&&roomCells(x,y).has(a.y*G.W+a.x)&&stunU(a)){if(a.hidden)reveal(a,'被閃光盾');n++;}log(`${nm(u)} 的閃光盾震暈了 ${n} 名幹員`,s);},
  ying:async(u,x,y,s)=>{SFX.flash();let n=0;for(const a of G.units)if(a.alive&&a!==u&&cheb(a.x,a.y,x,y)<=2&&roomCells(x,y).has(a.y*G.W+a.x)&&stunU(a)){if(a.hidden)reveal(a,'被坎德拉');n++;}log(`${nm(u)} 的坎德拉閃光彈震暈了 ${n} 名幹員`,s);},
  twitch:async(u,x,y,s)=>{G.gadgets.push({type:'drone',x,y,side:'A',alive:true,moving:true,mp:5,by:u.id,own:'twitch'});SFX.step();camDiscover();
@@ -5734,6 +5753,7 @@ for(const k of Object.keys(PLACE))if(!UG[k])UG[k]=async(u,x,y,s)=>{PLACE[k](u,x,
 // ---- AI: placement during setup, and when to use a gadget in play ----
 var pickC=l=>shuffle(l)[0]||null;
 var SAI={
+ alibi:(u,rooms,rs)=>pickC(GT.alibi(u,true).filter(([x,y])=>cell(x,y).indoor)),
  castle:(u,rooms,rs)=>pickC(GT.castle(u,true).filter(([x,y])=>adj4(x,y).some(([a,b])=>rs.has(b*G.W+a)))),
  thunderbird:(u,rooms,rs)=>pickC(GT.thunderbird(u,true).filter(([x,y])=>rs.has(y*G.W+x)&&!G.gadgets.some(g=>g.alive&&g.type==='kona'&&inRoomOf(g,x,y)))),
  frost:(u,rooms,rs)=>pickC(GT.frost(u,true).filter(([x,y])=>adj4(x,y).some(([a,b])=>cell(a,b).t==='bar'))),
@@ -5781,7 +5801,7 @@ function render(){try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{
   if(R3){update3D();return;}
   sizeBoard();ctx.save();ctx.translate(M,M);drawMap(G.map);
   // gadgets
-  for(const g of G.gadgets){if(!g.alive)continue;if(!G.over&&!gadgetVisibleTo(g,G.player))continue;const cx=g.x*S+S/2,cy=g.y*S+S/2;
+  for(const g of G.gadgets){if(!g.alive||g.type==='prisma')continue;if(!G.over&&!gadgetVisibleTo(g,G.player))continue;const cx=g.x*S+S/2,cy=g.y*S+S/2;
     if(g.type==='gas'){const gr=ctx.createRadialGradient(cx,cy,S*.2,cx,cy,S*1.7);gr.addColorStop(0,'rgba(140,220,90,.55)');gr.addColorStop(1,'rgba(120,200,80,.05)');ctx.fillStyle=gr;ctx.fillRect((g.x-1)*S,(g.y-1)*S,3*S,3*S);}
     else{if(g.type==='ced'){ctx.strokeStyle=COL.elec;ctx.setLineDash([3,3]);ctx.lineWidth=1;ctx.strokeRect((g.x-1)*S+1,(g.y-1)*S+1,3*S-2,3*S-2);ctx.setLineDash([]);}if(g.type==='jammer'){ctx.strokeStyle=COL.def;ctx.setLineDash([3,3]);ctx.lineWidth=1;ctx.strokeRect((g.x-2)*S+1,(g.y-2)*S+1,5*S-2,5*S-2);ctx.setLineDash([]);}drawGadgetIcon(g.type,cx,cy,g);if(g.bp){ctx.strokeStyle='#e3aa3e';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(cx,cy,S*.27,0,7);ctx.stroke();}}}
   // fog
@@ -5812,6 +5832,9 @@ function render(){try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{
     if(u.side!==G.player&&u.spotted>0){ctx.strokeStyle=COL.danger;ctx.setLineDash([3,2]);ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(cx,cy,r+3,0,7);ctx.stroke();ctx.setLineDash([]);}
     if(u===G.sel){ctx.strokeStyle=COL.accent;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx,cy,r+3,0,7);ctx.stroke();}
   }
+  for(const g of G.gadgets)if(g.alive&&g.type==='prisma'){const mine=G.player==='D'||G.over;if(!mine&&!projSeen(g,G.player))continue;const p=projU(g),cx=g.x*S+S/2,cy=g.y*S+S/2;
+    ctx.globalAlpha=mine?.45:1;drawToken(p,cx,cy,S*.38);ctx.fillStyle='rgba(10,14,18,.75)';ctx.fillRect(g.x*S+2,g.y*S+S-6,S-4,5);for(let i=0;i<p.max;i++){ctx.fillStyle=i<p.hp?COL.ok:'#3a2a2a';ctx.fillRect(g.x*S+3+i*(S-6)/p.max,g.y*S+S-5,(S-6)/p.max-1,3);}ctx.globalAlpha=1;}
+  if(G.mode==='pdir'){const g=pdirG();if(g){ctx.fillStyle='#ffc84a';for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){const L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,cx=(g.x+.5+dx*.75)*S,cy=(g.y+.5+dy*.75)*S,px=-uy,py=ux;ctx.beginPath();ctx.moveTo(cx+ux*S*.22,cy+uy*S*.22);ctx.lineTo(cx-ux*S*.1+px*S*.2,cy-uy*S*.1+py*S*.2);ctx.lineTo(cx-ux*S*.1-px*S*.2,cy-uy*S*.1-py*S*.2);ctx.closePath();ctx.fill();}}}
   if(!G.over)for(const u of G.units)if(u.alive&&u.x>=0&&u.side!==G.player&&u.spotted>0&&!vis.has(u.id)){const cx=u.x*S+S/2,cy=u.y*S+S/2;ctx.fillStyle=COL.danger;ctx.beginPath();ctx.arc(cx,cy-S*.08,S*.2,Math.PI*.8,Math.PI*2.2);ctx.lineTo(cx,cy+S*.32);ctx.closePath();ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy-S*.08,S*.07,0,7);ctx.fill();}
   if(!G.over)for(const h of heatPins()){const cx=h.x*S+S/2,cy=h.y*S+S/2;ctx.fillStyle='#ff7a2e';ctx.beginPath();ctx.arc(cx,cy-S*.08,S*.2,Math.PI*.8,Math.PI*2.2);ctx.lineTo(cx,cy+S*.32);ctx.closePath();ctx.fill();ctx.fillStyle='#fff';ctx.font=`700 ${S*.24|0}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('?',cx,cy-S*.08);}
   if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash')&&G.sel&&G.sel.x>=0){const u=G.sel;ctx.fillStyle='#ffc84a';for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const cx=(u.x+.5+dx*.75)*S,cy=(u.y+.5+dy*.75)*S,px=-dy,py=dx;ctx.beginPath();ctx.moveTo(cx+dx*S*.22,cy+dy*S*.22);ctx.lineTo(cx-dx*S*.1+px*S*.2,cy-dy*S*.1+py*S*.2);ctx.lineTo(cx-dx*S*.1-px*S*.2,cy-dy*S*.1-py*S*.2);ctx.closePath();ctx.fill();}}
@@ -6749,6 +6772,21 @@ function unit3D(u){
   f.target=new THREE.Vector3();f.face=u.side==='A'?Math.PI:0;f.placed=false;
   R3.unitG.add(f.grp);R3.figs[u.id]=f;return f;
 }
+// a Prisma hologram is Alibi's own figure: faded for her side, solid for the attackers who see it; when it breaks it flickers out in place and never falls
+function figAlpha(f,a){if(f._a===a)return;f._a=a;f.grp.traverse(o=>{if(!o.material||o===f.badge)return;for(const m of Array.isArray(o.material)?o.material:[o.material]){if(m._o0==null)m._o0=m.opacity;m.transparent=a<1||m._o0<1;m.opacity=m._o0*a;m.depthWrite=m._dw0!==false;m.needsUpdate=true;}});}
+function prisma3D(g){let f=R3.figs[g.pid];
+  if(!g.alive){if(f&&!f.vanish){if(f.grp.visible)prismaVanish(f,g.pid);else{R3.unitG.remove(f.grp);delete R3.figs[g.pid];}}return;}
+  const p=projU(g),mine=G.player==='D'||G.over,show=mine||projSeen(g,G.player);
+  if(!f){f=unit3D(p);f.grp.traverse(o=>{if(!o.material||o===f.badge)return;o.material=Array.isArray(o.material)?o.material.map(m=>{const c=m.clone();c._dw0=m.depthWrite;return c;}):(c=>(c._dw0=o.material.depthWrite,c))(o.material.clone());});f.face=Math.atan2(g.fd[0],g.fd[1]);f.body.rotation.y=f.face;}
+  figAlpha(f,mine?.45:1);
+  if(!f.grp.visible&&show)f.placed=false;
+  f.grp.visible=show&&!(R3.cardHide&&R3.cardHide.has(g.pid));
+  f.target.set(g.x+.5,cell(g.x,g.y)?(cell(g.x,g.y).stand||0):0,g.y+.5);f.face=Math.atan2(g.fd[0],g.fd[1]);f.dead=false;
+  f.sel.visible=false;f.spot.visible=false;f.grp.traverse(o=>{o.userData.cell=[g.x,g.y];});badgeDraw(f,p);}
+function prismaVanish(f,k){f.vanish=1;const a0=f._a||1;let t=0;SFX.miss&&SFX.miss();
+  (R3.fx2||(R3.fx2=[])).push(dt=>{t+=dt;const q=t/1.1;
+    if(q>=1||R3.figs[k]!==f){R3.unitG.remove(f.grp);if(R3.figs[k]===f)delete R3.figs[k];return false;}
+    f.grp.visible=Math.sin(t*(24+q*60))>q*1.4-.6;f.body.scale.set(1+(Math.random()-.5)*.18*q,1,1);figAlpha(f,Math.round(a0*(1-q*.7)*20)/20);f.badge.material.opacity=1-q;return true;});}
 function clearFigs(){for(const k in R3.figs){R3.unitG.remove(R3.figs[k].grp);}R3.figs={};}
 // target glow: an open tube of light standing on the figure's base, bright at the floor and gone by the waist, plus a ring on the base
 function tgtGlow(list){if(!R3)return;let g=R3.glow;
@@ -7191,6 +7229,7 @@ function update3D(){
     f.grp.traverse(o=>{o.userData.cell=[u.x,u.y];});
     badgeDraw(f,u);
   }
+  for(const g of G.gadgets)if(g.type==='prisma'&&g.pid)prisma3D(g);
   // shot tracer + face the target
   if(G.fx&&G.fx!==R3.fxId){R3.fxId=G.fx;addTracer(G.fx);const sh=unitAt(G.fx.x0,G.fx.y0);if(sh&&R3.figs[sh.id])R3.figs[sh.id].face=Math.atan2(G.fx.x1-G.fx.x0,G.fx.y1-G.fx.y0);}
   // fog
@@ -7202,17 +7241,17 @@ function update3D(){
   if(G.mode==='move'&&G.sel&&G.phase==='play')for(const [x,y] of camClicks(G.sel))tg.push([x,y,.08,0xe8574e]);
   else if(!(G.phase==='setup'&&G.mode==='move')){const col=G.mode==='shoot'?0xe8574e:G.mode==='dronemove'?0x46d17c:0xe3aa3e;
     const rg=G.phase==='setup'&&G.mode==='rearr'&&!G.rearrCam;
-    for(const [x,y] of curTargets()){const c=cell(x,y);const wall=isWallC(c);if(rg){if(c.t==='soft'||c.rfR)tg.push([x,y,WH+.08,c.rfR?0x9aa4ad:0x22d860]);else glow.push([x,y,0,0x22d860,2.3]);continue;}if(!wall&&unitAt(x,y)){glow.push([x,y,0,col]);continue;}tg.push([x,y,wall?WH+.08:.08,col]);}}
+    for(const [x,y] of curTargets()){const c=cell(x,y);const wall=isWallC(c);if(rg){if(c.t==='soft'||c.rfR)tg.push([x,y,WH+.08,c.rfR?0x9aa4ad:0x22d860]);else glow.push([x,y,0,0x22d860,2.3]);continue;}if(!wall&&(unitAt(x,y)||prismaAt(x,y))){glow.push([x,y,0,col]);continue;}tg.push([x,y,wall?WH+.08:.08,col]);}}
   if(G.phase==='setup'&&G.player==='A')G.map.spawns.forEach((z,i)=>z.cells.forEach(([x,y])=>tg.push([x,y,.06,i===G.spawn?0xffa060:0xef7f3e])));
   if(G.scanFx&&performance.now()<G.scanFx.until){for(const [x,y] of G.scanFx.cells)if(!isWallC(cell(x,y)))tg.push([x,y,.05,G.scanFx.c||0x5ad0ff]);setTimeout(()=>{if(G&&G.scanFx&&performance.now()>=G.scanFx.until){G.scanFx=null;render();}},1450);}
   setInst(R3.reachIM,reach,.02);setInst(R3.tgtIM,tg);tgtGlow(glow);R3.hl=new Set([...reach,...tg,...glow].map(c=>c[0]+','+c[1]));
   // gadgets, defuser, trail
   const dg=R3.dynG;while(dg.children.length)dg.remove(dg.children[0]);
-  for(const g of G.gadgets){if(!g.alive)continue;if(!G.over&&!gadgetVisibleTo(g,G.player))continue;const gm3=gadget3D(g);if(CAMT.includes(g.type))gm3.userData.cell=[g.x,g.y];dg.add(gm3);}
+  for(const g of G.gadgets){if(!g.alive||g.type==='prisma')continue;if(!G.over&&!gadgetVisibleTo(g,G.player))continue;const gm3=gadget3D(g);if(CAMT.includes(g.type))gm3.userData.cell=[g.x,g.y];dg.add(gm3);}
   if(G.phase==='play'&&!G.over){for(const u of G.units)if(u.alive&&u.x>=0&&u.side!==G.player&&u.spotted>0&&!vis.has(u.id))dg.add(pin3D(u.x,u.y));
     if(G.player==='D')for(const k of G.decoys||[])if(k.alive)dg.add(token3D(k.x,k.y,true));
     for(const h of heatPins())dg.add(pin3D(h.x,h.y));}
-  if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash'||G.mode==='face')&&G.sel&&G.sel.x>=0&&G.phase==='play')dg.add(owArrows(G.sel,G.mode==='face'?[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]:null));else R3.owA=null;
+  if(G.mode==='pdir'&&pdirG())dg.add(owArrows(pdirG(),[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]));else if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash'||G.mode==='face')&&G.sel&&G.sel.x>=0&&G.phase==='play')dg.add(owArrows(G.sel,G.mode==='face'?[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]:null));else R3.owA=null;
   if(G.phase==='setup'&&G.player==='A')G.map.spawns.forEach((z,i)=>dg.add(spawn3D(z,i,i===G.spawn||G.spawn==null)));
   if(G.hostage&&hostSeen())dg.add(hostage3D(G.hostage));
   if(G.mission!=='hostage'&&GIMG.bomb)for(const s of ['A','B']){if(R3.siteMap!==G.map){R3.siteMap=G.map;R3.siteC={};}const cs=R3.siteC,key=s;if(!cs[key]){const L=[];for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++)if(G.grid[y][x].site===s&&!G.grid[y][x].obst)L.push([x,y]);
