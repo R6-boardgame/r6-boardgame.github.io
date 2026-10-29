@@ -3854,9 +3854,9 @@ function sharedCells(side){if(!G||!G.grid)return new Set();
   const k=side+'|'+(G._wv||0)+'|'+G.gadgets.map(g=>g.alive&&['drone','cam','mirror'].includes(g.type)?g.type+g.x+','+g.y+(g.open?'o':'')+(jammed(g.x,g.y)?'j':''):'').join(';');
   const C=G._shc||(G._shc={});if(C[side]&&C[side].k===k)return C[side].s;const s=new Set();
   const look=(g,r,ok)=>{for(let y=Math.max(0,g.y-r);y<=Math.min(G.H-1,g.y+r);y++)for(let x=Math.max(0,g.x-r);x<=Math.min(G.W-1,g.x+r);x++)if(ok(x,y)&&los(g.x,g.y,x,y,false,true))s.add(y*G.W+x);};
-  for(const g of G.gadgets){if(!g.alive||g.side!==side&&!(side==='D'&&(g.type==='cam'||g.type==='mirror')))continue;
+  for(const g of G.gadgets){if(!g.alive||g.side!==side&&!(side==='D'&&((g.type==='cam'&&!(g.bp&&g.side==='A'))||g.type==='mirror')))continue;
     if(g.type==='drone'){const c=cell(g.x,g.y);if(c&&c.indoor)for(const q of roomCells(g.x,g.y))s.add(q);else look(g,3,()=>true);s.add(g.y*G.W+g.x);}
-    else if(side==='D'&&g.type==='cam'&&!jammed(g.x,g.y)){
+    else if(g.type==='cam'&&!jammed(g.x,g.y)){
       if(g.wall)look(g,10,(x,y)=>(x-g.x)*g.wall[0]+(y-g.y)*g.wall[1]<=0);
       else if(outCam(g))look(g,8,()=>true);
       else if(cell(g.x,g.y).indoor)for(const [x,y] of roomOf(g.x,g.y))s.add(y*G.W+x);}
@@ -4105,7 +4105,7 @@ async function step(u,x,y){DMGBY=null;
     if(cedAt(x,y)&&!u.shocked){u.shocked=true;stunU(u);log(`${nm(u)} 踩到 Bandit 的電擊線，被震暈`,'kd');await damage(u,1,'電擊');if(!u.alive)return false;}
     if(gadgetAt(x,y,'wire')){log(`${nm(u)} 被鐵絲網纏住，啟動結束`,'kd');u.mp=0;u.ap=0;await damage(u,1,'鐵絲網');if(!u.alive)return false;}
   }
-  if(u.side==='D'){const cl=G.gadgets.find(g=>g.alive&&g.type==='clay'&&((g.x===x&&g.y===y)||(g.x+g.dx===x&&g.y+g.dy===y)));
+  {const cl=G.gadgets.find(g=>g.alive&&g.type==='clay'&&g.side!==u.side&&((g.x===x&&g.y===y)||(g.x+g.dx===x&&g.y+g.dy===y)));
     if(cl){log(`${nm(u)} 觸發了闊刀地雷！`,'ka');await clayBoom(cl);if(!u.alive)return false;}}
   if(!(await stepHooks(u,x,y,px,py)))return false;
   u._mv=1;camCheck(u);revealCheck();
@@ -4390,13 +4390,13 @@ async function throwGadget(u,kind,x,y){ST(u).gad++;DMGBY=u;aimCam(u,[[x,y]]);
   G.fx={x0:u.x,y0:u.y,x1:x,y1:y,until:performance.now()+400,c:COL.accent};render();await sleep(150);await afterAct(u);
 }
 const clayTargets=u=>G.clay>0?adj4(u.x,u.y).filter(([x,y])=>{const c=cell(x,y);return !blocks(c)&&!gadgetAt(x,y)&&!unitAt(x,y);}):[];
-function deployClay(u,x,y){useAct(u,'tactical');G.clay--;note(u,'闊刀地雷');G.gadgets.push({type:'clay',x,y,dx:x-u.x,dy:y-u.y,side:'A',alive:true});log(`${nm(u)} 在 ${coord(x,y)} 佈下闊刀地雷（朝${dirName([x-u.x,y-u.y])}）`,'ka');render();return afterAct(u);}
+function deployClay(u,x,y){useAct(u,'tactical');G.clay--;note(u,'闊刀地雷');G.gadgets.push({type:'clay',x,y,dx:x-u.x,dy:y-u.y,side:u.side,alive:true});log(`${nm(u)} 在 ${coord(x,y)} 佈下闊刀地雷（朝${dirName([x-u.x,y-u.y])}）`,'ka');render();return afterAct(u);}
 const deployTargets=u=>[[u.x,u.y],...adj8(u.x,u.y)].filter(([x,y])=>{const c=cell(x,y);return c.t==='floor'&&c.indoor&&!gadgetAt(x,y)&&!(unitAt(x,y)&&!(x===u.x&&y===u.y));}).filter(([x,y])=>!(x===u.x&&y===u.y));
 async function deployGadget(u,kind,x,y,w){
   if(G.phase!=='setup')useAct(u,'tactical');
   if(kind==='wire'){G.wire--;G.gadgets.push({type:'wire',x,y,side:'D',alive:true});if(pub(u)||G.player==='D')log(`${nm(u)} 拉起鐵絲網`,'kd');}
-  else if(kind==='bpcam'){if(!w){const cs=bpCands(x,y);if(cs.length>1&&G.player==='D'&&!G.ai){G.bpPend=cs;G.mode='bpface';bigNote('選一面牆','點發光的牆，攝影機會貼在那一面','d',1600);return;}if(cs[0]){x=cs[0].x;y=cs[0].y;w=cs[0].w;}}G.bpcam--;G.gadgets.push({type:'cam',bp:true,x,y,side:'D',alive:true,wall:w?[w[0]-x,w[1]-y]:null});if(G.player==='D')log(`${nm(u)} 裝上防彈攝影機`,'kd');}
-  else{G.shield--;const sg={type:'shield',x,y,side:'D',alive:true};sg.dir=shDef(x,y);G.gadgets.push(sg);if(pub(u)||G.player==='D')log(`${nm(u)} 架設防彈盾`,'kd');
+  else if(kind==='bpcam'){if(!w){const cs=bpCands(x,y);if(cs.length>1&&G.player==='D'&&!G.ai){G.bpPend=cs;G.mode='bpface';bigNote('選一面牆','點發光的牆，攝影機會貼在那一面','d',1600);return;}if(cs[0]){x=cs[0].x;y=cs[0].y;w=cs[0].w;}}G.bpcam--;G.gadgets.push({type:'cam',bp:true,x,y,side:u.side,alive:true,wall:w?[w[0]-x,w[1]-y]:null});if(G.player==='D')log(`${nm(u)} 裝上防彈攝影機`,'kd');}
+  else{G.shield--;const sg={type:'shield',x,y,side:u.side,alive:true};sg.dir=shDef(x,y);G.gadgets.push(sg);if(pub(u)||G.player==='D')log(`${nm(u)} 架設防彈盾`,'kd');
     if(u.side===G.player&&!G.ai){G.shdir=sg;G.mode='shdir';bigNote('選擇盾牌正面','點盾牌旁邊的格子，只擋那一側的半圓','d',1600);}}
   render();if(G.phase==='play')await afterAct(u);
 }
@@ -4764,9 +4764,9 @@ function curTargets(){if(G&&G.mode==='bpface'&&G.bpPend)return G.bpPend.map(p=>p
     case 'face':return adj8all(u.x,u.y);
     case 'frag':case 'flash':case 'smk':case 'nitro':return throwTargets(u);
     case 'impact':return impactTargets(u);
-    case 'clay':return clayTargets(u);
-    case 'wire':case 'shield':return deployTargets(u);
-    case 'charge':return chargeTargets(u);
+    case 'clay':return giBorrow(u,'clay',()=>clayTargets(u));
+    case 'wire':case 'shield':case 'bpcam':return deployTargets(u);
+    case 'charge':return giBorrow(u,'charge',()=>chargeTargets(u));
     case 'reinf':return reinfTargets(u);
     case 'gadget':{const t=gTargets(u);return t==='self'?[]:t;}
   }
@@ -4825,14 +4825,14 @@ async function onCell(x,y){
       if(mode==='shoot')await doShoot(u,shootables(u).find(t=>t.x===x&&t.y===y));
       else if(mode==='destroy')await doDestroy(u,x,y);
       else if(mode==='decoy'){await moveDecoy(u,x,y);G.mode=decoyReach(u).size?'decoy':'move';}
-      else if(mode==='charge')await doCharge(u,x,y);
-      else if(mode==='clay')await deployClay(u,x,y);
+      else if(mode==='charge')await giBorrow(u,mode,()=>doCharge(u,x,y));
+      else if(mode==='clay')await giBorrow(u,mode,()=>deployClay(u,x,y));
       else if(mode==='gadget')await useGadget(u,x,y);
       else if(mode==='drone')await droneDeploy(u,x,y);
       else if(mode==='dronemove')await droneStep(u,x,y);
       else if(mode==='owdir')overwatch(u,false,[x-u.x,y-u.y]);
-      else if(['frag','flash','smk','impact','nitro'].includes(mode))await throwGadget(u,mode,x,y);
-      else if(mode==='wire'||mode==='shield')await deployGadget(u,mode,x,y);
+      else if(['frag','flash','smk','impact','nitro'].includes(mode))await giBorrow(u,mode,()=>throwGadget(u,mode,x,y));
+      else if(mode==='wire'||mode==='shield'||mode==='bpcam')await giBorrow(u,mode,()=>deployGadget(u,mode,x,y));
     });
   }
   if(G.mode==='dronemove')return render();
@@ -5833,6 +5833,7 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
       tac('impact','衝擊手榴彈',G.impact,impactTargets(u));tac('nitro','C4 遙控炸藥',G.nitro,throwTargets(u));
       if(G.mission!=='hostage'&&G.defuser)L.push(btn('解除拆彈器',sub('obj','站上或相鄰'),false,!can('obj')||!defuseOK(u),wrap(async()=>{defuse(u);await afterAct(u);}),'primary'));
     }
+    if(u.gi)for(const [k,n] of Object.entries(u.gi)){const m=k==='charges'?'charge':k;tac(m,INV[u.side==='A'?'D':'A'][k][0],n,giBorrow(u,m,()=>giTargets(u,m)));}
     if(curSide()===G.player&&!G.busy&&!u.defusing)L.push(btn('轉向',G.mode==='face'?'點箭頭選方向':'免費 · 不花行動',G.mode==='face',false,()=>setMode('face'),'','<span class="bic" style="display:inline-grid;place-items:center;font-size:1.1em">⟳</span>'));
     if(ok)L.push(btn('監視並結束',G.mode==='owdir'?'點箭頭選方向':'選方向後結束',G.mode==='owdir',G.busy,()=>{if(G.mode==='owdir')return setMode('move');if(commit(u))setMode('owdir');},'primary'));
   }} else {el.remove();return;}
@@ -8249,7 +8250,13 @@ function copPrep(on){copAll();for(const s of ['a','d'])['rifle','shotgun'].forEa
   const c=ECO.cop[i],st=copStat(c),sk=copSkOn(c,side);
   PROF[id]={run:st.run,st:st.hp,d:c.d.map(b=>b.join('')),dr:'低',dz:1,shield:false,card:true,cop:i};
   OPS[id]={...COPDEF[id].O,name:c.nm,role:'自訂幹員',g:sk?OPS[sk].g:'',gd:sk?OPS[sk].gd:'',ch:sk?OPS[sk].ch:0};});}
-function copUnit(u,i){const c=ECO.cop[i],st=copStat(c);u.speed=st.mv;u.fh=st.fov/2;u.cop=i;u.nmz=c.nm;const sk=copSkOn(c,u.side);if(sk)u.sk=sk;}
+function copUnit(u,i){const c=ECO.cop[i],st=copStat(c);u.speed=st.mv;u.fh=st.fov/2;u.cop=i;u.nmz=c.nm;const sk=copSkOn(c,u.side);if(sk)u.sk=sk;
+  for(const g of c.g)if(g&&!INV[u.side][g]){u.gi=u.gi||{};u.gi[g]=(u.gi[g]|0)+1;}}
+// the other side's gadgets the custom operator carries live on the unit (u.gi); each use borrows the shared counter for that one call
+function giBorrow(u,mode,fn){const k=mode==='charge'?'charges':mode;if(!u||!u.gi||!(u.gi[k]>0))return fn();const g0=G[k]|0;G[k]=g0+1;
+  const done=()=>{if((G[k]|0)!==g0+1)u.gi[k]--;G[k]=g0;};let r;try{r=fn();}catch(e){done();throw e;}
+  if(r&&typeof r.then==='function')return r.then(v=>{done();return v;},e=>{done();throw e;});done();return r;}
+const giTargets=(u,m)=>m==='charge'?chargeTargets(u):m==='clay'?clayTargets(u):m==='impact'?impactTargets(u):m==='shield'||m==='bpcam'?deployTargets(u):throwTargets(u);
 function copGear(){for(const k of cfg.picks[cfg.side]){const i=copSlot(k);if(i==null)continue;for(const g of ECO.cop[i].g)if(g&&INV[cfg.side][g])G[g]=(G[g]|0)+1;}}
 function copEnd(lines){if(!G||G.net||G.tut)return;const u=G.units.find(u=>u.side===G.player&&u.cop!=null);if(!u)return;const c=ECO.cop[u.cop],k=ST(u).k|0,t0=copTot(c);
   c.k+=k;c.e=Math.min(COP_CAP-COP_BASE,(c.e|0)+k);const got=copTot(c)-t0;
@@ -8317,7 +8324,7 @@ function cpSheet(){const s=CP.sheet;if(!s)return '';const c=copAll()[CP.i];
   if(s.t==='g'){const o=c.g[1-s.i];
     return `<div class="cpOv" data-ov="1"><div class="cpSheet" role="dialog" aria-label="選擇攜帶道具"><small class="e">GADGET · 道具 ${s.i+1}</small><h3>選擇攜帶道具<span>通用道具，免費</span></h3>
       <div class="cpGrid">${COPG.map(k=>{const side=INV.A[k]?'A':'D';return `<button class="cpIt ${c.g[s.i]===k?'sel':''}" data-gk="${k}"><i class="sd ${side}"></i>${o===k?'<span class="used">已帶</span>':''}<span class="ic">${WZI[k]||''}</span>${INV[side][k][0]}</button>`;}).join('')}</div>
-      <p class="cpNote">進攻道具只在進攻時帶上，防守道具只在防守時帶上。</p>
+      <p class="cpNote">攻守都能用，每格開局多帶 1 個。</p>
       <div class="cpFoot in"><button class="cpBtn g" id="cpGClr">清空</button><button class="cpBtn p" id="cpGX">完成</button></div></div></div>`;}
   if(s.t==='rt'){const ok=ECO.rn>=COP_RT;
     return `<div class="cpOv" data-ov="1"><div class="cpSheet" role="dialog" aria-label="重新訓練"><small class="e">RETRAIN</small><h3>重新訓練 ${esc(c.nm)}？</h3>
