@@ -3661,8 +3661,8 @@ function lineCells(x0,y0,x1,y1){const dx=x1-x0,dy=y1-y0,n=Math.ceil(Math.max(Mat
     if((x===x0&&y===y0)||(x===x1&&y===y1)||seen.has(k))continue;seen.add(k);o.push([x,y]);}return o;}
 function los(x0,y0,x1,y1,located,noOps){
   for(const [x,y] of lineCells(x0,y0,x1,y1)){const c=cell(x,y);
-    if(located){if(c.t==='hard'||c.t==='reinf')return false;if(!noOps&&G.units.some(u=>u.alive&&u.x===x&&u.y===y&&!u.hidden))return false;continue;}
-    if((blocks(c)&&!(LOSD&&c.mirror))||(smokeAt(x,y)&&!LOSW))return false;
+    if(located){if((c.t==='hard'||c.t==='reinf')&&!(c&&c.mOpen))return false;if(!noOps&&G.units.some(u=>u.alive&&u.x===x&&u.y===y&&!u.hidden))return false;continue;}
+    if((blocks(c)&&!(c&&c.mOpen))||(smokeAt(x,y)&&!LOSW))return false;
     if(!noOps&&G.units.some(u=>u.alive&&u.x===x&&u.y===y&&!u.hidden))return false;}
   return true;
 }
@@ -3989,10 +3989,57 @@ async function riposte(u){
   }
   return u.alive&&!G.over;
 }
-function camRooms(){const o=[];for(const g of G.gadgets)if(g.alive&&g.type==='cam'&&!jammed(g.x,g.y)&&cell(g.x,g.y).indoor){const r=new Set(roomOf(g.x,g.y).map(([x,y])=>y*G.W+x));o.push(r);}return o;}
+// ---- v88: wall-mounted bulletproof cameras, Mira's Black Mirror (closed = one-way, open = hole) ----
+const bpWall=(x,y)=>{const c=cell(x,y);return !!c&&['hard','soft','reinf'].includes(c.t)&&!c.mirror&&!c.panel;};
+// nearest free floor cells of the tapped room that touch a solid wall (doors / windows don't count)
+function bpCands(x,y){const room=new Set(roomOf(x,y).map(([a,b])=>b*G.W+a));room.add(y*G.W+x);const seen=new Set([y*G.W+x]);let q=[[x,y]];
+  while(q.length){const nq=[],hit=[];
+    for(const [a,b] of q){if(setupIndoor(a,b)&&!gadgetAt(a,b)&&!unitAt(a,b))for(const w of adj4(a,b))if(bpWall(...w))hit.push({x:a,y:b,w});
+      for(const [i,j] of adj4(a,b)){const k=j*G.W+i;if(!seen.has(k)&&room.has(k)){seen.add(k);nq.push([i,j]);}}}
+    if(hit.length){const by=new Map();for(const h of hit){const k=h.w.join();const o=by.get(k);if(!o||cheb(h.x,h.y,x,y)<cheb(o.x,o.y,x,y))by.set(k,h);}return [...by.values()];}
+    q=nq;}
+  return [];}
+function bpCam3D(gd,grp){const [dx,dy]=gd.wall,wc=cell(gd.x+dx,gd.y+dy),th={hard:.4,soft:.3,reinf:.42}[wc&&wc.t]||.4,WH=WALLH[R3.wall]||1.45;
+  const sg=new THREE.Group();sg.position.set(dx*(1-th/2-.025),Math.max(.32,WH*.74),dy*(1-th/2-.025));sg.rotation.y=Math.atan2(-dx,-dy);grp.add(sg);
+  const mk=(geo,mat,s,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.scale.set(...s);m.position.set(x,y,z);m.castShadow=true;sg.add(m);return m;};
+  const fr=gm('bpfr',()=>std(0x5d646b,{metalness:.7,roughness:.35})),pl=gm('bppl',()=>std(0x2a2f34,{metalness:.5,roughness:.45}));
+  mk(BOX3,pl,[.34,.34,.05],0,0,0);
+  for(const [x,y,w,h] of [[0,.16,.36,.04],[0,-.16,.36,.04],[.16,0,.04,.36],[-.16,0,.04,.36]])mk(BOX3,fr,[w,h,.07],x,y,.01);
+  for(const [x,y] of [[.12,.12],[-.12,.12],[.12,-.12],[-.12,-.12]])mk(SPH3,fr,[.018,.018,.018],x,y,.045);
+  const d=mk(HSPH3,gm('bpdome',()=>std(0x15191d,{metalness:.3,roughness:.12})),[.11,.08,.11],0,0,.025);d.rotation.x=Math.PI/2;
+  mk(SPH3,gm('lens',()=>new THREE.MeshStandardMaterial({color:0xe8574e,emissive:0xe8574e,emissiveIntensity:1.2})),[.035,.035,.035],0,0,.1);
+  const sp=new THREE.Sprite(camBadge());sp.scale.set(.7,.7,1);sp.position.set(sg.position.x,WH+.45,sg.position.z);sp.renderOrder=11;grp.add(sp);}
+// a mirror knows which side is "inside": the side it was set from
+function mirIn(u,x,y){if(u&&u.x>=0&&man(u.x,u.y,x,y)===1)return [u.x-x,u.y-y];
+  const n=[[0,1],[0,-1],[1,0],[-1,0]].filter(([a,b])=>setupIndoor(x+a,y+b));
+  return n.find(([a,b])=>{const o=cell(x-a,y-b);return !o||!o.indoor||blocks(o);})||n[0]||[0,1];}
+const mirSide=(g,x,y)=>(x-g.x)*g.mi[0]+(y-g.y)*g.mi[1];
+// attackers passing in front of a mirror get marked; the line of sight still matters
+function mirSees(u){return u.side==='A'&&u.x>=0&&G.gadgets.some(g=>g.alive&&g.type==='mirror'&&g.mi&&mirSide(g,u.x,u.y)<0&&cheb(g.x,g.y,u.x,u.y)<=10&&los(g.x,g.y,u.x,u.y));}
+// wall-mounted bulletproof cameras look out from their wall: a 180° half-plane, by line of sight
+function bpSees(u){return u.side==='A'&&u.x>=0&&G.gadgets.some(g=>g.alive&&g.type==='cam'&&g.wall&&!jammed(g.x,g.y)&&((u.x-g.x)*g.wall[0]+(u.y-g.y)*g.wall[1])<=0&&cheb(g.x,g.y,u.x,u.y)<=10&&los(g.x,g.y,u.x,u.y));}
+const mirOpenable=u=>u&&u.side==='D'&&u.x>=0?G.gadgets.filter(g=>g.alive&&g.type==='mirror'&&!g.open&&g.mi&&cheb(u.x,u.y,g.x,g.y)<=1&&mirSide(g,u.x,u.y)>0):[];
+async function mirOpen(u,g){useAct(u,'mirror');g.open=true;const c=cell(g.x,g.y);c.mOpen=true;G._wv=(G._wv||0)+1;if(R3)R3.sig='';try{SFX.boom();}catch(e){}
+  log(`${nm(u)} 打開黑鏡，洞口兩邊都看得到、打得到了`,'kd');render();await afterAct(u);}
+function buildMirror(g,x,y,c,WH){const m=G.gadgets.find(q=>q.type==='mirror'&&q.x===x&&q.y===y);const hz=m&&m.mi?m.mi[1]!==0:(isWallC(cell(x-1,y))||isWallC(cell(x+1,y)));
+  const M3=R3.mats,mats=M3.reinf,cc=[x,y],th=.42,cx=x+.5,cz=y+.5,y0=WH*.31,y1=WH*.79,hw=.3;
+  const eA=wj(cell(hz?x-1:x,hz?y:y-1))?.5:th/2,eB=wj(cell(hz?x+1:x,hz?y:y+1))?.5:th/2;
+  const seg=(a,b,yy,h)=>{const L=b-a,o=(a+b)/2;hz?addBox(g,mats,cx+o,yy,cz,L+.002,h,th,cc):addBox(g,mats,cx,yy,cz+o,th,h,L+.002,cc);};
+  seg(-eA,eB,y0/2,y0);seg(-eA,eB,(y1+WH)/2,WH-y1);seg(-eA,-hw,(y0+y1)/2,y1-y0);seg(hw,eB,(y0+y1)/2,y1-y0);return true;}
+function mirror3D(gd,grp){const WH=WALLH[R3.wall]||1.45,y0=WH*.31,y1=WH*.79,h=y1-y0,mi=gd.mi||[0,1];
+  const sg=new THREE.Group();sg.rotation.y=Math.atan2(mi[0],mi[1]);grp.add(sg);
+  const mk=(geo,mat,s,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.scale.set(...s);m.position.set(x,y,z);m.castShadow=true;sg.add(m);return m;};
+  const fr=gm('mirfr',()=>std(0x4a5056,{metalness:.8,roughness:.3}));
+  for(const z of [.225,-.225]){mk(BOX3,fr,[.68,.05,.04],0,y1+.02,z);mk(BOX3,fr,[.68,.05,.04],0,y0-.02,z);mk(BOX3,fr,[.05,h+.08,.04],.32,(y0+y1)/2,z);mk(BOX3,fr,[.05,h+.08,.04],-.32,(y0+y1)/2,z);}
+  const can=mk(CYL3,gm(gd.open?'mircan0':'mircan',()=>std(gd.open?0x5a2420:0xc8322a,{metalness:.4,roughness:.4})),[.06,.26,.06],0,y0-.09,.29);can.rotation.z=Math.PI/2;
+  mk(BOX3,fr,[.3,.03,.08],0,y0-.04,.27);
+  if(!gd.open)mk(BOX3,gm('mirgl',()=>new THREE.MeshStandardMaterial({color:0x07090c,metalness:.95,roughness:.06,emissive:0x05080c})),[.6,h,.05],0,(y0+y1)/2,0);
+  else{const p=mk(BOX3,gm('mirgl',()=>new THREE.MeshStandardMaterial({color:0x07090c,metalness:.95,roughness:.06,emissive:0x05080c})),[.6,.03,h],.05,.02,.72);p.rotation.y=.18;}}
+
+function camRooms(){const o=[];for(const g of G.gadgets)if(g.alive&&g.type==='cam'&&!g.wall&&!jammed(g.x,g.y)&&cell(g.x,g.y).indoor){const r=new Set(roomOf(g.x,g.y).map(([x,y])=>y*G.W+x));o.push(r);}return o;}
 const outCam=g=>g.alive&&g.type==='cam'&&g.fixed&&cell(g.x,g.y)&&cell(g.x,g.y).t==='out'&&(G.map.spawns||[]).some(z=>z.cells.some(([a,b])=>cheb(a,b,g.x,g.y)<=2));
 function outCamSees(u){return !!u._mv&&G.gadgets.some(g=>outCam(g)&&!jammed(g.x,g.y)&&cheb(g.x,g.y,u.x,u.y)<=8&&los(g.x,g.y,u.x,u.y));}
-function camCheck(u){if(u.side!=='A'||!u.alive||u.spotted||NOLOC.has(u.op))return;if(camRooms().some(r=>r.has(u.y*G.W+u.x))||outCamSees(u)){u.spotted=1;SFX.alert();if(u.side===G.player)bigNote('被攝影機發現！',`${OPS[u.op].name} 的位置已暴露`,'warn',1500);log(`${nm(u)} 被攝影機拍到，位置被標記`,'kd');}}
+function camCheck(u){if(u.side!=='A'||!u.alive||u.spotted||NOLOC.has(u.op))return;const cm=camRooms().some(r=>r.has(u.y*G.W+u.x))||outCamSees(u)||bpSees(u),mr=!cm&&mirSees(u);if(cm||mr){u.spotted=1;SFX.alert();if(u.side===G.player)bigNote(mr?'被黑鏡發現！':'被攝影機發現！',`${OPS[u.op].name} 的位置已暴露`,'warn',1500);log(`${nm(u)} ${mr?'經過黑鏡':'被攝影機拍到'}，位置被標記`,'kd');}}
 function gHint(c){if(!c||!G)return;const mine=c.u.side===G.player;if(!mine&&!c.msgs.length)return;
   const name=c.name||(OPS[c.u.op]&&(GSH[c.u.op]||OPS[c.u.op].g))||'道具',ic=GADIC[name]||GADIC[GSH[c.u.op]]||opIcon(c.u.op);
   let el=$('#gHint');if(!el){el=document.createElement('div');el.id='gHint';el.setAttribute('role','status');document.body.appendChild(el);}
@@ -4026,7 +4073,7 @@ function chargePlant3D(u,x,y,ms){return new Promise(res=>{if(!R3||!R3.fxG||docum
   const t0=performance.now(),fin=()=>{if(done)return;done=true;R3.fxG.remove(g);pl.geometry.dispose();pl.material.dispose();tex.dispose();res();};setTimeout(fin,ms+120);
   R3.fx2.push(()=>{age=(performance.now()-t0)/1000;pl.scale.setScalar(Math.min(1,.2+age*5));led.visible=Math.sin(age*(10+age*30))>0;if(age*1000>=ms)fin();return !done;});
   try{SFX.tick();setTimeout(()=>SFX.tick(),ms*.45);setTimeout(()=>SFX.alert(),ms*.8);}catch(e){}});}
-function destroyCell(x,y){try{const t0=cell(x,y).t;if(['soft','reinf','bar','hard'].includes(t0)){wallBlast3D(x,y,t0);if(G&&!G.over&&curSide()===G.player)G._wb=(G._wb||0)+1;}}catch(e){}G._wv=(G._wv||0)+1;G.gadgets.forEach(g=>{if(g.type==='mirror'&&g.x===x&&g.y===y)g.alive=false;});SFX.boom();const c=cell(x,y);if(c.t!=='bar')c.breach=true;if(c.t==='bar')c.wasBar=true;c.t='floor';c.rubble=c.breach;c.opened=true;c.elec=false;c.indoor=true;if(c.pair&&!c.breach){const q=cell(c.pair[0],c.pair[1]);if(q&&q.t==='bar')destroyCell(c.pair[0],c.pair[1]);}
+function destroyCell(x,y){try{const t0=cell(x,y).t;if(['soft','reinf','bar','hard'].includes(t0)){wallBlast3D(x,y,t0);if(G&&!G.over&&curSide()===G.player)G._wb=(G._wb||0)+1;}}catch(e){}G._wv=(G._wv||0)+1;G.gadgets.forEach(g=>{if(g.type==='mirror'&&g.x===x&&g.y===y)g.alive=false;if(g.type==='cam'&&g.wall&&g.x+g.wall[0]===x&&g.y+g.wall[1]===y)g.alive=false;});SFX.boom();const c=cell(x,y);if(c.t!=='bar')c.breach=true;if(c.t==='bar')c.wasBar=true;c.t='floor';c.rubble=c.breach;c.opened=true;c.elec=false;c.indoor=true;if(c.pair&&!c.breach){const q=cell(c.pair[0],c.pair[1]);if(q&&q.t==='bar')destroyCell(c.pair[0],c.pair[1]);}
   const tr=gadgetAt(x,y,'trap'); /* trap stays in doorway */ void tr;}
 
 function shootables(u){
@@ -4212,10 +4259,10 @@ async function throwGadget(u,kind,x,y){ST(u).gad++;DMGBY=u;aimCam(u,[[x,y]]);
 const clayTargets=u=>G.clay>0?adj4(u.x,u.y).filter(([x,y])=>{const c=cell(x,y);return !blocks(c)&&!gadgetAt(x,y)&&!unitAt(x,y);}):[];
 function deployClay(u,x,y){useAct(u,'tactical');G.clay--;note(u,'闊刀地雷');G.gadgets.push({type:'clay',x,y,dx:x-u.x,dy:y-u.y,side:'A',alive:true});log(`${nm(u)} 在 ${coord(x,y)} 佈下闊刀地雷（朝${dirName([x-u.x,y-u.y])}）`,'ka');render();return afterAct(u);}
 const deployTargets=u=>[[u.x,u.y],...adj8(u.x,u.y)].filter(([x,y])=>{const c=cell(x,y);return c.t==='floor'&&c.indoor&&!gadgetAt(x,y)&&!(unitAt(x,y)&&!(x===u.x&&y===u.y));}).filter(([x,y])=>!(x===u.x&&y===u.y));
-async function deployGadget(u,kind,x,y){
+async function deployGadget(u,kind,x,y,w){
   if(G.phase!=='setup')useAct(u,'tactical');
   if(kind==='wire'){G.wire--;G.gadgets.push({type:'wire',x,y,side:'D',alive:true});if(pub(u)||G.player==='D')log(`${nm(u)} 拉起鐵絲網`,'kd');}
-  else if(kind==='bpcam'){G.bpcam--;G.gadgets.push({type:'cam',bp:true,x,y,side:'D',alive:true});if(G.player==='D')log(`${nm(u)} 裝上防彈攝影機`,'kd');}
+  else if(kind==='bpcam'){if(!w){const cs=bpCands(x,y);if(cs.length>1&&G.player==='D'&&!G.ai){G.bpPend=cs;G.mode='bpface';bigNote('選一面牆','點發光的牆，攝影機會貼在那一面','d',1600);return;}if(cs[0]){x=cs[0].x;y=cs[0].y;w=cs[0].w;}}G.bpcam--;G.gadgets.push({type:'cam',bp:true,x,y,side:'D',alive:true,wall:w?[w[0]-x,w[1]-y]:null});if(G.player==='D')log(`${nm(u)} 裝上防彈攝影機`,'kd');}
   else{G.shield--;const sg={type:'shield',x,y,side:'D',alive:true};sg.dir=shDef(x,y);G.gadgets.push(sg);if(pub(u)||G.player==='D')log(`${nm(u)} 架設防彈盾`,'kd');
     if(u.side===G.player&&!G.ai){G.shdir=sg;G.mode='shdir';bigNote('選擇盾牌正面','點盾牌旁邊的格子，只擋那一側的半圓','d',1600);}}
   render();if(G.phase==='play')await afterAct(u);
@@ -4406,6 +4453,7 @@ async function aiDefender(u){
   beginAct(u);let guard=0;
   while(u.alive&&!G.over&&(u.ap>0||u.mp>0)&&guard++<40){
     G._vis=sees('D');
+    if(u.ap>=2&&canDo(u,'mirror')&&canDo(u,'shoot')){const mg=mirOpenable(u)[0];if(mg){const mc=cell(mg.x,mg.y);mc.mOpen=true;const ok=shootables(u).some(t=>t.kind==='unit');mc.mOpen=false;if(ok){await mirOpen(u,mg);continue;}}}
     const tg=shootables(u).filter(t=>t.kind==='unit');
     if(tg.length&&canDo(u,'shoot')){tg.sort((a,b)=>a.t.hp-b.t.hp);await doShoot(u,tg[0]);continue;}
     if(canDo(u,'destroy')){const g=destroyTargets(u).find(([x,y])=>gadgetAt(x,y,'drone')||(gadgetAt(x,y,'clay')&&cheb(u.x,u.y,x,y)>1));if(g){await doDestroy(u,...g);continue;}}
@@ -4488,7 +4536,7 @@ function autoDefSetup(withGadgets){
     G.rearr=0;G._wv=(G._wv||0)+1;}
   for(let i=0;i<3&&G.wire>0;i++){const c=shuffle(allCells().filter(([x,y])=>cell(x,y).t==='floor'&&cell(x,y).indoor&&!gadgetAt(x,y)&&!unitAt(x,y)&&adj4(x,y).some(([a,b])=>cell(a,b).t==='bar')))[0];if(c){G.wire--;G.gadgets.push({type:'wire',x:c[0],y:c[1],side:'D',alive:true});}}
   for(let i=0;i<2&&G.shield>0;i++){const d=ds[i%ds.length],c=shuffle(adj8(d.x,d.y).filter(([x,y])=>cell(x,y).t==='floor'&&!gadgetAt(x,y)&&!unitAt(x,y)))[0];if(c){G.shield--;G.gadgets.push({type:'shield',x:c[0],y:c[1],side:'D',alive:true});}}
-  for(let i=0;i<3&&G.bpcam>0;i++){const c=shuffle(indoor.filter(([x,y])=>!roomSet.has(y*G.W+x)&&!gadgetAt(x,y)&&!unitAt(x,y)&&!camRooms().some(r=>r.has(y*G.W+x))))[0];if(!c)break;G.bpcam--;G.gadgets.push({type:'cam',bp:true,x:c[0],y:c[1],side:'D',alive:true});}
+  for(let i=0;i<3&&G.bpcam>0;i++){const c=shuffle(indoor.filter(([x,y])=>!roomSet.has(y*G.W+x)&&!gadgetAt(x,y)&&!unitAt(x,y)&&!camRooms().some(r=>r.has(y*G.W+x))))[0];if(!c)break;{const p=bpCands(c[0],c[1])[0];G.bpcam--;G.gadgets.push({type:'cam',bp:true,x:p?p.x:c[0],y:p?p.y:c[1],wall:p?[p.w[0]-p.x,p.w[1]-p.y]:null,side:'D',alive:true});}}
   for(const u of ds){
     let n=0;
     while(u.ch>0&&n++<5){
@@ -4548,7 +4596,7 @@ function startPlay(){if(G&&!G.reroll)G.reroll={A:0,D:0};try{playStartHooks();}ca
 }
 
 // ---------- player input ----------
-function curTargets(){
+function curTargets(){if(G&&G.mode==='bpface'&&G.bpPend)return G.bpPend.map(p=>p.w);
   if(G.mode==='shdir'&&G.shdir)return adj4(G.shdir.x,G.shdir.y);
   const u=G.sel;if(!u)return [];
   if(G.phase==='setup'){
@@ -4600,6 +4648,7 @@ async function onCell(x,y){
   if(G.mode==='shdir'&&G.shdir){const g=G.shdir;if(adj4(g.x,g.y).some(([a,b])=>a===x&&b===y)){g.dir=[x-g.x,y-g.y];log(`盾牌正面朝${dirName(g.dir)}，只擋這一側的半圓`,'kd');G.shdir=null;G.mode=G.phase==='setup'&&G.shield>0?'shield':'move';render();}return;}
   if(G.mode==='owq')return owqTap(x,y);
   const u=G.sel,c=cell(x,y),k=`${x},${y}`;
+  if(G.phase==='setup'&&G.mode==='bpface'){const h=(G.bpPend||[]).find(p=>p.w[0]===x&&p.w[1]===y);G.bpPend=null;G.mode='bpcam';if(h){await deployGadget(u,'bpcam',h.x,h.y,h.w);if(!G.bpcam)G.mode='move';return render();}}
   const inT=curTargets().some(([a,b])=>a===x&&b===y);
   if(G.phase==='setup'){
     if(G.player==='A'){const o=unitAt(x,y);if(o&&o.side==='A'){G.sel=o;return render();}
@@ -4610,7 +4659,7 @@ async function onCell(x,y){
     if(!inT||!u)return;
     if(G.mode==='move'){const was=u.x<0;u.x=x;u.y=y;u.anchor=[x,y];if(was)nextUnplaced();}
     else if(G.mode==='gadget'){await useGadget(u,x,y);if(u.ch<=0)G.mode='move';}
-    else if(G.mode==='wire'||G.mode==='shield'||G.mode==='bpcam'){await deployGadget(u,G.mode,x,y);if(G.mode!=='shdir'&&!G[G.mode])G.mode='move';}
+    else if(G.mode==='wire'||G.mode==='shield'||G.mode==='bpcam'){await deployGadget(u,G.mode,x,y);if(G.mode!=='shdir'&&G.mode!=='bpface'&&!G[G.mode])G.mode='move';}
     else if(G.mode==='decoy'){const k=decoyOf(u);if(k){k.x=x;k.y=y;}G.mode='move';}
     else if(G.mode==='rearr'){G.rearr=G.rearr??5;const cg=G.gadgets.find(g=>g.alive&&g.type==='cam'&&g.fixed&&g.x===x&&g.y===y);
       if(G.rearrCam){if(!G.rearrCam.moved){G.rearr--;G.rearrCam.moved=1;}G.rearrCam.x=x;G.rearrCam.y=y;G.rearrCam=null;log('攝影機換了位置','kd');}
@@ -4949,7 +4998,7 @@ function drawProp([t,x,y,w,h],i){
   else if(t==='crate'){ctx.fillStyle=TEX.wood;ctx.fillRect(X,Y,Wd,Ht);ctx.strokeStyle='#4a2e14';ctx.lineWidth=Math.max(1.5,S*.05);ctx.strokeRect(X+1,Y+1,Wd-2,Ht-2);ctx.beginPath();ctx.moveTo(X,Y);ctx.lineTo(X+Wd,Y+Ht);ctx.stroke();}
   ctx.restore();
 }
-function drawGadgetIcon(type,cx,cy,g){
+function drawGadgetIcon(type,cx,cy,g){if(g&&g.wall){cx+=g.wall[0]*S*.24;cy+=g.wall[1]*S*.24;}
   if(type==='cam'){const im=gImg(g&&g.bp?'bpcam':g&&g.valk?'valk':'cam');if(im){const z=g&&g.bp?.62:.56;ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.arc(cx+2,cy+2,S*.26,0,7);ctx.fill();ctx.drawImage(im,cx-S*z/2,cy-S*z/2,S*z,S*z);return;}}
   if(type==='shield'){const im=gImg('shield');if(im){ctx.drawImage(im,cx-S*.42,cy-S*.42,S*.84,S*.84);return;}}
   if(type==='ced'){ctx.fillStyle='#2a2f35';rrect(cx-S*.16,cy-S*.12,S*.32,S*.24,S*.04);ctx.fill();ctx.fillStyle=COL.elec;ctx.beginPath();ctx.moveTo(cx+S*.03,cy-S*.1);ctx.lineTo(cx-S*.07,cy+S*.02);ctx.lineTo(cx,cy+S*.02);ctx.lineTo(cx-S*.03,cy+S*.1);ctx.lineTo(cx+S*.08,cy-S*.03);ctx.lineTo(cx+S*.01,cy-S*.03);ctx.closePath();ctx.fill();return;}
@@ -5234,7 +5283,7 @@ var GDX={
  ying:['〔行動〕坎德拉：丟到 6 格內（可越過一面輕牆），該房間內除了 Ying 以外的所有幹員都被震暈。',2],
  zofia:['〔行動〕KS79 震盪彈：看得到的一名敵人被震暈，並受一顆橙骰傷害。',2],
  dokkaebi:['〔行動〕邏輯炸彈：讓最近一名還沒被標記的防守方手機響起，他被標記並現身。',2],
- mira:['〔佈防／行動〕黑鏡：把相鄰的一面軟牆或加固牆變成單向窗：會變成加固牆，防守方可以隔著它看見並射擊，進攻方看不穿。',2],
+ mira:['〔佈防／行動〕黑鏡：把相鄰的一面軟牆或加固牆變成黑鏡（加固牆）。關著時，外面經過的進攻方會被標記位置，外面看不進來，雙方都不能隔著它射擊；站在裡側旁邊的防守方花 1 行動可以打開，打開後洞口透明，雙方依視線互相看見、射擊。',2],
  lesion:['〔佈防／行動〕蠱毒地雷：佈防時放在室內，對戰中丟在 3 格內。進攻方看不到，踩到被標記並受 1 傷。',3],
  ela:['〔佈防／行動〕Grzmot 地雷：佈防時放在室內，對戰中丟在 3 格內。進攻方走到地雷或旁邊一格就被震暈。',3],
  vigil:['〔被動〕ERC-7：永遠不會被標記（無人機、Lion 都抓不到）；射擊他的人少擲一顆骰。',0],
@@ -5361,7 +5410,7 @@ var PLACE={
  frost:(u,x,y)=>G.gadgets.push({type:'mat',x,y,side:'D',alive:true}),
  lesion:(u,x,y)=>G.gadgets.push({type:'gu',x,y,side:'D',alive:true}),
  ela:(u,x,y)=>G.gadgets.push({type:'grz',x,y,side:'D',alive:true}),
- mira:(u,x,y)=>{const c=cell(x,y);c.t='reinf';c.mirror=true;G._wv=(G._wv||0)+1;G.gadgets.push({type:'mirror',x,y,side:'D',alive:true});if(R3)R3.sig='';},
+ mira:(u,x,y)=>{const c=cell(x,y);c.t='reinf';c.mirror=true;G._wv=(G._wv||0)+1;G.gadgets.push({type:'mirror',x,y,side:'D',alive:true,mi:mirIn(u,x,y)});if(R3)R3.sig='';},
  maestro:(u,x,y)=>G.gadgets.push({type:'eye',x,y,side:'D',alive:true}),
  kaid:(u,x,y)=>G.gadgets.push({type:'claw',x,y,side:'D',alive:true}),
  goyo:(u,x,y)=>G.gadgets.push({type:'shield',volcan:true,x,y,side:'D',alive:true}),
@@ -5611,7 +5660,7 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
     if(decoyOf(u))L.push(btn('移動誘餌','點空格放這名幹員的誘餌',G.mode==='decoy',false,()=>setMode('decoy')));
     L.push(btn('調整場景',`攝影機、門窗、鐵牆 · 剩 ${G.rearr??5} 次`,G.mode==='rearr',(G.rearr??5)<=0&&!G.rearrCam,()=>{G.rearrCam=null;setMode('rearr');}));
     for(const d of alive('D').filter(d=>setupGadget(d.op)))L.push(btn(GSH[d.op]||OPS[d.op].g,`${OPS[d.op].name} · 剩 ${d.ch}`,G.mode==='gadget'&&u===d,d.ch<=0,()=>{if(G.mode==='gadget'&&G.sel===d)return setMode('move');G.sel=d;setMode('gadget');},'',d.op==='valkyrie'?eqIc('valk'):`<img class="bic" src="${opIcon(d.op)}" alt="">`));
-    L.push(btn('鐵絲網',`剩 ${G.wire}`,G.mode==='wire',G.wire<=0,()=>setMode('wire')));L.push(btn('可部署盾牌',`剩 ${G.shield}`,G.mode==='shield',G.shield<=0,()=>setMode('shield'),'',eqIc('shield')));L.push(btn('防彈攝影機',`剩 ${G.bpcam}`,G.mode==='bpcam',G.bpcam<=0,()=>setMode('bpcam'),'',eqIc('bpcam')));
+    L.push(btn('鐵絲網',`剩 ${G.wire}`,G.mode==='wire',G.wire<=0,()=>setMode('wire')));L.push(btn('可部署盾牌',`剩 ${G.shield}`,G.mode==='shield',G.shield<=0,()=>setMode('shield'),'',eqIc('shield')));L.push(btn('防彈攝影機',`剩 ${G.bpcam}`,G.mode==='bpcam'||G.mode==='bpface',G.bpcam<=0,()=>{G.bpPend=null;if(G.mode==='bpface')G.mode='bpcam';setMode('bpcam');},'',eqIc('bpcam')));
   } else if(u.side===G.player&&u.alive){
     const ok=canAct(u),isA=G.active===u,can=k=>ok&&(!isA||canDo(u,k)),sub=(k,t)=>isA&&k!=='destroy'&&u.used.has(k)?'已用過':t;
     const dmv=dmOf();if(dmv&&isA){L.push(btn('結束移動並掃描',`無人機剩 ${dmv.mp} 移動點`,false,G.busy,()=>act(()=>droneFinish(u)),'primary','',eqIc('drone')));}else{
@@ -5632,6 +5681,7 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
       if(G.mission==='hostage')L.push(btn('護送人質',sub('obj','相鄰人質'),false,!can('obj')||!escortOK(u),wrap(()=>escort(u)),'primary'));
       else L.push(btn('安裝拆彈器',sub('obj','站在 A/B 點'),false,!can('obj')||!plantOK(u),wrap(async()=>{plant(u);await afterAct(u);}),'primary'));
     } else {
+      {const mg=mirOpenable(u);if(mg.length)L.push(btn('打開黑鏡',sub('mirror','1 行動 · 洞口變透明'),false,!can('mirror'),wrap(()=>mirOpen(u,mg[0])),'',`<img class="bic" src="${opIcon('mira')}" alt="">`));}
       tac('impact','衝擊手榴彈',G.impact,impactTargets(u));tac('nitro','C4 遙控炸藥',G.nitro,throwTargets(u));
       if(G.mission!=='hostage'&&G.defuser)L.push(btn('解除拆彈器',sub('obj','站上或相鄰'),false,!can('obj')||!defuseOK(u),wrap(async()=>{defuse(u);await afterAct(u);}),'primary'));
     }
@@ -5941,6 +5991,7 @@ function buildStatic0(m){
     const cx=x+.5,cz=y+.5;
     if(c.t==='bar'){buildOpening(g,x,y,c,WH);continue;}
     if(c.panel&&c.t==='reinf'&&buildPanel(g,x,y,c,WH))continue;
+    if(c.mirror&&c.t==='reinf'&&buildMirror(g,x,y,c,WH))continue;
     const th={hard:.4,soft:.3,reinf:.42}[c.t],mats=M3[c.t];
     addBox(g,mats,cx,WH/2,cz,th,WH,th,cc);
     const L=.5-th/2,o=th/2+L/2;
@@ -6463,14 +6514,15 @@ function g3x(gd,add,grp){const em=(k,c,i=1.4)=>gm(k,()=>new THREE.MeshStandardMa
   case 'magnet':{add(CYL3,gm('mag',()=>std(0x3a3f45,{metalness:.6})),[.16,.06,.16],0,.04,0);const r=add(new THREE.TorusGeometry(.17,.012,6,24),em('magl',0x4aa8e2,1.2),[1,1,1],0,.08,0);r.rotation.x=Math.PI/2;return true;}
   case 'banshee':{add(BOX3,gm('ban',()=>std(0x1d2026,{metalness:.4})),[.24,.24,.12],0,.12,0);add(CYL3,gm('banh',()=>std(0x30353c,{metalness:.5})),[.08,.08,.08],0,.14,.08).rotation.x=Math.PI/2;
     grp.userData.blink=add(SPH3,em('banl',0x4aa8e2),[.03,.03,.03],0,.27,0);return true;}
-  case 'mirror':{const c=cell(gd.x,gd.y),vert=cell(gd.x-1,gd.y)&&cell(gd.x+1,gd.y)&&!blocks(cell(gd.x-1,gd.y))&&!blocks(cell(gd.x+1,gd.y));
+  case 'mirror':{mirror3D(gd,grp);return true;const c=cell(gd.x,gd.y),vert=cell(gd.x-1,gd.y)&&cell(gd.x+1,gd.y)&&!blocks(cell(gd.x-1,gd.y))&&!blocks(cell(gd.x+1,gd.y));
     const p=add(BOX3,gm('mirr',()=>new THREE.MeshStandardMaterial({color:0x1a2a3a,metalness:.9,roughness:.05,emissive:0x0a1a2a,emissiveIntensity:.5})),vert?[.08,.5,.7]:[.7,.5,.08],0,1.05,0);void c;void p;return true;}
   }
   return false;}
 function gadget3D(gd){
   const grp=new THREE.Group();grp.position.set(gd.x+.5,0,gd.y+.5);
   const add=(geo,mat,s,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.scale.set(...s);m.position.set(x,y,z);m.castShadow=true;grp.add(m);return m;};
-  if(gd.type==='cam'){add(CYL3,gm('pole',()=>std(0x3a4148,{metalness:.6})),[.025,.9,.025],0,.45,0);add(HSPH3,gm('dome',()=>std(0x15191d,{metalness:.4,roughness:.3})),[.14,-.12,.14],0,.92,0);
+  if(gd.type==='cam'&&gd.bp&&gd.wall)bpCam3D(gd,grp);
+  else if(gd.type==='cam'){add(CYL3,gm('pole',()=>std(0x3a4148,{metalness:.6})),[.025,.9,.025],0,.45,0);add(HSPH3,gm('dome',()=>std(0x15191d,{metalness:.4,roughness:.3})),[.14,-.12,.14],0,.92,0);
     add(SPH3,gm('lens',()=>new THREE.MeshStandardMaterial({color:0xe8574e,emissive:0xe8574e,emissiveIntensity:1.2})),[.04,.04,.04],0,.84,.1);
     if(!gd.valk){const sp=new THREE.Sprite(camBadge());sp.scale.set(.7,.7,1);sp.position.y=1.5;sp.renderOrder=11;grp.add(sp);}}
   else if(gd.type==='jammer'){add(BOX3,gm('jam',()=>std(0x1d2a36,{metalness:.4})),[.26,.16,.2],0,.08,0);grp.userData.blink=add(SPH3,gm('jamled',()=>new THREE.MeshStandardMaterial({color:0x4aa8e2,emissive:0x4aa8e2,emissiveIntensity:1.5})),[.04,.04,.04],0,.18,0);
@@ -7816,7 +7868,7 @@ const CHG_IMG='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAADwCAYAAACHQW/
 GIMG.charge=CHG_IMG;GIMG.charges=CHG_IMG;GADIC['爆破炸藥']=CHG_IMG;WZI.charges=`<img src="${CHG_IMG}" alt="" style="width:100%;height:100%;object-fit:contain">`;
 // an attacker caught on camera shows as a pin; once no camera and no defender sees him, moving loses the pin
 function spotTrack(u){if(!G||u.side!=='A'||!u.alive||u.x<0||NOLOC.has(u.op))return;const k=u.y*G.W+u.x;
-  if(camRooms().some(r=>r.has(k))||outCamSees(u)){if(!u.spotted)camCheck(u);return;}
+  if(camRooms().some(r=>r.has(k))||outCamSees(u)||bpSees(u)||mirSees(u)){if(!u.spotted)camCheck(u);return;}
   if(u.spotted&&!alive('D').some(d=>d.x>=0&&inSight(d,u)))u.spotted=0;}
 // a shot that passes through a light wall or barricade
 function thruWall(sh,t){return lineCells(sh.x,sh.y,t.x,t.y).some(([x,y])=>{const c=cell(x,y);return c&&!c.breach&&(c.t==='soft'||c.t==='bar');});}
