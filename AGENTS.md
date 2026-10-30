@@ -6,7 +6,7 @@
 
 - 《Rainbow Six Siege – The Board Game》的網頁版，可對戰電腦、新手教學、自訂房間連線、排名戰、成就、商店。
 - 線上版：https://r6-boardgame.github.io/ （GitHub Pages，`main` 分支根目錄直接發佈，推上去就上線）。
-- 目前版本 v97（見 `git log`）。
+- 目前版本 v99（見 `git log`）。
 - 使用者要求：PR 做完、測完就直接合併上線，不用再問。
 
 ## 檔案結構
@@ -111,6 +111,8 @@
 - v95：Alibi 改成 Prisma 投影分身（佈防／行動，2 次）：`GT.alibi` 3 格內空格，放下後進 `pdir` 模式選 8 方向（`G.pdir` 存 `pid`，`pdirG()`）。投影是 `type:'prisma'` 道具，`projU(g)` 做出跟本體一樣的假幹員給 `shootables`／`shootUnit`（`t.proj`：中彈就 `prismaBreak`，不扣血）。進攻方看得到就擋路（`reach`），穿過、C4、破片／衝擊（`GSTR.prisma`）、集束、闊刀、榴彈、EMP、盾牌猛擊都會打散。3D 用 `unit3D(projU(g))`＋複製材質，自己半透明（`figAlpha`）、敵人看實心；消失用 `prismaVanish` 原姿勢閃爍淡出不倒下。拿掉舊的開場多 2 個誘餌。
 - v96：鏡頭少轉：用道具／技能不再切特寫（破片手榴彈 `fragShow` 只出卡片不動鏡頭），進射擊模式不再 `aimCam` 轉向目標，閒置 25 秒自動旋轉拿掉。射擊特寫預設第一人稱（`CINE.mode='fp'`）：開槍者模型隱藏（`R3.cineSelf`），視線上擋住目標的牆與家具用 `cineClear` 淡出，但隔牆射擊穿過的軟牆／路障保留（`keep`）。
 - v97：轉職後的角色圖（`.cpArt.cw`）改成整張塞進舞台（`object-fit:contain`、底部對齊、遮罩從 82% 才淡出），不再放大裁掉下半身；步槍兵女版看得到臀部以下。 女步槍兵換成全身新圖。轉職條件加難（`nOR` 橘以上骰數、`nR` 紅骰數）：步槍＝中距 5 骰至少 3 橘＋視野 4；衝鋒＝奔跑 5＋近中各 3 骰以上各 1 橘；狙擊＝遠距 5 骰至少 2 紅；散彈＝近距 5 骰至少 2 紅；機槍＝裝甲 3＋三段各 3 骰以上各 1 橘；盾牌＝裝甲 3＋近中各 4 骰以上各 1 橘。
+
+- v99：領事館照真實一樓藍圖重做（38×25 格，只有一樓）。旋轉樓梯區改成平面的半圓大廳（地圖欄位 `spiral:{cx,cy,r0,R}`），切成圓弧梯形格：每一格在規則上仍是一個方格（`spiralCells` 依半徑分環、依角度對應），只有畫法、棋子位置與點擊落點照圓弧走（`pcOf`、`cwx`/`cwz` 取格子中心、`w2c` 把點擊座標換回格子；`setInst` 會把高亮轉成圓弧方向）。弧形外牆 `spiralWall3D`（格子標 `c.curve` 不畫方塊牆），地板內嵌弧線 `drawSpiral`，大廳地板徽章 `drawMedal`，雕像花台 `statue`、平台鋼琴 `gpiano`。材質照實景俯視圖：`consulTEX`（clobby、cspiral、cblue、cmaroon、cbath、cbrown、cwood、cpiano、cslate），牆沿用 `bankWallMats`。炸彈點與人質每場隨機：地圖有 `sitePool`（房名清單）時，`parseMap(m,true)` 呼叫 `randSites`，從清單挑兩個共用一面牆的相鄰房間，各放 2×2 的 A／B 點，人質在 A 點；銀行也套用（教學仍用固定點）。領事館加入線上對戰地圖 `ONLINE_MAPS`。手機俯視放大鏡頭上限（`maxDistance` 140、相機 far 200）讓寬地圖裝得下。
 
 ## 尚未完成 / 等使用者回覆
 
