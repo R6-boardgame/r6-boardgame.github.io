@@ -4041,7 +4041,7 @@ async function shootUnit(sh,t,ow){
   render(); await sleep(G.ai?320:160);
   ST(sh).shots++;if(hits)ST(sh).hits++;
   if(hits&&t.op==='blackbeard'&&t.ch>0){const c=Math.min(2,hits);hits-=c;t.ch--;log(`${nm(t)} 的步槍護盾擋下 ${c} 傷（剩 ${t.ch}）`,t.side==='A'?'ka':'kd');}
-  DMGBY=sh;if(t.proj)prismaBreak(t.proj,`子彈直接穿過了 ${nm(sh)} 瞄準的目標`);else if(hits)await damage(t,hits);DMGBY=null;
+  DMGBY=sh;if(t.proj)prismaBreak(t.proj,`子彈直接穿過了 ${nm(sh)} 瞄準的目標`);else if(hits)await damage(t,hits);DMGBY=null;if(G.bot&&!t.proj)botNote(sh,t,tw,hits);
   {const dr=lineCells(sh.x,sh.y,t.x,t.y).filter(([x,y])=>{const c=cell(x,y);return c&&c.t==='bar'&&c.kind==='door';});
    if(dr.length){const bm=SFX.boom;SFX.boom=()=>{};try{for(const [x,y] of dr)if(cell(x,y).t==='bar')destroyCell(x,y);}finally{SFX.boom=bm;}SFX.hit();
      log(`子彈打穿了門路障，門已經被打爛（之後從這裡穿過不再有掩護）`,'ks');render();}}
@@ -4111,7 +4111,7 @@ function showAnalysis(w,why){if(!G||!G.over||G.tut)return;let o=$('#anal');if(o)
     <div class="anScroll"><table class="anT a">${anCap('A')}${head}${rows('A')}</table>
     <table class="anT d">${anCap('D')}${head}${rows('D')}</table></div>
     <div class="anFoot"><div class="anS a"><small>進攻方總傷害</small><b>${TA.dmg}</b></div><div class="anS mid"><small>本場 MVP</small><b>${mvp?OPS[mvp.op].name:'–'}</b></div><div class="anS d"><small>防守方總傷害</small><b>${TD.dmg}</b></div></div>
-    ${(G._newAch||[]).length?`<div class="anAch ico"><b>成就達成</b>${G._newAch.map(id=>{const a=ACHM[id];return `<span title="${esc(a.n)}" aria-label="${esc(a.n)}" onclick="this.classList.toggle('show')">${a.ic}</span>`;}).join('')}</div>`:''}<div class="anBtns">${!G.net?'<button id="anAgain">再來一局</button>':''}<button class="primary" id="anHome">結束任務・回大廳</button></div></div>`;
+    ${(G._newAch||[]).length?`<div class="anAch ico"><b>成就達成</b>${G._newAch.map(id=>{const a=ACHM[id];return `<span title="${esc(a.n)}" aria-label="${esc(a.n)}" onclick="this.classList.toggle('show')">${a.ic}</span>`;}).join('')}</div>`:''}<div class="anBtns">${!G.net&&!G.bot?'<button id="anAgain">再來一局</button>':''}<button class="primary" id="anHome">結束任務・回大廳</button></div></div>`;
   document.body.appendChild(o);const rk=$('#rkres');if(rk)o.querySelector('.anTop').appendChild(rk);
   $('#anHome').onclick=()=>{o.remove();$('#banner').hidden=true;goTitle();};
   o.querySelectorAll('.anFr').forEach(b=>b.onclick=()=>frTap(b));
@@ -4121,8 +4121,8 @@ function finish(w,why){if(G&&G.tut2)return tuFinish(w,why);
   G.over=true;G.busy=false;G.active=null;G.win=w;G.why=why;SFX.music(-1);SFX.win(w===G.player);
   if(!(NET&&NET.applying))log(`${w==='A'?'進攻方':'防守方'}勝利：${why}`,'ks');
   const b=$('#banner');b.hidden=false;b.classList.toggle('bwin',w===G.player);b.classList.toggle('blose',w!==G.player);
-  if(G.net){b.innerHTML=`<h2 class="${w==='A'?'a':'d'}">${w===G.player?'任務成功':'任務失敗'}</h2><p>${w==='A'?'進攻方':'防守方'}勝利：${why}</p><div id="rkres"></div><div class="row"><button class="primary" id="menu">回到主畫面</button></div>`;$('#menu').onclick=()=>{b.hidden=true;goTitle();};
-    setTimeout(()=>showAnalysis(w,why),1400);if(NET&&NET.ranked&&!G._rated){G._rated=true;rankResult(w===G.player).then(h=>{const r=$('#rkres');if(r)r.innerHTML=h;});}render();return;}
+  if(G.net||G.bot){b.innerHTML=`<h2 class="${w==='A'?'a':'d'}">${w===G.player?'任務成功':'任務失敗'}</h2><p>${w==='A'?'進攻方':'防守方'}勝利：${why}</p><div id="rkres"></div><div class="row"><button class="primary" id="menu">回到主畫面</button></div>`;$('#menu').onclick=()=>{b.hidden=true;goTitle();};
+    setTimeout(()=>showAnalysis(w,why),1400);if(!G.bot&&NET&&NET.ranked&&!G._rated){G._rated=true;rankResult(w===G.player).then(h=>{const r=$('#rkres');if(r)r.innerHTML=h;});}render();return;}
   if(G.tut){G.tut.i=TUT.length;b.innerHTML=`<h2 class="${w==='A'?'a':'d'}">${w==='A'?'教學完成':'教學結束'}</h2><p>${w==='A'?'你已經學會移動、破門、偵查、射擊和安裝拆彈器。正式對戰的防守方會佈陷阱、加固牆面並反擊。':why}</p><div class="row"><button class="primary" id="menu">開始正式對戰</button><button id="again">重玩教學</button></div>`;
     $('#again').onclick=()=>{b.hidden=true;startTutorial();};$('#menu').onclick=()=>{b.hidden=true;G=null;showMenu();};render();return;}
   b.innerHTML=`<h2 class="${w==='A'?'a':'d'}">${w===G.player?'任務成功':'任務失敗'}</h2><p>${w==='A'?'進攻方':'防守方'}勝利：${why}</p><div class="row"><button class="primary" id="again">再來一局</button><button id="menu">回到選單</button></div>`;setTimeout(()=>showAnalysis(w,why),1400);
@@ -4136,7 +4136,7 @@ async function step(u,x,y){DMGBY=null;
   if(occ){ if(occ.side!==u.side){occ.spotted=1;if(occ.hidden)reveal(occ,'被撞見，');log(`${nm(u)} 撞見了 ${nm(occ)}！`,'ks');} u.mp=Math.max(0,u.mp-1);return false; }
   const px=u.x,py=u.y;u.fd=[Math.sign(x-u.x),Math.sign(y-u.y)];u.x=x;u.y=y;u.exp=null;spotTrack(u);camDiscover();u.mp=Math.max(0,u.mp-cost);
   if(G.hostage&&G.hostage.by===u.id){G.hostage.x=x;G.hostage.y=y;}
-  if(G.cur&&G.cur.u===u)G.cur.path.push([x,y,pubNow(u)]); if(pub(u))SFX.step(); render(); await sleep(G.ai?(pub(u)?85:10):70);
+  if(G.cur&&G.cur.u===u)G.cur.path.push([x,y,pubNow(u)]); if(pub(u))SFX.step(); render(); await sleep(G.ai?(pub(u)?(G.bot?150:85):10):70);
   if(u.side==='A'){
     const tr=gadgetAt(x,y,'trap');
     if(tr){tr.alive=false;const n=1+Math.floor(Math.random()*2);try{SFX.boom();wallBlast3D(x,y,'floor');}catch(e){}log(`${nm(u)} 觸發了 Kapkan 的入口引爆裝置！擲出 ${n} 點`,'kd');await damage(u,n);if(!u.alive)return false;}
@@ -4438,8 +4438,7 @@ async function fragShow(u,a,pool,idx,r,ctr){
   else SFX.boom();
   const dice=[...pool].map((ch,i)=>`<i class="die" style="background:${DIEC.Y}">${DIE.Y[idx[i]]}</i>`).join('');
   await rollDice3D(pool,idx,`<small>破片手榴彈 → ${OPS[a.op].name} · ${ctr?'正中':'波及'}</small><span>${dice} = ${r}</span><b class="${r?'hit':'miss'}">${r?r+' 傷':'未受傷'}</b>`,fast);
-  diceHide();if(si)si.fire(r);if(r)SFX.hit();else SFX.miss();await shotFX(r,cine||!!si);if(si)si.kill();
-  if(cine)await sleep(300);}
+  diceHide();if(si)si.fire(r);if(r)SFX.hit();else SFX.miss();await shotFX(r,!!si);if(si)si.kill();}
 async function throwGadget(u,kind,x,y){ST(u).gad++;DMGBY=u;aimCam(u,[[x,y]]);
   useAct(u,'tactical');const side=u.side==='A'?'ka':'kd';
   if(catchThrow(u,x,y)){G[kind]--;render();await afterAct(u);return;}
@@ -4607,7 +4606,7 @@ function pathCost(u,x,y){
   const dz=u.side==='A'&&G._danger?G._danger[y*G.W+x]:0;
   if(c.t==='out'||c.t==='floor')return enterCost(x,y)+dz+(u.side==='A'&&(inGas(x,y)||gadgetAt(x,y,'wire')||inFire(x,y))?4:0)+(u.side==='D'&&(inFire(x,y)||traxNear(x,y))?4:0);
   if(c.t==='bar')return 3;
-  if(u.side==='D')return Infinity;
+  if(u.side==='D')return BOTBR===u&&c.t==='soft'?6:Infinity;
   const jam=jammed(x,y);
   if(c.t==='soft'){if((BRK[u.op]&&u.ch>0)||u.op==='sledge'||(u.op==='ash'&&u.ch>0)||(u.op==='thermite'&&u.ch>0&&!jam)||(G.charges>0&&!jam))return 5;return Infinity;}
   if(c.t==='reinf'){if(u.op==='thermite'&&u.ch>0&&!c.elec&&!jam)return 6;if(BRKR[u.op]&&u.ch>0&&!c.elec&&!jam)return 6;if(u.op==='sledge'&&c.panel)return 5;return Infinity;}
@@ -4652,21 +4651,21 @@ async function aiBreach(u,x,y){
 }
 async function aiAttacker(u){
   beginAct(u);let guard=0;
-  if(u.op==='lion'&&u.ch>0&&G.round>=2&&!sees('A').size&&canDo(u,'special'))await useGadget(u);
+  if(u.op==='lion'&&u.ch>0&&G.round>=2&&!sees('A').size&&canDo(u,'special'))await BH(u,'useGadget'),await useGadget(u);
   while(u.alive&&!G.over&&(u.ap>0||u.mp>0)&&guard++<40){
     G._vis=sees('A');G._danger=dangerMap();aiTurn(u);
     const tg=shootables(u);const units=tg.filter(t=>t.kind==='unit');
-    if(units.length&&canDo(u,'shoot')&&canDo(u,'tactical')&&G.flash>0){const t=units.find(t=>throwTargets(u).some(([x,y])=>x===t.x&&y===t.y));if(t&&!t.t.stun){await throwGadget(u,'flash',t.x,t.y);continue;}}
-    if(units.length&&canDo(u,'shoot')){units.sort((a,b)=>a.t.hp-b.t.hp||cheb(u.x,u.y,a.x,a.y)-cheb(u.x,u.y,b.x,b.y));await doShoot(u,units[0]);continue;}
+    if(units.length&&canDo(u,'shoot')&&canDo(u,'tactical')&&G.flash>0){const t=units.find(t=>throwTargets(u).some(([x,y])=>x===t.x&&y===t.y));if(t&&!t.t.stun){await BH(u,'throwGadget'),await throwGadget(u,'flash',t.x,t.y);continue;}}
+    if(units.length&&canDo(u,'shoot')){units.sort((a,b)=>a.t.hp-b.t.hp||cheb(u.x,u.y,a.x,a.y)-cheb(u.x,u.y,b.x,b.y));await BH(u,'shoot'),await doShoot(u,G.bot?botTarget(u,units):units[0]);if(u.hp<=2)await botCover(u);continue;}
     if(canDo(u,'tactical')&&G.drones>0){const toks=[...alive('D').filter(d=>d.hidden&&!d.spotted),...(G.decoys||[]).filter(k=>k.alive)].filter(k=>cheb(k.x,k.y,u.x,u.y)<=9);
       let plan=null;for(const k of toks){if(!cell(k.x,k.y).indoor)continue;const room=new Set(roomOf(k.x,k.y).map(([x,y])=>y*G.W+x));plan=dronePlan(u,room);if(plan)break;}
-      if(plan){await aiDrone(u,plan);continue;}}
-    if(canDo(u,'tactical')&&G.flash>0){const ow=alive('D').find(d=>pub(d)&&d.overwatch&&!d.stun&&cheb(d.x,d.y,u.x,u.y)<=6&&throwTargets(u).some(([x,y])=>x===d.x&&y===d.y));if(ow){await throwGadget(u,'flash',ow.x,ow.y);continue;}}
-    if(canDo(u,'tactical')&&G.frag>0){const d=alive('D').find(d=>pub(d)&&throwTargets(u).some(([x,y])=>x===d.x&&y===d.y));if(d){await throwGadget(u,'frag',d.x,d.y);continue;}}
-    if(canDo(u,'special')&&u.op==='fuze'&&u.ch>0){const d=alive('D').find(d=>G._vis.has(d.id)&&cheb(u.x,u.y,d.x,d.y)<=3);if(d){await useGadget(u,d.x,d.y);continue;}}
+      if(plan){await BH(u,'aiDrone'),await aiDrone(u,plan);continue;}}
+    if(canDo(u,'tactical')&&G.flash>0){const ow=alive('D').find(d=>pub(d)&&d.overwatch&&!d.stun&&cheb(d.x,d.y,u.x,u.y)<=6&&throwTargets(u).some(([x,y])=>x===d.x&&y===d.y));if(ow){await BH(u,'throwGadget'),await throwGadget(u,'flash',ow.x,ow.y);continue;}}
+    if(canDo(u,'tactical')&&G.frag>0){const d=alive('D').find(d=>pub(d)&&throwTargets(u).some(([x,y])=>x===d.x&&y===d.y));if(d){await BH(u,'throwGadget'),await throwGadget(u,'frag',d.x,d.y);continue;}}
+    if(canDo(u,'special')&&u.op==='fuze'&&u.ch>0){const d=alive('D').find(d=>G._vis.has(d.id)&&cheb(u.x,u.y,d.x,d.y)<=3);if(d){await BH(u,'useGadget'),await useGadget(u,d.x,d.y);continue;}}
     if(canDo(u,'special')&&u.op==='thatcher'&&u.ch>0){const g=G.gadgets.find(g=>g.alive&&g.side==='D'&&g.type!=='trap'&&g.type!=='gas'&&gadgetVisibleTo(g,'A')&&cheb(u.x,u.y,g.x,g.y)<=4);
-      if(g){const t=within(u.x,u.y,3).sort((a,b)=>cheb(a[0],a[1],g.x,g.y)-cheb(b[0],b[1],g.x,g.y))[0];await useGadget(u,t[0],t[1]);continue;}}
-    if(canDo(u,'special')&&u.ch>0&&AIG[u.op]){const t=AIG[u.op](u);if(t){await useGadget(u,...(t==='self'?[]:t));continue;}}
+      if(g){const t=within(u.x,u.y,3).sort((a,b)=>cheb(a[0],a[1],g.x,g.y)-cheb(b[0],b[1],g.x,g.y))[0];await BH(u,'useGadget'),await useGadget(u,t[0],t[1]);continue;}}
+    if(canDo(u,'special')&&u.ch>0&&AIG[u.op]){const t=AIG[u.op](u);if(t){await BH(u,'useGadget'),await useGadget(u,...(t==='self'?[]:t));continue;}}
     if(canDo(u,'obj')&&plantOK(u)){plant(u);continue;}
     if(canDo(u,'obj')&&escortOK(u)){await escort(u);continue;}
     if(G.defuser&&man(u.x,u.y,G.defuser.x,G.defuser.y)<=3)break;
@@ -4678,12 +4677,12 @@ async function aiAttacker(u){
     if(!blocks(c)){
       const o=unitAt(nx,ny);
       if(o&&o.side===u.side)break;
-      if(u.mp>=enterCost(nx,ny)){await step(u,nx,ny);continue;}
+      if(u.mp>=enterCost(nx,ny)){await BH(u,'step'),await step(u,nx,ny);continue;}
       if(u.run&&canDo(u,'run')&&u.ap>=2){sprint(u);continue;}
       break;
     }
     if(u.ap<=0)break;
-    if(!(await aiBreach(u,nx,ny)))break;
+    if(!(await BH(u,'aiBreach'),await aiBreach(u,nx,ny)))break;
   }
   G._danger=null;
   if(u.alive&&u.ap>0&&!G.over)overwatch(u);
@@ -4716,40 +4715,40 @@ async function aiDefender(u){
   beginAct(u);let guard=0;
   while(u.alive&&!G.over&&(u.ap>0||u.mp>0)&&guard++<40){
     G._vis=sees('D');aiTurn(u);
-    if(u.ap>=2&&canDo(u,'mirror')&&canDo(u,'shoot')){const mg=mirOpenable(u)[0];if(mg){const mc=cell(mg.x,mg.y);mc.mOpen=true;const ok=shootables(u).some(t=>t.kind==='unit');mc.mOpen=false;if(ok){await mirOpen(u,mg);continue;}}}
+    if(u.ap>=2&&canDo(u,'mirror')&&canDo(u,'shoot')){const mg=mirOpenable(u)[0];if(mg){const mc=cell(mg.x,mg.y);mc.mOpen=true;const ok=shootables(u).some(t=>t.kind==='unit');mc.mOpen=false;if(ok){await BH(u,'mirOpen'),await mirOpen(u,mg);continue;}}}
     const tg=shootables(u).filter(t=>t.kind==='unit');
-    if(tg.length&&canDo(u,'shoot')){tg.sort((a,b)=>a.t.hp-b.t.hp);await doShoot(u,tg[0]);continue;}
-    if(canDo(u,'destroy')){const g=destroyTargets(u).find(([x,y])=>gadgetAt(x,y,'drone')||(gadgetAt(x,y,'clay')&&cheb(u.x,u.y,x,y)>1));if(g){await doDestroy(u,...g);continue;}}
-    if(!u.hidden&&canDo(u,'tactical')&&G.nitro>0){const t=throwTargets(u).find(([x,y])=>{const a=unitAt(x,y);return a&&a.side==='A'&&pub(a)&&blastArea(x,y).every(([i,j])=>{const b=unitAt(i,j);return !b||b.side==='A';});});if(t){await throwGadget(u,'nitro',...t);continue;}}
+    if(tg.length&&canDo(u,'shoot')){tg.sort((a,b)=>a.t.hp-b.t.hp);await BH(u,'shoot'),await doShoot(u,G.bot?botTarget(u,tg):tg[0]);await botCover(u);continue;}
+    if(canDo(u,'destroy')){const g=destroyTargets(u).find(([x,y])=>gadgetAt(x,y,'drone')||(gadgetAt(x,y,'clay')&&cheb(u.x,u.y,x,y)>1));if(g){await BH(u,'doDestroy'),await doDestroy(u,...g);continue;}}
+    if(!u.hidden&&canDo(u,'tactical')&&G.nitro>0){const t=throwTargets(u).find(([x,y])=>{const a=unitAt(x,y);return a&&a.side==='A'&&pub(a)&&blastArea(x,y).every(([i,j])=>{const b=unitAt(i,j);return !b||b.side==='A';});});if(t){await BH(u,'throwGadget'),await throwGadget(u,'nitro',...t);continue;}}
     if(G.defuser){
       if(canDo(u,'obj')&&defuseOK(u)){defuse(u);continue;}
       const r=findPath(u,(x,y)=>man(x,y,G.defuser.x,G.defuser.y)<=1);
-      if(r&&r.p.length>1&&!blocks(cell(...r.p[1]))&&!unitAt(...r.p[1])){if(u.mp>=enterCost(...r.p[1])){await step(u,...r.p[1]);continue;}if(u.run&&canDo(u,'run')){sprint(u);continue;}}
-      if(r&&r.p.length>1&&cell(...r.p[1]).t==='bar'&&canDo(u,'destroy')){await aiBreach(u,...r.p[1]);continue;}
+      if(r&&r.p.length>1&&!blocks(cell(...r.p[1]))&&!unitAt(...r.p[1])){if(u.mp>=enterCost(...r.p[1])){await BH(u,'step'),await step(u,...r.p[1]);continue;}if(u.run&&canDo(u,'run')){sprint(u);continue;}}
+      if(r&&r.p.length>1&&cell(...r.p[1]).t==='bar'&&canDo(u,'destroy')){await BH(u,'aiBreach'),await aiBreach(u,...r.p[1]);continue;}
       break;
     }
-    if(canDo(u,'special')&&u.op==='doc'&&u.ch>0){const t=gTargets(u).find(([x,y])=>{const a=unitAt(x,y);return a.max-a.hp>=2;});if(t){await useGadget(u,...t);continue;}}
-    if(canDo(u,'special')&&u.ch>0&&AIG[u.op]){const t=AIG[u.op](u);if(t){await useGadget(u,...(t==='self'?[]:t));continue;}}
-    if(canDo(u,'special')&&u.op==='smoke'&&u.ch>0){const t=alive('A').find(a=>cheb(u.x,u.y,a.x,a.y)<=4&&los(u.x,u.y,a.x,a.y));if(t){await useGadget(u,t.x,t.y);continue;}}
+    if(canDo(u,'special')&&u.op==='doc'&&u.ch>0){const t=gTargets(u).find(([x,y])=>{const a=unitAt(x,y);return a.max-a.hp>=2;});if(t){await BH(u,'useGadget'),await useGadget(u,...t);continue;}}
+    if(canDo(u,'special')&&u.ch>0&&AIG[u.op]){const t=AIG[u.op](u);if(t){await BH(u,'useGadget'),await useGadget(u,...(t==='self'?[]:t));continue;}}
+    if(canDo(u,'special')&&u.op==='smoke'&&u.ch>0){const t=alive('A').find(a=>cheb(u.x,u.y,a.x,a.y)<=4&&los(u.x,u.y,a.x,a.y));if(t){await BH(u,'useGadget'),await useGadget(u,t.x,t.y);continue;}}
     const seen=alive('A').filter(a=>G._vis.has(a.id)&&cheb(a.x,a.y,u.x,u.y)<=(u.hidden?5:8));
     if(seen.length&&u.mp>0&&canDo(u,'shoot')&&!u.peeked&&Math.random()<.6){
       u.peeked=true;const m=reach(u);let best=null;
       for(const [k,v] of m){const x=k%G.W,y=(k/G.W)|0;if(unitAt(x,y)&&!(x===u.x&&y===u.y))continue;
         if(seen.some(a=>cheb(x,y,a.x,a.y)<=6&&los(x,y,a.x,a.y))&&(!best||v.d<best.d))best={x,y,d:v.d};}
-      if(best&&best.d>0){for(const [x,y] of pathFrom(m,best.x,best.y)){if(!(await step(u,x,y)))break;}continue;}
+      if(best&&best.d>0){for(const [x,y] of pathFrom(m,best.x,best.y)){if(!(await BH(u,'step'),await step(u,x,y)))break;}continue;}
     }
-    if(G.hostage&&G.hostage.by){const c=G.units.find(a=>a.id===G.hostage.by);const r=findPath(u,(x,y)=>cheb(x,y,c.x,c.y)<=3);if(r&&r.p.length>1&&!blocks(cell(...r.p[1]))&&!unitAt(...r.p[1])&&u.mp>=enterCost(...r.p[1])){await step(u,...r.p[1]);continue;}}
+    if(G.hostage&&G.hostage.by){const c=G.units.find(a=>a.id===G.hostage.by);const r=findPath(u,(x,y)=>cheb(x,y,c.x,c.y)<=3);if(r&&r.p.length>1&&!blocks(cell(...r.p[1]))&&!unitAt(...r.p[1])&&u.mp>=enterCost(...r.p[1])){await BH(u,'step'),await step(u,...r.p[1]);continue;}}
     const kn=alive('A').filter(a=>a.x>=0&&(G._vis.has(a.id)||a.spotted>0)&&man(u.x,u.y,a.x,a.y)<=12);if(kn.length)G.lastA={x:kn[0].x,y:kn[0].y,r:G.round};
     const lastOk=G.lastA&&G.lastA.r>=G.round-1&&man(u.x,u.y,G.lastA.x,G.lastA.y)<=12&&man(u.x,u.y,G.lastA.x,G.lastA.y)>1;
     if(u.mp>0&&(kn.length||lastOk||(u.roam&&G.round>=2))){
       const near=(kn.length?kn:lastOk?[G.lastA]:alive('A').filter(a=>a.x>=0)).slice().sort((a,b)=>man(u.x,u.y,a.x,a.y)-man(u.x,u.y,b.x,b.y))[0];
       if(near&&man(u.x,u.y,near.x,near.y)>4){const r=findPath(u,(x,y)=>man(x,y,near.x,near.y)<=4);
-        if(r&&r.p.length>1&&!blocks(cell(...r.p[1]))&&!unitAt(...r.p[1])&&u.mp>=enterCost(...r.p[1])){await step(u,...r.p[1]);continue;}
-        if(r&&r.p.length>1&&cell(...r.p[1]).t==='bar'&&canDo(u,'destroy')){await aiBreach(u,...r.p[1]);continue;}}
+        if(r&&r.p.length>1&&!blocks(cell(...r.p[1]))&&!unitAt(...r.p[1])&&u.mp>=enterCost(...r.p[1])){await BH(u,'step'),await step(u,...r.p[1]);continue;}
+        if(r&&r.p.length>1&&cell(...r.p[1]).t==='bar'&&canDo(u,'destroy')){await BH(u,'aiBreach'),await aiBreach(u,...r.p[1]);continue;}}
     }
     if(u.anchor&&man(u.x,u.y,u.anchor[0],u.anchor[1])>1&&u.mp>0){
       const r=findPath(u,(x,y)=>x===u.anchor[0]&&y===u.anchor[1]);
-      if(r&&r.p.length>1&&!blocks(cell(...r.p[1]))&&!unitAt(...r.p[1])&&u.mp>=enterCost(...r.p[1])){await step(u,...r.p[1]);continue;}
+      if(r&&r.p.length>1&&!blocks(cell(...r.p[1]))&&!unitAt(...r.p[1])&&u.mp>=enterCost(...r.p[1])){await BH(u,'step'),await step(u,...r.p[1]);continue;}
     }
     break;
   }
@@ -4759,7 +4758,7 @@ async function aiDefender(u){
   endAct(u);
 }
 async function runAI(){
-  if(G.over)return;
+  if(G.over)return;if(G.bot)return botRunAI();
   G.busy=true;const side=curSide();let n=0;
   while(n<3&&!G.over){
     const c=unspent(side);if(!c.length)break;
@@ -4777,6 +4776,123 @@ async function runAI(){
   if(!G.over)endPhase();
 }
 
+// ---------- matchmaking bot: an online opponent with a human pace and a few real tactics ----------
+// G.bot holds what it has learned: shots taken (who fired from where), cameras lost, and its own mood
+const BOTNM=['Kuro_Wolf','阿哲不睡覺','xXSnipeXx','小籠包戰神','NightOwl_77','Tachi','邊緣人老王','RushB_Only','Mochi醬','Viper.tw','ShadowFox','台南吳彥祖','Rook媽媽','ZeroK','鹹酥雞特攻隊','Lynx','Ghost_TW','煞氣a阿凱','IceTea','KAI_99'];
+const BOTDELAY={step:[450,1200],shoot:[900,2200],throwGadget:[1100,2400],useGadget:[1000,2300],aiDrone:[800,1700],aiBreach:[900,2000],doDestroy:[800,1600],mirOpen:[900,1800],breach:[900,2000]};
+let BOTBR=null; // the defender currently allowed to path through light walls (it carries something to open them)
+const rr=(a,b)=>a+Math.random()*(b-a);
+function botMake(){return {name:BOTNM[Math.floor(Math.random()*BOTNM.length)],shots:[],camDead:new Set(),seen:0,mood:rr(.35,.75)};}
+// a pause before each action; consecutive steps flow the way a finger drags along a path
+async function BH(u,k){if(!G||!G.bot||document.hidden)return;const prev=u._bk;u._bk=k;
+  if(k==='step'&&prev==='step')return sleep(rr(40,160));const d=BOTDELAY[k]||[600,1400];await sleep(rr(d[0],d[1]));}
+function botNote(sh,t,tw,hits){if(!G||!G.bot||G.over||sh.side===curBotSide())return;
+  G.bot.shots.push({by:sh.id,x:sh.x,y:sh.y,vic:t.id,vx:t.x,vy:t.y,tw:!!tw,hits,r:G.round,ph:G.phaseIdx,new:1});}
+const curBotSide=()=>G&&G.bot?(G.player==='A'?'D':'A'):null;
+// last place the bot can honestly know an enemy is: in its view, marked, or where the shot came from
+function botWhere(id,fx,fy){const e=G.units.find(a=>a.id===id);if(!e||!e.alive||e.x<0)return null;
+  if(seenBy(curBotSide(),e)||e.spotted>0)return {x:e.x,y:e.y,live:1};return fx==null?null:{x:fx,y:fy};}
+function botIntel(side){const B=G.bot;if(side!=='D')return;const ds=alive('D').filter(u=>u.x>=0);
+  // cameras that went dark since the last look: someone is right there
+  for(const g of G.gadgets)if(g.type==='cam'&&g.side==='D'&&!g.alive&&!B.camDead.has(g)){B.camDead.add(g);
+    const near=alive('A').filter(a=>a.x>=0&&(seenBy('D',a)||a.spotted>0)).sort((a,b)=>cheb(a.x,a.y,g.x,g.y)-cheb(b.x,b.y,g.x,g.y))[0];
+    const tgt=near&&cheb(near.x,near.y,g.x,g.y)<=5?{id:near.id,x:near.x,y:near.y}:{id:null,x:g.x,y:g.y};
+    const h=botFree(ds,tgt.x,tgt.y,10);if(h){h.botJob={kind:'hunt',id:tgt.id,x:tgt.x,y:tgt.y,r:G.round};log(`${nm(h)} 察覺攝影機被破壞了`,'kd');}}
+  // shot at (through a wall or not): the victim trades back, a second defender swings round behind the shooter
+  for(const s of B.shots.filter(s=>s.new)){s.new=0;const vic=G.units.find(a=>a.id===s.vic);if(vic&&vic.alive)vic.botTrade=s.by;
+    const w=botWhere(s.by,s.x,s.y);if(!w)continue;
+    if(ds.some(d=>d.botJob&&d.botJob.kind==='flank'&&d.botJob.id===s.by))continue;
+    const f=botFree(ds.filter(d=>d!==vic),w.x,w.y,14);if(f)f.botJob={kind:'flank',id:s.by,x:w.x,y:w.y,vx:s.vx,vy:s.vy,r:G.round};}
+  // jobs go stale after two rounds without fresh word
+  for(const d of ds)if(d.botJob&&G.round-d.botJob.r>2)d.botJob=null;}
+// the nearest defender not already busy and not the last one holding the site
+function botFree(ds,x,y,lim){const busy=ds.filter(d=>d.botJob).length;if(busy>=2)return null;
+  const site=ds.filter(d=>d.anchor&&!d.botJob);
+  return ds.filter(d=>!d.botJob&&!d.defusing&&man(d.x,d.y,x,y)<=lim&&(!d.anchor||site.length>2||d.roam))
+    .sort((a,b)=>(b.roam?3:0)-(a.roam?3:0)+man(a.x,a.y,x,y)-man(b.x,b.y,x,y))[0]||null;}
+// expected damage of a shot, so the bot only takes fights worth taking
+function botEV(u,e){const {p,pool}=shotPool(u,e);let s=0;for(const ch of pool)s+=DIEV[ch.toUpperCase()]||1;return Math.max(0,s-p);}
+function botTarget(u,tg){const sc=t=>{const ev=botEV(u,t.t);return ev*2+(ev>=t.t.hp?6:0)+(t.t.botTrade===u.id?2:0)-t.t.hp*.5+(u.botTrade===t.t.id?4:0);};
+  const s=tg.slice().sort((a,b)=>sc(b)-sc(a));return Math.random()<.12&&s[1]?s[1]:s[0];} // now and then picks the less obvious target, like people do
+function botPick(side,c){const B=G.bot;
+  const sc=u=>{const sh=shootables(u).some(t=>t.kind==='unit');let v=sh?1000:0;
+    if(side==='A'){const r=findPath(u,aiGoal(u));v-=(r?r.cost:99);if(G.round===1&&G.drones>0&&!B.seen&&u.op!=='sledge')v+=30;}
+    else{if(u.botTrade)v+=800;if(u.botJob)v+=500+(u.botJob.kind==='flank'?50:0);v+=G.defuser?50-man(u.x,u.y,G.defuser.x,G.defuser.y):Math.random()*10;if(u.anchor&&man(u.x,u.y,u.anchor[0],u.anchor[1])>1)v+=20;}
+    return v+rr(0,6);};
+  return c.slice().sort((a,b)=>sc(b)-sc(a))[0];}
+async function botRunAI(){
+  if(G.over)return;G.busy=true;const side=curSide();let n=0;
+  botIntel(side);render();
+  await sleep(rr(1200,2800)*(G.round===1&&G.phaseIdx<2?1.5:1)); // reads the board before committing
+  while(n<3&&!G.over){
+    const c=unspent(side);if(!c.length)break;
+    G._vis=sees(side);const u=botPick(side,c);u._bk=null;
+    if(n)await sleep(rr(700,2200));
+    if(side==='A')await aiAttacker(u);else if(u.botJob)await botDefender(u);else await aiDefender(u);
+    u.botTrade=null;n++;render();G.bot.seen=G.bot.seen||sees(side).size;
+  }
+  if(!G.over&&!pub({side:side,id:'x'}))log(`${side==='A'?'進攻方':'防守方'}啟動了 ${n} 名幹員`,side==='A'?'ka':'kd');
+  G.busy=false;G.ai=false;
+  if(!G.over)endPhase();
+}
+// defenders open a light wall with an impact grenade or a heavy weapon, then go through
+async function botBreachD(u,x,y){const c=cell(x,y);
+  if(c.t==='bar'){if(!canDo(u,'destroy'))return false;await doDestroy(u,x,y);return true;}
+  if(c.t!=='soft')return false;
+  if(G.impact>0&&canDo(u,'tactical')&&impactTargets(u).some(([a,b])=>a===x&&b===y)){await throwGadget(u,'impact',x,y);return true;}
+  if(canDo(u,'destroy')&&destroyTargets(u).some(([a,b])=>a===x&&b===y)){await doDestroy(u,x,y);return true;}
+  return false;}
+const botCanBreach=u=>G.impact>0||(PROF[u.op].dz||1)>=2;
+// a defender with a job: hunt the spot where a camera died, or circle behind someone who shot a teammate
+async function botDefender(u){
+  const job=u.botJob;beginAct(u);let guard=0;if(botCanBreach(u))BOTBR=u;
+  try{while(u.alive&&!G.over&&(u.ap>0||u.mp>0)&&guard++<40){
+    G._vis=sees('D');aiTurn(u);
+    const tg=shootables(u).filter(t=>t.kind==='unit');
+    if(tg.length&&canDo(u,'shoot')){const t=botTarget(u,tg);if(botEV(u,t.t)>=.8||u.botTrade===t.t.id||!u.mp){await BH(u,'shoot');await doShoot(u,t);continue;}}
+    if(!u.botJob)break;
+    const w=botWhere(job.id,job.x,job.y);if(!w){u.botJob=null;break;}if(w.live){job.x=w.x;job.y=w.y;}
+    const goal=job.kind==='flank'?((x,y)=>{const d=cheb(x,y,w.x,w.y);return d>=1&&d<=3&&(x-w.x)*(job.vx-w.x)+(y-w.y)*(job.vy-w.y)<=0;}):((x,y)=>cheb(x,y,w.x,w.y)<=2);
+    const r=findPath(u,goal);
+    if(!r){u.botJob=null;break;}
+    if(r.p.length<2){if(!w.live)u.botJob=null;break;}
+    const [nx,ny]=r.p[1],c=cell(nx,ny);
+    if(!blocks(c)){if(unitAt(nx,ny))break;
+      if(u.mp>=enterCost(nx,ny)){await BH(u,'step');if(!(await step(u,nx,ny)))break;continue;}
+      if(u.run&&canDo(u,'run')&&u.ap>=2){sprint(u);continue;}break;}
+    if(u.ap<=0)break;
+    await BH(u,'breach');if(!(await botBreachD(u,nx,ny)))break;
+  }}finally{BOTBR=null;}
+  if(!u.alive||G.over){endAct(u);return;}
+  const w=u.botJob&&botWhere(u.botJob.id,u.botJob.x,u.botJob.y);
+  if(w&&!aiTurn(u))u.fd=[w.x-u.x,w.y-u.y];else if(!w&&!aiTurn(u)&&!knownFoe(u))u.fd=bestFace(u);
+  if(u.ap>0)overwatch(u,false,w?[w.x-u.x,w.y-u.y]:null);
+  endAct(u);
+}
+// after shooting with steps left, slip back out of the open like a peek
+async function botCover(u){if(!G.bot||!u.alive||G.over||u.mp<=0||u.overwatch)return;
+  const foes=G.units.filter(e=>e.alive&&e.side!==u.side&&e.x>=0&&(seenBy(u.side,e)||e.spotted>0));if(!foes.length)return;
+  const ex=(x,y)=>foes.filter(e=>cheb(x,y,e.x,e.y)<=10&&los(e.x,e.y,x,y)).length;
+  const here=ex(u.x,u.y);if(!here)return;const m=reach(u);let best=null;
+  for(const [k,v] of m){if(v.pass)continue;const x=k%G.W,y=(k/G.W)|0;if(unitAt(x,y)&&!(x===u.x&&y===u.y))continue;const e=ex(x,y);
+    if(e<here&&(!best||e<best.e||(e===best.e&&v.d<best.d)))best={x,y,d:v.d,e};}
+  if(!best)return;await BH(u,'step');for(const [x,y] of pathFrom(m,best.x,best.y)){if(!(await step(u,x,y)))break;}}
+// the ranked queue gives up on finding a person after 30 seconds and sends in the bot
+function rankBot(){if(SCREEN!=='queue'||RQ.busy)return;rankLeaveQueue();RQ.busy=false;
+  const side=Math.random()<.5?'A':'D',ks=Object.keys(MAPS),mk=ks[Math.floor(Math.random()*ks.length)],m=MAPS[mk],en=side==='A'?'D':'A';
+  cfg.map=mk;cfg.side=side;fillPicks(side);SCREEN='game';showMapReveal(mk,side);
+  G={map:m,grid:parseMap(m),W:m.rows[0].length,H:m.rows.length,units:[],gadgets:[],reinf:0,round:1,maxRounds:6,phaseIdx:0,phase:'setup',acts:0,active:null,sel:null,mode:'move',defuser:null,over:false,busy:false,ai:false,log:[],moves:[],cur:null,hl:null,player:side,aiSite:Math.random()<.5?'A':'B',fx:null,spawn:null,bot:botMake()};
+  copPrep(false);
+  const bases=new Set(),theirs=[];for(const k of shuffle(OPBASE.filter(k=>OPC[k].side===en&&SCRIPTED.has(k)))){if(theirs.length>=5)break;if(!bases.has(OPC[k].base)){bases.add(OPC[k].base);theirs.push(k);}}
+  const mine=cfg.picks[side].slice(),ap=side==='A'?mine:theirs,dp=side==='D'?mine:theirs;
+  ap.forEach((op,i)=>G.units.push(mkUnit(op,'A',i)));dp.forEach((op,i)=>G.units.push(mkUnit(op,'D',i)));
+  if(dp.includes('rook'))alive('D').forEach(u=>{u.max++;u.hp++;});
+  Object.assign(G,{drones:3,wire:3,...invFor('A',INV_DEF.A),...invFor('D',INV_DEF.D),decoys:[],mission:'bomb',hostage:null});
+  m.cams.forEach(([x,y])=>G.gadgets.push({type:'cam',x,y,side:'D',alive:true,fixed:true}));
+  autoDefSetup(true);placeAttackers(Math.floor(Math.random()*m.spawns.length));
+  log(`線上對戰開始：對手 ${esc(G.bot.name)}，防守方已自動佈防，進攻方隨機出生點。`,'ks');
+  if(R3)R3.sig='';startPlay();if(R3){R3.camPhase='setup';setTimeout(()=>G&&G.phase==='setup'?setView('top'):playCam(),50);}
+}
 // ---------- setup ----------
 function roomOf(sx,sy){const seen=new Set([sy*G.W+sx]),q=[[sx,sy]];while(q.length){const [x,y]=q.shift();for(const [nx,ny] of adj4(x,y)){const k=ny*G.W+nx;if(seen.has(k))continue;const c=cell(nx,ny);if(blocks(c)||!c.indoor)continue;seen.add(k);q.push([nx,ny]);}}return [...seen].map(k=>[k%G.W,(k/G.W)|0]);}
 function autoDefSetup(withGadgets){
@@ -5362,7 +5478,7 @@ function frTap(b){const o=G&&G.net&&NET&&NET.opp;
   if(!b.classList.contains('arm')){b.classList.add('arm');b.querySelector('em').textContent='再點一下加好友';clearTimeout(b._t);b._t=setTimeout(()=>{b.classList.remove('arm');b.querySelector('em').textContent='加好友';},6000);return;}
   frAdd(o);renderPlayer();b.classList.remove('arm');b.classList.add('ok');b.innerHTML=SVG_FR.ok+'<em>已加好友</em>';}
 function anCap(side){const mine=side===G.player,o=G.net&&NET&&NET.opp;
-  const nm=mine?meName():(G.net?(o?o.name:'對手'):'電腦');
+  const nm=mine?meName():(G.bot?G.bot.name:G.net?(o?o.name:'對手'):'電腦');
   const fr=mine?'':(o&&isFriend(o.id)?`<button class="anFr ok" aria-label="已是好友">${SVG_FR.ok}<em>已加好友</em></button>`:`<button class="anFr${o?'':' off'}" aria-label="加好友">${SVG_FR.add}<em>加好友</em></button>`);
   return `<caption><span class="anSide">${side==='A'?'進攻方':'防守方'}</span><b class="anPN">${esc(nm)}</b>${mine?'<i class="me">你</i>':''}${fr}</caption>`;}
 // ---- achievements ----
@@ -5485,7 +5601,7 @@ function achFinish(w){if(!G||G._achDone)return;G._achDone=true;G._newAch=[];
   if(maxK>=2)got.push('double');if(maxK>=Math.max(5,en.length))got.push('ace');
   if(t.shots>=6&&t.hits/t.shots>=.8)got.push('sharp');
   if(t.gad>=8)got.push('gadget');if(win&&t.taken>=8)got.push('tank');
-  if(G.net){got.push('online');if(NET&&NET.ranked)got.push('ranked');if(NET&&NET.opp)frRecord(NET.opp,win);}
+  if(G.bot)got.push('online','ranked');if(G.net){got.push('online');if(NET&&NET.ranked)got.push('ranked');if(NET&&NET.opp)frRecord(NET.opp,win);}
   achSave();G.over=true;got.forEach(id=>achGive(id));try{renderPlayer();}catch(e){}}
 // toasts queue so several unlocks show one after another
 const ATQ=[];let atBusy=false;
@@ -7325,7 +7441,7 @@ function renderTitle(){
   else if(SCREEN==='rank'){if(ME.mode!=='account')h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(null,40)}<div><b>排名戰需要登入帳號</b><br><span>登入後，段位與戰績會存在這個遊戲的共用資料裡。訪客可以玩其他所有模式。</span></div></div></div>`+B('t-login','登入帳號','啟用線上身分','primary')+B('t-back','返回','',' ghost');
     else{fillPicks('A');fillPicks('D');h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(ME.rating,44)}<div><span>你的段位</span><br><b>${ME.rating==null?'—':tierName(tierOf(ME.rating))}</b> <span>${ME.rating??''} 分 · ${ME.w} 勝 ${ME.l} 敗</span></div></div>
       <div class="sq"><em>進攻小隊</em>${ops('A')}<button data-edit="A">更換</button></div><div class="sq"><em>防守小隊</em>${ops('D')}<button data-edit="D">更換</button></div><span class="hint">陣營隨機分配，地圖配對後揭曉。勝利 +25 分，落敗 −20 分。</span></div>`+B('t-queue','開始配對','PVP RANK','primary')+B('t-back','返回','',' ghost');}}
-  else if(SCREEN==='queue')h=`<h2 class="tsec">線上對戰</h2><div class="tqueue"><div class="ring"></div><span>搜尋對手中</span><b id="qclock">${fmtClock(Date.now()-RQ.t0)}</b><span>排隊中的玩家 <b id="qcount" style="font-size:14px">1</b></span><span>找到對手後會自動進入對戰。</span><span class="qnote">需要另一位玩家同時排隊；同一個帳號或同一個瀏覽器不會跟自己配對。</span></div>`+B('t-qcancel','取消配對','',' ghost');
+  else if(SCREEN==='queue')h=`<h2 class="tsec">線上對戰</h2><div class="tqueue"><div class="ring"></div><span>搜尋對手中</span><b id="qclock">${fmtClock(Date.now()-RQ.t0)}</b><span>排隊中的玩家 <b id="qcount" style="font-size:14px">1</b></span><span>找到對手後會自動進入對戰。</span><span class="qnote">通常 30 秒內就會配到對手。</span></div>`+B('t-qcancel','取消配對','',' ghost');
   else if(SCREEN==='pvp')h=`<h2 class="tsec">自訂房間</h2>`+B('t-create','建立房間','你當房主，選陣營；地圖配對後隨機揭曉','primary')+B('t-find','尋找房間','加入其他人開的房間')+B('t-back','返回','',' ghost');
   else if(SCREEN==='create'){const s=cfg.side;fillPicks(s);h=`<h2 class="tsec">建立房間</h2><div class="tpick"><span>你的陣營</span><div class="row">${['A','D'].map(k=>`<button data-cs="${k}" class="${s===k?'on':''}"><b class="${k==='A'?'a':'d'}">${k==='A'?'進攻方':'防守方'}</b></button>`).join('')}</div>
     <span>地圖</span><p class="tnote">隨機抽選，配對成功後揭曉。</p>
@@ -7886,7 +8002,7 @@ async function rankQueue(){
   RQ.t0=Date.now();RQ.busy=false;SCREEN='queue';NETMSG='';renderTitle();
   RQ.q.presence({q:RQ.t0,code:null,for:null}).catch(()=>{});
   RQ.un=RQ.q.onPeers(ch=>rankMatch(ch.peers),()=>{NETMSG='配對連線中斷，請再試一次。';rankCancel();SCREEN='rank';renderTitle();});
-  RQ.t=setInterval(()=>{const c=$('#qclock');if(c)c.textContent=fmtClock(Date.now()-RQ.t0);if(RQ.busy&&RQ.bt&&Date.now()-RQ.bt>70000&&!(G&&G.net))rankRequeue();},1000);
+  RQ.t=setInterval(()=>{const c=$('#qclock');if(c)c.textContent=fmtClock(Date.now()-RQ.t0);if(!RQ.busy&&SCREEN==='queue'&&Date.now()-RQ.t0>=30000)return rankBot();if(RQ.busy&&RQ.bt&&Date.now()-RQ.bt>70000&&!(G&&G.net))rankRequeue();},1000);
 }
 function rankMatch(peers){
   const el=$('#qcount');if(el)el.textContent=peers.filter(p=>p.kind==='viewer'&&p.presence&&p.presence.q).length;
@@ -8146,7 +8262,7 @@ function ecoAdd(n){ECO.rn=Math.max(0,(ECO.rn|0)+n);}
 function ecoGame(w){if(!G||G._eco)return G&&G._eco;ecoRoll();const P=G.player,win=w===P,lines=[];let earn=0;
   if(G.tut){if(w==='A'&&!ECO.tut){ECO.tut=1;earn+=2000;lines.push(['完成新手教學',2000]);}}
   else{const mine=G.units.filter(u=>u.side===P),t={k:0,gad:0};mine.forEach(u=>{const q=ST(u);t.k+=q.k||0;t.gad+=q.gad||0;});
-    const quick=G.net&&NET&&NET.ranked,custom=G.net&&!quick;
+    const quick=!!G.bot||G.net&&NET&&NET.ranked,custom=G.net&&!quick;
     if(quick){const v=win?700:500;earn+=v;lines.push([win?'線上對戰勝利':'線上對戰',v]);}
     else if(custom){const v=win?700:500;earn+=v;lines.push([win?'自訂房間勝利':'自訂房間',v]);}
     else{const d=dayKey();if(ECO.pveDay!==d){ECO.pveDay=d;ECO.pveEarn=0;}const v=win?500:300;ECO.pveEarn+=v;earn+=v;
@@ -8360,7 +8476,7 @@ function hMenu(){let m=$('#hmenu');if(m){m.remove();return;}m=document.createEle
     if(k==='mus'){SFX.toggleMusic();try{musicLevel();}catch(e){}}else if(k==='snd')$('#sndBtn').click();else if(k==='set')openSettings();else if(k==='ach')openAch();else homeGo();};
   setTimeout(()=>addEventListener('pointerdown',function f(e){if(!m.contains(e.target)&&e.target.closest('#homeBtn')==null){m.remove();removeEventListener('pointerdown',f,true);}},true),0);}
 $('#homeBtn').onclick=()=>{if(!G){goTitle();return;}hMenu();};
-function homeGo(){if(!G){goTitle();return;}if(G.over)return goTitle();if(confirm(G.net?'離開連線對戰？對手會留在房間裡。':'離開這場對戰，回到主畫面？')){if(!G.tut)achGive('retreat');goTitle();}};
+function homeGo(){if(!G){goTitle();return;}if(G.over)return goTitle();if(confirm(G.net||G.bot?'離開連線對戰？這場會算落敗。':'離開這場對戰，回到主畫面？')){if(!G.tut)achGive('retreat');goTitle();}};
 $('#manualClose').onclick=closeManual;
 $('#manual').addEventListener('click',e=>{if(e.target.id==='manual')closeManual();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#manual').hidden)closeManual();});
@@ -8494,7 +8610,7 @@ function giBorrow(u,mode,fn){const k=mode==='charge'?'charges':mode;if(!u||!u.gi
   if(r&&typeof r.then==='function')return r.then(v=>{done();return v;},e=>{done();throw e;});done();return r;}
 const giTargets=(u,m)=>m==='charge'?chargeTargets(u):m==='clay'?clayTargets(u):m==='impact'?impactTargets(u):m==='shield'||m==='bpcam'?deployTargets(u):throwTargets(u);
 function copGear(){for(const k of cfg.picks[cfg.side]){const i=copSlot(k);if(i==null)continue;for(const g of ECO.cop[i].g)if(g&&INV[cfg.side][g])G[g]=(G[g]|0)+1;}}
-function copEnd(lines){if(!G||G.net||G.tut)return;const u=G.units.find(u=>u.side===G.player&&u.cop!=null);if(!u)return;const c=ECO.cop[u.cop],k=ST(u).k|0,t0=copTot(c);
+function copEnd(lines){if(!G||G.net||G.bot||G.tut)return;const u=G.units.find(u=>u.side===G.player&&u.cop!=null);if(!u)return;const c=ECO.cop[u.cop],k=ST(u).k|0,t0=copTot(c);
   c.k+=k;c.e=Math.min(COP_CAP-COP_BASE,(c.e|0)+k);const got=copTot(c)-t0;
   if(!u.alive){lines.push([`${c.nm} 陣亡，${COPN[u.cop]}要重新取名、從頭培養`,0]);ECO.cop[u.cop]=copNew(c);}
   else{c.sv++;lines.push([`${c.nm} 存活${k?`，擊殺 ${k}`:''}${got?`，點數 +${got}`:''}`,0]);}
@@ -8655,10 +8771,10 @@ const CLK_SVG={A:'<svg viewBox="0 0 48 48"><path d="M8 6l3-2 15 15-3 3zM40 6l-3-
   D:'<svg viewBox="0 0 48 48"><path d="M13 6h5v5h4V6h4v5h4V6h5v10l-3 3v17l4 6H12l4-6V19l-3-3z"/></svg>'};
 const clockOn=()=>!!(G&&G.clock&&G.phase==='play');
 function clockReset(){if(!G)return;G.clockOut={A:false,D:false};
-  const tpo=G.net?60:cfg.timer;
+  const tpo=G.net||G.bot?60:cfg.timer;
   G.clock=tpo&&!G.tut?{A:tpo*1000*Math.max(1,alive('A').length),D:tpo*1000*Math.max(1,alive('D').length)}:null;}
 const fmtClock=ms=>{const t=Math.max(0,Math.ceil(ms/1000));return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');};
-function clockWho(s){if(G.net)return s===G.player?'你':'對手';return s===G.player?'你':'電腦';}
+function clockWho(s){if(G.net||G.bot)return s===G.player?'你':'對手';return s===G.player?'你':'電腦';}
 function renderClocks(){try{obClock();}catch(e){}
   const fr=$('#frame');let box=document.getElementById('clocks');
   const on=clockOn()&&!G.over;document.body.classList.toggle('hasClk',on);
