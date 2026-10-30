@@ -7945,14 +7945,14 @@ function gaMerge(d,first){const e=d.eco||{},newer=(e.ts||0)>(ECO.ts||0),lrn=ECO.
   const p=d.prof||{};if(!ME.nick&&p.nick)ME.nick=p.nick;if(newer&&p.avatar){ME.avatar=p.avatar;ME.usePhoto=!!p.usePhoto;}
   try{localStorage.setItem(EKEY,JSON.stringify(ECO));localStorage.setItem(AKEY,JSON.stringify(AS));localStorage.setItem(FKEY,JSON.stringify(FR));}catch(x){}}
 async function gaOn(u){GA.u=u;GA.ok=false;GA.err='';
-  const re=()=>{renderPlayer();renderSettings();};
+  const re=()=>{renderPlayer();renderSettings();lgState();};
   if(!u){GA.busy=false;re();if(ME.mode==='account')acctLoad().then(re);return;}
   GA.busy=true;renderSettings();
   try{const d=await R6FB.load();let first=true;try{first=localStorage.getItem('r6bg.glink')!==u.uid;}catch(x){}
     if(d)gaMerge(d,first);if(String(u.email||'').toLowerCase()==='aesopfilmedit@gmail.com'&&!ECO.g58){ECO.g58=1;ECO.rn=(ECO.rn|0)+999999;ecoSave();}GA.ok=true;try{localStorage.setItem('r6bg.glink',u.uid);}catch(x){}
     ME.mode='account';saveMe();gaPush(true);acctLoad().then(re);}
   catch(e){const c=(e&&e.code)||'';GA.err=/permission/.test(c)?'雲端存檔被拒絕：資料庫規則還沒設定好。':'讀不到雲端存檔，請檢查網路後重新登入。';}
-  GA.busy=false;renderPlayer();renderSettings();if(SCREEN==='title'||SCREEN==='task')renderTitle();}
+  GA.busy=false;renderPlayer();renderSettings();if(SCREEN==='title'||SCREEN==='task')renderTitle();lgState();}
 function gaHTML(){const u=GA.u,err=GA.err?`<p class="terr">${esc(GA.err)}</p>`:'';
   if(u)return `<p class="pshint">已綁定 Google：<b>${esc(u.name||u.email)}</b>${u.name&&u.email?` · ${esc(u.email)}`:''}</p><p class="pshint">${GA.busy?'正在讀取雲端存檔…':'聲望、幹員、熟練度、成就和好友會自動存到雲端，換裝置登入同一個 Google 帳號就能接著玩。'}</p>${err}<div class="psrow"><button id="psGout">登出 Google</button></div>`;
   return `<p class="pshint">目前是訪客，進度只存在這台裝置上。用 Google 登入後，進度會存到雲端，換裝置也能接著玩。</p>${err}<div class="pslogin"><button class="primary" id="psGoogle"${GA.busy?' disabled':''}><span class="lgico g">G</span>${GA.busy?'登入中…':'使用 Google 登入'}</button><button class="on" disabled><span class="lgico">訪</span>訪客（目前）</button></div>`;}
@@ -7972,8 +7972,10 @@ function loginShow(){if($('#login'))return;const el=document.createElement('div'
     <div class="lgBtns" id="lgBtns"></div></div>`;
   document.body.appendChild(el);lgState();}
 // signed in already: only a welcome (tap to enter) and a sign-out link
-function lgButtons(u){const w=$('#lgBtns');if(!w)return;const k=u?'u'+(u.uid||u.email):'n';if(w.dataset.k===k)return;w.dataset.k=k;
-  w.innerHTML=u?`<button class="lgBtn g lgWel" id="lgG"><span><b>歡迎 ${esc(u.name||u.email||'')}</b><small>點一下進入</small></span></button><button class="lgOut" id="lgOut">登出</button><p class="lgErr" id="lgErr" role="status"></p>`
+// v97: welcome shows the in-game name (nickname), falling back to the Google name
+const lgName=u=>ME.nick||(ME.acct&&ME.acct.name)||u.name||u.email||'';
+function lgButtons(u){const w=$('#lgBtns');if(!w)return;const k=u?'u'+(u.uid||u.email)+'|'+lgName(u):'n';if(w.dataset.k===k)return;w.dataset.k=k;
+  w.innerHTML=u?`<button class="lgBtn g lgWel" id="lgG"><span><b>歡迎 ${esc(lgName(u))}</b><small>點一下進入</small></span></button><button class="lgOut" id="lgOut">登出</button><p class="lgErr" id="lgErr" role="status"></p>`
     :`<button class="lgBtn g" id="lgG"><i class="lgIc">G</i><span><b>使用 Google 登入</b><small>進度存到雲端，換裝置也能接著玩</small></span></button>
     <button class="lgBtn" id="lgGuest"><i class="lgIc">訪</i><span><b>以訪客身分進入</b><small>進度只存在這台裝置</small></span></button><p class="lgErr" id="lgErr" role="status"></p>`;
   const g=$('#lgGuest');if(g)g.onclick=()=>loginDone('guest');$('#lgG').onclick=lgGoogle;
