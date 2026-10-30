@@ -6674,7 +6674,9 @@ function make3DMats(){
     dark:std(0x1b1f23,{metalness:.45,roughness:.45}),chrome:std(0xc8ced4,{metalness:.8,roughness:.25})};
 }
 function floorCanvas(m){
-  const P=Math.min(112,Math.floor(4096/(Math.max(G.W,G.H)+2))),W=G.W,H=G.H,c=document.createElement('canvas');c.width=(W+2)*P;c.height=(H+2)*P;const g=c.getContext('2d');
+  // phones: the big maps' floor at 4096px (uploaded twice, colour and bump) runs iOS out of GPU memory and the board comes up empty
+  const cap=matchMedia('(pointer:coarse)').matches||Math.min(innerWidth,innerHeight)<700?2304:4096;
+  const P=Math.min(112,Math.floor(cap/(Math.max(G.W,G.H)+2))),W=G.W,H=G.H,c=document.createElement('canvas');c.width=(W+2)*P;c.height=(H+2)*P;const g=c.getContext('2d');
   const sc=ctx,sS=S,sM=M;ctx=g;S=P;M=P;OFF=true;TEXKEY='';buildTex();
   if(PBR.ready)for(const k in PBR_FLOOR){const [n,t,a,br]=PBR_FLOOR[k];TEX[k]=g.createPattern(pbrCanvas(n,P*2,t,a,br),'repeat');}
   g.fillStyle='#10161c';g.fillRect(0,0,c.width,c.height);g.save();g.translate(P,P);drawMap(m,true);g.restore();
@@ -6694,7 +6696,7 @@ function addBox(parent,mats,x,y,z,sx,sy,sz,cc,shadow=true){const m=new THREE.Mes
 let BOX3=null,SPH3=null,HSPH3=null,CYL3=null;
 function buildStatic(m){make3DMats();const _M=R3.mats,_h=_M.hard,_s=_M.soft;if(G.map===MAPS.bank||G.map===MAPS.consulate||G.map===MAPS.kafe){_M.hard=_M.hardB||(_M.hardB=bankWallMats());_M.soft=_M.softB||(_M.softB=bankWallMats(true));}if(G.map===MAPS.clubhouse){_M.hard=_M.hardK||(_M.hardK=clubWallMats());_M.soft=_M.softK||(_M.softK=clubWallMats(true));}try{return buildStatic0(m);}finally{_M.hard=_h;_M.soft=_s;}}
 function buildStatic0(m){
-  const g=R3.staticG;while(g.children.length){const o=g.children.pop();if(o.material&&o.material.map&&o.userData.own){o.material.map.dispose();o.material.dispose();}}
+  const g=R3.staticG;while(g.children.length){const o=g.children.pop();if(o.material&&o.material.map&&o.userData.own){const q=o.material;q.map.dispose();if(q.bumpMap)q.bumpMap.dispose();if(q.roughnessMap)q.roughnessMap.dispose();q.dispose();}}
   BOX3=BOX3||new THREE.BoxGeometry(1,1,1);SPH3=SPH3||new THREE.SphereGeometry(1,20,14);HSPH3=HSPH3||new THREE.SphereGeometry(1,20,10,0,Math.PI*2,0,Math.PI/2);CYL3=CYL3||new THREE.CylinderGeometry(1,1,1,16);
   const fc=floorCanvas(m);const ft=canvasTex(fc);ft.wrapS=ft.wrapT=THREE.ClampToEdgeWrapping;
   const rt=new THREE.CanvasTexture(roughCanvas());rt.wrapS=rt.wrapT=THREE.ClampToEdgeWrapping;const bt=new THREE.CanvasTexture(fc);bt.wrapS=bt.wrapT=THREE.ClampToEdgeWrapping;
