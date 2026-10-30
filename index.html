@@ -914,6 +914,8 @@ body[data-scr="setup"] header.top{visibility:hidden}
 .sintro.w.fast .siA,.sintro.w.fast .siT{animation-duration:.18s}
 @keyframes siPop{0%{transform:scale(.55);opacity:0;filter:brightness(3)}60%{opacity:1}100%{transform:none;opacity:1;filter:none}}
 /* v26: big centre notices, bomb countdown chip, low-health vignette */
+#barBtn{position:fixed;left:max(12px,env(safe-area-inset-left));z-index:9;width:62px;height:62px;padding:4px;border:2px solid #e3aa3e;border-radius:4px;background:#0b121a;color:#f2d79a;display:grid;place-items:center;grid-template-rows:1fr auto;gap:0;font:700 11px 'Noto Sans TC',sans-serif;cursor:pointer;box-shadow:0 0 14px rgba(227,170,62,.45);animation:bnIn .3s ease-out}
+#barBtn svg{width:30px;height:30px}
 .bignote{position:fixed;inset:0;z-index:320;display:grid;place-items:center;pointer-events:none}
 .bignote .bnBand{width:100%;padding:18px 6vw 20px;text-align:center;background:linear-gradient(90deg,transparent,rgba(8,12,16,.88) 18%,rgba(8,12,16,.88) 82%,transparent);border-top:2px solid var(--bn,#e8eef3);border-bottom:2px solid var(--bn,#e8eef3);animation:bnIn .38s cubic-bezier(.2,1.2,.4,1) both}
 .bignote b{display:block;font:italic 800 clamp(40px,8vw,104px)/1 'Saira Condensed','Noto Sans TC',sans-serif;letter-spacing:.04em;color:var(--bn,#fff);text-shadow:0 0 28px rgba(var(--bnr,255,255,255),.55),0 4px 0 rgba(0,0,0,.6)}
@@ -3690,8 +3692,8 @@ const MAPS={
     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'],
     cams:[[7,19],[21,18],[34,6],[13,6]],
     labels:[['鋼琴室',5,16.9,'cpiano'],['黃色樓梯',5.5,9.6,'cwood'],['後走廊',11.5,6.9,'cblue'],['廁所走廊',11.5,9.9,'cmaroon'],['廁所',12.4,13.9,'cbath'],['隔間',10,15,'cbath'],['前廳',11.5,18.2,'cbrown'],['大廳',19,17.4,'clobby'],['旋轉樓梯',19,3.2,'cspiral'],['簽證走廊',26.5,6.9,'cblue'],['櫃員室',25,12.3,'cbrown'],['簽證樓梯',27.5,19.4,'cslate'],['儲藏室',24.5,18,'cbrown'],['簽證處',32.5,15.2,'cslate']],
-    sitePool:['鋼琴室','黃色樓梯','後走廊','廁所走廊','廁所','前廳','簽證走廊','櫃員室','簽證樓梯','簽證處'],
-    props:[['stairs',3.15,6.15,1.5,3.1],['atm',6.25,6.05,0.6,0.4],['atm',6.95,6.05,0.6,0.4],['plant',7.2,10.2,0.6,0.6],['desk',3.3,12.2,2.4,0.6],['rug',3.6,14.5,3.8,4.6],['gpiano',4.4,15.5,1.7,1.4],['chair',6.1,15.9,0.45,0.45],['plant',3.15,19.25,0.6,0.6],['sofa',7.3,16.2,0.5,1.6],['bench',9.4,6.1,1.6,0.45],['bench',11.7,6.1,1.6,0.45],['plant',13.25,9.15,0.6,0.6],['poster',9.3,10.4,0.5,0.12],['counter',11.3,12.05,2.6,0.55],['cabinet',9.1,12.1,0.8,0.55],['sofa',9.15,17.2,0.5,1.7],['ctable',10.2,17.8,0.6,0.5],['desk',11.7,19.25,1.6,0.55],['plant',13.25,17.1,0.6,0.6],['statue',18,5,2,2],['pillar',15.25,6.2,0.65,0.65],['pillar',22.1,6.2,0.65,0.65],['arc',19,14,1.5,-140,140],['sofa',15.15,10.4,0.5,1.8],['sofa',22.35,10.4,0.5,1.8],['plant',15.15,21.3,0.6,0.6],['plant',21.25,21.3,0.6,0.6],['bench',24.6,6.1,1.6,0.45],['plant',28.25,6.1,0.6,0.6],['counter',26.4,9.6,0.55,4.8],['desk',24.25,10.2,1.3,0.6],['desk',24.25,13.4,1.3,0.6],['pc',24.6,10.25,0.5,0.1],['pc',24.6,13.45,0.5,0.1],['printer',27.6,15.2,0.7,0.55],['stairs',26.1,17.15,2.8,1.7],['cabinet',24.1,19.3,0.8,0.55],['pillar',31.15,9.15,0.65,0.65],['pillar',31.15,13.15,0.65,0.65],['pillar',31.15,17.15,0.65,0.65],['atm',33.2,6.05,0.6,0.4],['atm',33.9,6.05,0.6,0.4],['bench',33.45,9.6,0.45,1.6],['bench',33.45,12.7,0.45,1.6],['desk',30.2,6.3,0.6,1.4],['planter',33.8,19.1,1,0.7],['tree',0.15,1.2,1.3,1.3],['tree',5.2,1.6,1.3,1.3],['tree',9.6,1.3,1.2,1.2],['tree',27.5,1.4,1.3,1.3],['tree',32.6,1.6,1.3,1.3],['hedge',2.4,3.3,10.4,0.3],['hedge',25.2,3.3,10.4,0.3],['tree',9.8,22.2,1.4,1.4],['tree',26.4,22.2,1.4,1.4],['planter',13.2,21.6,1.4,0.8],['planter',23.4,21.6,1.4,0.8]],
+    sitePool:['鋼琴室','黃色樓梯','廁所','前廳','櫃員室','簽證處'],
+    props:[['stairs',3.15,6.15,1.5,3.1],['atm',6.25,6.05,0.6,0.4],['atm',6.95,6.05,0.6,0.4],['plant',7.2,10.2,0.6,0.6],['desk',3.3,12.2,2.4,0.6],['rug',3.6,14.5,3.8,4.6],['gpiano',4.4,15.5,1.7,1.4],['chair',6.1,15.9,0.45,0.45],['plant',3.15,19.25,0.6,0.6],['sofa',7.3,16.2,0.5,1.6],['bench',9.4,6.1,1.6,0.45],['bench',11.7,6.1,1.6,0.45],['plant',13.25,9.15,0.6,0.6],['poster',9.3,10.4,0.5,0.12],['counter',11.3,12.05,2.6,0.55],['cabinet',9.1,12.1,0.8,0.55],['sofa',9.15,17.2,0.5,1.7],['ctable',10.2,17.8,0.6,0.5],['desk',11.7,19.25,1.6,0.55],['plant',13.25,17.1,0.6,0.6],['statue',18,5,2,2],['pillar',15.25,6.2,0.65,0.65],['pillar',22.1,6.2,0.65,0.65],['arc',19,14,1.5,-140,140],['sofa',15.15,10.4,0.5,1.8],['sofa',22.35,10.4,0.5,1.8],['plant',15.15,21.3,0.6,0.6],['plant',21.25,21.3,0.6,0.6],['bench',24.6,6.1,1.6,0.45],['plant',28.25,6.1,0.6,0.6],['counter',26.4,9.6,0.55,4.8],['desk',24.25,10.2,1.3,0.6],['desk',24.25,13.4,1.3,0.6],['pc',24.6,10.25,0.5,0.1],['pc',24.6,13.45,0.5,0.1],['printer',27.6,15.2,0.7,0.55],['stairs',27.05,17.1,0.9,1.85],['cabinet',24.1,19.3,0.8,0.55],['pillar',31.15,9.15,0.65,0.65],['pillar',31.15,13.15,0.65,0.65],['pillar',31.15,17.15,0.65,0.65],['atm',33.2,6.05,0.6,0.4],['atm',33.9,6.05,0.6,0.4],['bench',33.45,9.6,0.45,1.6],['bench',33.45,12.7,0.45,1.6],['desk',30.2,6.3,0.6,1.4],['planter',33.8,19.1,1,0.7],['tree',0.15,1.2,1.3,1.3],['tree',5.2,1.6,1.3,1.3],['tree',9.6,1.3,1.2,1.2],['tree',27.5,1.4,1.3,1.3],['tree',32.6,1.6,1.3,1.3],['hedge',2.4,3.3,10.4,0.3],['hedge',25.2,3.3,10.4,0.3],['tree',9.8,22.2,1.4,1.4],['tree',26.4,22.2,1.4,1.4],['planter',13.2,21.6,1.4,0.8],['planter',23.4,21.6,1.4,0.8]],
     spawns:[{name:'西側黃門',cells:[[0,6],[0,7],[0,8],[1,6],[1,8]]},{name:'正門廣場',cells:[[17,24],[18,24],[19,24],[20,24],[21,24]]},{name:'東側簽證門',cells:[[37,14],[37,15],[37,16],[37,17],[37,18]]}]},
   clubhouse:{name:'俱樂部會所',sub:'',tl:1,rows:[
     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
@@ -3729,7 +3731,7 @@ const MAPS={
     cams:[[19,16],[9,21],[31,27],[18,9]],
     labels:[['舞廳後台',3.5,17.5,'chback'],['脫衣舞廳',9,18.5,'chstrip'],['舞廳前區',8,23.5,'chfront'],['脫衣舞走廊',10.5,11,'chhall'],['廁所',14,9.5,'chtoilet'],['撞球間',14,16,'chpool'],['酒吧',19,15.5,'chbar'],['舞台',24.5,14,'chstage'],['主入口',25.5,19,'chmain'],['中央走廊',18,9.5,'chhall'],['廚房',23,7,'chkitchen'],['冷凍庫',21.5,3.5,'chfridge'],['倉庫',31,13.5,'chconc'],['休息室',31,18,'chlounge'],['電力室',37,16.5,'chblue'],['車庫',30.5,24.5,'chgarage']],
     sitePool:['脫衣舞廳','撞球間','酒吧','舞台','倉庫','車庫','休息室'],
-    props:[['pole',8.3,18.3,1.5,1.5],['csofa',6.6,16.05,2.0,0.6,'n'],['csofa',6.05,19.1,0.6,1.8,'w'],['csofa',11.35,16.9,0.6,1.8,'e'],['dj',10.2,20.6,1.2,0.6],['neon',9.8,16.0,1.4,0.12,'pink'],['sofa',3.05,18.2,0.5,1.6],['crate',4.25,16.1,0.65,0.65],['desk',9.6,23.05,1.7,0.55],['pc',10.0,23.1,0.45,0.12],['chair',10.3,23.75,0.45,0.45],['cabinet',4.1,23.1,0.8,0.5],['stall',13,9,3,1],['pool',13.15,16.15,1.6,2.3],['neon',15.86,16.0,0.12,1.5,'blue'],['bar',18.15,12.05,0.6,1.6],['bar',18.75,13.15,1.9,0.6],['neon',17.2,12.02,1.4,0.12,'bar'],['ctable',17.4,16.4,0.6,0.6],['ctable',19.6,16.4,0.6,0.6],['chair',18.15,16.45,0.45,0.45],['chair',20.35,16.45,0.45,0.45],['stool',18.2,14.1,0.4,0.4],['stool',19.3,14.1,0.4,0.4],['stool',20.4,14.1,0.4,0.4],['stage',25.9,12.05,1.05,3.0],['stage',24.9,15.05,2.05,1.0],['cbars',26.72,12.2,0.14,2.6],['bear',23.15,16.15,0.7,0.7],['stairs',17.05,5.05,2.9,2.0],['plant',19.3,9.2,0.55,0.55],['counter',23.6,6.15,0.6,1.6],['counter',25.4,6.05,0.55,2.9],['counter',21.05,7.6,0.55,1.35],['meat',21.1,3.1,1.8,0.6],['shelf',29.6,12.05,2.0,0.4],['stairs',33.05,13.1,1.9,2.85],['crate',29.0,14.25,0.7,0.7],['crate',28.15,14.3,0.6,0.6],['sofa',28.1,17.05,1.8,0.5],['ctable',28.6,17.75,0.7,0.45],['sofa',31.1,17.05,1.6,0.5],['tv',31.3,19.75,1.2,0.12],['stairs',36.05,15.05,1.9,1.9],['cabinet',38.35,17.3,0.55,0.8],['cabinet',38.35,15.2,0.55,0.8],['bike',29.2,22.35,1.7,0.6],['bike',28.8,24.35,1.7,0.6],['desk',28.05,26.0,0.6,1.4],['crate',30.1,26.2,0.75,0.75],['stairs',28.95,28.05,2.9,0.9],['car',0.15,21.5,1.1,2.3],['car',0.15,25.3,1.1,2.3],['crate',3.0,27.2,0.8,0.8],['crate',3.9,27.5,0.7,0.7],['tree',6.0,2.0,1.3,1.3],['tree',11.2,3.4,1.2,1.2],['tree',2.0,9.0,1.3,1.3],['car',13.5,25.6,2.4,1.2],['car',17.2,27.3,2.4,1.2],['car',37.2,24.6,1.2,2.4],['tree',23.5,27.8,1.3,1.3],['crate',33.0,3.2,0.8,0.8],['crate',34.0,4.0,0.8,0.8],['crate',36.5,5.4,0.7,0.7],['tree',38.5,8.2,1.3,1.3],['tree',27.2,1.4,1.2,1.2]],
+    props:[['pole',8.3,18.3,1.5,1.5],['csofa',6.6,16.05,2.0,0.6,'n'],['csofa',6.05,19.1,0.6,1.8,'w'],['csofa',11.35,16.9,0.6,1.8,'e'],['dj',10.2,20.6,1.2,0.6],['neon',12.27,16.6,0.12,1.4,'pink'],['sofa',3.05,18.2,0.5,1.6],['crate',4.25,16.1,0.65,0.65],['desk',9.6,23.05,1.7,0.55],['pc',10.0,23.1,0.45,0.12],['chair',10.3,23.75,0.45,0.45],['cabinet',4.1,23.1,0.8,0.5],['stall',13,9,3,1],['pool',13.15,16.15,1.6,2.3],['neon',16.27,16.0,0.12,1.5,'blue'],['bar',18.05,13.5,4.3,0.45],['bar',18.05,13.05,0.45,0.5],['neon',19.0,11.61,1.6,0.12,'bar'],['ctable',17.4,16.4,0.6,0.6],['ctable',19.6,16.4,0.6,0.6],['chair',18.15,16.45,0.45,0.45],['chair',20.35,16.45,0.45,0.45],['stool',18.2,14.1,0.4,0.4],['stool',19.3,14.1,0.4,0.4],['stool',20.4,14.1,0.4,0.4],['stage',25.9,12.05,1.05,3.0],['stage',24.9,15.05,2.05,1.0],['cbars',26.72,12.2,0.14,2.6],['bear',23.15,16.15,0.7,0.7],['stairs',17.05,5.05,2.9,2.0],['plant',19.3,9.2,0.55,0.55],['counter',23.6,6.15,0.6,1.6],['counter',25.4,6.05,0.55,2.9],['counter',21.05,7.6,0.55,1.35],['meat',21.1,3.1,1.8,0.6],['shelf',29.6,12.05,2.0,0.4],['stairs',33.05,13.1,1.9,2.85],['crate',29.0,14.25,0.7,0.7],['crate',28.15,14.3,0.6,0.6],['sofa',28.1,17.05,1.8,0.5],['ctable',28.6,17.75,0.7,0.45],['sofa',31.1,17.05,1.6,0.5],['tv',31.3,20.27,1.2,0.08,'n'],['stairs',36.05,15.05,1.9,1.9],['cabinet',38.35,17.3,0.55,0.8],['cabinet',38.35,15.2,0.55,0.8],['bike',29.2,22.35,1.7,0.6],['bike',28.8,24.35,1.7,0.6],['desk',28.05,26.0,0.6,1.4],['crate',30.1,26.2,0.75,0.75],['stairs',28.95,28.05,2.9,0.9],['car',0.15,21.5,1.1,2.3],['car',0.15,25.3,1.1,2.3],['crate',3.0,27.2,0.8,0.8],['crate',3.9,27.5,0.7,0.7],['tree',6.0,2.0,1.3,1.3],['tree',11.2,3.4,1.2,1.2],['tree',2.0,9.0,1.3,1.3],['car',13.5,25.6,2.4,1.2],['car',17.2,27.3,2.4,1.2],['car',37.2,24.6,1.2,2.4],['tree',23.5,27.8,1.3,1.3],['crate',33.0,3.2,0.8,0.8],['crate',34.0,4.0,0.8,0.8],['crate',36.5,5.4,0.7,0.7],['tree',38.5,8.2,1.3,1.3],['tree',27.2,1.4,1.2,1.2]],
     spawns:[{name:'西側廢車場',cells:[[0,15],[0,16],[0,17],[0,18],[0,19]]},{name:'南側停車場',cells:[[18,22],[19,22],[20,22],[21,22],[22,22]]},{name:'北側工地',cells:[[27,6],[28,6],[29,6],[30,6],[31,6]]}]},
   bank:{name:'銀行',sub:'',tl:1,rows:[
     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
@@ -3789,9 +3791,9 @@ const MAPS={
     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'],
     cams:[[26,8],[13,9],[22,16],[5,15]],
     labels:[['大廳',27.5,6.6,'klobby'],['紅樓梯',11.5,6.5,'klobby'],['紅走廊',14,9.5,'klobby'],['吧台',24,12.2,'klobby'],['用餐區',32.5,7.6,'klobby'],['衣帽間',15.5,4.8,'kcoat'],['正門',20.5,5.6,'kentry'],['小麵包店',5.5,8.1,'kdot'],['麵包店',4.6,18.2,'kdot'],['廚房',12.6,18.6,'kwhite'],['出餐區',23,17.3,'kgrey'],['咖啡吧',25.6,14.8,'kgrey'],['洗碗區',19.9,21.6,'kgrey'],['冷凍庫',24.6,20.6,'kdark'],['準備室',9.4,23.4,'kprep'],['VIP 室',32.5,14.8,'kvip'],['VIP 走廊',28.95,19,'kwood'],['車庫',31.2,25.1,'kwood']],
-    sitePool:['小麵包店','麵包店','廚房','準備室','出餐區','冷凍庫','衣帽間','正門','VIP 室'],
+    sitePool:['小麵包店','麵包店','廚房','準備室','出餐區','冷凍庫','正門','VIP 室'],
     matRects:[[10,8,17,10,'kred'],[10,3,12,7,'kred'],[21,11,29,12,'kbar'],[31,3,33,10,'kbeige'],[18,20,21,23,'kcoat'],[14,20,16,23,'kcoat'],[28,24,33,25,'kgarage'],[31,20,33,23,'kwood']],
-    props:[['sofa',4.4,6.06,1.5,.45],['rtable',4.55,6.75,.8,.8],['rtable',6.9,7.4,.8,.8],['rtable',3.15,8.1,.8,.8],['plant',8.3,6.1,.6,.6],['counter',6.55,12.3,.6,4.6],['shelf',8.45,12.2,.5,2.6],['rtable',3.15,12.0,.85,.85],['rtable',3.15,16.3,.85,.85],['rtable',4.9,14.1,.8,.8],['plant',3.15,19.2,.6,.6],['stairs',10.05,3.05,1.4,2.5],['stairs',11.55,3.05,1.4,2.5],['shelf',14.1,3.06,2.8,.45],['desk',15.3,6.35,1.6,.5],['rug',19.1,3.5,3.8,2.6],['plant',18.15,3.15,.6,.6],['plant',23.25,3.15,.6,.6],['ctable',20.7,4.5,.6,.5],['stairs',25.05,3.05,2.4,1.4],['stairs',27.55,3.05,2.4,1.4],['plant',29.3,9.3,.6,.6],['stairs',31.6,3.05,2.3,1.2],['table',32.3,5.7,1.5,.7],['table',32.3,8.4,1.5,.7],['bar',21.3,10.55,5.5,.55],['dishes',22.4,10.6,.3,.45],['dishes',25.2,10.6,.3,.45],['shelf',10.05,13.0,.45,3.4],['kcounter',11.35,13.6,.8,3.8],['kcounter',14.4,13.6,1.3,3.8],['kcounter',15.1,12.05,1.85,.5],['kcounter',14.1,23.45,2.8,.5],['kcounter',21.05,14.05,.55,2.0],['kcounter',24.05,15.85,2.9,.5],['dishes',25.6,15.9,.3,.4],['kcounter',18.05,20.05,.55,3.9],['kcounter',18.6,20.05,2.2,.5],['cabinet',20.6,17.5,.8,.5],['shelf',23.05,19.1,.5,2.6],['crate',25.6,19.2,.7,.7],['hatch',25.15,21.95,1.1,1.05],['kcounter',7.6,21.4,2.6,1.1],['kcounter',9.4,23.45,2.6,.5],['rug',31.3,12.6,2.4,3.2],['sofa',33.45,13.0,.5,1.8],['ctable',32.1,13.9,.8,.6],['xmas',32.2,17.2,1.3,1.3],['crate',28.1,25.15,.7,.7],['crate',28.9,25.15,.7,.7],['cabinet',33.2,24.1,.6,.5],['stairs',31.05,20.1,1.3,3.6],['stairs',32.5,20.1,1.3,3.6],['planter',11.5,.7,1.2,.7],['planter',15.5,.7,1.2,.7],['planter',26.5,.7,1.2,.7],['planter',30.6,.7,1.2,.7],['car',.1,10,1.3,2.4],['car',.1,24.6,1.3,2.4],['car',10,25.7,3,1.3],['tree',20,25.8,1.3,1.3],['tree',3.5,1,1.3,1.3],['car',35.4,6,1.3,2.4]],
+    props:[['sofa',4.4,6.06,1.5,.45],['rtable',4.55,6.75,.8,.8],['rtable',6.9,7.4,.8,.8],['rtable',3.15,8.1,.8,.8],['plant',8.3,6.1,.6,.6],['counter',6.55,12.3,.6,4.6],['shelf',8.45,12.2,.5,2.6],['rtable',3.15,12.0,.85,.85],['rtable',3.15,16.3,.85,.85],['rtable',4.9,14.1,.8,.8],['plant',3.15,19.2,.6,.6],['stairs',10.05,3.05,1.4,2.5],['stairs',11.55,3.05,1.4,2.5],['shelf',14.1,3.06,1.8,.45],['desk',15.3,6.35,1.6,.5],['rug',19.1,3.5,3.8,2.6],['plant',18.15,3.15,.6,.6],['plant',23.25,3.15,.6,.6],['ctable',20.7,4.5,.6,.5],['stairs',25.05,3.05,2.4,1.4],['stairs',27.55,3.05,2.4,1.4],['plant',29.3,9.3,.6,.6],['stairs',31.6,3.05,2.3,1.2],['table',32.3,5.7,1.5,.7],['table',32.3,8.4,1.5,.7],['bar',21.3,10.55,5.5,.55],['dishes',22.4,10.6,.3,.45],['dishes',25.2,10.6,.3,.45],['shelf',10.05,13.0,.45,3.4],['kcounter',11.35,13.6,.8,3.8],['kcounter',14.4,13.6,1.3,3.8],['kcounter',15.1,12.05,1.85,.5],['kcounter',14.1,23.45,2.8,.5],['kcounter',21.05,14.05,.55,2.0],['kcounter',24.05,15.85,2.9,.5],['dishes',25.6,15.9,.3,.4],['kcounter',18.05,20.05,.55,3.9],['kcounter',18.6,20.05,2.2,.5],['cabinet',20.6,17.5,.8,.5],['shelf',23.05,19.1,.5,2.6],['crate',25.6,19.2,.7,.7],['hatch',25.15,21.95,1.1,1.05],['kcounter',7.6,21.4,2.6,1.1],['kcounter',9.4,23.45,2.6,.5],['rug',31.3,12.6,2.4,3.2],['sofa',33.45,13.0,.5,1.8],['ctable',32.1,13.9,.8,.6],['xmas',32.2,17.2,1.3,1.3],['crate',28.1,25.15,.7,.7],['crate',28.9,25.15,.7,.7],['cabinet',33.2,24.1,.6,.5],['stairs',31.05,20.1,1.3,3.6],['stairs',32.5,20.1,1.3,3.6],['planter',11.5,.7,1.2,.7],['planter',15.5,.7,1.2,.7],['planter',26.5,.7,1.2,.7],['planter',30.6,.7,1.2,.7],['car',.1,10,1.3,2.4],['car',.1,24.6,1.3,2.4],['car',10,25.7,3,1.3],['tree',20,25.8,1.3,1.3],['tree',3.5,1,1.3,1.3],['car',35.4,6,1.3,2.4]],
     spawns:[{name:'北側正門街道',cells:[[19,0],[20,0],[21,0],[22,0],[23,0]]},{name:'西側巷口',cells:[[0,18],[0,19],[0,20],[0,21],[0,22]]},{name:'東南車庫',cells:[[29,28],[30,28],[31,28],[32,28],[33,28]]}]}
 };
 // operator profiles in the style of the board game's cards: run bonus, stamina, hit dice per range band
@@ -3905,6 +3907,10 @@ function parseMap(m,rnd){
     else if(ch==='d'){c.kind='door';c.wasBar=true;c.opened=true;c.gap=1;} // a door left open (no barricade); rooms don't spill through it
     else if(ch==='o')c.gap=1; // open doorway: walkable, but rooms (materials, bomb sites) don't spill through it
     return c;}));
+  // v104: corridors start with their doors open (no barricade); the defenders can still close them
+  for(const [n,lx,ly] of m.labels||[]){if(!/走廊/.test(n))continue;const H=g.length,W=g[0].length,sx=Math.floor(lx),sy=Math.floor(ly),seen=new Set([sy*W+sx]),q=[[sx,sy]];if(!g[sy]||!g[sy][sx]||g[sy][sx].t!=='floor')continue;
+    while(q.length){const [x,y]=q.shift();for(const [nx,ny] of [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]){const c=g[ny]&&g[ny][nx],k=ny*W+nx;if(!c||seen.has(k))continue;seen.add(k);
+      if(c.t==='bar'&&c.kind==='door'){c.t='floor';c.wasBar=true;c.opened=true;c.gap=1;continue;}if(c.t==='floor'&&c.indoor&&!c.gap&&c.kind!=='door')q.push([nx,ny]);}}}
   if(m.spiral){const {cx,cy,R}=m.spiral;g.forEach((row,y)=>row.forEach((c,x)=>{if(y>=cy)return;const d=Math.hypot(x+.5-cx,y+.5-cy);if(c.t==='floor'&&d<R)c.spiral=1;else if(c.t==='hard'&&y<cy-1&&d<R+1.2)c.curve=1;}));}
   linkDoors(g,m);assignMats(g,m);markObst(g,m);if(rnd)randSites(g,m);return g;
 }
@@ -3980,7 +3986,7 @@ function sharedCells(side){if(!G||!G.grid)return new Set();
     else if(g.type==='cam'&&!jammed(g.x,g.y)){
       if(g.wall)look(g,10,(x,y)=>(x-g.x)*g.wall[0]+(y-g.y)*g.wall[1]<=0);
       else if(outCam(g))look(g,8,()=>true);
-      else if(cell(g.x,g.y).indoor)for(const [x,y] of roomOf(g.x,g.y))s.add(y*G.W+x);}
+      else if(cell(g.x,g.y).indoor)for(const [x,y] of roomOf(g.x,g.y)){if(los(g.x,g.y,x,y,false,true))s.add(y*G.W+x);}}// v104: 360° but only what the lens can see; a wall corner inside the room hides what is behind it
     else if(side==='D'&&g.type==='mirror'&&g.mi)look(g,10,(x,y)=>mirSide(g,x,y)<=0);}
   C[side]={k,s};return s;}
 // attackers with line of sight unmask hidden defenders and see through decoys
@@ -4320,7 +4326,7 @@ function mirror3D(gd,grp){const WH=WALLH[R3.wall]||1.45,y0=WH*.31,y1=WH*.79,h=y1
   if(!gd.open)mk(BOX3,gm('mirgl',()=>new THREE.MeshStandardMaterial({color:0x07090c,metalness:.95,roughness:.06,emissive:0x05080c})),[.6,h,.05],0,(y0+y1)/2,0);
   else{const p=mk(BOX3,gm('mirgl',()=>new THREE.MeshStandardMaterial({color:0x07090c,metalness:.95,roughness:.06,emissive:0x05080c})),[.6,.03,h],.05,.02,.72);p.rotation.y=.18;}}
 
-function camRooms(){const o=[];for(const g of G.gadgets)if(g.alive&&g.type==='cam'&&!g.wall&&!jammed(g.x,g.y)&&cell(g.x,g.y).indoor){const r=new Set(roomOf(g.x,g.y).map(([x,y])=>y*G.W+x));o.push(r);}return o;}
+function camRooms(){const o=[];for(const g of G.gadgets)if(g.alive&&g.type==='cam'&&!g.wall&&!jammed(g.x,g.y)&&cell(g.x,g.y).indoor){const r=new Set(roomOf(g.x,g.y).filter(([x,y])=>los(g.x,g.y,x,y,false,true)).map(([x,y])=>y*G.W+x));o.push(r);}return o;}
 const outCam=g=>g.alive&&g.type==='cam'&&g.fixed&&cell(g.x,g.y)&&cell(g.x,g.y).t==='out'&&(G.map.spawns||[]).some(z=>z.cells.some(([a,b])=>cheb(a,b,g.x,g.y)<=2));
 function outCamSees(u){return !!u._mv&&G.gadgets.some(g=>outCam(g)&&!jammed(g.x,g.y)&&cheb(g.x,g.y,u.x,u.y)<=8&&los(g.x,g.y,u.x,u.y));}
 function camCheck(u){if(u.side!=='A'||!u.alive||u.spotted||NOLOC.has(u.op))return;const cm=camRooms().some(r=>r.has(u.y*G.W+u.x))||outCamSees(u)||bpSees(u),mr=!cm&&mirSees(u);if(cm||mr){u.spotted=1;SFX.alert();if(u.side===G.player)bigNote(mr?'被黑鏡發現！':'被攝影機發現！',`${OPS[u.op].name} 的位置已暴露`,'warn',1500);log(`${nm(u)} ${mr?'經過黑鏡':'被攝影機拍到'}，位置被標記`,'kd');}}
@@ -4609,7 +4615,7 @@ async function shieldBash(u,v){if(u.csk===G.round)return;u.csk=G.round;useAct(u,
     if(blocks(c)){if(c.t==='soft'||c.t==='bar'){destroyCell(x,y);what=c.kind?'撞破路障':'撞破軟牆';}break;}
     const sg=G.gadgets.find(g=>g.alive&&g.x===x&&g.y===y&&g.type==='shield');
     if(sg){sg.alive=false;what='撞爆可部署盾牌';break;}
-    if(c.obst&&!c.stand){wreckCover(x,y);what='撞爆掩護';break;}
+    if(c.obst&&!c.stand){if(c.bomb){what='撞到炸彈';break;}wreckCover(x,y);what='撞爆掩護';break;}
     if(i===3)break;u.x=x;u.y=y;}
   G.scanFx={cells:[[u.x+f[0],u.y+f[1]]],until:performance.now()+700,c:0xffc84a};
   log(`${nm(u)} 盾牌猛擊${what?'，'+what:''}`,s);G.mode='move';render();await afterAct(u);}
@@ -4634,8 +4640,8 @@ function propCells(m,p){const [k,px,py,w,h]=p;if(k==='arc'||k==='cstairs')return
   for(let y=Math.floor(cy-h/2);y<=Math.floor(cy+h/2);y++)for(let x=Math.floor(cx-w/2);x<=Math.floor(cx+w/2);x++)if(Math.abs(x+.5-cx)<=w/2+pad&&Math.abs(y+.5-cy)<=h/2+pad)o.push([x,y]);return o;}
 function wreckCover(x,y){const m=G.map;let n=0;
   (m.props||[]).forEach((p,i)=>{if(!OBSTK.has(p[0])||(G.propGone&&G.propGone.has(i)))return;const cs=propCells(m,p);if(!cs.some(([a,b])=>a===x&&b===y))return;
-    (G.propGone||(G.propGone=new Set())).add(i);n++;for(const [a,b] of cs){const c=cell(a,b);if(c){c.obst=false;c.tall=false;c.stand=0;}}});
-  const c=cell(x,y);if(c&&c.obst){c.obst=false;c.tall=false;c.stand=0;n++;}if(n){G._wv=(G._wv||0)+1;if(R3)R3.sig='';}return n>0;}
+    (G.propGone||(G.propGone=new Set())).add(i);n++;for(const [a,b] of cs){const c=cell(a,b);if(c&&!c.bomb){c.obst=false;c.tall=false;c.stand=0;}}});
+  const c=cell(x,y);if(c&&c.obst&&!c.bomb){c.obst=false;c.tall=false;c.stand=0;n++;}if(n){G._wv=(G._wv||0)+1;if(R3)R3.sig='';}return n>0;}
 const propOn=i=>!(G&&G.propGone&&G.propGone.has(i));
 const heatPins=()=>(G&&G.heat||[]).filter(h=>h.r===G.round&&h.side===G.player&&!G.units.some(e=>e.alive&&e.x===h.x&&e.y===h.y&&e.side!==G.player&&seenBy(G.player,e)));
 function sprint(u){note(u,'奔跑');useAct(u,'run');u.mp+=u.run;}
@@ -4663,12 +4669,13 @@ function endPhase(){
   {const ow=alive(s).filter(u=>u.x>=0&&!u.overwatch&&!u.defusing);ow.forEach(u=>overwatch(u,true));const sh=ow.filter(u=>pub(u)||s===G.player);if(sh.length&&(s===G.player||G.over))log(`${sh.map(nm).join('、')} 自動進入掩護射擊`,s==='A'?'ka':'kd');}
   G.gadgets.forEach(g=>{if((g.type==='gas'||g.type==='fire')&&g.alive&&--g.life<=0)g.alive=false;});
   if(s==='D'&&G.defuser){const du=dfU();if(du){if(--G.defuser.dleft<=0){render();dfDone(du);if(G.over)return;}}else G.defuser.by=null;if(G.defuser&&--G.defuser.timer<=0&&!dfU()){render();return bombBoom();}}
+  bigNote(s==='A'?'進攻方結束行動':'防守方結束行動','',s==='A'?'a':'d',1100);// v104: say who just finished
   G.phaseIdx++;
   if(G.phaseIdx>=4){
     G.phaseIdx=0;
     if(G.round>=G.maxRounds&&!G.defuser){render();return finish('D',G.mission==='hostage'?'時間耗盡，人質沒有被救出':'時間耗盡，進攻方沒有完成任務');}
     G.round++;G.units.forEach(u=>{u._k=0;u.activated=false;if(!(G.tut2&&u.side==='D')){u.spotted=0;u.wmark=0;}u.owHit=null;u.stun=false;if(u.defusing&&u.alive)u.activated=true;});G.gadgets.forEach(g=>{if(g.type==='smk')g.alive=false;});
-    log(`—— 第 ${G.round} 輪開始 ——`,'ks');SFX.round();bigNote(`第 ${G.round} 輪`,G.round===G.maxRounds?'最後一輪':`共 ${G.maxRounds} 輪`,'r',1300);if(G.clock)clockReset();
+    log(`—— 第 ${G.round} 輪開始 ——`,'ks');SFX.round();{const rn=G.round,mx=G.maxRounds;setTimeout(()=>bigNote(`第 ${rn} 輪`,rn===mx?'最後一輪':`共 ${mx} 輪`,'r',1300),1250);}if(G.clock)clockReset();
   }
   startPhase();
 }
@@ -4719,7 +4726,7 @@ function reach(u){ECU=u; // cheapest walkable spaces within the remaining moveme
   return m;
 }
 function pathFrom(m,x,y){const W=G.W,p=[];let k=y*W+x;while(k>=0&&m.has(k)){p.unshift([k%W,(k/W)|0]);k=m.get(k).p;}return p.slice(1);}
-const siteGoal=s=>(x,y)=>cell(x,y).site===s;
+const siteGoal=s=>(x,y)=>cell(x,y).site===s&&!cell(x,y).bomb;
 
 async function aiBreach(u,x,y){
   const c=cell(x,y),jam=jammed(x,y);
@@ -5023,12 +5030,17 @@ function autoDefSetup(withGadgets){
     }
   }
 }
+// v104: each bomb site holds a 3D bomb on its middle free cell; that cell is cover nobody can stand on
+function placeBombs(){G.bombC={};for(const s of ['A','B']){const L=allCells().filter(([x,y])=>cell(x,y).site===s&&!cell(x,y).obst);if(L.length<2)continue;
+  const mx=L.reduce((a,c)=>a+c[0],0)/L.length,my=L.reduce((a,c)=>a+c[1],0)/L.length;const busy=new Set();for(const p of G.map.props||[])for(const [a,b] of propCells(G.map,p))busy.add(b*G.W+a);
+  L.sort((a,b)=>busy.has(a[1]*G.W+a[0])-busy.has(b[1]*G.W+b[0])||Math.hypot(a[0]-mx,a[1]-my)-Math.hypot(b[0]-mx,b[1]-my)||a[1]-b[1]||a[0]-b[0]);
+  const [x,y]=L[0],c=cell(x,y);c.bomb=1;c.obst=true;c.stand=0;c.tall=false;G.bombC[s]=[x,y];}}
 function placeHostage(){const s=allCells().filter(([x,y])=>cell(x,y).site==='A');const c=s[Math.floor(s.length/2)];G.hostage={x:c[0],y:c[1],by:null};}
 function placeAttackers(zi){
   const z=G.map.spawns[zi];G.spawn=zi;alive('A').forEach((u,i)=>{u.x=z.cells[i][0];u.y=z.cells[i][1];});
 }
 const INV={A:{frag:['破片手榴彈',3,'投擲 6 格：目標格 2 黃骰、相鄰格各 1 黃骰傷害，並破壞路障'],charges:['爆破炸藥',3,'相鄰：炸開軟牆或路障（D3）'],flash:['閃光彈',2,'投擲：目標格與相鄰格所有幹員震暈'],clay:['闊刀地雷',2,'部署在相鄰格，敵人踏入或走到箭頭格時引爆：2 紅骰'],smk:['煙霧彈',2,'投擲：2×2 煙霧擋視線到回合結束']},
-  D:{bpcam:['防彈攝影機',3,'部署階段：放在室內，看整個房間；只能從相鄰格破壞'],shield:['可部署盾牌',2,'部署時選正面方向，只擋前方半圓，相鄰目標 −2'],impact:['衝擊手榴彈',3,'投擲 6 格：破壞軟牆、路障與道具（D2）'],nitro:['C4 遙控炸藥',2,'投擲 6 格：目標 2 橙骰、相鄰各 1 橙骰傷害']}};
+  D:{bpcam:['防彈攝影機',3,'部署階段：放在室內，360° 監看房間，但牆角後面看不到；只能從相鄰格破壞'],shield:['可部署盾牌',2,'部署時選正面方向，只擋前方半圓，相鄰目標 −2'],impact:['衝擊手榴彈',3,'投擲 6 格：破壞軟牆、路障與道具（D2）'],nitro:['C4 遙控炸藥',2,'投擲 6 格：目標 2 橙骰、相鄰各 1 橙骰傷害']}};
 const INV_CAP={A:6,D:4};
 function invFor(side,inv){const o={};for(const k in INV[side])o[k]=Math.max(0,Math.min(INV[side][k][1],(inv&&inv[k])|0));return o;}
 const invUsed=side=>Object.values(cfg.inv[side]).reduce((a,b)=>a+b,0);
@@ -5046,7 +5058,7 @@ function newGame(){
   dpicks.forEach((op,i)=>G.units.push(mkUnit(op,'D',i)));
   if(dpicks.includes('rook'))alive('D').forEach(u=>{u.max++;u.hp++;});
   m.cams.forEach(([x,y])=>G.gadgets.push({type:'cam',x,y,side:'D',alive:true,fixed:true}));
-  if(G.mission==='hostage')placeHostage();
+  if(G.mission==='hostage')placeHostage();else placeBombs();
   if(cfg.side==='A')autoDefSetup(true);
   if(cfg.side==='D')placeAttackers(Math.floor(Math.random()*m.spawns.length));
   G.sel=alive(cfg.side)[0];
@@ -5556,7 +5568,7 @@ function bankProp(g,p,i,B,P,M3){
       mesh(new THREE.BoxGeometry(1.0,hh,tw),marble,px,hh/2,pz,-a);
       const ox=ax+Math.cos(a)*(r+.5),oz=ay+Math.sin(a)*(r+.5);mesh(new THREE.BoxGeometry(.08,hh+.32,tw),wood,ox,(hh+.32)/2,oz,-a);}
     return true;}
-  if(t==='stairs'){const n=6,L=v?h:w,Wd=v?w:h;for(let k=0;k<n;k++){const hh=.08+k*.12,o=-L/2+(k+.5)*L/n;v?B(marble,cx,hh/2,cz+o,Wd,hh,L/n+.01):B(marble,cx+o,hh/2,cz,L/n+.01,hh,Wd);}
+  if(t==='stairs'){const n=6,L=v?h:w,Wd=v?w:h;for(let k=0;k<n;k++){const hh=.08+k*.12,o=-L/2+(k+.5)*L/n;v?B(marble,cx,hh/2,cz+o,Wd-.14,hh,L/n+.01):B(marble,cx+o,hh/2,cz,L/n+.01,hh,Wd-.14);}
     v?(B(wood,x+.03,.45,cz,.06,.9,L),B(wood,x+w-.03,.45,cz,.06,.9,L)):(B(wood,cx,.45,y+.03,L,.9,.06),B(wood,cx,.45,y+h-.03,L,.9,.06));return true;}
   if(t==='shelf'){const r=rng(i+21),H=.95;for(const [a,b] of [[-1,-1],[1,-1],[-1,1],[1,1]])B(steel,cx+a*(w/2-.03),H/2,cz+b*(h/2-.03),.05,H,.05);
     for(let k=0;k<4;k++){const yy=.05+k*.3;B(steel,cx,yy,cz,w,.03,h);if(k<3){const L=v?h:w;let o=-L/2+.04;while(o<L/2-.1){const s=.12+r()*.18,col=['#b08a5a','#c19a66','#3d5a80','#7a2e2e','#d9d2c0','#556b4a'][(r()*6)|0];
@@ -5572,7 +5584,7 @@ function bankProp(g,p,i,B,P,M3){
   if(t==='hatch'){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),std(0xffffff,{map:hatchTex(),roughness:.7}));m.rotation.x=-Math.PI/2;m.position.set(cx,.012,cz);m.receiveShadow=true;g.add(m);return true;}
   if(t==='printer'){B(P('#d6d9db',{roughness:.5}),cx,.28,cz,w,.56,h);B(dark,cx,.57,cz,w*.9,.03,h*.7);B(P('#f5f5f2'),cx,.6,cz,w*.5,.01,h*.4);return true;}
   if(t==='pc'){B(dark,cx,.72,cz,w,.2,.03);B(dark,cx,.61,cz,.04,.06,.04);return true;}
-  if(t==='tv'){B(P('#0d0f12',{roughness:.2,metalness:.3}),cx,1.0,cz,w,.5,h);B(P('#244a6a',{emissive:'#1a3a5a',emissiveIntensity:.6}),cx,1.0,cz+h/2+.002,w*.92,.44,.004);return true;}
+  if(t==='tv'){B(P('#0d0f12',{roughness:.2,metalness:.3}),cx,1.0,cz,w,.5,h);B(P('#244a6a',{emissive:'#1a3a5a',emissiveIntensity:.6}),cx,1.0,cz+(p[5]==='n'?-1:1)*(h/2+.002),w*.92,.44,.004);return true;}
   if(t==='hedge'){B(P('#4a3b30'),cx,.16,cz,w,.32,h);const r=rng(i+7),L=v?h:w,n=Math.round(L*3);for(let k=0;k<n;k++){const s=new THREE.Mesh(SPH3,P(['#2f6a39','#3b7d45','#285c31'][k%3]));s.scale.setScalar(.13+r()*.06);const o=-L/2+(k+.5)*L/n;v?s.position.set(cx+(r()-.5)*.08,.38+r()*.1,cz+o):s.position.set(cx+o,.38+r()*.1,cz+(r()-.5)*.08);s.castShadow=true;g.add(s);}return true;}
   if(t==='poster'){B(P('#c9a24a',{metalness:.8,roughness:.3}),cx,.42,cz,.05,.84,.05);B(P('#1d2a3a'),cx,.62,cz,w,.42,.03);return true;}
   if(t==='atm'){B(P('#39414a',{metalness:.45,roughness:.4}),cx,.5,cz,w,1.0,h);B(P('#5ac8ff',{emissive:'#2a8acc',emissiveIntensity:.7}),cx,.72,cz+h/2+.002,w*.6,.2,.004);B(dark,cx,.5,cz+h/2+.04,w*.7,.05,.08);return true;}
@@ -6220,7 +6232,19 @@ var AIG={
  lesion:u=>{const a=alive('A').filter(a=>cheb(u.x,u.y,a.x,a.y)<=6)[0];if(!a)return null;return nearest(a,GT.lesion(u,false).filter(([x,y])=>cheb(x,y,a.x,a.y)>=1&&cheb(x,y,a.x,a.y)<=2))||null;},
  ela:u=>{const a=alive('A').filter(a=>cheb(u.x,u.y,a.x,a.y)<=6)[0];if(!a)return null;return nearest(a,GT.ela(u,false).filter(([x,y])=>cheb(x,y,a.x,a.y)===2))||null;},
 };
-function render(){try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{renderTension();}catch(e){}
+// v104: a defender next to an open door or window gets a button (bottom-left) that closes it with a breakable barricade, for 1 action
+function barTargets(u){if(!G||!u||u.side!=='D'||!u.alive||u.x<0||G.phase!=='play')return [];
+  return adj4(u.x,u.y).filter(([x,y])=>{const c=cell(x,y);return c&&(c.kind==='door'||c.kind==='window')&&c.t==='floor'&&!unitAt(x,y)&&!gadgetAt(x,y)&&!(G.hostage&&G.hostage.x===x&&G.hostage.y===y)&&!(G.defuser&&G.defuser.x===x&&G.defuser.y===y);});}
+async function rebar(u,x,y){useAct(u,'barr');const c0=cell(x,y),cs=[[x,y]];if(c0.pair){const p=cell(...c0.pair);if(p&&p.t==='floor'&&!unitAt(...c0.pair)&&!gadgetAt(...c0.pair))cs.push(c0.pair);}
+  for(const [a,b] of cs){const c=cell(a,b);c.t='bar';c.opened=false;c.unbar=false;c.breach=false;c.shotOut=false;c.hole=false;}
+  G._wv=(G._wv||0)+1;if(R3)R3.sig='';try{SFX.click&&SFX.click();}catch(e){}log(`${nm(u)} 封上${c0.kind==='window'?'窗戶':'門'}的路障`,'kd');render();await afterAct(u);}
+function barBtnUpd(){let b=document.getElementById('barBtn');const u=G&&G.sel;
+  const t=u&&!G.busy&&u.side===G.player&&canAct(u)&&(G.active!==u||canDo(u,'barr'))?barTargets(u):[];
+  if(!t.length||document.body.dataset.scr!=='game'){if(b)b.remove();return;}
+  if(!b){b=document.createElement('button');b.id='barBtn';b.innerHTML='<svg viewBox="0 0 48 48" fill="none" stroke="#e3aa3e" stroke-width="3" stroke-linecap="round"><rect x="9" y="5" width="30" height="38" rx="2"/><path d="M9 16l30 9M9 30l30-9"/></svg><span>封門</span>';document.body.appendChild(b);}
+  const sh=document.getElementById('sheetT'),r0=sh&&sh.getBoundingClientRect(),r=r0&&r0.width?r0:null;b.style.bottom=(r&&r.top>innerHeight*.4?Math.round(innerHeight-r.top+10):Math.round(innerHeight*.3))+'px';
+  b.onclick=ev=>{ev.stopPropagation();const v=G.sel;if(!v||!commit(v))return;act(async()=>{const tt=barTargets(v);if(tt.length&&canDo(v,'barr'))await rebar(v,...tt[0]);});};}
+function render(){setTimeout(()=>{try{barBtnUpd();}catch(e){}},0);try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{renderTension();}catch(e){}
   const scr=G?'game':(SCREEN==='setup'?'setup':'title');document.body.dataset.scr=scr;{const wz=$('#wiz');if(wz&&(G||SCREEN!=='setup'))wz.hidden=true;}
   const tt=$('#title');if(tt){const show=scr==='title';if(tt.hidden===show)tt.hidden=!show;if(show&&tt.dataset.s!==SCREEN){tt.dataset.s=SCREEN;renderTitle();}}
   if(R3){heroScene(scr==='title');if(R3.lastScr!==scr){R3.lastScr=scr;R3.sig='';if(scr!=='title')setTimeout(()=>R3&&!R3.camGoal&&setView(G&&G.phase==='setup'?'top':'angle'),0);}}
@@ -6626,8 +6650,8 @@ function setView(kind,snap){
   flyTo(p,new THREE.Vector3(tx,0,tz+oz),snap);
 }
 function introCam(){setView('top');const g=R3.camGoal;if(!g)return;R3.camGoal=null;const off=g.p.clone().sub(g.t),R=off.length(),az1=Math.atan2(off.x,off.z),el1=Math.asin(Math.min(1,off.y/R));
-  const wait=document.querySelector('.mapintro')?1900:0;R3.intro={t0:performance.now()+wait,dur:3600,t:g.t.clone(),R,az0:az1-Math.PI*1.25,az1,el0:.17,el1};introStep(0);}
-function introStep(k){const I=R3.intro;if(!I)return;const e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2,az=I.az0+(I.az1-I.az0)*e,el=I.el0+(I.el1-I.el0)*Math.pow(e,1.4),r=I.R*(.5+.5*e);
+  const wait=document.querySelector('.mapintro')?1900:0;R3.intro={t0:performance.now()+wait,dur:3600,t:g.t.clone(),R,az0:az1-Math.PI*1.25,az1,el0:Math.min(el1,.8),el1};introStep(0);}
+function introStep(k){const I=R3.intro;if(!I)return;const e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2,az=I.az0+(I.az1-I.az0)*e,el=I.el0+(I.el1-I.el0)*Math.pow(e,1.4),r=I.R*(.85+.15*e);// v104: starts high and wide enough that the board is always on screen
   R3.camera.position.set(I.t.x+r*Math.cos(el)*Math.sin(az),I.t.y+r*Math.sin(el),I.t.z+r*Math.cos(el)*Math.cos(az));R3.controls.target.copy(I.t);if(k>=1)R3.intro=null;}
 function flyTo(p,t,snap){R3.intro=null;const c=R3.controls,cam=R3.camera;if(snap){cam.position.copy(p);c.target.copy(t);c.update();R3.camGoal=null;}else R3.camGoal={p,t};}
 // after deployment: angled and close, on the unit that acts first (or the first of ours)
@@ -6732,7 +6756,7 @@ function buildStatic0(m){
       if(c.elec&&elecVisible(x,y))for(const k of [.2,.5,.8]){const yy=WH*k;hz?addBox(g,M3.elec,cx,yy,cz,1,.035,th+.05,cc,false):addBox(g,M3.elec,cx,yy,cz,th+.05,.035,1,cc,false);}}
   }
   if(m.spiral)spiralWall3D(g,m,WH,M3);
-  (m.props||[]).forEach((p,i)=>{if(propOn(i))buildProp(g,p,i);});envTune(g);
+  {const pg=new THREE.Group();pg.userData.props=true;g.add(pg);(m.props||[]).forEach((p,i)=>{if(propOn(i))buildProp(pg,p,i);});standMap(pg);}envTune(g);
   {// wall lamps: up to 6, spread across the building, on the room side of a hard wall
     const cand=[];for(let y=1;y<G.H-1;y++)for(let x=1;x<G.W-1;x++){const c=G.grid[y][x];if(c.t!=='hard')continue;
       for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]){const n=G.grid[y+dy]&&G.grid[y+dy][x+dx];if(n&&n.indoor&&!['hard','soft','reinf','bar'].includes(n.t)&&!n.obst){cand.push([x,y,dx,dy]);break;}}}
@@ -6743,6 +6767,7 @@ function buildStatic0(m){
       const L=new THREE.PointLight(0xffb060,1.25,6.5,1.6);L.position.set(lx,ly-.1,lz);g.add(L);}}
   for(const s of ['A','B']){const cs=[];for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++)if(G.grid[y][x].site===s)cs.push([x,y]);if(!cs.length)continue;
     const cx=cs.reduce((a,c)=>a+c[0],0)/cs.length+.5,cz=cs.reduce((a,c)=>a+c[1],0)/cs.length+.5;
+    if(G.bombC&&G.bombC[s])bomb3D(g,G.bombC[s][0]+.5,G.bombC[s][1]+.5);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:canvasTex(siteBadge(s)),depthTest:false,transparent:true}));sp.scale.set(.9,.9,1);sp.position.set(cx,WH+1.1,cz);sp.renderOrder=9;sp.userData.own=true;sp.visible=!(R3.hero&&R3.hero.visible);g.add(sp);}
 }
 function siteBadge(s){const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
@@ -6793,6 +6818,23 @@ function buildOpening(g,x,y,c,WH){
     for(const s of [-1,1]){const p=along(0,.95,.82,.09,.08,M3.woodArr);hz?p.rotation.z=s*.62:p.rotation.x=s*.62;}
   }
 }
+// v104: a unit on walkable cover stands on the cover's real 3D top, read by casting down onto the built props
+function standMap(pg){const M=new Map(),rc=new THREE.Raycaster(),dn=new THREE.Vector3(0,-1,0),ms=[];rc.camera=R3.camera;pg.updateMatrixWorld(true);pg.traverse(o=>{if(o.isMesh)ms.push(o);});
+  const top=(x,z)=>{rc.set(new THREE.Vector3(x,1.6,z),dn);rc.far=1.6;for(const h of rc.intersectObjects(ms,false))if(h.point.y<1.3)return h.point.y;return 0;};
+  for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++){const c=G.grid[y][x];if(!c.stand)continue;let v=top(x+.5,y+.5);
+    if(v<.05)for(const [a,b] of [[.25,0],[-.25,0],[0,.25],[0,-.25]])v=Math.max(v,top(x+.5+a,y+.5+b));M.set(y*G.W+x,v>.05?v:c.stand);}
+  R3.standY=M;}
+function standY(x,y){const c=cell(x,y);if(!c||!c.stand)return 0;const v=R3&&R3.standY&&R3.standY.get(y*G.W+x);return v??c.stand;}
+// v104: the site bomb as a real object: a hard case with two gas tanks, wiring and a red timer
+function bomb3D(g,x,z){const grp=new THREE.Group();grp.position.set(x,0,z);grp.rotation.y=((x*7+z*13)%4)*.4;g.add(grp);
+  const add=(geo,mat,px,py,pz,rx,rz)=>{const m=new THREE.Mesh(geo,mat);m.position.set(px,py,pz);if(rx)m.rotation.x=rx;if(rz)m.rotation.z=rz;m.castShadow=m.receiveShadow=true;grp.add(m);return m;};
+  const cse=gm('bm1',()=>std('#3b4130',{roughness:.7})),blk=gm('bm2',()=>std('#16181b',{roughness:.5,metalness:.3})),tank=gm('bm3',()=>std('#9a2b22',{roughness:.35,metalness:.4})),tank2=gm('bm4',()=>std('#c9a23a',{roughness:.35,metalness:.4}));
+  add(new THREE.BoxGeometry(.62,.2,.42),cse,0,.1,0);add(new THREE.BoxGeometry(.66,.03,.46),blk,0,.215,0);
+  for(const [a,m] of [[-.12,tank],[.12,tank2]]){add(new THREE.CylinderGeometry(.075,.075,.44,16),m,0,.31,a,0,Math.PI/2);for(const e of [-.22,.22])add(new THREE.CylinderGeometry(.078,.078,.025,16),blk,e,.31,a,0,Math.PI/2);}
+  add(new THREE.BoxGeometry(.2,.11,.14),blk,0,.43,0);
+  const scr=new THREE.Mesh(new THREE.PlaneGeometry(.15,.06),gm('bm5',()=>new THREE.MeshBasicMaterial({color:0xff2a1a,toneMapped:false})));scr.position.set(0,.43,.071);grp.add(scr);
+  for(const [c,o] of [['#d33',-.05],['#36c',.0],['#dc3',.05]]){const w=new THREE.Mesh(new THREE.TorusGeometry(.09,.008,6,16,Math.PI),gm('bmw'+c,()=>std(c,{roughness:.6})));w.position.set(o,.38,-.08);w.rotation.y=Math.PI/2;grp.add(w);}
+  return grp;}
 function buildProp(g,[t,x,y,w,h],i){
   const M3=R3.mats,cx=x+w/2,cz=y+h/2,v=h>w,B=(mats,px,py,pz,sx,sy,sz)=>addBox(g,mats,px,py,pz,sx,sy,sz,null);
   R3.pm=R3.pm||{};const P=(col,o)=>{const k=col+JSON.stringify(o||{});return R3.pm[k]||(R3.pm[k]=std(col,o));};
@@ -7214,7 +7256,7 @@ function prisma3D(g){let f=R3.figs[g.pid];
   figAlpha(f,mine?.45:1);
   if(!f.grp.visible&&show)f.placed=false;
   f.grp.visible=show&&!(R3.cardHide&&R3.cardHide.has(g.pid));
-  f.target.set(cwx(g.x,g.y),cell(g.x,g.y)?(cell(g.x,g.y).stand||0):0,cwz(g.x,g.y));f.face=Math.atan2(g.fd[0],g.fd[1]);f.dead=false;
+  f.target.set(cwx(g.x,g.y),standY(g.x,g.y),cwz(g.x,g.y));f.face=Math.atan2(g.fd[0],g.fd[1]);f.dead=false;
   f.sel.visible=false;f.spot.visible=false;f.grp.traverse(o=>{o.userData.cell=[g.x,g.y];});badgeDraw(f,p);}
 function prismaVanish(f,k){f.vanish=1;const a0=f._a||1;let t=0;SFX.miss&&SFX.miss();
   (R3.fx2||(R3.fx2=[])).push(dt=>{t+=dt;const q=t/1.1;
@@ -7360,7 +7402,7 @@ async function shotCam(sh,t){
 // fade out walls and props between the camera and the two fighters for the close-up
 function cineClear(P,tc,near,pts,keep){
   const fru=new THREE.Frustum().setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(tc.projectionMatrix,tc.matrixWorldInverse)),hid=R3.cineHid||(R3.cineHid=[]),box=new THREE.Box3(),ray=new THREE.Ray(),hit=new THREE.Vector3();
-  for(const o of R3.staticG.children){if(!o.visible||o.isSprite)continue;if(keep&&o.userData.cell&&keep.has(o.userData.cell+''))continue;
+  for(const o of R3.staticG.children.flatMap(o=>o.userData.props?o.children:[o])){if(!o.visible||o.isSprite)continue;if(keep&&o.userData.cell&&keep.has(o.userData.cell+''))continue;
     box.setFromObject(o);if(box.max.y<.12)continue;
     let hide=box.clone().expandByScalar(.3).containsPoint(P)||(box.distanceToPoint(P)<near&&fru.intersectsBox(box));
     for(const q of pts){if(hide)break;const d=q.clone().sub(P),L=d.length();ray.set(P,d.divideScalar(L));if(ray.intersectBox(box,hit)&&hit.distanceTo(P)<L-.3)hide=true;}
@@ -7531,6 +7573,13 @@ function visPlane(key,y,ro){let p=R3[key];if(p&&p.userData.wh!==G.W+'x'+G.H){R3.
     p=new THREE.Mesh(new THREE.PlaneGeometry(G.W,G.H),new THREE.MeshBasicMaterial({map:tx,transparent:true,depthWrite:false}));p.rotation.x=-Math.PI/2;p.position.set(G.W/2,y,G.H/2);p.renderOrder=ro;p.frustumCulled=false;
     p.userData={wh:G.W+'x'+G.H,S,cv,ctx:cv.getContext('2d'),tx,key:''};R3.scene.add(p);R3[key]=p;}
   return p;}
+// v104: the fan texture also lies on the tops of walkable cover, so a unit standing on a counter still shows its fan there
+function fanTop(pu){const sm=R3.standY;if(R3.fanTopM&&R3.fanTopM.userData.sm===sm&&R3.fanTopM.material.map===pu.tx)return R3.fanTopM;
+  if(R3.fanTopM){R3.scene.remove(R3.fanTopM);R3.fanTopM.geometry.dispose();R3.fanTopM.material.dispose();R3.fanTopM=null;}if(!sm||!sm.size)return null;
+  const v=[],uv=[],ix=[];for(const [k,h] of sm){if(h<.05)continue;const x=k%G.W,y=(k/G.W)|0,yy=h+.012,n=v.length/3;
+    for(const [a,b] of [[0,0],[1,0],[1,1],[0,1]]){v.push(x+a,yy,y+b);uv.push((x+a)/G.W,1-(y+b)/G.H);}ix.push(n,n+3,n+1,n+1,n+3,n+2);}
+  if(!ix.length)return null;const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(v,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));geo.setIndex(ix);
+  const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({map:pu.tx,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));m.renderOrder=3;m.frustumCulled=false;m.userData.sm=sm;R3.scene.add(m);return R3.fanTopM=m;}
 function visFx3D(){const play=G.phase==='play'&&!G.over;
   const fp=visPlane('fogP',.05,2),fu=fp.userData;fp.visible=play;
   const mine=play?G.units.filter(u=>u.alive&&u.side===G.player&&u.x>=0):[];
@@ -7542,7 +7591,7 @@ function visFx3D(){const play=G.phase==='play'&&!G.over;
     for(const u of mine){const r=visRays(u);c.beginPath();c.moveTo(r.o[0]*S,r.o[1]*S);for(const [x,y] of r.pts)c.lineTo(x*S,y*S);c.closePath();c.fill();c.beginPath();c.arc(r.o[0]*S,r.o[1]*S,S*.55,0,Math.PI*2);c.fill();}
     for(const k of sh)c.fillRect((k%G.W)*S,((k/G.W)|0)*S,S,S);
     c.shadowBlur=0;fu.tx.needsUpdate=true;}
-  const pp=visPlane('fanP',.055,3),pu=pp.userData;pp.visible=!!sel;
+  const pp=visPlane('fanP',.055,3),pu=pp.userData;pp.visible=!!sel;{const ft=fanTop(pu);if(ft)ft.visible=!!sel;}
   if(!sel){if(R3.glowG){R3.scene.remove(R3.glowG);R3.glowG=null;}pu.key='';return;}
   const pk=[sel.id,sel.x,sel.y,(sel.fd||[]).join(','),G._wv||0,key,R3.wall].join('|');if(pu.key===pk&&R3.glowG)return;pu.key=pk;
   const S=pu.S,c=pu.ctx,r=visRays(sel),[ox,oy]=r.o;c.clearRect(0,0,pu.cv.width,pu.cv.height);
@@ -7625,6 +7674,8 @@ function tick3D(){
   if(G&&G.phase==='play'&&!G.over&&!R3.cine){const u=G.active||G.sel,k=u&&u.alive&&u.x>=0&&(u.side===G.player||pub(u))?u.id:null;const pk=k&&u.x+','+u.y;if(k!==R3.followId||(k&&pk!==R3.followPos)){R3.followId=k;R3.followPos=pk;if(k&&R3.camPhase==='play')setTimeout(()=>followCam(u),40);}}
   if(R3.owA&&R3.owA.parent){const k=.78+.12*Math.sin(t*7);for(const a of R3.owA.children){const d=a.userData.d,n=d[0]&&d[1]?.78:1;a.position.set(d[0]*k*n,.35,d[1]*k*n);}}
   try{stunFx(t);}catch(e){}
+  // v104: however the view is dragged, the orbit centre stays over the board, so the map never leaves the screen
+  if(G&&G.W&&!(R3.hero&&R3.hero.visible)){const t=R3.controls.target,x=Math.max(-1,Math.min(G.W+1,t.x)),z=Math.max(-1,Math.min(G.H+1,t.z));if(x!==t.x||z!==t.z){R3.camera.position.x+=x-t.x;R3.camera.position.z+=z-t.z;t.x=x;t.z=z;}}
   R3.controls.update();
   const camD=R3.camera.position.distanceTo(R3.controls.target),bs=Math.max(.32,Math.min(1,camD/15));
   for(const k in R3.figs){const f=R3.figs[k];if(!f.grp.visible)continue;
@@ -7660,7 +7711,7 @@ function update3D(){
     const show=u.alive?seen:(f.seenDead||G.over);
     if(!f.grp.visible&&show)f.placed=false;
     f.grp.visible=show&&!(R3.cardHide&&R3.cardHide.has(u.id))&&R3.cineSelf!==u.id;
-    f.target.set(cwx(u.x,u.y),u.alive&&cell(u.x,u.y)?(cell(u.x,u.y).stand||0):0,cwz(u.x,u.y));
+    f.target.set(cwx(u.x,u.y),u.alive?standY(u.x,u.y):0,cwz(u.x,u.y));
     if(u.fd&&(u.fd[0]||u.fd[1]))f.face=Math.atan2(u.fd[0],u.fd[1]);else if(f.last&&(f.last[0]!==u.x||f.last[1]!==u.y))f.face=Math.atan2(u.x-f.last[0],u.y-f.last[1]);
     f.last=[u.x,u.y];f.dead=!u.alive;
     f.sel.visible=u===G.sel&&u.alive;f.spot.visible=u.side!==G.player&&u.spotted>0&&u.alive&&!G.over;
@@ -7692,10 +7743,6 @@ function update3D(){
   if(G.mode==='pdir'&&pdirG())dg.add(owArrows(pdirG(),[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]));else if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash'||G.mode==='face')&&G.sel&&G.sel.x>=0&&G.phase==='play')dg.add(owArrows(G.sel,G.mode==='face'?[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]:null));else R3.owA=null;
   if(G.phase==='setup'&&G.player==='A')G.map.spawns.forEach((z,i)=>dg.add(spawn3D(z,i,i===G.spawn||G.spawn==null)));
   if(G.hostage&&hostSeen())dg.add(hostage3D(G.hostage));
-  if(G.mission!=='hostage'&&GIMG.bomb)for(const s of ['A','B']){if(R3.siteMap!==G.map){R3.siteMap=G.map;R3.siteC={};}const cs=R3.siteC,key=s;if(!cs[key]){const L=[];for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++)if(G.grid[y][x].site===s&&!G.grid[y][x].obst)L.push([x,y]);
-      if(!L.length){cs[key]=-1;continue;}const mx=L.reduce((a,c)=>a+c[0],0)/L.length,my=L.reduce((a,c)=>a+c[1],0)/L.length;L.sort((a,b)=>Math.hypot(a[0]-mx,a[1]-my)-Math.hypot(b[0]-mx,b[1]-my));cs[key]=L[0];}
-    const p=cs[key];if(p===-1)continue;if(G.defuser&&G.defuser.x===p[0]&&G.defuser.y===p[1])continue;if(G.units.some(u=>u.alive&&u.x===p[0]&&u.y===p[1]&&pub(u)))continue;
-    const b=standee('bomb',.38,.76);b.position.set(p[0]+.5,0,p[1]+.5);faceCam(b,p[0]+.5,p[1]+.5);dg.add(b);}
   for(const u of G.units)if(u.alive&&u.overwatch&&u.x>=0&&pub(u))dg.add(owArc(u));
   if(G.phase==='play'||G.phase==='setup')dg.add(zones3D());
   if(G.defuser){const grp=new THREE.Group();grp.position.set(cwx(G.defuser.x,G.defuser.y),0,cwz(G.defuser.x,G.defuser.y));
