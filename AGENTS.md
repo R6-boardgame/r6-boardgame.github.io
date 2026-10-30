@@ -6,7 +6,7 @@
 
 - 《Rainbow Six Siege – The Board Game》的網頁版，可對戰電腦、新手教學、自訂房間連線、排名戰、成就、商店。
 - 線上版：https://r6-boardgame.github.io/ （GitHub Pages，`main` 分支根目錄直接發佈，推上去就上線）。
-- 目前版本 v99（見 `git log`）。
+- 目前版本 v100（見 `git log`）。
 - 使用者要求：PR 做完、測完就直接合併上線，不用再問。
 
 ## 檔案結構
@@ -113,6 +113,8 @@
 - v97：轉職後的角色圖（`.cpArt.cw`）改成整張塞進舞台（`object-fit:contain`、底部對齊、遮罩從 82% 才淡出），不再放大裁掉下半身；步槍兵女版看得到臀部以下。 女步槍兵換成全身新圖。轉職條件加難（`nOR` 橘以上骰數、`nR` 紅骰數）：步槍＝中距 5 骰至少 3 橘＋視野 4；衝鋒＝奔跑 5＋近中各 3 骰以上各 1 橘；狙擊＝遠距 5 骰至少 2 紅；散彈＝近距 5 骰至少 2 紅；機槍＝裝甲 3＋三段各 3 骰以上各 1 橘；盾牌＝裝甲 3＋近中各 4 骰以上各 1 橘。
 
 - v99：領事館照真實一樓藍圖重做（38×25 格，只有一樓）。旋轉樓梯區改成平面的半圓大廳（地圖欄位 `spiral:{cx,cy,r0,R}`），切成圓弧梯形格：每一格在規則上仍是一個方格（`spiralCells` 依半徑分環、依角度對應），只有畫法、棋子位置與點擊落點照圓弧走（`pcOf`、`cwx`/`cwz` 取格子中心、`w2c` 把點擊座標換回格子；`setInst` 會把高亮轉成圓弧方向）。弧形外牆 `spiralWall3D`（格子標 `c.curve` 不畫方塊牆），地板內嵌弧線 `drawSpiral`，大廳地板徽章 `drawMedal`，雕像花台 `statue`、平台鋼琴 `gpiano`。材質照實景俯視圖：`consulTEX`（clobby、cspiral、cblue、cmaroon、cbath、cbrown、cwood、cpiano、cslate），牆沿用 `bankWallMats`。炸彈點與人質每場隨機：地圖有 `sitePool`（房名清單）時，`parseMap(m,true)` 呼叫 `randSites`，從清單挑兩個共用一面牆的相鄰房間，各放 2×2 的 A／B 點，人質在 A 點；銀行也套用（教學仍用固定點）。領事館加入線上對戰地圖 `ONLINE_MAPS`。手機俯視放大鏡頭上限（`maxDistance` 140、相機 far 200）讓寬地圖裝得下。
+
+- v100：咖啡館照真實一樓藍圖重做（37×29 格，只有一樓，地圖欄位 `tl:1`）：小麵包店、麵包店、紅樓梯／紅走廊、衣帽間、正門、大廳、吧台、用餐區、廚房（含 k3）、出餐區（含咖啡吧、洗碗區）、冷凍庫（地板活門）、準備室、VIP 室、VIP 走廊、車庫。黃色可破壞牆→軟牆，藍圖深灰的內窗（衣帽間、準備室、冷凍庫）→窗。材質照實景俯視圖：`kafeTEX`（kdot 米色黑點磚、kred 紅地毯、klobby 米色大磚深色格線、kwhite 廚房白磚、kgrey 出餐區淡灰磚、kdark 冷凍庫深褐磚、kprep、kcoat、kentry 正門地毯、kvip、kbar、kbeige、kwood、kgarage），牆沿用 `bankWallMats`。同一個連通區域裡只有第一個標籤的材質會留下（其實是最後一個蓋掉），所以大廳那一大片的標籤都用 klobby，局部改用 `matRects`。新家具：`kcounter` 不鏽鋼工作台、`rtable` 圓咖啡桌配兩張紅椅、`xmas` 聖誕樹。炸彈點與人質用 `sitePool` 每場隨機（小麵包店、麵包店、廚房、準備室、出餐區、冷凍庫、衣帽間、正門、VIP 室裡共用一面牆的兩間）。咖啡館加入 `ONLINE_MAPS`。
 
 ## 尚未完成 / 等使用者回覆
 
