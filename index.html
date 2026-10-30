@@ -646,6 +646,19 @@ body[data-scr="setup"] header.top{visibility:hidden}
 .ttopr .online{position:static}
 .tlang{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;background:rgba(12,18,24,.85);border:1px solid var(--line);font-size:13px}
 .lsel{background:#0f151b;color:#e6edf2;border:1px solid #2c3a47;padding:4px 6px;font:inherit}
+.tside{position:absolute;top:max(16px,env(safe-area-inset-top));right:max(18px,env(safe-area-inset-right));z-index:3;display:flex;gap:8px}
+#title:not([data-s="title"]) .tside{display:none}
+.tsb{display:grid;place-items:center;width:40px;height:40px;padding:0;background:rgba(8,11,14,.72);border:1px solid rgba(255,255,255,.22);color:#e6edf2;cursor:pointer;clip-path:var(--cham)}
+.tsb svg{width:21px;height:21px}.tsb.heart{color:#ff5a6e}.tsb:hover{border-color:var(--accent);background:rgba(30,24,10,.85)}
+.fbsel,.fbtxt{width:100%;background:#0f151b;color:#e6edf2;border:1px solid #2c3a47;padding:9px 10px;font:inherit;font-size:15px;box-sizing:border-box}
+.fbtxt{min-height:150px;resize:vertical;line-height:1.55}.fbsel:focus,.fbtxt:focus{outline:none;border-color:var(--accent)}
+.fbcnt{font-size:12px;color:#7f8c97;text-align:right;margin-top:4px}
+.fbmsg{margin:0;font-size:13.5px;line-height:1.5}.fbmsg.ok{color:#7fdc8f}.fbmsg.err{color:#ff8a7a}
+.fbsend{padding:11px;font-size:16px;font-weight:800}
+.spheart{width:54px;height:54px;color:#ff5a6e;flex:none}
+.splist{display:flex;flex-direction:column;gap:8px}.splist a,.splist span{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:#121a22;border:1px solid #2a3a48;color:#e6edf2;text-decoration:none;font-size:15px}
+.splist a:hover{border-color:var(--accent)}.splist span{color:#7f8c97}.splist em{font-style:normal;font-size:12px;color:#9aa7b2}
+@media (max-width:760px){.tside{right:12px;top:max(10px,env(safe-area-inset-top));gap:6px}.tsb{width:36px;height:36px}.tsb svg{width:19px;height:19px}}
 .psettings{position:fixed;inset:0;z-index:70;background:rgba(3,5,8,.72);display:grid;place-items:center;padding:16px}.psettings[hidden]{display:none}
 .psbox{width:min(560px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:#0e141a;border:1px solid #2c3a47;border-top:3px solid var(--accent);padding:18px 20px;display:flex;flex-direction:column;gap:14px;color:#e6edf2}
 .pshead{display:flex;align-items:center;gap:12px}.pshead .pav{width:58px;height:58px;object-fit:cover;background:#10171e}.pshead div{flex:1;display:flex;flex-direction:column}.pshead b{font-size:20px}.pshead span{font-size:12.5px;color:#9aa7b2}
@@ -1973,7 +1986,7 @@ body.hasClk #tracker .seg{display:none}
 
   <div class="layout">
     <section class="boardwrap">
-      <div class="boardframe" id="frame"><canvas id="board" aria-label="戰術地圖平面圖"></canvas><div class="hud3d" id="hud3d" hidden><button id="view-eye" aria-label="切換視角"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1.5 12S5.5 4.5 12 4.5 22.5 12 22.5 12 18.5 19.5 12 19.5 1.5 12 1.5 12Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.6" fill="currentColor"/></svg><span id="eyeLab">斜角</span></button><button id="view-angle">斜角視角</button><button id="view-top">俯視</button><button id="view-wall">牆：全高</button><button id="view-focus">聚焦幹員</button><button id="view-q" hidden>畫質：高</button><button id="view-cine">射擊特寫：第一人稱</button><button id="view-in" aria-label="放大">＋</button><button id="view-out" aria-label="縮小">－</button><span class="hint3d">拖曳旋轉 · 右鍵平移 · 滾輪縮放 · 方向鍵旋轉</span></div><div class="coord" id="coord"></div><div class="tutbox" id="tutbox" hidden></div><div class="title" id="title"><div class="tbg" aria-hidden="true"></div><div class="tplayer" id="tplayer"></div><div class="tlogo"><img class="r6" alt="Tom Clancy's Rainbow Six Siege"><div class="lg"><img class="six" alt="6"><div><small>THE BOARDGAME</small><h1>虹彩六號<br>戰術桌遊</h1></div></div></div><nav class="tmenu" id="tmenu"></nav></div><div id="banner" class="banner" hidden></div></div>
+      <div class="boardframe" id="frame"><canvas id="board" aria-label="戰術地圖平面圖"></canvas><div class="hud3d" id="hud3d" hidden><button id="view-eye" aria-label="切換視角"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1.5 12S5.5 4.5 12 4.5 22.5 12 22.5 12 18.5 19.5 12 19.5 1.5 12 1.5 12Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.6" fill="currentColor"/></svg><span id="eyeLab">斜角</span></button><button id="view-angle">斜角視角</button><button id="view-top">俯視</button><button id="view-wall">牆：全高</button><button id="view-focus">聚焦幹員</button><button id="view-q" hidden>畫質：高</button><button id="view-cine">射擊特寫：第一人稱</button><button id="view-in" aria-label="放大">＋</button><button id="view-out" aria-label="縮小">－</button><span class="hint3d">拖曳旋轉 · 右鍵平移 · 滾輪縮放 · 方向鍵旋轉</span></div><div class="coord" id="coord"></div><div class="tutbox" id="tutbox" hidden></div><div class="title" id="title"><div class="tbg" aria-hidden="true"></div><div class="tplayer" id="tplayer"></div><div class="tside" id="tside"><button class="tsb heart" id="t-love" aria-label="贊助" title="贊助"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg></button><button class="tsb" id="t-fb" aria-label="回報" title="回報"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.5h16a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5v-3.5H4A1.5 1.5 0 0 1 2.5 16V6A1.5 1.5 0 0 1 4 4.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="8" cy="11" r="1.3" fill="currentColor"/><circle cx="12" cy="11" r="1.3" fill="currentColor"/><circle cx="16" cy="11" r="1.3" fill="currentColor"/></svg></button></div><div class="tlogo"><img class="r6" alt="Tom Clancy's Rainbow Six Siege"><div class="lg"><img class="six" alt="6"><div><small>THE BOARDGAME</small><h1>虹彩六號<br>戰術桌遊</h1></div></div></div><nav class="tmenu" id="tmenu"></nav></div><div id="banner" class="banner" hidden></div></div>
       <div class="legend" id="legend"></div>
     </section>
     <aside class="panel" id="panel"></aside>
@@ -7855,6 +7868,30 @@ async function acctLogin(){const ok=await acctLoad();if(!ok){PMSG='連不上對�
   ME.mode='account';PMSG='';saveMe();renderPlayer();renderSettings();if(SCREEN==='rank')renderTitle();}
 function acctLogout(){ME.mode='guest';saveMe();renderPlayer();renderSettings();if(SCREEN==='rank'||SCREEN==='queue'){rankCancel();SCREEN='rank';renderTitle();}}
 let PMSG='';
+// ---------- sponsor / feedback ----------
+const FB_TO='aesopfilmedit@gmail.com';
+// 贊助連結：填上網址就會變成可點的按鈕（url 空白時顯示「即將開放」）
+const SPONSOR=[{n:'贊助連結一',url:''},{n:'贊助連結二',url:''}];
+function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement('div');el.id=id;el.className='psettings';el.setAttribute('role','dialog');el.setAttribute('aria-label',label);document.body.appendChild(el);
+    el.addEventListener('click',e=>{if(e.target===el)el.hidden=true;});}
+  el.hidden=false;el.innerHTML=html;el.querySelector('.tsX').onclick=()=>{el.hidden=true;};return el;}
+function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b><span>喜歡這款遊戲嗎？你的支持會讓它持續更新。</span></div><button class="tsX" aria-label="關閉">✕</button></div>
+  <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
+  <p class="pshint">謝謝每一位玩家的支持！</p></div>`);}
+function openFeedback(){const el=tsDlg('feedback','回報',`<div class="psbox"><div class="pshead"><div><b>回報</b><span>遇到問題或有想法，都歡迎告訴我們。</span></div><button class="tsX" aria-label="關閉">✕</button></div>
+  <section><h4>類型</h4><select class="fbsel" id="fbType"><option value="bug">回報 Bug</option><option value="idea">遊戲建議</option></select></section>
+  <section><h4>內容</h4><textarea class="fbtxt" id="fbText" maxlength="2000" placeholder="請描述發生了什麼、在哪個畫面，或你的建議…"></textarea><div class="fbcnt" id="fbCnt">0 / 2000</div></section>
+  <p class="fbmsg" id="fbMsg"></p><button class="primary fbsend" id="fbSend">發送</button></div>`);
+  const tx=el.querySelector('#fbText'),cnt=el.querySelector('#fbCnt'),msg=el.querySelector('#fbMsg'),bt=el.querySelector('#fbSend');
+  tx.oninput=()=>{cnt.textContent=tx.value.length+' / 2000';};
+  bt.onclick=async()=>{const t=tx.value.trim();if(t.length<3){msg.className='fbmsg err';msg.textContent='請先寫一下內容再發送。';tx.focus();return;}
+    const ty=el.querySelector('#fbType').value==='bug'?'回報 Bug':'遊戲建議';bt.disabled=true;bt.textContent='發送中…';msg.className='fbmsg';msg.textContent='';
+    try{const r=await fetch('https://formsubmit.co/ajax/'+FB_TO,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
+        body:JSON.stringify({_subject:`[虹彩六號桌遊] ${ty}`,_template:'table',_captcha:'false','類型':ty,'內容':t,'玩家':meName(),'版本':(document.title||'')+' · '+location.href,'裝置':navigator.userAgent,'時間':new Date().toLocaleString('zh-TW')})});
+      const j=await r.json().catch(()=>({}));if(!r.ok||j.success==='false'||j.success===false)throw 0;
+      msg.className='fbmsg ok';msg.textContent='已送出，謝謝你的回報！';tx.value='';cnt.textContent='0 / 2000';bt.textContent='已送出';setTimeout(()=>{bt.disabled=false;bt.textContent='發送';},2500);}
+    catch(e){msg.className='fbmsg err';msg.textContent='送出失敗，請檢查網路後再試一次。';bt.disabled=false;bt.textContent='發送';}};}
+{const a=$('#t-love'),b=$('#t-fb');if(a)a.onclick=openSponsor;if(b)b.onclick=openFeedback;}
 function renderPlayer(){const el=$('#tplayer');if(!el)return;const acct=ME.mode==='account';
   el.innerHTML=`<button class="pcard" id="pcard" aria-label="玩家資料與設定"><img class="pav" src="${meAvatar()}" alt=""><span class="pinfo"><b>${esc(meName())}</b><span class="prank">${ecoTag()}</span></span><i class="pgear" aria-hidden="true">⚙</i></button>`;
   el.insertAdjacentHTML('beforeend',`<button class="pach" id="pach" aria-label="成就與好友"><i>🏆</i><b>${achCount()}/${ACH.length}</b></button>`);$('#pach').onclick=()=>openAch();{const n=tkClaimable();el.insertAdjacentHTML('beforeend',`<button class="ptask" id="ptask" aria-label="任務"><i>📋</i><b>任務</b>${n?`<em>${n}</em>`:''}</button>`);$('#ptask').onclick=()=>{if(typeof G!=='undefined'&&G&&!G.over&&SCREEN!=='title'&&SCREEN!=='task')return;SCREEN='task';NETMSG='';renderTitle();};}
