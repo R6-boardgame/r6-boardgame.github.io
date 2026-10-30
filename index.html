@@ -6825,15 +6825,36 @@ function standMap(pg){const M=new Map(),rc=new THREE.Raycaster(),dn=new THREE.Ve
     if(v<.05)for(const [a,b] of [[.25,0],[-.25,0],[0,.25],[0,-.25]])v=Math.max(v,top(x+.5+a,y+.5+b));M.set(y*G.W+x,v>.05?v:c.stand);}
   R3.standY=M;}
 function standY(x,y){const c=cell(x,y);if(!c||!c.stand)return 0;const v=R3&&R3.standY&&R3.standY.get(y*G.W+x);return v??c.stand;}
-// v104: the site bomb as a real object: a hard case with two gas tanks, wiring and a red timer
-function bomb3D(g,x,z){const grp=new THREE.Group();grp.position.set(x,0,z);grp.rotation.y=((x*7+z*13)%4)*.4;g.add(grp);
+// v105: the site bomb modelled on the bomb card art: a yellow cage with mesh sides and a hazard band, gas tanks, valves and an antenna on top; about as tall as a unit, inside one cell
+let BOMBH=1.05;
+function bomb3D(g,x,z){const grp=new THREE.Group();grp.position.set(x,0,z);g.add(grp);const S=BOMBH/1.0;grp.scale.setScalar(S);
   const add=(geo,mat,px,py,pz,rx,rz)=>{const m=new THREE.Mesh(geo,mat);m.position.set(px,py,pz);if(rx)m.rotation.x=rx;if(rz)m.rotation.z=rz;m.castShadow=m.receiveShadow=true;grp.add(m);return m;};
-  const cse=gm('bm1',()=>std('#3b4130',{roughness:.7})),blk=gm('bm2',()=>std('#16181b',{roughness:.5,metalness:.3})),tank=gm('bm3',()=>std('#9a2b22',{roughness:.35,metalness:.4})),tank2=gm('bm4',()=>std('#c9a23a',{roughness:.35,metalness:.4}));
-  add(new THREE.BoxGeometry(.62,.2,.42),cse,0,.1,0);add(new THREE.BoxGeometry(.66,.03,.46),blk,0,.215,0);
-  for(const [a,m] of [[-.12,tank],[.12,tank2]]){add(new THREE.CylinderGeometry(.075,.075,.44,16),m,0,.31,a,0,Math.PI/2);for(const e of [-.22,.22])add(new THREE.CylinderGeometry(.078,.078,.025,16),blk,e,.31,a,0,Math.PI/2);}
-  add(new THREE.BoxGeometry(.2,.11,.14),blk,0,.43,0);
-  const scr=new THREE.Mesh(new THREE.PlaneGeometry(.15,.06),gm('bm5',()=>new THREE.MeshBasicMaterial({color:0xff2a1a,toneMapped:false})));scr.position.set(0,.43,.071);grp.add(scr);
-  for(const [c,o] of [['#d33',-.05],['#36c',.0],['#dc3',.05]]){const w=new THREE.Mesh(new THREE.TorusGeometry(.09,.008,6,16,Math.PI),gm('bmw'+c,()=>std(c,{roughness:.6})));w.position.set(o,.38,-.08);w.rotation.y=Math.PI/2;grp.add(w);}
+  const M=(k,c,o)=>gm('bm'+k,()=>std(c,o)),yel=M('y','#c78600',{roughness:.6,metalness:.1,emissive:'#2a1a00'}),blk=M('k','#1a1c1f',{roughness:.5,metalness:.4}),grn=M('g','#3f5a2c',{roughness:.45,metalness:.3}),red=M('r','#8a2a20',{roughness:.45,metalness:.3}),
+    brs=M('b','#b08a3a',{roughness:.3,metalness:.8}),org=M('o','#d9682a',{roughness:.5}),wht=M('w','#e6e2d6',{roughness:.4}),base=M('p','#1f4a30',{roughness:.6});
+  const mesh=gm('bmmesh',()=>{const c=document.createElement('canvas');c.width=c.height=64;const t=c.getContext('2d');t.fillStyle='rgba(22,24,26,.7)';t.fillRect(0,0,64,64);t.strokeStyle='rgba(150,155,160,.85)';t.lineWidth=2;
+      for(let i=-64;i<128;i+=10){t.beginPath();t.moveTo(i,0);t.lineTo(i+64,64);t.stroke();t.beginPath();t.moveTo(i+64,0);t.lineTo(i,64);t.stroke();}
+      const tx=new THREE.CanvasTexture(c);tx.wrapS=tx.wrapT=THREE.RepeatWrapping;tx.repeat.set(3,3);return new THREE.MeshStandardMaterial({map:tx,transparent:true,side:THREE.DoubleSide,roughness:.6,metalness:.5,depthWrite:false});}),
+    haz=gm('bmhaz',()=>{const c=document.createElement('canvas');c.width=128;c.height=16;const t=c.getContext('2d');t.fillStyle='#e8c21e';t.fillRect(0,0,128,16);t.fillStyle='#16181a';for(let i=-16;i<144;i+=16){t.beginPath();t.moveTo(i,16);t.lineTo(i+8,0);t.lineTo(i+16,0);t.lineTo(i+8,16);t.fill();}
+      const tx=new THREE.CanvasTexture(c);tx.encoding=THREE.sRGBEncoding;return std('#ffffff',{map:tx,roughness:.6});});
+  const W=.56,D=.46,H=.52;
+  add(new THREE.BoxGeometry(W+.08,.04,D+.08),base,0,.02,0);
+  // inner body behind the mesh, with the hazard band across it
+  add(new THREE.BoxGeometry(W-.1,H-.06,D-.1),blk,0,.04+(H-.06)/2,0);
+  for(const [sx,sz,rot] of [[0,D/2-.05,0],[0,-(D/2-.05),Math.PI],[W/2-.05,0,Math.PI/2],[-(W/2-.05),0,-Math.PI/2]]){const m=new THREE.Mesh(new THREE.PlaneGeometry(rot%Math.PI?D-.1:W-.1,.06),haz);m.position.set(sx,H*.72,sz);m.rotation.y=rot;grp.add(m);}
+  // cage: four posts, three rings of rails, mesh panels
+  for(const a of [-1,1])for(const b of [-1,1])add(new THREE.BoxGeometry(.05,H,.05),yel,a*W/2,.04+H/2,b*D/2);
+  for(const yy of [.06,.04+H*.52,.04+H])for(const b of [-1,1]){add(new THREE.BoxGeometry(W,.04,.04),yel,0,yy,b*D/2);add(new THREE.BoxGeometry(.04,.04,D),yel,b*W/2,yy,0);}
+  for(const [sx,sz,ry,L] of [[0,D/2,0,W],[0,-D/2,0,W],[W/2,0,Math.PI/2,D],[-W/2,0,Math.PI/2,D]]){const m=new THREE.Mesh(new THREE.PlaneGeometry(L-.05,H*.44),mesh);m.position.set(sx,.06+H*.24,sz);m.rotation.y=ry;m.renderOrder=2;grp.add(m);}
+  add(new THREE.BoxGeometry(W+.02,.03,D+.02),yel,0,.055+H,0);
+  // tanks on top: green pair and a red one, domed, with brass valves
+  const T=.04+H+.02;for(const [tx,tz,r,h,m] of [[-.12,.04,.11,.26,grn],[.12,.04,.1,.24,grn],[0,-.09,.1,.22,red]]){add(new THREE.CylinderGeometry(r,r,h,18),m,tx,T+h/2,tz);const d=add(new THREE.SphereGeometry(r,18,10,0,Math.PI*2,0,Math.PI/2),m,tx,T+h,tz);
+    add(new THREE.CylinderGeometry(.022,.022,.07,10),brs,tx,T+h+r*.8+.03,tz);add(new THREE.CylinderGeometry(.035,.035,.02,10),blk,tx,T+h+r*.8+.07,tz);}
+  add(new THREE.CylinderGeometry(.05,.05,.13,14),wht,-.2,T+.065,-.12);
+  add(new THREE.TorusGeometry(.13,.014,8,20,Math.PI),org,0,T+.2,.12,0,0);
+  add(new THREE.BoxGeometry(.06,.05,.05),blk,.03,T+.08,.17);
+  // antenna with a small cross bar and a red tip
+  add(new THREE.CylinderGeometry(.009,.009,.3,6),blk,0,T+.36,-.09);add(new THREE.BoxGeometry(.08,.012,.012),blk,0,T+.4,-.09);
+  add(new THREE.SphereGeometry(.018,8,6),gm('bmtip',()=>new THREE.MeshBasicMaterial({color:0xff3a22,toneMapped:false})),0,T+.52,-.09);
   return grp;}
 function buildProp(g,[t,x,y,w,h],i){
   const M3=R3.mats,cx=x+w/2,cz=y+h/2,v=h>w,B=(mats,px,py,pz,sx,sy,sz)=>addBox(g,mats,px,py,pz,sx,sy,sz,null);
