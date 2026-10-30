@@ -6,7 +6,7 @@
 
 - 《Rainbow Six Siege – The Board Game》的網頁版，可對戰電腦、新手教學、自訂房間連線、排名戰、成就、商店。
 - 線上版：https://r6-boardgame.github.io/ （GitHub Pages，`main` 分支根目錄直接發佈，推上去就上線）。
-- 目前版本 v95（見 `git log`）。
+- 目前版本 v96（見 `git log`）。
 - 使用者要求：PR 做完、測完就直接合併上線，不用再問。
 
 ## 檔案結構
@@ -50,7 +50,7 @@
 1. 直接改 `index.html`（從現在起它就是唯一原始碼）。
 2. 本機測試：`python3 -m http.server` 後開 `http://localhost:8000/`。至少測兩種尺寸：**手機直式 390×844** 與 **桌機 1400×900**。
 3. 自動化測試建議用 Playwright：開頁 → `#t-pve` 進入對戰電腦 → 可在 `page.evaluate` 裡直接呼叫全域函式（例如 `WZ.step=2;renderWiz()` 跳到選地圖），截圖確認並收集 `pageerror`，必須沒有錯誤。
-4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v95）。
+4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v96）。
 
 ### 舊流程說明（只是背景，不需要照做）
 
@@ -109,6 +109,7 @@
 - v93：商店技能詳情框重排（`skDet`：`.shDBox.shKD` 改成直排卡片，標籤列 `.shKDm` 顯示次數、行動點、職業限制，說明按〔被動〕〔行動〕分段）。
 - v94：軟牆彈孔改成真的洞：`holeWall` 用細柱子圍出不規則開口（`rng(hash)` 決定形狀），邊緣碎片、地上碎屑；2D 也畫出破口。`los`／`wallSolid` 把 `c.hole` 的軟牆當成可看穿（跟打開的黑鏡一樣），所以隔著彈孔看得到、打得到（仍算輕型掩護 1）。
 - v95：Alibi 改成 Prisma 投影分身（佈防／行動，2 次）：`GT.alibi` 3 格內空格，放下後進 `pdir` 模式選 8 方向（`G.pdir` 存 `pid`，`pdirG()`）。投影是 `type:'prisma'` 道具，`projU(g)` 做出跟本體一樣的假幹員給 `shootables`／`shootUnit`（`t.proj`：中彈就 `prismaBreak`，不扣血）。進攻方看得到就擋路（`reach`），穿過、C4、破片／衝擊（`GSTR.prisma`）、集束、闊刀、榴彈、EMP、盾牌猛擊都會打散。3D 用 `unit3D(projU(g))`＋複製材質，自己半透明（`figAlpha`）、敵人看實心；消失用 `prismaVanish` 原姿勢閃爍淡出不倒下。拿掉舊的開場多 2 個誘餌。
+- v96：鏡頭少轉：用道具／技能不再切特寫（破片手榴彈 `fragShow` 只出卡片不動鏡頭），進射擊模式不再 `aimCam` 轉向目標，閒置 25 秒自動旋轉拿掉。射擊特寫預設第一人稱（`CINE.mode='fp'`）：開槍者模型隱藏（`R3.cineSelf`），視線上擋住目標的牆與家具用 `cineClear` 淡出，但隔牆射擊穿過的軟牆／路障保留（`keep`）。
 
 ## 尚未完成 / 等使用者回覆
 

@@ -1973,7 +1973,7 @@ body.hasClk #tracker .seg{display:none}
 
   <div class="layout">
     <section class="boardwrap">
-      <div class="boardframe" id="frame"><canvas id="board" aria-label="戰術地圖平面圖"></canvas><div class="hud3d" id="hud3d" hidden><button id="view-eye" aria-label="切換視角"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1.5 12S5.5 4.5 12 4.5 22.5 12 22.5 12 18.5 19.5 12 19.5 1.5 12 1.5 12Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.6" fill="currentColor"/></svg><span id="eyeLab">斜角</span></button><button id="view-angle">斜角視角</button><button id="view-top">俯視</button><button id="view-wall">牆：全高</button><button id="view-focus">聚焦幹員</button><button id="view-q" hidden>畫質：高</button><button id="view-cine">射擊特寫：肩後</button><button id="view-in" aria-label="放大">＋</button><button id="view-out" aria-label="縮小">－</button><span class="hint3d">拖曳旋轉 · 右鍵平移 · 滾輪縮放 · 方向鍵旋轉</span></div><div class="coord" id="coord"></div><div class="tutbox" id="tutbox" hidden></div><div class="title" id="title"><div class="tbg" aria-hidden="true"></div><div class="tplayer" id="tplayer"></div><div class="tlogo"><img class="r6" alt="Tom Clancy's Rainbow Six Siege"><div class="lg"><img class="six" alt="6"><div><small>THE BOARDGAME</small><h1>虹彩六號<br>戰術桌遊</h1></div></div></div><nav class="tmenu" id="tmenu"></nav></div><div id="banner" class="banner" hidden></div></div>
+      <div class="boardframe" id="frame"><canvas id="board" aria-label="戰術地圖平面圖"></canvas><div class="hud3d" id="hud3d" hidden><button id="view-eye" aria-label="切換視角"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1.5 12S5.5 4.5 12 4.5 22.5 12 22.5 12 18.5 19.5 12 19.5 1.5 12 1.5 12Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.6" fill="currentColor"/></svg><span id="eyeLab">斜角</span></button><button id="view-angle">斜角視角</button><button id="view-top">俯視</button><button id="view-wall">牆：全高</button><button id="view-focus">聚焦幹員</button><button id="view-q" hidden>畫質：高</button><button id="view-cine">射擊特寫：第一人稱</button><button id="view-in" aria-label="放大">＋</button><button id="view-out" aria-label="縮小">－</button><span class="hint3d">拖曳旋轉 · 右鍵平移 · 滾輪縮放 · 方向鍵旋轉</span></div><div class="coord" id="coord"></div><div class="tutbox" id="tutbox" hidden></div><div class="title" id="title"><div class="tbg" aria-hidden="true"></div><div class="tplayer" id="tplayer"></div><div class="tlogo"><img class="r6" alt="Tom Clancy's Rainbow Six Siege"><div class="lg"><img class="six" alt="6"><div><small>THE BOARDGAME</small><h1>虹彩六號<br>戰術桌遊</h1></div></div></div><nav class="tmenu" id="tmenu"></nav></div><div id="banner" class="banner" hidden></div></div>
       <div class="legend" id="legend"></div>
     </section>
     <aside class="panel" id="panel"></aside>
@@ -4426,7 +4426,7 @@ const FGSVG='<svg viewBox="0 0 40 40"><rect x="17" y="3" width="9" height="7" rx
 async function fragShow(u,a,pool,idx,r,ctr){
   if(!CINE.on||document.hidden||a===u||!u.alive){const dice=[...pool].map((ch,i)=>`<i class="die" style="background:${DIEC.Y}">${DIE.Y[idx[i]]}</i>`).join('');
     await rollDice3D(pool,idx,`<small>破片手榴彈 → ${OPS[a.op].name}${ctr?' · 正中':' · 波及'}</small><span>${dice} = ${r}</span><b class="${r?'hit':'miss'}">${r?r+' 傷':'未受傷'}</b>`,G.ai);diceHide();return;}
-  const fast=!!G.ai,cine=await shotCam(u,a);if(!cine)aimCam(u,[a],1);const si=await shotIntro(u,a,fast,cine);
+  const fast=!!G.ai,si=await shotIntro(u,a,fast,false);
   const el=si&&$('.sintro:not(.out)');
   if(el){el.classList.add('fg');const A=el.querySelector('.siA'),T=el.querySelector('.siT'),bb=e=>({left:e.offsetLeft,top:e.offsetTop,width:e.offsetWidth,height:e.offsetHeight}),ra=bb(A),rt=bb(T);
     const x0=ra.left+ra.width*.62,y0=ra.top+ra.height*.32,x1=rt.left+rt.width*.5,y1=rt.top+rt.height*.62,hy=Math.min(y0,y1)-Math.max(60,innerHeight*.16);
@@ -4989,8 +4989,7 @@ async function onCell(x,y){
   }
   G.mode='move';render();
 }
-function setMode(m){G.mode=G.mode===m?'move':m;render();
-  if(G.phase==='play'&&G.mode!=='move'&&G.sel&&G.sel.x>=0){const L=curTargets();if(Array.isArray(L)&&L.length&&L.length<=40&&G.mode==='shoot')aimCam(G.sel,L,1);}}
+function setMode(m){G.mode=G.mode===m?'move':m;render();}
 async function doCharge(u,x,y){useAct(u,'tactical');note(u,'爆破炸藥');G.charges--;render();await chargePlant3D(u,x,y,G.ai?650:950);destroyCell(x,y);log(`${nm(u)} 引爆爆破炸藥`,'ka');render();await sleep(G.ai?150:60);await afterAct(u);}
 
 // ---------- rendering ----------
@@ -6885,7 +6884,7 @@ function gadget3D(gd){
   return grp;
 }
 // ---------- shot cinematics: over-the-shoulder close-up (first person when a wall is behind) ----------
-const CINE={on:true,mode:'tp'};
+const CINE={on:true,mode:'fp'};
 async function shotCam(sh,t){
   if(!R3||!CINE.on||document.hidden)return false;
   const c=R3.controls,cam=R3.camera,V3=THREE.Vector3;
@@ -6894,7 +6893,12 @@ async function shotCam(sh,t){
   const right=new V3(-dir.z,0,dir.x);
   aimPose(sh,S,T);
   let p,look;
-  if(CINE.mode==='fp'){p=S.clone().addScaledVector(dir,.32);p.y=1.12;look=T.clone();look.y=.75;}
+  if(CINE.mode==='fp'){p=S.clone().addScaledVector(dir,.32);p.y=1.12;look=T.clone();look.y=.75;
+    // from the shooter's eyes: hide the shooter, fade whatever stands between the eyes and the target, except the wall being shot through
+    R3.cineSelf=sh.id;const f=R3.figs[sh.id];if(f)f.grp.visible=false;
+    const tc=new THREE.PerspectiveCamera(cam.fov,cam.aspect,.1,100);tc.position.copy(p);tc.lookAt(look);tc.updateMatrixWorld();
+    const keep=new Set(lineCells(sh.x,sh.y,t.x,t.y).filter(([x,y])=>{const c=cell(x,y);return c&&!c.breach&&(c.t==='soft'||c.t==='bar');}).map(q=>q+''));
+    cineClear(p,tc,.6,[.15,.5,.85,1.3].map(y=>T.clone().setY(y)).concat([-.25,.25].map(o=>T.clone().addScaledVector(right,o).setY(.8))),keep);}
   else{
     // behind the shooter's right shoulder, pulled back until the shooter sits bottom-left and the target top-right
     const tc=new THREE.PerspectiveCamera(cam.fov,cam.aspect,.1,100),at=y=>v=>v.clone().setY(y);
@@ -6920,9 +6924,9 @@ async function shotCam(sh,t){
   R3.cine=true;R3.cineGoal={p,t:look};flyTo(p,look);await sleep(G.ai?600:800);return true;
 }
 // fade out walls and props between the camera and the two fighters for the close-up
-function cineClear(P,tc,near,pts){
+function cineClear(P,tc,near,pts,keep){
   const fru=new THREE.Frustum().setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(tc.projectionMatrix,tc.matrixWorldInverse)),hid=R3.cineHid||(R3.cineHid=[]),box=new THREE.Box3(),ray=new THREE.Ray(),hit=new THREE.Vector3();
-  for(const o of R3.staticG.children){if(!o.visible||o.isSprite)continue;
+  for(const o of R3.staticG.children){if(!o.visible||o.isSprite)continue;if(keep&&o.userData.cell&&keep.has(o.userData.cell+''))continue;
     box.setFromObject(o);if(box.max.y<.12)continue;
     let hide=box.clone().expandByScalar(.3).containsPoint(P)||(box.distanceToPoint(P)<near&&fru.intersectsBox(box));
     for(const q of pts){if(hide)break;const d=q.clone().sub(P),L=d.length();ray.set(P,d.divideScalar(L));if(ray.intersectBox(box,hit)&&hit.distanceTo(P)<L-.3)hide=true;}
@@ -6936,7 +6940,7 @@ function aimPose(sh,S,T){
   envTune(F.grp,.5);F.grp.remove(F.body);f.grp.add(F.body);
   F.body.rotation.y=Math.atan2(T.x-S.x,T.z-S.z)-(POSE[pose].twist||0);f.body.visible=false;f.aimBody=F.body;
 }
-function shotCamEnd(){if(!R3||!R3.cineSave)return;const s=R3.cineSave;R3.cineSave=null;R3.cine=false;
+function shotCamEnd(){if(!R3||!R3.cineSave)return;const s=R3.cineSave;R3.cineSave=null;R3.cine=false;R3.cineSelf=null;
   (R3.cineHid||[]).forEach(h=>{if(h.ms)h.ms.forEach(m=>{(Array.isArray(m.material)?m.material:[m.material]).forEach(x=>x.dispose());m.material=m.userData.ghost;delete m.userData.ghost;});else h.visible=true;});R3.cineHid=[];
   for(const k in R3.figs){const f=R3.figs[k];if(f.aimBody){f.grp.remove(f.aimBody);f.aimBody=null;f.body.visible=true;}}
   flyTo(s.p,s.t);}
@@ -7181,7 +7185,7 @@ function tick3D(){
   if(R3.hero&&R3.hero.visible){R3.camGoal=null;const sw=Math.sin(t*.12);const ph=R3.camera.aspect<1;R3.camera.position.set(ph?4.9+sw*.5:6.6+sw*.9,ph?1.9:1.15,ph?23:19.2);R3.controls.target.set(ph?4.3:3.2+sw*.3,ph?.15:1.1,ph?14.2:13.6);}
   if(R3.intro){R3.camGoal=null;introStep(Math.max(0,Math.min(1,(performance.now()-R3.intro.t0)/R3.intro.dur)));}
   if(R3.camGoal){const g=R3.camGoal,k=1-Math.pow(.002,rdt);R3.camera.position.lerp(g.p,k);R3.controls.target.lerp(g.t,k);if(R3.camera.position.distanceTo(g.p)<.01&&R3.controls.target.distanceTo(g.t)<.01)R3.camGoal=null;}
-  {const idle=G&&!G.busy&&!R3.cine&&!R3.camGoal&&G.phase==='play'&&!document.hidden&&performance.now()-(R3.idleT||0)>25000;if(idle!==R3.controls.autoRotate){R3.controls.autoRotate=idle;R3.controls.autoRotateSpeed=.5;}}
+  if(R3.controls.autoRotate)R3.controls.autoRotate=false;
   if(G&&G.phase!==R3.camPhase){const was=R3.camPhase;R3.camPhase=G.phase;if(G.phase==='setup')setTimeout(()=>R3&&introCam(),60);else if(was==='setup'&&G.phase==='play')setTimeout(playCam,80);}
   // whoever is acting (our selected unit, or a visible enemy taking its turn) gets the camera
   if(G&&G.phase==='play'&&!G.over&&!R3.cine){const u=G.active||G.sel,k=u&&u.alive&&u.x>=0&&(u.side===G.player||pub(u))?u.id:null;const pk=k&&u.x+','+u.y;if(k!==R3.followId||(k&&pk!==R3.followPos)){R3.followId=k;R3.followPos=pk;if(k&&R3.camPhase==='play')setTimeout(()=>followCam(u),40);}}
@@ -7221,7 +7225,7 @@ function update3D(){
     if(u.alive&&seen)f.seenDead=true;
     const show=u.alive?seen:(f.seenDead||G.over);
     if(!f.grp.visible&&show)f.placed=false;
-    f.grp.visible=show&&!(R3.cardHide&&R3.cardHide.has(u.id));
+    f.grp.visible=show&&!(R3.cardHide&&R3.cardHide.has(u.id))&&R3.cineSelf!==u.id;
     f.target.set(u.x+.5,u.alive&&cell(u.x,u.y)?(cell(u.x,u.y).stand||0):0,u.y+.5);
     if(u.fd&&(u.fd[0]||u.fd[1]))f.face=Math.atan2(u.fd[0],u.fd[1]);else if(f.last&&(f.last[0]!==u.x||f.last[1]!==u.y))f.face=Math.atan2(u.x-f.last[0],u.y-f.last[1]);
     f.last=[u.x,u.y];f.dead=!u.alive;
