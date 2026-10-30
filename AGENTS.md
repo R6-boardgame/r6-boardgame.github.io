@@ -6,7 +6,7 @@
 
 - 《Rainbow Six Siege – The Board Game》的網頁版，可對戰電腦、新手教學、自訂房間連線、排名戰、成就、商店。
 - 線上版：https://r6-boardgame.github.io/ （GitHub Pages，`main` 分支根目錄直接發佈，推上去就上線）。
-- 目前版本 v101（見 `git log`）。
+- 目前版本 v102（見 `git log`）。
 - 使用者要求：PR 做完、測完就直接合併上線，不用再問。
 
 ## 檔案結構
@@ -116,6 +116,7 @@
 
 - v100：咖啡館照真實一樓藍圖重做（37×29 格，只有一樓，地圖欄位 `tl:1`）：小麵包店、麵包店、紅樓梯／紅走廊、衣帽間、正門、大廳、吧台、用餐區、廚房（含 k3）、出餐區（含咖啡吧、洗碗區）、冷凍庫（地板活門）、準備室、VIP 室、VIP 走廊、車庫。黃色可破壞牆→軟牆，藍圖深灰的內窗（衣帽間、準備室、冷凍庫）→窗。材質照實景俯視圖：`kafeTEX`（kdot 米色黑點磚、kred 紅地毯、klobby 米色大磚深色格線、kwhite 廚房白磚、kgrey 出餐區淡灰磚、kdark 冷凍庫深褐磚、kprep、kcoat、kentry 正門地毯、kvip、kbar、kbeige、kwood、kgarage），牆沿用 `bankWallMats`。`assignMats` 會讓同一個連通區域裡後面的標籤蓋掉前面的材質，所以大廳那一大片的標籤都用 klobby，局部改用 `matRects`。新家具：`kcounter` 不鏽鋼工作台、`rtable` 圓咖啡桌配兩張紅椅、`xmas` 聖誕樹。炸彈點與人質用 `sitePool` 每場隨機（小麵包店、麵包店、廚房、準備室、出餐區、冷凍庫、衣帽間、正門、VIP 室裡共用一面牆的兩間）。咖啡館加入 `ONLINE_MAPS`。
 - v101：俱樂部會所照真實一樓藍圖重做（42×32 格，只有一樓，樓梯只放模型）。新格子字元 `o`＝沒有門板的開口（`c.gap`）：可以走，但 `assignMats`／`randSites` 的房間填色不會穿過去，所以酒吧和舞台、走廊和酒吧這種大開口仍算不同房間。材質照實景照片：`clubTEX`（chstrip 紫色舞廳地毯、chpool 桃紅、chbar 深色石磚、chstage 黑木、chkitchen 紅磚瓦、chfridge 花紋鋼板、chgarage 油漬水泥…），牆用 `clubWallMats`（紅磚；可破壞牆下半是深色木護牆板）。新家具 `CLUBP`：`pole` 鋼管舞台（可站）、`dj` 台、`stage` 舞台平台（可站）、`cbars` 彩條投影幕、`bear` 熊、`bike` 機車、`stall` 廁所隔間、`meat` 冷凍庫掛肉、`neon` 霓虹招牌（第 6 欄 bar／pink／blue）、`stool` 吧台椅；3D 在 `clubProp`、2D 在 `drawClubProp`。炸彈點從 `sitePool` 隨機（撞球間太窄不列入）。加入 `ONLINE_MAPS`。
+- v102：手機（觸控或短邊 < 700px）地板貼圖上限從 4096px 降到 2304px（`floorCanvas` 的 `cap`）：新的大地圖地板 4096px 又上傳兩次（顏色＋凹凸），iPhone 記憶體不夠，進遊戲地圖一片空白。`buildStatic0` 重建時也一起釋放 `bumpMap`／`roughnessMap`（之前每次牆被打掉重建都會漏掉這兩張）。
 
 ## 尚未完成 / 等使用者回覆
 
