@@ -1843,6 +1843,7 @@ body.hasClk #tracker .seg{display:none}
 .cpSw button.on{background:var(--accent)!important;color:#1b1305!important}
 .cpStage{position:relative;flex:1 1 auto;min-height:200px;overflow:hidden;margin-top:-44px}
 .cpArt{position:absolute;left:50%;top:34px;height:calc(100% + 120px);max-height:820px;transform:translateX(-46%);pointer-events:none;-webkit-mask-image:linear-gradient(#000 60%,transparent 88%);mask-image:linear-gradient(#000 60%,transparent 88%)}
+.cpArt.cw{left:0;top:40px;width:100%;height:calc(100% - 40px);max-height:none;transform:none;object-fit:contain;object-position:62% 100%;-webkit-mask-image:linear-gradient(#000 82%,transparent 100%);mask-image:linear-gradient(#000 82%,transparent 100%)}
 .cpBig{position:absolute;right:-6px;top:52px;font-family:var(--display);font-size:92px;line-height:.8;color:#ffffff0d;writing-mode:vertical-rl;pointer-events:none}
 .cpId{position:absolute;left:14px;top:56px;z-index:3;max-width:60%}
 .cpPen{display:grid!important;place-items:center;width:28px;height:24px;border:1px solid var(--ln)!important;background:#0b1016d8!important;color:#8b9cad!important;margin-bottom:4px}
@@ -8556,7 +8557,7 @@ function renderCop(){const el=$('#cop');if(!el||el.hidden)return;const cs=copAll
   el.innerHTML=`<div class="cpBox">
   <div class="cpTop"><button class="cpBack" id="cpBack" aria-label="返回">‹</button><div class="cpTt"><small>CUSTOM OPERATOR</small><h2>自訂幹員</h2></div>
     <div class="cpSw" role="tablist">${COPN.map((n,i)=>`<button role="tab" data-ci="${i}" class="${i===CP.i?'on':''}" aria-selected="${i===CP.i}">${n}</button>`).join('')}</div></div>
-  <div class="cpStage"><img class="cpArt" src="${copArt(c,CP.i)}" alt=""><div class="cpBig">${c.w?WPN[c.w].en:'RECRUIT'}</div>
+  <div class="cpStage"><img class="cpArt${c.w&&WART[c.w]?' cw':''}" src="${copArt(c,CP.i)}" alt=""><div class="cpBig">${c.w?WPN[c.w].en:'RECRUIT'}</div>
     <div class="cpId">${CP.edit?`<div class="cpEd"><input id="cpNm" value="${esc(c.nm)}" autocomplete="off" aria-label="幹員名字"><span id="cpCnt">${copW(c.nm)}/12</span></div>`
       :`<button class="cpPen" id="cpPen" aria-label="改名">${PENI}</button><div class="cpNm">${esc(c.nm)}</div>`}<span class="cpTag${c.w?' w':''}">${c.w?WPN[c.w].t:'新進人員'}</span>
       <div class="cpKd"><div><b>${c.k}</b><span>擊殺</span></div><div><b>${c.sv}</b><span>存活場數</span></div></div></div>
