@@ -642,7 +642,7 @@ body[data-scr="setup"] header.top{visibility:hidden}
 .pcard .pav{width:52px;height:52px;object-fit:cover;background:#10171e;border:1px solid rgba(255,255,255,.2)}
 .pinfo{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}.pinfo b{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
 .prank{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#c7d1da}.pgear{font-style:normal;opacity:.7;font-size:18px;padding-right:10px}
-.ttopr{position:absolute;top:max(16px,env(safe-area-inset-top));right:max(18px,env(safe-area-inset-right));z-index:3;display:flex;gap:8px;align-items:center}
+.ttopr{position:absolute;top:calc(max(16px,env(safe-area-inset-top)) + 50px);right:max(18px,env(safe-area-inset-right));z-index:3;display:flex;gap:8px;align-items:center}
 .ttopr .online{position:static}
 .tlang{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;background:rgba(12,18,24,.85);border:1px solid var(--line);font-size:13px}
 .lsel{background:#0f151b;color:#e6edf2;border:1px solid #2c3a47;padding:4px 6px;font:inherit}
@@ -1832,7 +1832,7 @@ body.hasClk #tracker .seg{display:none}
  .tbtn{padding-left:52px!important}
  .tbtn{min-height:70px;padding:10px 46px!important}.tbtn b{font-size:22px!important}.tbtn::after{right:40px}
  .tplayer{left:12px;top:max(10px,env(safe-area-inset-top))}.pcard{min-width:0;padding:5px 10px 5px 5px}.pcard .pav{width:40px;height:40px}.pinfo b{font-size:15px;max-width:130px}
- .ttopr{top:max(10px,env(safe-area-inset-top));right:10px;flex-direction:column;align-items:flex-end;gap:4px}
+ .ttopr{top:calc(max(10px,env(safe-area-inset-top)) + 44px);right:10px;flex-direction:column;align-items:flex-end;gap:4px}
  .tutbox{left:50%!important;width:calc(100% - 20px)!important;top:max(98px,calc(env(safe-area-inset-top) + 90px))!important}}
 
 /* v54: stunned operator in the squad bar */
@@ -5031,10 +5031,20 @@ function autoDefSetup(withGadgets){
   }
 }
 // v104: each bomb site holds a 3D bomb on its middle free cell; that cell is cover nobody can stand on
-function placeBombs(){G.bombC={};for(const s of ['A','B']){const L=allCells().filter(([x,y])=>cell(x,y).site===s&&!cell(x,y).obst);if(L.length<2)continue;
+function placeBombs(){G.bombC={};let ok=true;for(const s of ['A','B']){const L=allCells().filter(([x,y])=>cell(x,y).site===s&&!cell(x,y).obst);if(L.length<2)continue;
   const mx=L.reduce((a,c)=>a+c[0],0)/L.length,my=L.reduce((a,c)=>a+c[1],0)/L.length;const busy=new Set();for(const p of G.map.props||[])for(const [a,b] of propCells(G.map,p))busy.add(b*G.W+a);
-  L.sort((a,b)=>busy.has(a[1]*G.W+a[0])-busy.has(b[1]*G.W+b[0])||Math.hypot(a[0]-mx,a[1]-my)-Math.hypot(b[0]-mx,b[1]-my)||a[1]-b[1]||a[0]-b[0]);
-  const [x,y]=L[0],c=cell(x,y);c.bomb=1;c.obst=true;c.stand=0;c.tall=false;G.bombC[s]=[x,y];}}
+  // v106: never on a cell that would block a path: next to a doorway/window, or whose removal splits the walkable floor around it
+  const walk=(x,y)=>{const c=cell(x,y);return !!c&&c.t!=='out'&&!blocks(c)&&!(c.obst&&!c.stand);},
+    nearDoor=(x,y)=>adj4(x,y).some(([a,b])=>{const c=cell(a,b);return c&&(c.kind||c.gap||c.wasBar);}),
+    splits=(x,y)=>{const nb=adj4(x,y).filter(([a,b])=>walk(a,b));if(nb.length<2)return nb.length===0;const seen=new Set([y*G.W+x,nb[0][1]*G.W+nb[0][0]]),q=[nb[0]];
+      while(q.length){const [i,j]=q.shift();for(const [a,b] of adj4(i,j)){const k=b*G.W+a;if(!seen.has(k)&&walk(a,b)){seen.add(k);q.push([a,b]);}}}return nb.some(([a,b])=>!seen.has(b*G.W+a));},
+    bad=new Set(L.filter(([x,y])=>nearDoor(x,y)||splits(x,y)).map(([x,y])=>y*G.W+x));
+  // every site cell would block: use a free cell just beside the site in the same room instead
+  if(L.every(([x,y])=>bad.has(y*G.W+x))){const [cx,cy]=L[0],ex=allCells().filter(([x,y])=>{const c=cell(x,y);return c.indoor&&walk(x,y)&&!c.obst&&!c.site&&!c.gap&&!c.kind&&Math.hypot(x-mx,y-my)<=3.2&&los(cx,cy,x,y,false,true)&&!nearDoor(x,y)&&!splits(x,y);});L.push(...ex);}
+  L.sort((a,b)=>bad.has(a[1]*G.W+a[0])-bad.has(b[1]*G.W+b[0])||busy.has(a[1]*G.W+a[0])-busy.has(b[1]*G.W+b[0])||Math.hypot(a[0]-mx,a[1]-my)-Math.hypot(b[0]-mx,b[1]-my)||a[1]-b[1]||a[0]-b[0]);
+  const [x,y]=L[0],c=cell(x,y);if(bad.has(y*G.W+x)||(!c.site&&(nearDoor(x,y)||splits(x,y))))ok=false;c.bomb=1;c.obst=true;c.stand=0;c.tall=false;G.bombC[s]=[x,y];}return ok;}
+// random sites are re-rolled until both bombs sit where they block nothing
+function placeBombsSafe(){for(let i=0;i<30;i++){if(placeBombs()||!G.map.sitePool)return;for(const [x,y] of Object.values(G.bombC)){const c=cell(x,y);c.bomb=0;c.obst=false;}randSites(G.grid,G.map);}}
 function placeHostage(){const s=allCells().filter(([x,y])=>cell(x,y).site==='A');const c=s[Math.floor(s.length/2)];G.hostage={x:c[0],y:c[1],by:null};}
 function placeAttackers(zi){
   const z=G.map.spawns[zi];G.spawn=zi;alive('A').forEach((u,i)=>{u.x=z.cells[i][0];u.y=z.cells[i][1];});
@@ -5058,7 +5068,7 @@ function newGame(){
   dpicks.forEach((op,i)=>G.units.push(mkUnit(op,'D',i)));
   if(dpicks.includes('rook'))alive('D').forEach(u=>{u.max++;u.hp++;});
   m.cams.forEach(([x,y])=>G.gadgets.push({type:'cam',x,y,side:'D',alive:true,fixed:true}));
-  if(G.mission==='hostage')placeHostage();else placeBombs();
+  if(G.mission==='hostage')placeHostage();else placeBombsSafe();
   if(cfg.side==='A')autoDefSetup(true);
   if(cfg.side==='D')placeAttackers(Math.floor(Math.random()*m.spawns.length));
   G.sel=alive(cfg.side)[0];
@@ -8459,10 +8469,11 @@ const ECO=(()=>{let e=null;try{e=JSON.parse(localStorage.getItem(EKEY)||'null');
 function ecoSave(){ECO.ts=Date.now();try{localStorage.setItem(EKEY,JSON.stringify(ECO));}catch(e){}gaPush();}
 // ---- Google account (public site only): renown, operators, mastery, achievements and friends live in the cloud ----
 var GA={u:null,busy:false,ok:false,err:''};let gaT=0;
-function gaPack(){const {nick,avatar,usePhoto}=ME;return{v:1,ts:Date.now(),eco:JSON.parse(JSON.stringify(ECO)),got:AS.got,n:AS.n,fr:FR.list.slice(0,200),prof:{nick,avatar,usePhoto}};}
-function gaPush(now){if(!GA||!GA.u||!GA.ok||!window.R6FB)return;clearTimeout(gaT);gaT=setTimeout(()=>{R6FB.save(gaPack()).catch(e=>{GA.err='雲端存檔失敗，稍後會再試。';});},now?0:1500);}
+// v106: Firestore refuses nested arrays (custom operator dice are arrays of arrays), so the economy travels as one JSON string
+function gaPack(){const {nick,avatar,usePhoto}=ME;return JSON.parse(JSON.stringify({v:2,ts:Date.now(),ecoJ:JSON.stringify(ECO),got:AS.got,n:AS.n,fr:FR.list.slice(0,200),prof:{nick,avatar,usePhoto:!!usePhoto}}));}
+function gaPush(now){if(!GA||!GA.u||!GA.ok||!window.R6FB)return;clearTimeout(gaT);gaT=setTimeout(()=>{R6FB.save(gaPack()).then(()=>{if(GA.err){GA.err='';try{renderSettings();}catch(x){}}}).catch(e=>{console.warn('cloud save',e);GA.err='雲端存檔失敗，稍後會再試。';try{renderSettings();}catch(x){}clearTimeout(gaT);gaT=setTimeout(()=>gaPush(true),30000);});},now?0:1500);}
 // first link on this device: keep the better of both; afterwards the newer save wins, but owned operators and mastery never go backwards
-function gaMerge(d,first){const e=d.eco||{},newer=(e.ts||0)>(ECO.ts||0),lrn=ECO.rn|0,lsk=(ECO.sk||[]).slice(),lown=ECO.own.slice(),lmx=Object.assign({},ECO.mx),ltut=ECO.tut|0,lttl=ECO.title;
+function gaMerge(d,first){let e=d.eco||{};if(d.ecoJ)try{e=JSON.parse(d.ecoJ)||{};}catch(x){}const newer=(e.ts||0)>(ECO.ts||0),lrn=ECO.rn|0,lsk=(ECO.sk||[]).slice(),lown=ECO.own.slice(),lmx=Object.assign({},ECO.mx),ltut=ECO.tut|0,lttl=ECO.title;
   if(newer)Object.assign(ECO,e);
   ECO.own=[...new Set([...(e.own||[]),...lown])];ECO.sk=[...new Set([...(e.sk||[]),...lsk])];ECO.mx=Object.assign({},e.mx||{});for(const k in lmx)ECO.mx[k]=Math.max(ECO.mx[k]|0,lmx[k]|0);
   ECO.tut=Math.max(ltut,e.tut|0);if(first)ECO.rn=Math.max(lrn,e.rn|0);if(!ECO.title)ECO.title=lttl||e.title||'';
