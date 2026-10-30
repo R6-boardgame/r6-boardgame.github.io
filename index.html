@@ -4879,7 +4879,7 @@ async function botCover(u){if(!G.bot||!u.alive||G.over||u.mp<=0||u.overwatch)ret
   if(!best)return;await BH(u,'step');for(const [x,y] of pathFrom(m,best.x,best.y)){if(!(await step(u,x,y)))break;}}
 // the ranked queue gives up on finding a person after 30 seconds and sends in the bot
 function rankBot(){if(SCREEN!=='queue'||RQ.busy)return;rankLeaveQueue();RQ.busy=false;
-  const side=Math.random()<.5?'A':'D',ks=Object.keys(MAPS),mk=ks[Math.floor(Math.random()*ks.length)],m=MAPS[mk],en=side==='A'?'D':'A';
+  const side=Math.random()<.5?'A':'D',ks=ONLINE_MAPS,mk=ks[Math.floor(Math.random()*ks.length)],m=MAPS[mk],en=side==='A'?'D':'A';
   cfg.map=mk;cfg.side=side;fillPicks(side);SCREEN='game';showMapReveal(mk,side);
   G={map:m,grid:parseMap(m),W:m.rows[0].length,H:m.rows.length,units:[],gadgets:[],reinf:0,round:1,maxRounds:6,phaseIdx:0,phase:'setup',acts:0,active:null,sel:null,mode:'move',defuser:null,over:false,busy:false,ai:false,log:[],moves:[],cur:null,hl:null,player:side,aiSite:Math.random()<.5?'A':'B',fx:null,spawn:null,bot:botMake()};
   copPrep(false);
@@ -7513,7 +7513,7 @@ function netOnGame(d){
   if(d.state&&d.seq>NET.seq&&d.by!==NET.me)netApply(d);
 }
 function netStartGame(guestPicks){if(RQ.q)rankLeaveQueue();SCREEN='game';
-  const ks=Object.keys(MAPS);NET.map=ks[Math.floor(Math.random()*ks.length)];const m=MAPS[NET.map];cfg.map=NET.map;showMapReveal(NET.map,NET.side);
+  const ks=ONLINE_MAPS;NET.map=ks[Math.floor(Math.random()*ks.length)];const m=MAPS[NET.map];cfg.map=NET.map;showMapReveal(NET.map,NET.side);
   G={map:m,grid:parseMap(m),W:m.rows[0].length,H:m.rows.length,units:[],gadgets:[],reinf:0,round:1,maxRounds:6,phaseIdx:0,phase:'setup',acts:0,active:null,sel:null,mode:'move',defuser:null,over:false,busy:false,ai:false,log:[],moves:[],cur:null,hl:null,player:NET.side,aiSite:'A',fx:null,spawn:null,net:true};
   copPrep(false);
   const mine=cfg.picks[NET.side].slice(),theirs=(guestPicks&&guestPicks.length===5)?guestPicks:cfg.picks[NET.side==='A'?'D':'A'].slice();
@@ -8455,6 +8455,7 @@ function loadC3D(){if(typeof C3D_SRC==='undefined'||!window.THREE||!THREE.GLTFLo
     if(R3&&R3.figs){clearFigs();render();}if(typeof renderPortraits==='function')try{renderPortraits();}catch(e){}
   },undefined,e=>console.warn('c3d',op,e));}
 // ---------- PvP: the map is drawn at random and revealed once both players are in ----------
+const ONLINE_MAPS=['bank']; // online and the queue bot only draw maps that are finished
 function showMapReveal(key,side,done){const m=MAPS[key];let el=$('#mreveal');if(el)el.remove();el=document.createElement('div');el.id='mreveal';el.className='mreveal';el.setAttribute('role','dialog');el.setAttribute('aria-label','地圖揭曉');
   el.innerHTML=`<small>配對成功 · 地圖抽選中</small><div class="roll"></div><img alt="${m.name}平面圖" src="${mapThumb(key)}"><div class="meta"><span>任務 <b>炸彈</b></span><span>你是 <b class="${side==='A'?'a':'d'}">${side==='A'?'進攻方':'防守方'}</b></span></div><small style="margin-top:14px">點一下繼續</small>`;
   document.body.appendChild(el);const roll=el.querySelector('.roll'),names=Object.values(MAPS).map(x=>x.name);let i=0,t=0;
