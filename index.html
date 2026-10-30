@@ -1843,6 +1843,7 @@ body.hasClk #tracker .seg{display:none}
 .cpSw button.on{background:var(--accent)!important;color:#1b1305!important}
 .cpStage{position:relative;flex:1 1 auto;min-height:200px;overflow:hidden;margin-top:-44px}
 .cpArt{position:absolute;left:50%;top:34px;height:calc(100% + 120px);max-height:820px;transform:translateX(-46%);pointer-events:none;-webkit-mask-image:linear-gradient(#000 60%,transparent 88%);mask-image:linear-gradient(#000 60%,transparent 88%)}
+.cpArt.cw{left:0;top:40px;width:100%;height:calc(100% - 40px);max-height:none;transform:none;object-fit:contain;object-position:62% 100%;-webkit-mask-image:linear-gradient(#000 82%,transparent 100%);mask-image:linear-gradient(#000 82%,transparent 100%)}
 .cpBig{position:absolute;right:-6px;top:52px;font-family:var(--display);font-size:92px;line-height:.8;color:#ffffff0d;writing-mode:vertical-rl;pointer-events:none}
 .cpId{position:absolute;left:14px;top:56px;z-index:3;max-width:60%}
 .cpPen{display:grid!important;place-items:center;width:28px;height:24px;border:1px solid var(--ln)!important;background:#0b1016d8!important;color:#8b9cad!important;margin-bottom:4px}
@@ -8550,19 +8551,21 @@ const copSpent=c=>c.d.reduce((a,b)=>a+b.reduce((x,d)=>x+CDIEC[d],0),0)-3+(c.arm-
 const copLeft=c=>copTot(c)-copSpent(c);
 // v92 weapons (轉職): the triggers are hidden; after 確認 a newly met one asks whether to switch
 const WSVG=p=>`<svg viewBox="0 0 48 48" fill="none" stroke="#e3aa3e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+// orange-or-better and red dice in one range
+const nOR=L=>L.filter(d=>d==='O'||d==='R').length,nR=L=>L.filter(d=>d==='R').length;
 const WPN={
   mg:{n:'機槍',t:'機槍手',en:'GUNNER',ic:WSVG('<circle cx="24" cy="24" r="16"/><circle cx="24" cy="15" r="3.2"/><circle cx="32.6" cy="21.2" r="3.2"/><circle cx="29.3" cy="31.3" r="3.2"/><circle cx="18.7" cy="31.3" r="3.2"/><circle cx="15.4" cy="21.2" r="3.2"/>'),
-    trig:c=>c.arm>=3&&c.run===0&&c.d.flat().length>=10,fx:'三段距離各多 1 顆免費黃骰。每段骰子上限提高到 7 顆，合計可以超過 10 顆。'},
+    trig:c=>c.arm>=3&&[0,1,2].every(b=>c.d[b].length>=3&&nOR(c.d[b])>=1),fx:'三段距離各多 1 顆免費黃骰。每段骰子上限提高到 7 顆，合計可以超過 10 顆。'},
   sh:{n:'盾牌',t:'盾牌兵',en:'SHIELD',ic:WSVG('<path d="M24 5l15 6v11c0 10-6.5 17-15 21C15.5 39 9 32 9 22V11z"/><path d="M17 20h14"/>'),
-    trig:c=>c.arm>=3,fx:'受到的傷害固定 −2。不能奔跑。',lim:{2:{max:2,noR:1}}},
+    trig:c=>c.arm>=3&&[0,1].every(b=>c.d[b].length>=4&&nOR(c.d[b])>=1),fx:'受到的傷害固定 −2。不能奔跑。',lim:{2:{max:2,noR:1}}},
   sg:{n:'散彈槍',t:'散彈槍手',en:'BREACHER',ic:WSVG('<rect x="17" y="6" width="14" height="26" rx="2"/><path d="M17 32h14v8a2 2 0 0 1-2 2H19a2 2 0 0 1-2-2z"/><path d="M17 14h14"/>'),
-    trig:c=>c.d[0].length>=5,fx:'射擊會打爛路障；隔牆射擊會直接把軟牆打掉（這一槍仍然 −2）。可以用「破壞」拆軟牆。',lim:{2:{max:2,noR:1},1:{max:3}}},
+    trig:c=>c.d[0].length>=5&&nR(c.d[0])>=2,fx:'射擊會打爛路障；隔牆射擊會直接把軟牆打掉（這一槍仍然 −2）。可以用「破壞」拆軟牆。',lim:{2:{max:2,noR:1},1:{max:3}}},
   rf:{n:'步槍',t:'步槍兵',en:'RIFLEMAN',ic:WSVG('<circle cx="24" cy="24" r="13"/><path d="M24 5v8M24 35v8M5 24h8M35 24h8"/><path d="M19 26a5 5 0 1 0 1-6"/><path d="M19 17v4h4"/>'),
-    trig:c=>c.d[1].length>=5,fx:'視野 180°。穩定射擊：每次射擊後可以點一顆骰子重擲。'},
+    trig:c=>c.d[1].length>=5&&nOR(c.d[1])>=3&&c.vis>=4,fx:'視野 180°。穩定射擊：每次射擊後可以點一顆骰子重擲。'},
   sn:{n:'狙擊槍',t:'狙擊手',en:'MARKSMAN',ic:WSVG('<circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="3"/><path d="M24 4v10M24 34v10M4 24h10M34 24h10"/>'),
-    trig:c=>c.d[2].length>=5,fx:'視野距離 14 格。',lim:{0:{max:2,noR:1},1:{max:3}}},
+    trig:c=>c.d[2].length>=5&&nR(c.d[2])>=2,fx:'視野距離 14 格。',lim:{0:{max:2,noR:1},1:{max:3}}},
   smg:{n:'衝鋒槍',t:'衝鋒槍手',en:'RUSHER',ic:WSVG('<path d="M10 14l10 10-10 10"/><path d="M24 14l10 10-10 10"/>'),
-    trig:c=>c.run>=5,fx:'每回合可以開兩槍。第二槍擲一半的骰子（從紅骰開始捨棄，至少留 1 顆）。'}};
+    trig:c=>c.run>=5&&[0,1].every(b=>c.d[b].length>=3&&nOR(c.d[b])>=1),fx:'每回合可以開兩槍。第二槍擲一半的骰子（從紅骰開始捨棄，至少留 1 顆）。'}};
 // class skills (職業技能): one use per round, button in the action panel
 const CSK={mg:{n:'架槍',ap:'1 行動',d:'原地架好機槍，這回合不能再移動。直到你下次行動前，進入視野的每名敵人都會被掃射一次。剩下的行動點可以照常射擊。'},
   rf:{n:'精準射擊',ap:'免費',d:'下一次射擊無視掩護減傷。'},
@@ -8673,7 +8676,7 @@ function renderCop(){const el=$('#cop');if(!el||el.hidden)return;const cs=copAll
   el.innerHTML=`<div class="cpBox">
   <div class="cpTop"><button class="cpBack" id="cpBack" aria-label="返回">‹</button><div class="cpTt"><small>CUSTOM OPERATOR</small><h2>自訂幹員</h2></div>
     <div class="cpSw" role="tablist">${COPN.map((n,i)=>`<button role="tab" data-ci="${i}" class="${i===CP.i?'on':''}" aria-selected="${i===CP.i}">${n}</button>`).join('')}</div></div>
-  <div class="cpStage"><img class="cpArt" src="${copArt(c,CP.i)}" alt=""><div class="cpBig">${c.w?WPN[c.w].en:'RECRUIT'}</div>
+  <div class="cpStage"><img class="cpArt${c.w&&WART[c.w]?' cw':''}" src="${copArt(c,CP.i)}" alt=""><div class="cpBig">${c.w?WPN[c.w].en:'RECRUIT'}</div>
     <div class="cpId">${CP.edit?`<div class="cpEd"><input id="cpNm" value="${esc(c.nm)}" autocomplete="off" aria-label="幹員名字"><span id="cpCnt">${copW(c.nm)}/12</span></div>`
       :`<button class="cpPen" id="cpPen" aria-label="改名">${PENI}</button><div class="cpNm">${esc(c.nm)}</div>`}<span class="cpTag${c.w?' w':''}">${c.w?WPN[c.w].t:'新進人員'}</span>
       <div class="cpKd"><div><b>${c.k}</b><span>擊殺</span></div><div><b>${c.sv}</b><span>存活場數</span></div></div></div>
