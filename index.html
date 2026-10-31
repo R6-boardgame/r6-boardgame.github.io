@@ -2112,7 +2112,7 @@ body.hasClk #tracker .seg{display:none}
       <section id="m-win"><h3><i class="rqI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M9 17h6"/></svg></i>獲勝條件</h3>
         <div class="rqCards">
           <div class="rqCard"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="3.5"/><path d="M5 21c.8-4.3 3.6-6.5 7-6.5s6.2 2.2 7 6.5"/></svg>人質局</h4><p><b class="a">進攻方</b>：把人質帶到戶外撤離點，或殲滅對方。</p><p><b class="d">防守方</b>：撐到時間結束，或殲滅對方。</p></div>
-          <div class="rqCard"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="14" r="6.5"/><path d="M15.5 9.5L18 7M18 7l1-1M19.5 3.5l.5-1M21 5h1"/></svg>炸彈局</h4><p><b class="a">進攻方</b>：在 A 或 B 點裝上拆彈器，裝好後第三個防守階段結束時引爆、炸毀整個房間，或殲滅對方。</p><p><b class="d">防守方</b>：撐到時間結束，或殲滅對方。拆彈器裝好後一定要拆除，殲滅進攻方也一樣。</p></div></div></section>
+          <div class="rqCard"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="14" r="6.5"/><path d="M15.5 9.5L18 7M18 7l1-1M19.5 3.5l.5-1M21 5h1"/></svg>炸彈局</h4><p><b class="a">進攻方</b>：在 A 或 B 點裝上拆彈器，裝好後第三個防守階段結束時完成拆除（進攻方獲勝），或殲滅對方。</p><p><b class="d">防守方</b>：撐到時間結束，或殲滅對方。拆彈器裝好後一定要拆除，殲滅進攻方也一樣。</p></div></div></section>
       <section id="m-acts"><h3>行動一覽</h3>
         <div class="rqDiaRow"><span class="rqDia"><i class="f"></i><i class="f"></i><i></i></span><p><b>畫面上方三個菱形</b>：這個階段還能啟動幾名幹員。每階段最多 3 名，啟動一名就暗一格。</p></div>
         <div class="rqDiaRow"><span class="rqDia ap"><i class="f"></i><i class="f"></i><em>移動 5</em></span><p><b>下方幹員卡的行動點</b>：每名幹員啟動一次有 2 個行動點，射擊、奔跑、破壞、用道具各花 1 點，用掉就暗一格。旁邊的「移動」是這次還能走的格數。</p></div>
@@ -4650,19 +4650,15 @@ async function deployGadget(u,kind,x,y,w){
   render();if(G.phase==='play')await afterAct(u);
 }
 async function escort(u){useAct(u,'obj');G.hostage.known=true;note(u,'護送人質');G.hostage.by=u.id;G.hostage.x=u.x;G.hostage.y=u.y;SFX.alert();bigNote('人質已被帶走','送到任一出生區就能撤離','a',2200);log(`${nm(u)} 帶上人質，送到任一出生區就能撤離`,'ka');render();await afterAct(u);}
-function plant(u){if(u.side===G.player)G._pl=true;useAct(u,'obj');note(u,'安裝拆彈器');G.defuser={x:u.x,y:u.y,timer:3};SFX.siren();bigNote('拆彈器已安裝',`${siteAt(u.x,u.y)} 點 · 第三個防守階段結束時引爆`,'bomb',2600);log(`${nm(u)} 在 ${siteAt(u.x,u.y)} 點安裝了拆彈器！第三個防守階段結束時會引爆整個房間。`,'ka');render();}
+function plant(u){if(u.side===G.player)G._pl=true;useAct(u,'obj');note(u,'安裝拆彈器');G.defuser={x:u.x,y:u.y,timer:3};SFX.siren();bigNote('拆彈器已安裝',`${siteAt(u.x,u.y)} 點 · 第三個防守階段結束時完成拆除`,'bomb',2600);log(`${nm(u)} 在 ${siteAt(u.x,u.y)} 點安裝了拆彈器！第三個防守階段結束時完成拆除，進攻方獲勝。`,'ka');render();}
 function defuse(u){useAct(u,'obj');note(u,'開始拆彈');G.defuser.by=u.id;G.defuser.dleft=2;u.defusing=true;u.overwatch=false;u.ap=0;u.mp=0;u.activated=true;SFX.alert();bigNote('開始拆彈',`${OPS[u.op].name} 要撐一回合，期間不能行動`,'d',2200);log(`${nm(u)} 開始拆除拆彈器，要撐一回合，期間不能移動或射擊`,'kd');if(G.active===u&&u.side===G.player&&!G.ai)endAct(u);render();}
 function dfU(){const d=G&&G.defuser;if(!d||!d.by)return null;const u=G.units.find(x=>x.id===d.by);return u&&u.alive&&u.defusing?u:null;}
-function dfTxt(){const d=G.defuser;if(dfU())return d.timer<=0?`拆彈中 · 倒下就引爆 · 再撐 <b>${d.dleft}</b> 個防守階段`:`拆彈中 · 再撐 <b>${d.dleft}</b> 個防守階段`;return `拆彈器運作中 · 剩 <b>${d.timer}</b> 個防守階段`;}
+function dfTxt(){const d=G.defuser;if(dfU())return d.timer<=0?`拆彈中 · 倒下就完成拆除 · 再撐 <b>${d.dleft}</b> 個防守階段`:`拆彈中 · 再撐 <b>${d.dleft}</b> 個防守階段`;return `拆彈器運作中 · 剩 <b>${d.timer}</b> 個防守階段`;}
 function dfDone(u){u.defusing=false;G.defuser=null;if(u.side===G.player){G._df=true;if(!G.tut)setTimeout(()=>achGive('defuse'),600);}SFX.round();bigNote('拆彈器已解除',`${OPS[u.op].name} 撐住了`,'d',2200);log(`${nm(u)} 解除了拆彈器！`,'kd');if(!alive('A').length)return finish('D','拆彈器已解除，進攻方全員陣亡');render();}
-function bombBoom(){if(G._boom||G.over)return;G._boom=1;G.busy=true;const {x,y}=G.defuser,c0=cell(x,y);const room=c0.indoor?roomOf(x,y):[[x,y]],R=new Set(room.map(([i,j])=>j*G.W+i));
-  log(`拆彈器在 ${siteAt(x,y)||''} 點引爆，整個房間被炸毀！`,'ka');try{SFX.boom();setTimeout(()=>SFX.boom(),180);}catch(e){}bigNote('拆彈器引爆','整個房間被炸毀','bomb',2400);
-  try{boomFx3D(x,y,room);}catch(e){console.warn(e);}
-  {const fl=document.createElement('div');fl.className='bombFlash';document.body.appendChild(fl);setTimeout(()=>fl.remove(),1500);const fr=document.getElementById('frame');if(fr){fr.classList.remove('bshk');void fr.offsetWidth;fr.classList.add('bshk');setTimeout(()=>fr.classList.remove('bshk'),1300);}}
-  const W=new Set();room.forEach(([i,j])=>adj4(i,j).forEach(([a,b])=>{const c=cell(a,b);if(c&&['soft','bar','reinf'].includes(c.t))W.add(b*G.W+a);}));
-  setTimeout(()=>{if(!G||G.over)return;[...W].forEach(k=>{const c=cell(k%G.W,(k/G.W)|0);c.elec=false;destroyCell(k%G.W,(k/G.W)|0);});render();},220);
-  setTimeout(()=>{if(!G||G.over)return;G.units.forEach(u=>{if(u.alive&&u.x>=0&&R.has(u.y*G.W+u.x)){u.alive=false;u.hp=0;u.overwatch=false;u.defusing=false;log(`${nm(u)} 被爆炸波及陣亡`,'ks');}});G.gadgets.forEach(g=>{if(g.alive&&R.has(g.y*G.W+g.x))g.alive=false;});room.forEach(([i,j])=>{const c=cell(i,j);if(c&&c.t==='floor')c.scorch=1;});G.defuser=null;render();},380);
-  setTimeout(()=>{if(!G||G.over)return;G.busy=false;finish('A','拆彈器引爆，房間被炸毀');},2600);}
+// v113: when the defuser's timer runs out the bomb is disarmed and the attackers win (no explosion)
+function bombBoom(){if(G._boom||G.over)return;G._boom=1;G.busy=true;const {x,y}=G.defuser;
+  log(`${siteAt(x,y)||''} 點的炸彈已被拆除，進攻方獲勝！`,'ka');try{SFX.round();}catch(e){}bigNote('炸彈已被拆除','進攻方獲勝','a',2200);
+  setTimeout(()=>{if(!G||G.over)return;G.busy=false;finish('A','炸彈已被拆除，進攻方獲勝');},2300);}
 function boomFx3D(x,y,room){if(!R3||!R3.fxG||document.hidden)return;const T=THREE;R3.noLt=1;setTimeout(()=>{R3.noLt=0;},3200);
   room.slice().sort(()=>Math.random()-.5).slice(0,14).forEach(([i,j],n)=>setTimeout(()=>{try{wallBlast3D(i,j,'soft');}catch(e){}},90+n*70));
   let cx=0,cy=0;room.forEach(([i,j])=>{cx+=i;cy+=j;});cx=cx/room.length+.5;cy=cy/room.length+.5;
@@ -8635,7 +8631,7 @@ function mfCard(p,side){const me=side===MF.side;
 function mfVs(){const D=MF.side==='D'?MF.me:MF.opp,A=MF.side==='A'?MF.me:MF.opp;MF.st='vs';
   MF.el.innerHTML=`<div class="mfVs">${mfCard(D,'D')}${mfCard(A,'A')}<div class="mfX">VS</div>
     <div class="mfLoad"><span id="mfLt">讀取場地中…</span><div class="mfBar"><i id="mfLb"></i></div></div></div>`;
-  setTimeout(()=>{if(!MF||MF.st!=='vs')return;MF.el.querySelector('.mfVs').classList.add('hit');try{SFX.slam&&SFX.slam();}catch(e){}},430);
+  setTimeout(()=>{if(!MF||MF.st!=='vs')return;const v=MF.el.querySelector('.mfVs');if(v)v.classList.add('hit');try{SFX.slam&&SFX.slam();}catch(e){}},430);
   // cache: every map photo the reel shows, the layout thumbnail, both art pieces, and my side's operator portraits for the pick screen
   const urls=[...new Set([...ONLINE_MAPS.map(mapBig),profArt(MF.me),profArt(MF.opp),...mfPool(MF.side,true).map(opIcon)])].filter(u=>u&&!/^data:/.test(u));
   let done=0;const tot=urls.length+2,bump=()=>{done++;};
