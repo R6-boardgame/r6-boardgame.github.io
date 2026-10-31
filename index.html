@@ -9094,7 +9094,7 @@ function taskHTML(){ecoRoll();const row=(id,daily)=>{const t=TKALL[id],p=tkProg(
   return `<h2 class="tsec">任務</h2><div class="tkBal">${RNI}<b>${fmtN(ECO.rn)}</b><span>聲望 · 每 ${fmtN(OPPRICE)} 可解鎖一名幹員</span></div>
   <div class="tkWrap"><div class="tkSec"><h4>每日任務<small>${left()}後更新</small></h4>${ECO.dt.map(id=>row(id,1)).join('')}</div>
   <div class="tkSec"><h4>每週任務<small>每週一更新</small></h4>${TK_W.map(t=>row(t[0],0)).join('')}</div></div>
-  <p class="tkFoot">對局獎勵：線上對戰 勝 300／敗 120 · 電腦練習 勝 150／敗 50（每日上限 1,500）· 自訂房間 勝 30／敗 10</p>`;}
+  <p class="tkFoot">對局獎勵：線上對戰 勝 700／敗 500 · 自訂房間 勝 700／敗 500 · 電腦練習 勝 500／敗 300 · 額外：安裝／解除拆彈器 +50、人質護送成功 +100、傷害人質 −50</p>`;}
 function bindTask(){document.querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{const id=b.dataset.tk,daily=id[0]==='d',t=TKALL[id],L=daily?ECO.dc:ECO.wc;
   if(L.includes(id)||tkProg(id,daily)<t[3])return;L.push(id);ecoAdd(t[4]);ecoSave();try{SFX.alert();}catch(e){}renderTitle();renderPlayer();});}
 // ---------- shop: a dedicated page for unlocking operators with renown ----------
