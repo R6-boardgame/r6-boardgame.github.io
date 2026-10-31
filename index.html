@@ -9531,7 +9531,7 @@ function visFx3D(){const play=G.phase==='play'&&!G.over;
   for(const b of [3.5,6.5])if(b<r.R){const l=labs.find(o=>o.b===b),gap=l?S*.5/(b*S):0;c.beginPath();if(l)c.arc(ox*S,oy*S,b*S,l.a+gap,l.a-gap+Math.PI*2);else c.arc(ox*S,oy*S,b*S,0,Math.PI*2);c.stroke();}
   c.restore();
   c.save();c.font=`800 ${Math.round(S*.46)}px system-ui,sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillStyle='#fff';c.shadowColor='rgba(0,0,0,.75)';c.shadowBlur=S*.12;
-  for(const l of labs){const d=l.b===r.R?r.R-.45:l.b;c.fillText(l.t,(ox+Math.cos(l.a)*d)*S,(oy+Math.sin(l.a)*d)*S+S*.02);}
+  for(const l of labs){const d=l.b===r.R?r.R-.45:l.b;c.save();c.translate((ox+Math.cos(l.a)*d)*S,(oy+Math.sin(l.a)*d)*S);c.rotate(l.a+Math.PI/2);c.fillText(l.t,0,S*.02);c.restore();} // upright when read from the operator
   c.restore();
   c.save();poly();c.strokeStyle='rgba(255,226,190,.22)';c.lineWidth=S*.04;c.stroke();c.restore();
   // walls caught by the fan glow
