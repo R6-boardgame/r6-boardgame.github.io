@@ -1025,7 +1025,7 @@ html body #acts button.primary.owb.on,html body.actsR #actsR #acts button.primar
 .bignote .bnBand{width:100%;padding:18px 6vw 20px;text-align:center;background:linear-gradient(90deg,transparent,rgba(8,12,16,.88) 18%,rgba(8,12,16,.88) 82%,transparent);border-top:2px solid var(--bn,#e8eef3);border-bottom:2px solid var(--bn,#e8eef3);animation:bnIn .38s cubic-bezier(.2,1.2,.4,1) both}
 .bignote b{display:block;font:italic 800 clamp(40px,8vw,104px)/1 'Saira Condensed','Noto Sans TC',sans-serif;letter-spacing:.04em;color:var(--bn,#fff);text-shadow:0 0 28px rgba(var(--bnr,255,255,255),.55),0 4px 0 rgba(0,0,0,.6)}
 .bignote span{display:block;margin-top:8px;font:500 clamp(14px,1.8vw,22px) 'Noto Sans TC',sans-serif;color:#dfe6ec;letter-spacing:.08em}
-.bignote.a{--bn:#ff9a52;--bnr:255,140,60}.bignote.d{--bn:#62bdf2;--bnr:80,170,240}.bignote.a b,.bignote.d b{font-size:clamp(28px,8vw,104px);white-space:nowrap}.bignote.r{--bn:#e8eef3}.bignote.r b{font-size:clamp(34px,5.5vw,72px)}
+.bignote.a{--bn:#ff9a52;--bnr:255,140,60}.bignote.d{--bn:#62bdf2;--bnr:80,170,240}.bignote.a .bnBand,.bignote.d .bnBand{padding-left:8px;padding-right:8px}.bignote.a b,.bignote.d b{word-break:keep-all}.bignote.r{--bn:#e8eef3}.bignote.r b{font-size:clamp(34px,5.5vw,72px)}
 .bignote.warn{--bn:#ffd23a;--bnr:255,210,60}
 .bignote.bomb{--bn:#ff4040;--bnr:255,50,50;background:radial-gradient(circle,rgba(255,30,30,.22),transparent 70%);animation:bnFlash .5s 3}
 .bignote.bomb b{font-size:clamp(48px,10vw,130px)}
@@ -4806,7 +4806,7 @@ function endPhase(){
   {const ow=alive(s).filter(u=>u.x>=0&&!u.overwatch&&!u.defusing);ow.forEach(u=>overwatch(u,true));const sh=ow.filter(u=>pub(u)||s===G.player);if(sh.length&&(s===G.player||G.over))log(`${sh.map(nm).join('、')} 自動進入掩護射擊`,s==='A'?'ka':'kd');}
   G.gadgets.forEach(g=>{if((g.type==='gas'||g.type==='fire')&&g.alive&&--g.life<=0)g.alive=false;});
   if(s==='D'&&G.defuser){const du=dfU();if(du){if(--G.defuser.dleft<=0){render();dfDone(du);if(G.over)return;}}else G.defuser.by=null;if(G.defuser&&--G.defuser.timer<=0&&!dfU()){render();return bombBoom();}}
-  bigNote(`${s==='A'?'進攻方':'防守方'}第${'一二'[G.phaseIdx>>1]}階段結束`,'',s==='A'?'a':'d',1100);// v104: say who just finished
+  bigNote(`${s==='A'?'進攻方':'防守方'}<wbr>第${'一二'[G.phaseIdx>>1]}階段結束`,'',s==='A'?'a':'d',1100);// v104: say who just finished
   G.phaseIdx++;
   if(G.phaseIdx>=4){
     G.phaseIdx=0;
