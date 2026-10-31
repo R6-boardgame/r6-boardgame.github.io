@@ -697,7 +697,7 @@ i.die.bolt{outline:1.5px dashed rgba(255,255,255,.85);outline-offset:-3px}
 .mfSlots{grid-template-columns:repeat(5,minmax(0,48px))!important;gap:6px!important}.mfSl{max-height:48px!important}
 .mfFt button{padding:10px!important}
 .mfFt{display:flex;gap:8px}.mfFt button{padding:12px;font-size:15px;text-align:center}.mfFt #mfRnd{flex:none;width:96px}.mfFt #mfLock{flex:1}
-.avb{position:relative}.avb.cop img{object-position:50% 3%}.avW{position:absolute;right:2px;bottom:2px;width:18px;height:18px;background:rgba(0,0,0,.7);display:grid;place-items:center}.avW svg{width:15px;height:15px}
+.avb{position:relative}.avb.cop img,.avb.pic img{object-position:50% 50%}.avW{position:absolute;right:2px;bottom:2px;width:18px;height:18px;background:rgba(0,0,0,.7);display:grid;place-items:center}.avW svg{width:15px;height:15px}
 @media (max-width:700px){.mfArt{height:62vh;bottom:120px}.mfP{padding-bottom:calc(84px + env(safe-area-inset-bottom))}.mfInfo>b{font-size:20px}.mfCop{font-size:11.5px}}
 @keyframes mrIn{from{opacity:0}to{opacity:1}}@keyframes mrPop{0%{transform:scale(1.4);opacity:.2}100%{transform:scale(1);opacity:1}}
 body[data-scr="setup"] .panel{display:none!important}
@@ -8323,14 +8323,19 @@ function wzStepHTML(){const s=cfg.side,st=WZ.step;
       row('幹員',p.map(k=>`<img src="${opIcon(k)}" alt="">${OPC[k].name}`).join(' '),3)+
       row('戰術裝備',Object.entries(INV[s]).filter(([k])=>inv[k]).map(([k,v])=>`${v[0]} ×${inv[k]}`).join('、')||'無',4)+row('計時',T[cfg.timer||0],5)}</dl>`;}
   }}
-function renderWiz(){let el=$('#wiz');const keep=[...(el?el.querySelectorAll('.wzBody,.wzOg'):[])].map(e=>e.scrollTop);
+// v116: re-rendering a screen with innerHTML must not throw its scroll areas back to the top (avatar list, operator pick…)
+function scrollSnap(el){if(!el)return()=>{};const key=e=>e.tagName+'.'+String(typeof e.className==='string'?e.className:'').trim().split(/\s+/)[0];
+  const walk=f=>{const c={};[el,...el.querySelectorAll('*')].forEach(e=>{const k=key(e);c[k]=(c[k]||0)+1;f(e,k+'#'+c[k]);});};
+  const m={};walk((e,k)=>{if(e.scrollTop||e.scrollLeft)m[k]=[e.scrollTop,e.scrollLeft];});const wy=window.scrollY;
+  return skip=>{walk((e,k)=>{const v=m[k];if(v&&!(skip&&e.closest(skip))){e.scrollTop=v[0];e.scrollLeft=v[1];}});if(window.scrollY!==wy)window.scrollTo(0,wy);};}
+function renderWiz(){let el=$('#wiz');const _rs=WZ.lastStep===WZ.step?scrollSnap(el):null;const keep=[...(el?el.querySelectorAll('.wzBody,.wzOg'):[])].map(e=>e.scrollTop);
   if(!el){el=document.createElement('div');el.id='wiz';el.className='wiz';el.setAttribute('role','dialog');el.setAttribute('aria-label','對戰電腦設定');document.body.appendChild(el);}
   el.hidden=false;const st=WZ.step;WZ.seen=Math.max(WZ.seen,st);const ok=WZSTEPS[st].ok(),last=st===WZSTEPS.length-1;
   const reach=i=>i<=WZ.seen||WZSTEPS.slice(0,i).every(x=>x.ok());
   el.innerHTML=`<div class="wzTop"><h2>對戰電腦</h2><nav class="wzSteps">${WZSTEPS.map((x,i)=>`<button data-wz-go="${i}" class="${i===st?'cur':i<WZ.seen||(i<st)?'done':''}" ${reach(i)&&WZSTEPS.slice(0,i).every(y=>y.ok())?'':'disabled'}><i>${i<st?'✓':i+1}</i><span>${x.t}</span></button>`).join('')}</nav><span id="wzOnline"></span><button id="wzRules">規則</button></div>
     <div class="wzBody">${wzStepHTML()}</div>
     <div class="wzFoot"><button id="wzBack">${st?'‹ 上一步':'‹ 返回主畫面'}</button><span class="msg">${[0,1,2,5].includes(st)?(WZ.arm?'再點一次確定':'點一下看說明，再點一次確定'):ok?`第 ${st+1} 步，共 ${WZSTEPS.length} 步`:WZSTEPS[st].why}</span><button class="primary${last?' start':''}" id="wzNext" ${ok?'':'disabled'} >${last?'開始任務':'下一步 ›'}</button></div>`;
-  if(keep.length&&WZ.lastStep===st)el.querySelectorAll('.wzBody,.wzOg').forEach((e,i)=>{if(keep[i]!=null)e.scrollTop=keep[i];});WZ.lastStep=st;
+  if(keep.length&&WZ.lastStep===st)el.querySelectorAll('.wzBody,.wzOg').forEach((e,i)=>{if(keep[i]!=null)e.scrollTop=keep[i];});if(_rs)_rs();WZ.lastStep=st;
   const go=i=>{WZ.step=i;WZ.arm=null;WZ.peek=null;WZ.peekSlot=null;renderWiz();el.querySelector('.wzBody').scrollTop=0;};
   const twice=(key,set,after)=>{if(WZ.arm===key){WZ.arm=null;after();return;}WZ.arm=key;set();renderWiz();};
   const pick=()=>{const r=WZ.ret;WZ.ret=null;go(r!=null?r:st+1);};
@@ -8391,7 +8396,7 @@ const ME=(()=>{let p=null;try{p=JSON.parse(localStorage.getItem(PKEY)||'null');}
   p.acct=null;p.rating=null;p.w=0;p.l=0;return p;})();
 function saveMe(){gaPush();try{const {mode,guest,nick,avatar,usePhoto,lang}=ME;localStorage.setItem(PKEY,JSON.stringify({mode,guest,nick,avatar,usePhoto,lang}));}catch(e){}}
 const meName=()=>ME.nick||(ME.mode==='account'&&ME.acct&&ME.acct.name)||ME.guest;
-const meAvatar=()=>ME.usePhoto&&ME.acct&&ME.acct.photo?ME.acct.photo:/^cop:/.test(ME.avatar||'')?(copAv(ME.avatar)||{art:COPART[0]}).art:/^art:/.test(ME.avatar||'')?(opArt(ME.avatar.slice(4))||opIcon(ME.avatar.slice(4))):opIcon(ME.avatar);
+const meAvatar=()=>ME.usePhoto&&ME.acct&&ME.acct.photo?ME.acct.photo:/^cop:/.test(ME.avatar||'')?(copAv(ME.avatar)||copAv('cop:0')).av:/^pic:/.test(ME.avatar||'')?opPic(ME.avatar.slice(4)):/^art:/.test(ME.avatar||'')?(opArt(ME.avatar.slice(4))||opIcon(ME.avatar.slice(4))):opIcon(ME.avatar);
 const TIERS=[[0,'紅銅','Copper','カッパー','#b5653a'],[1100,'青銅','Bronze','ブロンズ','#a8794a'],[1200,'白銀','Silver','シルバー','#b8c4cc'],[1350,'黃金','Gold','ゴールド','#e3aa3e'],[1500,'白金','Platinum','プラチナ','#5fc7c2'],[1700,'翡翠','Emerald','エメラルド','#3fbf75'],[1900,'鑽石','Diamond','ダイヤモンド','#9c7cf2'],[2100,'冠軍','Champion','チャンピオン','#e8574e']];
 const tierOf=r=>{let t=TIERS[0];for(const x of TIERS)if(r>=x[0])t=x;return t;};
 const tierName=t=>t[{zh:1,en:2,ja:3}[ME.lang]||1];
@@ -8436,20 +8441,22 @@ function renderPlayer(){const el=$('#tplayer');if(!el)return;const acct=ME.mode=
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function openSettings(){let el=$('#psettings');if(!el){el=document.createElement('div');el.id='psettings';el.className='psettings';el.setAttribute('role','dialog');el.setAttribute('aria-label','玩家設定');document.body.appendChild(el);
     el.addEventListener('click',e=>{if(e.target===el)closeSettings();});}
-  el.hidden=false;renderSettings();}
+  el.hidden=false;renderSettings();{const bx=el.querySelector('.psbox');if(bx)bx.scrollTop=0;}}
 function closeSettings(){const el=$('#psettings');if(el)el.hidden=true;}
-function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;const acct=ME.mode==='account'&&ME.acct;
+function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;const acct=ME.mode==='account'&&ME.acct;const _rs=scrollSnap(el);
   const avl=[];OPBASE.forEach(b=>{const lv=mxLv(ECO.mx[b]||0);if(b.startsWith('recruit_')||lv>=1||ME.avatar===b)avl.push([b,opIcon(b),OPC[b].name]);if(lv>=3||ME.avatar==='art:'+b)avl.push(['art:'+b,opArt(b)||opIcon(b),OPC[b].name+' 半身像']);});
-  {const wu=copWU();copAll().forEach((c,i)=>{avl.push(['cop:'+i,COPART[i],`${COPN[i]} ${c.nm}`]);for(const w of WORD)if(wu.has(i+':'+w))avl.push([`cop:${i}:${w}`,copAv(`cop:${i}:${w}`).art,`${COPN[i]} ${WPN[w].t}`,w]);});}
-  const avs=avl.map(([k,src,n,w])=>`<button class="avb ${!ME.usePhoto&&ME.avatar===k?'on':''} ${k.startsWith('art:')?'art':''} ${k.startsWith('cop:')?'cop':''}" data-av="${k}" title="${esc(n)}"><img src="${src}" alt="${esc(n)}">${w?`<i class="avW">${WPN[w].ic}</i>`:''}</button>`).join('');
+  {const wu=copWU();copAll().forEach((c,i)=>{avl.push(['cop:'+i,copAv('cop:'+i).av,`${COPN[i]} ${c.nm}`]);for(const w of WORD)if(wu.has(i+':'+w))avl.push([`cop:${i}:${w}`,copAv(`cop:${i}:${w}`).av,`${COPN[i]} ${WPN[w].t}`,w]);});}
+  OPBASE.forEach(b=>{if(!b.startsWith('recruit_')&&FACEM[artBase(b)]&&(owned(b)||ME.avatar==='pic:'+b))avl.push(['pic:'+b,opPic(b),OPC[b].name+' 照片']);});
+  const avs=avl.map(([k,src,n,w])=>`<button class="avb ${!ME.usePhoto&&ME.avatar===k?'on':''} ${k.startsWith('art:')?'art':''} ${k.startsWith('cop:')?'cop':''} ${k.startsWith('pic:')?'pic':''}" data-av="${k}" title="${esc(n)}"><img src="${src}" alt="${esc(n)}">${w?`<i class="avW">${WPN[w].ic}</i>`:''}</button>`).join('');
   const ttls=OPBASE.filter(b=>mxLv(ECO.mx[b]||0)>=5);
   el.innerHTML=`<div class="psbox"><div class="pshead"><img class="pav" src="${meAvatar()}" alt=""><div><b>${esc(meName())}</b><span>${GA.u?'Google 帳號':acct?'線上身分':'訪客'}</span></div><button id="psClose" aria-label="關閉">✕</button></div>
   <section><h4>名稱</h4><div class="psrow"><input id="psNick" maxlength="16" value="${esc(ME.nick)}" placeholder="${esc(acct&&ME.acct.name?ME.acct.name:ME.guest)}"><button id="psNickOk">儲存</button></div></section>
-  <section><h4>頭貼</h4><div class="avgrid">${acct&&ME.acct.photo?`<button class="avb ${ME.usePhoto?'on':''}" data-av="__photo" title="帳號照片"><img src="${ME.acct.photo}" alt="帳號照片"></button>`:''}${avs}</div><p class="pshint">幹員熟練度 Lv1 解鎖頭像、Lv3 解鎖半身像、Lv5 解鎖稱號。培養幹員轉職過的職業也能當頭像。</p></section><section><h4>稱號</h4>${ttls.length?`<div class="psrow wrap"><button class="ttl ${!ECO.title?'on':''}" data-ttl="">不顯示</button>${ttls.map(b=>`<button class="ttl ${ECO.title===b?'on':''}" data-ttl="${b}">${esc(mxTitle(b))}</button>`).join('')}</div>`:'<p class="pshint">把任一名幹員練到熟練度 Lv5，就能拿到他的專屬稱號。</p>'}</section>
+  <section><h4>頭貼</h4><div class="avgrid">${acct&&ME.acct.photo?`<button class="avb ${ME.usePhoto?'on':''}" data-av="__photo" title="帳號照片"><img src="${ME.acct.photo}" alt="帳號照片"></button>`:''}${avs}</div><p class="pshint">幹員熟練度 Lv1 解鎖頭像、Lv3 解鎖半身像、Lv5 解鎖稱號。已擁有的幹員可用照片當頭像，培養幹員轉職過的職業也能當頭像。</p></section><section><h4>稱號</h4>${ttls.length?`<div class="psrow wrap"><button class="ttl ${!ECO.title?'on':''}" data-ttl="">不顯示</button>${ttls.map(b=>`<button class="ttl ${ECO.title===b?'on':''}" data-ttl="${b}">${esc(mxTitle(b))}</button>`).join('')}</div>`:'<p class="pshint">把任一名幹員練到熟練度 Lv5，就能拿到他的專屬稱號。</p>'}</section>
   <section><h4>成就與好友</h4><div class="psrow"><button id="psAch">🏆 成就 ${achCount()}/${ACH.length}</button><button id="psFr">好友 ${FR.list.length} 人</button></div></section>
   <section><h4>登入資料</h4>${window.R6FB?gaHTML():acct?`<p class="pshint">已用 線上身分登入。</p><div class="psrow"><button id="psLogout">改用訪客身分</button></div>`:
     `<p class="pshint">目前是訪客，所有模式都能玩。聲望、解鎖的幹員和熟練度存在這台裝置上。</p><div class="pslogin"><button class="primary" id="psLogin"><span class="lgico">C</span>啟用線上身分</button><button disabled title="Google 登入目前還沒開放"><span class="lgico g">G</span>Google 登入（此頁面不支援）</button><button class="on" disabled><span class="lgico">訪</span>訪客（目前）</button></div>`}${PMSG?`<p class="terr">${PMSG}</p>`:''}</section>
   <section><h4>設定</h4><div class="psrow"><span>🌐 語言</span>${langSelect('psLang')}</div><div class="psrow pstg"><span>射擊特寫</span><button id="psCine">${CINE.on?'開':'關'}</button><span>音樂</span><button id="psMus">${SFX.mOn?'開':'關'}</button><span>音效</span><button id="psSfx">${SFX.on?'開':'關'}</button></div></section></div>`;
+  _rs();
   $('#psClose').onclick=closeSettings;
   $('#psNickOk').onclick=()=>{ME.nick=$('#psNick').value.trim().slice(0,16);saveMe();renderPlayer();renderSettings();};
   el.querySelectorAll('[data-ttl]').forEach(b=>b.onclick=()=>{ECO.title=b.dataset.ttl;ecoSave();renderPlayer();renderSettings();});el.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{if(b.dataset.av==='__photo')ME.usePhoto=true;else{ME.usePhoto=false;ME.avatar=b.dataset.av;}saveMe();renderPlayer();renderSettings();});
@@ -8619,12 +8626,14 @@ const MFT=45,MFMIS={bomb:'炸彈',hostage:'人質'};
 let MF=null;
 const ign=()=>ME.nick||ME.guest; // the in-game name, never the Google account name
 // custom operator avatars: cop:<slot> is the recruit art, cop:<slot>:<class> a class the player has unlocked (ECO.wu keeps them after a death)
-function copAv(k){const m=/^cop:([01])(?::(\w+))?$/.exec(k||'');if(!m)return null;const i=+m[1],w=m[2]&&WPN[m[2]]?m[2]:null;return {i,w,art:w&&WART[w]?`img/cop/${i?'m':'f'}_${w}.webp`:COPART[i]};}
+function copAv(k){const m=/^cop:([01])(?::(\w+))?$/.exec(k||'');if(!m)return null;const i=+m[1],w=m[2]&&WPN[m[2]]?m[2]:null;return {i,w,art:w&&WART[w]?`img/cop/${i?'m':'f'}_${w}.webp`:COPART[i],av:`img/av/cop_${i?'m':'f'}${w&&WART[w]?'_'+w:''}.webp`};}
+// v116: pic:<op> = chest-up photo crop of an owned operator (img/av/<op>.webp, made from img/face/)
+const opPic=b=>'img/av/'+artBase(b)+'.webp';
 function copWU(){const s=new Set(Array.isArray(ECO.wu)?ECO.wu:[]);copAll().forEach((c,i)=>{if(c.w)s.add(i+':'+c.w);});return s;}
 function copWUAdd(i,w){const s=copWU();s.add(i+':'+w);ECO.wu=[...s];}
 function myProf(){const p={n:ign(),av:ME.avatar||'',st:ECO.streak|0};if(ME.usePhoto&&ME.acct&&ME.acct.photo)p.ph=ME.acct.photo;
   const a=!p.ph&&copAv(p.av);if(a){const c=copAll()[a.i];p.cop={nm:c.nm,k:c.k|0,sv:c.sv|0};}return p;}
-function profArt(p){if(p&&p.ph)return p.ph;const a=copAv(p&&p.av);if(a)return a.art;const k=String((p&&p.av)||'').replace(/^art:/,'');return OPC[k]?(opArt(k)||opIcon(k)):opArt('ash')||opIcon('ash');}
+function profArt(p){if(p&&p.ph)return p.ph;const a=copAv(p&&p.av);if(a)return a.art;const pk=/^pic:/.test((p&&p.av)||''),k=String((p&&p.av)||'').replace(/^(art|pic):/,'');return OPC[k]?(pk?opFace(k):(opArt(k)||opIcon(k))):opArt('ash')||opIcon('ash');}
 function botProf(name){const ops=OPBASE.filter(k=>SCRIPTED.has(k)&&!copSlot(k)&&opArt(k));return {n:name,av:'art:'+ops[Math.floor(Math.random()*ops.length)],st:Math.random()<.6?0:2+Math.floor(Math.random()*5)};}
 const mfPool=(side,mine)=>{const seen=new Set(),o=[];for(const k of OPBASE){if(OPC[k].side!==side||!opPlayable(k)||(mine&&!owned(k))||seen.has(OPC[k].base))continue;seen.add(OPC[k].base);
     if(copSlot(k)!=null)o.push(...OPCARDS.filter(c=>c.base===k&&copSlot(c.id)!=null).map(c=>c.id));else o.push(k);}return o;};
@@ -8696,7 +8705,7 @@ function mfDet(k){if(!k||!OPC[k])return '';const c=OPC[k],i=MF.picks.indexOf(k),
     <div class="mfDS"><span>耐力 <b>${c.st??'—'}</b></span><span>${c.run?`奔跑 <b>+${c.run}</b>`:'不能奔跑'}</span><span>破壞 <b>${DZN[c.dz]||'—'}</b></span></div></div></div>`;}
 function mfToggle(k){const P=MF.picks,i=P.indexOf(k);if(i>=0)P.splice(i,1);else if(P.length<5&&!P.some(p=>mfBase(p)===mfBase(k)))P.push(k);try{SFX.ui&&SFX.ui();}catch(e){}}
 function mfDraw(){const el=MF.el,side=MF.side,pool=mfPool(side,true),P=MF.picks,inv=MF.inv,used=invSum(inv),cap=INV_CAP[side],L=MF.lock;
-  const left=Math.max(0,Math.ceil(MFT-(Date.now()-MF.pick0)/1000));const sc=el.querySelector('.mfOps');const st=sc?sc.scrollTop:0;
+  const left=Math.max(0,Math.ceil(MFT-(Date.now()-MF.pick0)/1000));const _rs=scrollSnap(el);
   const ops=pool.map(k=>{const i=P.indexOf(k);return `<button class="mfOp${i>=0?' on':''}${MF.cur===k?' cur':''}" data-k="${k}"${L?' disabled':''}><img src="${copSlot(k)!=null?(opArt(k)||opIcon(k)):opIcon(k)}" class="${copSlot(k)!=null?'cop':''}" alt=""><span>${esc(copSlot(k)!=null?COPN[copSlot(k)]:OPC[k].name)}</span>${i>=0?`<em>${i+1}</em>`:''}</button>`;}).join('');
   const invs=Object.entries(INV[side]).map(([k,[n,max,d]])=>`<div class="mfInv"><i>${WZI[k]||''}</i><div><b>${n}</b><span>${d}</span></div><div class="mfCnt"><button data-iv="${k}" data-d="-1"${L||inv[k]<=0?' disabled':''} aria-label="減少${n}">−</button><b>${inv[k]|0}</b><button data-iv="${k}" data-d="1"${L||inv[k]>=max||used>=cap?' disabled':''} aria-label="增加${n}">＋</button></div></div>`).join('');
   const wait=MF.oppLock?(MF.bot||MF.side==='A'?'雙方已鎖定':'雙方已鎖定，等待進攻方部署…'):'已鎖定，等待對手…';
@@ -8707,7 +8716,7 @@ function mfDraw(){const el=MF.el,side=MF.side,pool=mfPool(side,true),P=MF.picks,
     <div class="mfBody">${MF.tab==='op'?`<div class="mfOps" style="--mfc:${pool.length>18?8:pool.length>12?7:6}">${ops}</div>`:`<div class="mfInvs">${invs}<p class="mfNote">${side==='A'?'另有 3 架無人機。':'另有 3 捲鐵絲網與地圖上的攝影機。'}</p></div>`}</div>
     <div class="mfSlots">${[0,1,2,3,4].map(i=>`<div class="mfSl">${P[i]?`<img src="${copSlot(P[i])!=null?(opArt(P[i])||opIcon(P[i])):opIcon(P[i])}" class="${copSlot(P[i])!=null?'cop':''}" alt="${esc(mfName(P[i]))}">`:''}</div>`).join('')}</div>
     <footer class="mfFt"><button id="mfRnd"${L?' disabled':''}>隨機</button><button class="primary" id="mfLock"${L||P.length!==5?' disabled':''}>${L?wait:P.length===5?'鎖定':`再選 ${5-P.length} 名`}</button></footer></div>`;
-  {const o=el.querySelector('.mfOps');if(o)o.scrollTop=st;}
+  _rs();
   el.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{MF.tab=b.dataset.tab;mfDraw();});
   el.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{if(MF.lock)return;const k=b.dataset.k;if(MF.cur===k)mfToggle(k);else{MF.cur=k;try{SFX.ui&&SFX.ui();}catch(e){}}mfDraw();});
   const ad=$('#mfAdd');if(ad)ad.onclick=()=>{if(!MF.lock&&MF.cur){mfToggle(MF.cur);mfDraw();}};
@@ -9213,6 +9222,7 @@ function openOpSelect(side,onDone,browse){OSEL.side=side;OSEL.done=onDone;OSEL.b
   if(!el){el=document.createElement('div');el.id='opsel';el.className='opsel';document.body.appendChild(el);}el.hidden=false;renderOpSelect(true);}
 function closeOpSelect(){const el=$('#opsel');if(el)el.hidden=true;if(OSEL.done)OSEL.done();}
 function renderOpSelect(anim){
+  const _rs=scrollSnap($('#opsel'));
   const el=$('#opsel'),side=OSEL.side,picks=cfg.picks[side],cur=copCard(OPC[OSEL.cur]||OPCARDS[0]);
   const pickOf=b=>picks.findIndex(p=>OPC[p]&&OPC[p].base===b);
   const col=s=>`<div class="osCol ${s!==side&&!OSEL.browse?'dim':''}"><h3>${s==='A'?'攻擊方':'防守方'}</h3><div class="osGrid">${OPBASE.filter(b=>OPC[b].side===s).map(b=>{const i=s===side&&!OSEL.browse?pickOf(b):-1;
@@ -9239,6 +9249,7 @@ function renderOpSelect(anim){
   el.querySelectorAll('[data-ob]').forEach(b=>b.onclick=()=>{const bs=b.dataset.ob;const p=picks.find(x=>OPC[x]&&OPC[x].base===bs);OSEL.cur=p||bs;el.classList.add('showD');renderOpSelect(true);});
   el.querySelectorAll('[data-ov]').forEach(b=>b.onclick=()=>{const v=b.dataset.ov;const i=pickOf(cur.base);if(i>=0)picks[i]=v;OSEL.cur=v;renderOpSelect(false);});
   const pk=$('#osPick');if(pk)pk.onclick=()=>{if(!opPlayable(cur.base)||!owned(cur.base))return;const i=pickOf(cur.base);if(i>=0)picks.splice(i,1);else if(picks.length<5)picks.push(cur.id);renderOpSelect(false);};
+  _rs(anim?'.osR':null);
   el.classList.toggle('browse',OSEL.browse);el.classList.toggle('shop',!!OSEL.shop);const dn=$('#osDone');if(dn)dn.onclick=closeOpSelect;$('#osBack').onclick=closeOpSelect;$('#osEn').onclick=()=>{OSEL.en=!OSEL.en;renderOpSelect(false);};
   const x=$('#osX');if(x)x.onclick=()=>el.classList.remove('showD');{const ob=$('#osBuy');if(ob)ob.onclick=()=>{const b=cur.base;if(owned(b)||ECO.rn<OPPRICE)return;ECO.rn-=OPPRICE;ECO.own.push(b);ecoSave();try{SFX.click&&SFX.click();}catch(e){}achToastMsg(`已解鎖 ${OPC[b].name}`,"現在可以選他出戰");renderOpSelect(false);renderPlayer();};}
 }
