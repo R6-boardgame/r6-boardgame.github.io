@@ -6,7 +6,7 @@
 
 - 《Rainbow Six Siege – The Board Game》的網頁版，可對戰電腦、新手教學、自訂房間連線、排名戰、成就、商店。
 - 線上版：https://r6-boardgame.github.io/ （GitHub Pages，`main` 分支根目錄直接發佈，推上去就上線）。
-- 目前版本 v123（見 `git log`）。
+- 目前版本 v124（見 `git log`）。
 - 使用者要求：PR 做完、測完就直接合併上線，不用再問。
 
 ## 檔案結構
@@ -153,3 +153,4 @@
 - 畫在 canvas 上的字與 `confirm()` 不會被自動換，要包 `tt('中文')`。
 - 幹員卡片在英文模式下直接用卡片英文原文（`cardText`、`c.g.ab`）。
 - 英文字變長時，不要縮小字級：放大格子（讓它換行或加寬），或改用較短的同義詞。
+- 規則書全文有英文版：`<script type="text/plain" id="rulesmd_en">`（緊接在 `rulesmd` 後）。英文模式下 `rbBook` 會讀 `書的 src + "_en"`；改中文規則書時記得同步改英文版。
