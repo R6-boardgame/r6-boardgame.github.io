@@ -1341,6 +1341,12 @@ html body .tracker .seg>span{display:inline-flex;align-items:center;gap:4px;padd
 html body .tracker .seg svg{width:15px;height:15px}
 html body .tracker .seg .sa{color:var(--horg);border-right:1px solid var(--hl)}html body .tracker .seg .sd{color:var(--hblue)}
 html body .tracker .seg .on{opacity:1}html body .tracker .seg .sa.on{background:rgba(240,138,44,.16)}html body .tracker .seg .sd.on{background:rgba(69,166,239,.16)}
+html body .tracker .seg.chev{padding:0 10px 0 8px;gap:0}
+html body .tracker .seg.chev>i{display:block;width:22px;height:20px;margin-left:-4px;clip-path:polygon(0 0,60% 0,100% 50%,60% 100%,0 100%,40% 50%);opacity:.28;transition:opacity .25s,transform .25s}
+html body .tracker .seg.chev>i:first-child{margin-left:0}
+html body .tracker .seg.chev>i.a{background:var(--horg)}html body .tracker .seg.chev>i.d{background:var(--hblue)}
+html body .tracker .seg.chev>i.past{opacity:.5}
+html body .tracker .seg.chev>i.on{opacity:1}
 html body header.top .online{padding:4px 10px}
 #hmenu{position:fixed;z-index:60;display:flex;flex-direction:column;min-width:170px;background:var(--hb2);border:1px solid var(--hl);clip-path:var(--cham);padding:6px;gap:4px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 #hmenu button{text-align:left;padding:10px 12px;font-size:15px;background:rgba(255,255,255,.04);border:1px solid transparent;color:#e6edf3}
@@ -4798,7 +4804,7 @@ function endPhase(){
   {const ow=alive(s).filter(u=>u.x>=0&&!u.overwatch&&!u.defusing);ow.forEach(u=>overwatch(u,true));const sh=ow.filter(u=>pub(u)||s===G.player);if(sh.length&&(s===G.player||G.over))log(`${sh.map(nm).join('、')} 自動進入掩護射擊`,s==='A'?'ka':'kd');}
   G.gadgets.forEach(g=>{if((g.type==='gas'||g.type==='fire')&&g.alive&&--g.life<=0)g.alive=false;});
   if(s==='D'&&G.defuser){const du=dfU();if(du){if(--G.defuser.dleft<=0){render();dfDone(du);if(G.over)return;}}else G.defuser.by=null;if(G.defuser&&--G.defuser.timer<=0&&!dfU()){render();return bombBoom();}}
-  bigNote(s==='A'?'進攻方結束行動':'防守方結束行動','',s==='A'?'a':'d',1100);// v104: say who just finished
+  bigNote(`${s==='A'?'進攻方':'防守方'}第${'一二'[G.phaseIdx>>1]}階段結束`,'',s==='A'?'a':'d',1100);// v104: say who just finished
   G.phaseIdx++;
   if(G.phaseIdx>=4){
     G.phaseIdx=0;
@@ -6480,7 +6486,7 @@ function renderTracker(){
   const t=$('#tracker');
   if(!G||G.phase==='setup'){t.innerHTML=`<span>${G?'部署階段':'選擇陣營與地圖'}</span>`;return;}
   t.innerHTML=`<span>第 ${G.round}/${G.maxRounds} 輪</span><span class="pips">${G.maxRounds>12?'':[...Array(G.maxRounds)].map((_,i)=>`<i class="pip ${i+1<G.round?'done':i+1===G.round?'cur':''}"></i>`).join('')}</span>
-  <span class="seg">${(s=>`<span class="sa ${s==='A'?'on':''}">${SVGI.atk}攻</span><span class="sd ${s==='D'?'on':''}">${SVGI.def}守</span>`)(ORDER[G.phaseIdx])}</span>
+  <span class="seg chev" aria-label="${curSide()==='A'?'進攻方':'防守方'}第${'一二'[G.phaseIdx>>1]}階段">${ORDER.map((s,i)=>`<i class="${s==='A'?'a':'d'}${i===G.phaseIdx?' on':i<G.phaseIdx?' past':''}"></i>`).join('')}</span>
   <span class="phases">${ORDER.map((s,i)=>`<span class="ph ${s==='A'?'a':'d'} ${i===G.phaseIdx?'cur':''}">${s==='A'?'攻':'守'}</span>`).join('')}</span>
   ${G.defuser?`<span style="color:var(--accent)">${dfTxt().replace(/<\/?b>/g,'')}</span>`:''}`;
 }
