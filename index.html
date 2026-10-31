@@ -1015,7 +1015,7 @@ html.pg,html.pg body{touch-action:manipulation}html.pg .psbox,html.pg .avgrid{to
 #barBtn{position:fixed;left:max(12px,env(safe-area-inset-left));z-index:9;width:62px;height:62px;padding:4px;border:2px solid #e3aa3e;border-radius:4px;background:#0b121a;color:#f2d79a;display:grid;place-items:center;grid-template-rows:1fr auto;gap:0;font:700 11px 'Noto Sans TC',sans-serif;cursor:pointer;box-shadow:0 0 14px rgba(227,170,62,.45);animation:bnIn .3s ease-out}
 #barBtn svg{width:30px;height:30px}
 #noAp{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 118px);transform:translateX(-50%);z-index:300;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 20px 6px;background:rgba(12,14,16,.86);border:2px solid #f2b84a;border-radius:6px;box-shadow:0 0 18px rgba(242,184,74,.35);animation:noApIn .25s ease-out}
-#wfAsk{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 112px);transform:translateX(-50%);z-index:330;display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 14px 10px;background:rgba(12,14,16,.92);border:2px solid #4aa8e2;border-radius:8px;box-shadow:0 0 18px rgba(74,168,226,.35);max-width:calc(100vw - 32px);animation:noApIn .25s ease-out}
+#wfAsk{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 112px);transform:translateX(-50%);z-index:330;width:max-content;min-width:min(300px,calc(100vw - 32px));box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 14px 10px;background:rgba(12,14,16,.92);border:2px solid #4aa8e2;border-radius:8px;box-shadow:0 0 18px rgba(74,168,226,.35);max-width:calc(100vw - 32px);animation:noApIn .25s ease-out}
 #wfAsk>b{color:#cfe8f8;font-size:15px;letter-spacing:.06em}#wfAsk .wfB{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
 #wfAsk button{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:84px;padding:8px 12px;background:#1b2530;border:1px solid #4aa8e2;border-radius:6px;color:#e2e8ee;font:inherit;font-size:14px;cursor:pointer}
 #wfAsk button:disabled{opacity:.45;border-color:#304050;cursor:default}#wfAsk button small{font-size:11px;color:#93a4b4}#wfAsk .wfH{font-size:11px;color:#93a4b4}
@@ -9184,14 +9184,14 @@ function seg3(g,a,b,mat,w){const d=new THREE.Vector3().subVectors(b,a),L=d.lengt
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),d.normalize());m.castShadow=false;m.renderOrder=6;g.add(m);}
 function bolt3(g,a,b,mat,w,n){n=n||6;const d=new THREE.Vector3().subVectors(b,a),L=d.length();let p=a.clone();
   for(let i=1;i<=n;i++){const q=i===n?b.clone():a.clone().addScaledVector(d,i/n).add(new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5).multiplyScalar(L*.22));seg3(g,p,q,mat,w);p=q;}}
-const zapMats=()=>[gm('zapA',()=>new THREE.MeshBasicMaterial({color:0xfff27a,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false})),gm('zapB',()=>new THREE.MeshBasicMaterial({color:0x8fe0ff,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false}))];
+const zapMats=()=>[gm('zapA2',()=>new THREE.MeshBasicMaterial({color:0xffe02a,transparent:true,opacity:.95,depthWrite:false})),gm('zapB2',()=>new THREE.MeshBasicMaterial({color:0x3ab8ff,transparent:true,opacity:.95,depthWrite:false}))];
 // arcs that re-draw every ~70 ms; make() returns [from,to,width] pairs in the group's space
 function zapField(grp,make,hz){const zg=new THREE.Group();grp.add(zg);let nx=0;const [mA,mB]=zapMats();
   return t=>{if(t<nx)return;nx=t+(hz||.07);while(zg.children.length)zg.remove(zg.children[0]);for(const [a,b,w] of make())bolt3(zg,a,b,Math.random()<.65?mA:mB,w||.014);};}
 // a shocked operator: arcs crawl over the body and it shakes for a moment
 function zapU(u){try{SFX.zap();}catch(e){}try{if(!R3||!R3.figs)return;const f=R3.figs[u.id];if(!f||!f.grp)return;const grp=new THREE.Group();f.grp.add(grp);
   const z=zapField(grp,()=>{const o=[];for(let k=0;k<6;k++){const a=Math.random()*6.28,b=a+(Math.random()-.5)*2,y0=.1+Math.random()*1.1,y1=Math.min(1.35,y0+.2+Math.random()*.45),r=.2+Math.random()*.08;
-    o.push([new THREE.Vector3(Math.cos(a)*r,y0,Math.sin(a)*r),new THREE.Vector3(Math.cos(b)*r,y1,Math.sin(b)*r),.016]);}return o;},.05);
+    o.push([new THREE.Vector3(Math.cos(a)*r,y0,Math.sin(a)*r),new THREE.Vector3(Math.cos(b)*r,y1,Math.sin(b)*r),.022]);}return o;},.05);
   let t=0;const bx=f.body.position.x,bz=f.body.position.z;(R3.fx2||(R3.fx2=[])).push(dt=>{t+=dt;z(t);
     f.body.position.x=bx+(Math.random()-.5)*.07;f.body.position.z=bz+(Math.random()-.5)*.07;
     if(t>1.6){f.grp.remove(grp);f.body.position.x=bx;f.body.position.z=bz;return false;}return true;});}catch(e){}}
@@ -9227,15 +9227,15 @@ function ced3D(gd,grp){const sg=new THREE.Group();grp.add(sg);const mk=(geo,mat,
   grp.userData.blink=mk(SPH3,gm('cedled',()=>new THREE.MeshStandardMaterial({color:0xffd84a,emissive:0xffd84a,emissiveIntensity:1.6})),[.018,.018,.018],.12,.215,-.06);
   if(!cedLive(gd))return;
   const V=(a,b,c)=>new THREE.Vector3(a,b,c);
-  if(gd.wire){grp.userData.zap=zapField(grp,()=>{const o=[];for(let k=0;k<5;k++){const a=[(Math.random()-.5)*.8,.05+Math.random()*.3,(Math.random()-.5)*.8],b=a.map((v,i)=>i===1?Math.max(.03,v+(Math.random()-.5)*.3):v+(Math.random()-.5)*.5);o.push([V(...a),V(...b),.012]);}return o;});return;}
+  if(gd.wire){grp.userData.zap=zapField(grp,()=>{const o=[];for(let k=0;k<5;k++){const a=[(Math.random()-.5)*.8,.05+Math.random()*.3,(Math.random()-.5)*.8],b=a.map((v,i)=>i===1?Math.max(.03,v+(Math.random()-.5)*.3):v+(Math.random()-.5)*.5);o.push([V(...a),V(...b),.018]);}return o;});return;}
   const [dx,dy]=gd.wall,wc=cell(gd.x+dx,gd.y+dy),th={hard:.4,soft:.3,reinf:.42}[wc&&wc.t]||.42,WH=WALLH[R3.wall]||1.45,lx=-dy,lz=dx;
   const fp=(D,s,y)=>V(dx*D+lx*s,y,dy*D+lz*s);
-  grp.userData.zap=zapField(grp,()=>{const o=[];for(const D of [1-th/2-.015,1+th/2+.015])for(let k=0;k<3;k++){const s0=(Math.random()-.5)*.9,y0=.05+Math.random()*WH*.85;
-    o.push([fp(D,s0,y0),fp(D,Math.max(-.48,Math.min(.48,s0+(Math.random()-.5)*.6)),Math.max(.03,Math.min(WH*.95,y0+(Math.random()-.5)*.6))),.014]);}return o;});}
+  grp.userData.zap=zapField(grp,()=>{const o=[];for(const D of [1-th/2-.015,1+th/2+.015])for(let k=0;k<5;k++){const s0=(Math.random()-.5)*.9,y0=.05+Math.random()*WH*.85;
+    o.push([fp(D,s0,y0),fp(D,Math.max(-.48,Math.min(.48,s0+(Math.random()-.5)*.6)),Math.max(.03,Math.min(WH*.95,y0+(Math.random()-.5)*.6))),.024]);}return o;});}
 // razor wire on the floor: a loose tangle of coils inside one square, a few orange tape ties
 function wire3D(gd,grp){const M=gm('wirem',()=>std(0xb4bcc4,{metalness:.85,roughness:.3})),O=gm('wireo',()=>std(0xe8781e,{roughness:.6})),r=rng(gd.x*29+gd.y*53);
-  for(let k=0;k<11;k++){const ri=Math.floor(r()*5),rad=.12+ri*.045,t=new THREE.Mesh(gm('wtor'+ri,()=>new THREE.TorusGeometry(.12+ri*.045,.0075,3,30)),M);
-    t.position.set((r()-.5)*(.86-rad*1.4),.05+r()*.18,(r()-.5)*(.86-rad*1.4));t.rotation.set(r()*Math.PI,r()*Math.PI,r()*Math.PI);t.scale.set(1,1,.6+r()*.5);t.castShadow=true;grp.add(t);
+  for(let k=0;k<18;k++){const ri=Math.floor(r()*5),rad=.1+ri*.04,t=new THREE.Mesh(gm('wtor2'+ri,()=>new THREE.TorusGeometry(.1+ri*.04,.0045,3,34)),M);
+    t.position.set((r()-.5)*(.9-rad*1.6),.02+r()*.1,(r()-.5)*(.9-rad*1.6));t.rotation.set(Math.PI/2+(r()-.5)*1.3,(r()-.5)*.6,r()*Math.PI);t.scale.set(1,.55+r()*.45,1);t.castShadow=true;grp.add(t);
     if(r()<.5){const a=r()*6.28,b=new THREE.Mesh(BOX3,O);b.scale.set(.07,.012,.025);b.position.set(Math.cos(a)*rad,0,Math.sin(a)*rad).applyEuler(t.rotation).add(t.position);b.rotation.y=r()*3;grp.add(b);}}
   for(let k=0;k<6;k++){const a=r()*6.28,b=new THREE.Mesh(BOX3,O);b.scale.set(.1,.006,.03);b.position.set(Math.cos(a)*.3*r(),.01,Math.sin(a)*.3*r());b.rotation.y=r()*3;grp.add(b);}}
 // claymore: curved olive case marked FRONT TOWARDS ENEMY on two pairs of scissor legs, three red lasers fanning out over the floor
@@ -9251,9 +9251,9 @@ function clay3D(gd,grp){const dx=gd.dx||0,dy=gd.dy||1,sg=new THREE.Group();grp.a
   mk(BOX3,C,[.09,.03,.035],0,.29,-.01);mk(BOX3,C,[.05,.02,.02],0,.31,-.01);
   for(const sx of [-1,1])for(const lz of [-1,1]){const l=mk(BOX3,L,[.012,.17,.012],sx*.12+sx*.03,.065,lz*.03-.01);l.rotation.set(lz*.35,0,sx*.25);}
   const rays=clayRays(gd);if(!rays.length)return;
-  const LM=gm('claylz',()=>new THREE.MeshBasicMaterial({color:0xff2a1a,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false}));
+  const LM=gm('claylz2',()=>new THREE.MeshBasicMaterial({color:0xff1a0a,transparent:true,opacity:.9}));
   const a=new THREE.Vector3(dx*.06,.05,dy*.06);
-  for(const r of rays){if(Math.hypot(r.ex,r.ey)<.12)continue;seg3(grp,a,new THREE.Vector3(r.ex,.03,r.ey),LM,.016);}
+  for(const r of rays){if(Math.hypot(r.ex,r.ey)<.12)continue;seg3(grp,a,new THREE.Vector3(r.ex,.025,r.ey),LM,.022);}
   grp.userData.laser=1;}
 // ---------- shot cinematics: over-the-shoulder close-up (first person when a wall is behind) ----------
 const CINE={on:true,mode:'fp'};
