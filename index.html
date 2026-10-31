@@ -8054,7 +8054,7 @@ function renderTracker(){
   t.innerHTML=`<span>第 ${G.round}/${G.maxRounds} 輪</span><span class="pips">${G.maxRounds>12?'':[...Array(G.maxRounds)].map((_,i)=>`<i class="pip ${i+1<G.round?'done':i+1===G.round?'cur':''}"></i>`).join('')}</span>
   <span class="seg chev" aria-label="${curSide()==='A'?'進攻方':'防守方'}第${'一二'[G.phaseIdx>>1]}階段">${ORDER.map((s,i)=>`<i class="${s==='A'?'a':'d'}${i===G.phaseIdx?' on':i<G.phaseIdx?' past':''}"></i>`).join('')}</span>
   <span class="phases">${ORDER.map((s,i)=>`<span class="ph ${s==='A'?'a':'d'} ${i===G.phaseIdx?'cur':''}">${s==='A'?'攻':'守'}</span>`).join('')}</span>
-  ${G.defuser?`<span style="color:var(--accent)">${dfTxt().replace(/<\/?b>/g,'')}</span>`:''}`;
+  `;
 }
 function hpBar(u){return `<span class="hp">${[...Array(u.max)].map((_,i)=>`<i class="${i<u.hp?'f':''}"></i>`).join('')}</span>`;}
 function opCard(u){
