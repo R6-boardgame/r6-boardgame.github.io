@@ -5215,7 +5215,11 @@ function newGame(){
 }
 const unplaced=()=>G?alive(G.player).filter(u=>u.x<0):[];
 function nextUnplaced(){const n=unplaced()[0];if(n){G.sel=n;G.mode='move';}}
-function startPlay(){if(G&&!G.reroll)G.reroll={A:0,D:0};try{playStartHooks();}catch(e){console.warn(e);}
+function depWait(){return !!(G&&G.net&&G.phase==='setup'&&G.dep&&G.dep!==G.player);}
+// v117: online, the defender's start button ends their deployment and hands the board to the attacker
+function depDone(){if(unplaced().length)return;if(!(G.decoys||[]).length)seedDecoys();G.dep='A';G.sel=null;G.mode='move';G.bpPend=null;G.rearrCam=null;
+  log('防守方部署完成，等待進攻方部署…','kd');G._handoff=true;netPush();render();}
+function startPlay(){if(G&&G.net&&G.phase==='setup'&&G.player==='D'){if(G.dep==='D')depDone();return;}if(G&&!G.reroll)G.reroll={A:0,D:0};try{playStartHooks();}catch(e){console.warn(e);}
   if(G.phase==='setup'&&unplaced().length)return;
   if(!G.net&&G.player==='D'&&!G.decoys.length)seedDecoys();
   G.phase='play';G.sel=null;G.mode='move';clockReset();
@@ -5229,6 +5233,7 @@ function curTargets(){if(G&&G.mode==='bpface'&&G.bpPend)return G.bpPend.map(p=>p
   if(G.mode==='shdir'&&G.shdir)return adj4(G.shdir.x,G.shdir.y);
   const u=G.sel;if(!u)return [];
   if(G.phase==='setup'){
+    if(depWait())return [];
     if(G.player==='A')return [];
     if(G.mode==='gadget')return gTargets(u);
     if(G.mode==='wire'||G.mode==='shield'||G.mode==='bpcam')return allCells().filter(([x,y])=>setupIndoor(x,y)&&!gadgetAt(x,y)&&!unitAt(x,y));
@@ -5296,6 +5301,7 @@ async function onCell(x,y){
   if(G.phase==='setup'&&G.mode==='bpface'){const h=(G.bpPend||[]).find(p=>p.w[0]===x&&p.w[1]===y);G.bpPend=null;G.mode='bpcam';if(h){await deployGadget(u,'bpcam',h.x,h.y,h.w);if(!G.bpcam)G.mode='move';return render();}}
   const inT=curTargets().some(([a,b])=>a===x&&b===y);
   if(G.phase==='setup'){
+    if(depWait())return;
     if(G.player==='A'){const o=unitAt(x,y);if(o&&o.side==='A'){G.sel=o;return render();}
       const zi=G.map.spawns.findIndex(z=>z.cells.some(([a,b])=>a===x&&b===y));
       if(zi>=0&&u&&u.side==='A'){u.x=x;u.y=y;G.spawn=zi;nextUnplaced();render();}return;}
@@ -6538,11 +6544,12 @@ function renderPanel(){{const r=document.getElementById('actsR');if(r)r.replaceC
   if($('#zones'))$('#zones').innerHTML='',G.map.spawns.forEach((z,i)=>{const b=document.createElement('button');b.textContent=z.name;if(G.spawn===i)b.className='on';b.onclick=()=>{const z=G.map.spawns[i],free=z.cells.filter(([x,y])=>!unitAt(x,y));unplaced().forEach(u=>{const c=free.shift();if(c){u.x=c[0];u.y=c[1];}});G.spawn=i;nextUnplaced();render();};$('#zones').appendChild(b);});
   if($('#acts'))renderActs();
 }
-function renderDeploy(p){if(G.player==='D'&&!G.net&&!(G.decoys||[]).length&&!unplaced().length)seedDecoys();const team=G.units.filter(u=>u.side===G.player),left=unplaced().length,A=G.player==='A';
+function renderDeploy(p){if(depWait()){p.innerHTML=`<div class="box depBox"><div class="depHd"><h2>部署階段</h2><span>${G.dep==='A'?'已完成，等待進攻方選出生位置…':'等待防守方部署…'}</span></div></div>`;return;}
+  if(G.player==='D'&&!G.net&&!(G.decoys||[]).length&&!unplaced().length)seedDecoys();const team=G.units.filter(u=>u.side===G.player),left=unplaced().length,A=G.player==='A';
   p.innerHTML=`<div class="box depBox"><div class="depHd"><h2>部署階段</h2><span>${A?'點幹員，再點橘框格子':'點幹員，再點建築內空格'}</span></div>
     <div class="depSq">${team.map(u=>`<button data-u="${u.id}" class="${u===G.sel?'on':''} ${u.x<0?'todo':'ok'}"><img src="${opIcon(u.op)}" alt=""><span>${OPS[u.op].name}</span></button>`).join('')}</div>
     ${A?'<div class="depZ"><small>一次放到</small><div class="row" id="zones"></div></div>':G.sel?'<div class="row" id="acts"></div>':''}
-    <button class="primary" id="go" ${left?'disabled':''}>開始行動<span class="sub">${left?`還有 ${left} 名幹員沒放`:'進攻方先動'}</span></button></div>`;
+    <button class="primary" id="go" ${left?'disabled':''}>${G.net&&!A?'部署完成':'開始行動'}<span class="sub">${left?`還有 ${left} 名幹員沒放`:G.net&&!A?'換進攻方選出生位置':'進攻方先動'}</span></button></div>`;
   p.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const u=G.units.find(x=>x.id===b.dataset.u);if(u.alive&&u.x>=0)onCell(u.x,u.y);else{G.sel=u;render();}});
   $('#go').onclick=startPlay;
   if($('#zones'))G.map.spawns.forEach((z,i)=>{const b=document.createElement('button');b.textContent=z.name;if(G.spawn===i)b.className='on';b.onclick=()=>{const z=G.map.spawns[i],free=z.cells.filter(([x,y])=>!unitAt(x,y));unplaced().forEach(u=>{const c=free.shift();if(c){u.x=c[0];u.y=c[1];}});G.spawn=i;nextUnplaced();render();};$('#zones').appendChild(b);});
@@ -8065,16 +8072,16 @@ function netOnGame(d){
     return;}
   if(d.seq>NET.seq&&d.by!==NET.me)netApply(d);
 }
-function netStartGame(gp){if(RQ.q)rankLeaveQueue();if(NET.started)return;NET.started=true;SCREEN='game';if(NET.side==='A')mfEnd();
+function netStartGame(gp){if(RQ.q)rankLeaveQueue();if(NET.started)return;NET.started=true;SCREEN='game';
   if(!G||!G.warm)mkBoard(NET.map||ONLINE_MAPS[0],NET.mis||'bomb',NET.side,{});G.net=true;G.player=NET.side;
   const os=NET.side==='A'?'D':'A',my=NET.myPick||{p:cfg.picks[NET.side].slice(),inv:INV_DEF[NET.side]};
   const th=gp&&Array.isArray(gp.p)&&gp.p.length===5&&gp.p.every(k=>OPC[k]&&OPC[k].side===os)?gp:{p:rndPicks(os,false),inv:rndInv(os)};
   const A=NET.side==='A'?my:th,D=NET.side==='D'?my:th;
-  addTeams(A.p,D.p,invOK('A',A.inv),invOK('D',D.inv),true);
-  log(`連線對戰開始：房間 ${NET.code}，${MFMIS[G.mission]}任務，防守方已自動佈防，進攻方自己選出生位置。`,'ks');
+  addTeams(A.p,D.p,invOK('A',A.inv),invOK('D',D.inv),true,true);G.dep='D';
+  log(`連線對戰開始：房間 ${NET.code}，${MFMIS[G.mission]}任務。防守方先部署，完成後換進攻方選出生位置。`,'ks');
   if(R3){R3.sig='';R3.camPhase='setup';}
-  // the attacker deploys: the host does it here and pushes when they press start; otherwise the guest gets the setup board and the host waits on the pick screen
-  if(NET.side==='A'){G.sel=alive('A')[0];render();if(R3)setTimeout(()=>setView('top'),50);return;}
+  // v117: the defender deploys first, then hands the board to the attacker; the side not deploying waits (the attacker on the pick screen)
+  if(NET.side==='D'){mfEnd();G.sel=alive('D')[0];render();if(R3)setTimeout(()=>setView('top'),50);return;}
   render();G._handoff=true;netPush();
 }
 function netSer(){
@@ -8092,6 +8099,7 @@ function netDes(s){
 function netDirty(){
   if(!G||!G.net||!NET||NET.applying)return;
   if(curSide()!==G.player&&!G._handoff&&!G.over)return;
+  if(G.phase==='setup'&&G.dep&&G.dep!==G.player&&!G._handoff)return;
   clearTimeout(NET.t);NET.t=setTimeout(netPush,G._handoff||G.over?60:350);
 }
 function netPush(){
@@ -8103,7 +8111,8 @@ function netApply(d){
   NET.applying=true;NET.seq=d.seq;const was=G&&G.over;
   G=netDes(d.state);(G.units||[]).forEach(u=>{try{if(!OPS[u.op])ensureOp(u.op);}catch(e){}});G.player=NET.side;G.busy=false;G.ai=false;G.mode='move';
   if(curSide()===G.player&&!G.over){if(G.sel&&(G.sel.side!==G.player||!G.sel.alive))G.sel=null;}else if(!G.over)G.sel=null;
-  if(MF&&G.phase==='setup'&&G.player!=='A'){render();NET.applying=false;return;}
+  if(G.phase==='setup'&&G.dep===G.player&&!G.sel)G.sel=unplaced()[0]||null;
+  if(MF&&G.phase==='setup'&&G.dep!==G.player){MF.gotState=true;render();NET.applying=false;return;}
   if(SCREEN!=='game'||MF){if(RQ.q)rankLeaveQueue();mfEnd();SCREEN='game';if(R3){R3.sig='';setTimeout(()=>G&&G.phase==='setup'?setView('top'):playCam(),50);}}
   if(G.over&&!was){G.over=false;finish(G.win,G.why);}else render();
   NET.applying=false;
@@ -8650,11 +8659,11 @@ function mkBoard(mk,mis,side,extra){const m=MAPS[mk];cfg.map=mk;
   m.cams.forEach(([x,y])=>G.gadgets.push({type:'cam',x,y,side:'D',alive:true,fixed:true}));
   if(mis==='hostage')placeHostage();else placeBombsSafe();
   if(R3)R3.sig='';return G;}
-function addTeams(ap,dp,invA,invD,atkDeploys){copPrep(false);
+function addTeams(ap,dp,invA,invD,atkDeploys,defDeploys){copPrep(false);
   ap.forEach((op,i)=>G.units.push(mkUnit(op,'A',i)));dp.forEach((op,i)=>G.units.push(mkUnit(op,'D',i)));
   if(dp.includes('rook'))alive('D').forEach(u=>{u.max++;u.hp++;});
   Object.assign(G,invFor('A',invA),invFor('D',invD));delete G.warm;
-  autoDefSetup(true);if(!atkDeploys)placeAttackers(Math.floor(Math.random()*G.map.spawns.length));} // a human attacker places their own squad in the setup phase
+  if(!defDeploys)autoDefSetup(true);if(!atkDeploys)placeAttackers(Math.floor(Math.random()*G.map.spawns.length));} // a human attacker places their own squad in the setup phase
 // o: {side, mk, mis, opp (profile), bot, onLock({p,inv}), ready()}
 function mfStart(o){mfEnd();const side=o.side;
   MF=Object.assign({me:myProf(),picks:[],cur:mfPool(side,true)[0],inv:invOK(side,cfg.inv[side]),lock:false,oppLock:false,tab:'op',t0:0,pick0:0},o);
@@ -8708,7 +8717,7 @@ function mfDraw(){const el=MF.el,side=MF.side,pool=mfPool(side,true),P=MF.picks,
   const left=Math.max(0,Math.ceil(MFT-(Date.now()-MF.pick0)/1000));const _rs=scrollSnap(el);
   const ops=pool.map(k=>{const i=P.indexOf(k);return `<button class="mfOp${i>=0?' on':''}${MF.cur===k?' cur':''}" data-k="${k}"${L?' disabled':''}><img src="${copSlot(k)!=null?(opArt(k)||opIcon(k)):opIcon(k)}" class="${copSlot(k)!=null?'cop':''}" alt=""><span>${esc(copSlot(k)!=null?COPN[copSlot(k)]:OPC[k].name)}</span>${i>=0?`<em>${i+1}</em>`:''}</button>`;}).join('');
   const invs=Object.entries(INV[side]).map(([k,[n,max,d]])=>`<div class="mfInv"><i>${WZI[k]||''}</i><div><b>${n}</b><span>${d}</span></div><div class="mfCnt"><button data-iv="${k}" data-d="-1"${L||inv[k]<=0?' disabled':''} aria-label="減少${n}">−</button><b>${inv[k]|0}</b><button data-iv="${k}" data-d="1"${L||inv[k]>=max||used>=cap?' disabled':''} aria-label="增加${n}">＋</button></div></div>`).join('');
-  const wait=MF.oppLock?(MF.bot||MF.side==='A'?'雙方已鎖定':'雙方已鎖定，等待進攻方部署…'):'已鎖定，等待對手…';
+  const wait=MF.oppLock?(MF.bot||MF.side==='D'?'雙方已鎖定':'雙方已鎖定，等待防守方部署…'):'已鎖定，等待對手…';
   el.innerHTML=`<div class="mfPick ${side==='A'?'a':'d'}"><header class="mfHd"><img class="mfThumb" src="${mapThumb(MF.mk)}" alt="${MAPS[MF.mk].name}格局圖"><div class="mfMap"><b>${MAPS[MF.mk].name}</b><span>${MFMIS[MF.mis]} · <i>${side==='A'?'進攻方':'防守方'}</i></span></div><div class="mfTm${left<=5&&!L?' hot':''}" id="mfTm">${left}</div></header>
     <div class="mfVsl"><span class="${MF.lock?'ok':''}">${esc(MF.me.n)} ${MF.lock?'已鎖定':'選角中'}</span><span class="${MF.oppLock?'ok':''}">${esc(MF.opp.n)} ${MF.oppLock?'已鎖定':'選角中'}</span></div>
     <div class="mfTabs"><button data-tab="op" class="${MF.tab==='op'?'on':''}">幹員 ${P.length}/5</button><button data-tab="inv" class="${MF.tab==='inv'?'on':''}">裝備 ${used}/${cap}</button></div>
@@ -8735,15 +8744,14 @@ function netPre(opp){if(RQ.q)rankLeaveQueue();clearTimeout(RQ.hostT);const host=
     onLock:pk=>{NET.myPick=pk;netWrite('picks/'+code+'_'+(host?'h':'g'),{...pk,lock:1,ts:Date.now()});},
     ready:host?(()=>netStartGame(NET.oppPick)):null,
     // the host waits a few seconds past the clock for the guest's lock, then fills in for them; a guest with no game after that gives up
-    tick:left=>{if(host&&left<-8&&MF.lock)mfOppLock();if(!host&&left<-30&&MF.lock)netAbort();}});}
+    tick:left=>{if(host&&left<-8&&MF.lock)mfOppLock();if(!host&&left<-30&&MF.lock&&!MF.gotState)netAbort();}});}
 function netAbort(){mfEnd();G=null;try{netLeave();}catch(e){}SCREEN='rank';NETMSG='對手離線，這場配對取消了。';render();renderTitle();}
 function rankBotGo(pk){mfEnd();SCREEN='game';const side=G.player,en=side==='A'?'D':'A';
   const bases=new Set(),theirs=[];for(const k of shuffle(OPBASE.filter(k=>OPC[k].side===en&&SCRIPTED.has(k)))){if(theirs.length>=5)break;if(!bases.has(OPC[k].base)){bases.add(OPC[k].base);theirs.push(k);}}
   const ap=side==='A'?pk.p:theirs,dp=side==='D'?pk.p:theirs;
-  addTeams(ap,dp,side==='A'?pk.inv:INV_DEF.A,side==='D'?pk.inv:INV_DEF.D,side==='A');
-  log(`線上對戰開始：對手 ${esc(G.bot.name)}，${MFMIS[G.mission]}任務，防守方已自動佈防。${side==='A'?'點幹員，再點橘框出生格放下他。':'進攻方隨機出生點。'}`,'ks');
-  if(R3)R3.sig='';if(side==='A'){G.sel=alive('A')[0];render();if(R3){R3.camPhase='setup';setTimeout(()=>setView('top'),50);}return;}
-  startPlay();if(R3){R3.camPhase='setup';setTimeout(()=>G&&G.phase==='setup'?setView('top'):playCam(),50);}
+  addTeams(ap,dp,side==='A'?pk.inv:INV_DEF.A,side==='D'?pk.inv:INV_DEF.D,side==='A',side==='D');
+  log(`線上對戰開始：對手 ${esc(G.bot.name)}，${MFMIS[G.mission]}任務。${side==='A'?'防守方已佈防。點幹員，再點橘框出生格放下他。':'點幹員，再點建築內的空格放下他，也可以放鐵絲網、盾牌與攝影機。'}`,'ks');
+  if(R3)R3.sig='';G.sel=alive(side)[0];render();if(R3){R3.camPhase='setup';setTimeout(()=>setView('top'),50);}
 }
 setTimeout(()=>{renderPlayer();renderTopRight();placeOnline();if(SCREEN==='title'){const t=$('#title');if(t)t.dataset.s='';render();}},0);if(ME.mode==='account')acctLoad().then(ok=>{if(!ok)ME.mode='guest';renderPlayer();});if(ME.lang!=='zh')setTimeout(()=>setLang(ME.lang),0);
 // ---------- renown, operator unlocks, daily/weekly tasks, operator mastery ----------
