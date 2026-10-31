@@ -8271,9 +8271,9 @@ function openFeedback(){const el=tsDlg('feedback','回報',`<div class="psbox"><
     const ty=el.querySelector('#fbType').value==='bug'?'回報 Bug':'遊戲建議';bt.disabled=true;bt.textContent='發送中…';msg.className='fbmsg';msg.textContent='';
     try{const r=await fetch('https://formsubmit.co/ajax/'+FB_TO,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
         body:JSON.stringify({_subject:`[虹彩六號桌遊] ${ty}`,_template:'table',_captcha:'false','類型':ty,'內容':t,'玩家':meName(),'版本':(document.title||'')+' · '+location.href,'裝置':navigator.userAgent,'時間':new Date().toLocaleString('zh-TW')})});
-      const j=await r.json().catch(()=>({}));if(!r.ok||j.success==='false'||j.success===false)throw 0;
+      const j=await r.json().catch(()=>({}));if(!r.ok||j.success==='false'||j.success===false)throw {m:/activat/i.test(j.message||'')?'回報信箱還沒啟用，請稍後再試。':(j.message?'送出失敗：'+j.message:'')};
       msg.className='fbmsg ok';msg.textContent='已送出，謝謝你的回報！';tx.value='';cnt.textContent='0 / 2000';bt.textContent='已送出';setTimeout(()=>{bt.disabled=false;bt.textContent='發送';},2500);}
-    catch(e){msg.className='fbmsg err';msg.textContent='送出失敗，請檢查網路後再試一次。';bt.disabled=false;bt.textContent='發送';}};}
+    catch(e){msg.className='fbmsg err';msg.textContent=(e&&e.m)||'送出失敗，請檢查網路後再試一次。';bt.disabled=false;bt.textContent='發送';}};}
 {const a=$('#t-love'),b=$('#t-fb');if(a)a.onclick=openSponsor;if(b)b.onclick=openFeedback;}
 function renderPlayer(){const el=$('#tplayer');if(!el)return;const acct=ME.mode==='account';
   el.innerHTML=`<button class="pcard" id="pcard" aria-label="玩家資料與設定"><img class="pav" src="${meAvatar()}" alt=""><span class="pinfo"><b>${esc(meName())}</b><span class="prank">${ecoTag()}</span></span><i class="pgear" aria-hidden="true">⚙</i></button>`;
