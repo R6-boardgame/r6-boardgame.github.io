@@ -161,3 +161,9 @@
 - 幹員卡片在英文模式下直接用卡片英文原文（`cardText`、`c.g.ab`）。
 - 英文字變長時，不要縮小字級：放大格子（讓它換行或加寬），或改用較短的同義詞。
 - 規則書全文有英文版：`<script type="text/plain" id="rulesmd_en">`（緊接在 `rulesmd` 後）。英文模式下 `rbBook` 會讀 `書的 src + "_en"`；改中文規則書時記得同步改英文版。
+
+## v131：吧台場景（背景）
+
+- 棋盤底下是黑色遊戲墊，放在亮漆木吧台上；背景是酒吧實景照片（跟著鏡頭傾斜的照片球 `R3.bar.sky`）。程式：`barInit`（init3D 結尾，載入素材、換燈光與環境貼圖）、`barBuild(m)`（buildStatic 結尾與 size3D 呼叫，依地圖尺寸與直／橫式重建）。
+- 素材都在 `img/bar/`，全部來自 Poly Haven（CC0，可商用、免標註）：`cowboy_town_saloon` HDRI（已調暗紅色調、轉成 `bar_bg.jpg`／`bar_env.jpg`）、`lacquered_cherry_wood` 貼圖（`wood_*.jpg`）、`Lantern_01`、`wine_bottles_01` glTF 模型。
+- `.grade` 改成暖色暗角。

@@ -210,7 +210,7 @@ button.primary .sub{color:#3d300c}
 [hidden]{display:none!important}
 canvas.gl{display:block;margin:0 auto;touch-action:none;cursor:pointer}
 .boardframe canvas.gl{filter:saturate(.74) contrast(1.12) brightness(.97) sepia(.06)}
-.grade{position:absolute;inset:8px;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 55%,rgba(5,10,14,.5) 100%),linear-gradient(180deg,rgba(40,70,90,.10),rgba(90,60,30,.08));mix-blend-mode:multiply;z-index:1}
+.grade{position:absolute;inset:8px;pointer-events:none;background:radial-gradient(ellipse at 50% 55%,rgba(0,0,0,0) 45%,rgba(10,5,2,.72) 100%),linear-gradient(180deg,rgba(255,190,150,.10),rgba(255,170,120,.10));mix-blend-mode:multiply;z-index:1}
 .tutbox{position:absolute;left:14px;bottom:14px;z-index:4;width:min(460px,calc(100% - 28px));background:rgba(14,19,25,.93);border:1px solid #e3aa3e;padding:12px 14px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
 .tutbox .tuthead{display:flex;gap:8px;align-items:center}.tutbox .tuthead b{flex:1;color:#e3aa3e;font-size:12.5px;letter-spacing:.06em}
 .tutbox .tuthead button{font-size:12px;padding:3px 8px}
@@ -8439,12 +8439,13 @@ function init3D(){
   try{renderPortraits();}catch(e){console.warn('portraits',e);}
   try{setupPost();}catch(e){console.warn('post',e);R3.comp=null;}
   R3.hq=!!R3.comp&&Math.min(innerWidth,innerHeight)>=700;
+  try{barInit();}catch(e){console.warn('bar',e);}
   const qb=$('#view-q');if(qb){qb.hidden=!R3.comp;const lab=()=>qb.textContent=R3.hq?'畫質：高':'畫質：標準';lab();qb.onclick=()=>{R3.hq=!R3.hq;lab();};}
 }
 function cellName(x,y){const c=cell(x,y);if(!c)return '';const t={hard:'承重牆',soft:'軟牆',reinf:c.elec&&elecVisible(x,y)?'通電加固牆':'加固牆',out:'室外'}[c.t];
   if(t)return t;if(c.t==='bar')return c.kind==='window'?'窗（路障）':'門（路障）';return c.site&&!bombHid(c.site)?`${c.site} 炸彈點`:(c.rubble?'破口':'地板');}
 function size3D(){if(!R3)return;const f=$('#frame');const w=Math.max(200,f.clientWidth),h=Math.max(200,f.clientHeight);
-  R3.renderer.setSize(w,h);R3.camera.aspect=w/h;R3.camera.updateProjectionMatrix();if(R3.comp){const pr=R3.renderer.getPixelRatio();R3.comp.setPixelRatio(pr);R3.comp.setSize(w,h);}}
+  R3.renderer.setSize(w,h);R3.camera.aspect=w/h;R3.camera.updateProjectionMatrix();if(R3.bar&&R3.bar.m)try{barBuild(R3.bar.m);}catch(e){}if(R3.comp){const pr=R3.renderer.getPixelRatio();R3.comp.setPixelRatio(pr);R3.comp.setSize(w,h);}}
 function setupPost(){
   if(!THREE.EffectComposer||!THREE.SSAOPass||!THREE.UnrealBloomPass||!THREE.ACESFilmicToneMappingShader)return;
   const r=R3.renderer,sz=r.getSize(new THREE.Vector2());
@@ -8463,8 +8464,8 @@ function setView(kind,snap){
   if(cam.aspect<1){// portrait phone: fit the board's width, and lift it above the bottom sheet
     const e=kind==='top'?Math.PI/2-.01:58*Math.PI/180,vf=cam.fov*Math.PI/360,d=(W/2+.4)/(Math.tan(vf)*cam.aspect);
     const s=d*Math.tan(Math.atan(.26*Math.tan(vf)))/Math.sin(e),t=new THREE.Vector3(tx,0,tz+s);
-    R3.scene.fog.near=d*.95;R3.scene.fog.far=d*2.2;flyTo(t.clone().add(new THREE.Vector3(0,d*Math.sin(e),d*Math.cos(e))),t,snap);return;}
-  const far=Math.max(W,H),oz=0;R3.scene.fog.near=38;R3.scene.fog.far=90;
+    R3.scene.fog.near=d*1.25;R3.scene.fog.far=d*4.4;flyTo(t.clone().add(new THREE.Vector3(0,d*Math.sin(e),d*Math.cos(e))),t,snap);return;}
+  const far=Math.max(W,H),oz=0;R3.scene.fog.near=70;R3.scene.fog.far=170;
   const p=kind==='top'?new THREE.Vector3(tx,far*1.3,tz+oz+.01):new THREE.Vector3(tx,far*.78,tz+oz+far*.66);
   flyTo(p,new THREE.Vector3(tx,0,tz+oz),snap);
 }
@@ -8544,7 +8545,52 @@ function envTune(root,k){root.traverse(o=>{const ms=o.material?(Array.isArray(o.
 function staticSig(){let s=R3.wall+(G.mission==='bomb'&&G.player==='A'?'b'+bombHid('A')+bombHid('B'):'');for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++){const c=G.grid[y][x];s+=c.t[0]+(c.elec&&elecVisible(x,y)?'e':'')+(c.rubble?'r':'')+(c.hole?'h':'');}return s;}
 function addBox(parent,mats,x,y,z,sx,sy,sz,cc,shadow=true){const m=new THREE.Mesh(boxUV(sx,sy,sz),mats);m.position.set(x,y,z);m.castShadow=shadow;m.receiveShadow=true;if(cc)m.userData.cell=cc;parent.add(m);return m;}
 let BOX3=null,SPH3=null,HSPH3=null,CYL3=null;
-function buildStatic(m){make3DMats();const _M=R3.mats,_h=_M.hard,_s=_M.soft;if(G.map===MAPS.bank||G.map===MAPS.consulate||G.map===MAPS.kafe){_M.hard=_M.hardB||(_M.hardB=bankWallMats());_M.soft=_M.softB||(_M.softB=bankWallMats(true));}if(G.map===MAPS.clubhouse){_M.hard=_M.hardK||(_M.hardK=clubWallMats());_M.soft=_M.softK||(_M.softK=clubWallMats(true));}try{return buildStatic0(m);}finally{_M.hard=_h;_M.soft=_s;}}
+// v131: the board sits on a lacquered bar counter inside a real bar (Poly Haven CC0: cowboy_town_saloon HDRI, lacquered_cherry_wood, Lantern_01, wine_bottles_01)
+const BARD='img/bar/';
+function barInit(){
+  const T=THREE,S=R3.scene;R3.bar={key:'',g:null,ready:false,m:null};
+  S.background=new T.Color(0x0c0504);S.fog.color.set(0x1a0805);
+  S.traverse(o=>{if(o.isHemisphereLight){o.color.set(0xffc49a);o.groundColor.set(0x2a0e08);o.intensity=.12;}});
+  R3.sun.color.set(0xff9a6a);R3.sun.intensity=.95;
+  S.traverse(o=>{if(o.isDirectionalLight&&o!==R3.sun){o.color.set(0xff3a22);o.intensity=.35;o.position.set(-14,10,-12);}});
+  const tl=new T.TextureLoader(),load=(u,srgb)=>new Promise(r=>tl.load(BARD+u,t=>{if(srgb)t.encoding=T.sRGBEncoding;t.anisotropy=8;r(t);},undefined,()=>r(null)));
+  Promise.all([load('bar_bg.jpg',1),load('bar_env.jpg',1),load('wood_diff.jpg',1),load('wood_nor_gl.jpg'),load('wood_rough.jpg')]).then(([bg,envT,wd,wn,wr])=>{
+    if(bg){// photo sphere that follows the camera and tilts with it, so the bar's back shelves stay behind the board
+      bg.wrapS=T.RepeatWrapping;bg.repeat.x=-1;bg.offset.x=1;
+      const sky=new T.Mesh(new T.SphereGeometry(150,96,48),new T.MeshBasicMaterial({map:bg,side:T.BackSide,fog:false,depthWrite:false}));sky.renderOrder=-10;sky.frustumCulled=false;
+      const d=new T.Vector3();sky.onBeforeRender=(r,s,cam)=>{sky.position.copy(cam.position);cam.getWorldDirection(d);sky.rotation.set(-Math.asin(-d.y)*(cam.aspect<1?.78:.55),0,0);};
+      S.add(sky);R3.bar.sky=sky;}
+    if(envT){envT.mapping=T.EquirectangularReflectionMapping;const pm=new T.PMREMGenerator(R3.renderer);S.environment=pm.fromEquirectangular(envT).texture;pm.dispose();envT.dispose();}
+    R3.bar.tex={wd,wn,wr};R3.bar.ready=true;if(R3.bar.m)barBuild(R3.bar.m);
+  });
+}
+function barBuild(m){
+  const B=R3&&R3.bar;if(!B||!m||!m.rows)return;B.m=m;if(!B.ready)return;
+  const T=THREE,W=m.rows[0].length,H=m.rows.length,PH=R3.camera.aspect<1,key=W+'x'+H+(PH?'p':'l');if(B.key===key&&B.g)return;
+  if(B.g){R3.scene.remove(B.g);B.g.traverse(o=>{if(o.geometry&&!o.userData.keep)o.geometry.dispose();});}
+  B.key=key;const g=new T.Group();B.g=g;R3.scene.add(g);const cx=W/2,cz=H/2;
+  // black game mat under the board
+  const mx=W+3,mz=H+3,c=document.createElement('canvas');c.width=2048;c.height=Math.round(2048*mz/mx);{const x=c.getContext('2d'),w=c.width,h=c.height,s=w/mx;x.fillStyle='#141517';x.fillRect(0,0,w,h);
+    for(let i=0;i<60000;i++){x.fillStyle=`rgba(255,255,255,${Math.random()*.025})`;x.fillRect(Math.random()*w,Math.random()*h,1.5,1.5);}x.strokeStyle='#4a4e54';x.lineWidth=s*.05;x.strokeRect(s*.55,s*.55,w-s*1.1,h-s*1.1);}
+  const mt=new T.CanvasTexture(c);mt.encoding=T.sRGBEncoding;mt.anisotropy=8;
+  const blk=new T.MeshStandardMaterial({color:0x0e0f10,roughness:.8});
+  const mat=new T.Mesh(new T.BoxGeometry(mx,.3,mz),[blk,blk,new T.MeshStandardMaterial({map:mt,roughness:.85}),blk,blk,blk]);mat.position.set(cx,-.21,cz);mat.castShadow=mat.receiveShadow=true;g.add(mat);
+  // lacquered bar counter
+  const TOP=-.36,BACK=-14,FRONT=H+(PH?34:18),TX=W+120,TZ=FRONT-BACK,{wd,wn,wr}=B.tex;
+  const rep=(t,x,y)=>{if(!t)return null;const q=t.clone();q.needsUpdate=true;q.wrapS=q.wrapT=T.RepeatWrapping;q.repeat.set(x,y);return q;};
+  const topM=new T.MeshPhysicalMaterial({map:rep(wd,TX/40,TZ/40),normalMap:rep(wn,TX/40,TZ/40),roughnessMap:rep(wr,TX/40,TZ/40),roughness:.55,clearcoat:1,clearcoatRoughness:.07,envMapIntensity:1.1,normalScale:new T.Vector2(.4,.4)});
+  const sideM=new T.MeshStandardMaterial({map:rep(wd,TX/40,.15),color:0x8a6a5a,roughness:.5});
+  const frontM=new T.MeshStandardMaterial({map:rep(wd,TX/30,1.4),color:0x4a2a20,roughness:.6,normalMap:rep(wn,TX/30,1.4)});
+  const top=new T.Mesh(new T.BoxGeometry(TX,1.4,TZ),[sideM,sideM,topM,sideM,sideM,sideM]);top.position.set(cx,TOP-.7,(FRONT+BACK)/2);top.receiveShadow=true;g.add(top);
+  const lip=new T.Mesh(new T.CylinderGeometry(.9,.9,TX,32),topM);lip.rotation.z=Math.PI/2;lip.position.set(cx,TOP-.9,FRONT);lip.receiveShadow=true;g.add(lip);
+  const lip2=lip.clone();lip2.position.z=BACK;g.add(lip2);
+  const panel=new T.Mesh(new T.BoxGeometry(TX,120,1),frontM);panel.position.set(cx,TOP-61.5,FRONT-2.2);g.add(panel);
+  // real props
+  const put=(u,s,x,z,ry)=>{const done=o=>{if(B.g!==g)return;const k=o.clone();k.scale.setScalar(s);k.position.set(x,TOP,z);k.rotation.y=ry;k.traverse(q=>{if(q.isMesh){q.castShadow=q.receiveShadow=true;q.userData.keep=1;}});g.add(k);};
+    B.models=B.models||{};const p=B.models[u]||(B.models[u]=new Promise(r=>new T.GLTFLoader().load(BARD+u,x=>r(x.scene),undefined,()=>r(null))));p.then(o=>o&&done(o));};
+  if(T.GLTFLoader){put('bottles/wine_bottles_01_1k.gltf',38,PH?W-3:W+9,PH?-6:-4,.6);put('lantern/Lantern_01_1k.gltf',34,PH?4:-7,PH?-7:-3,.3);}
+}
+function buildStatic(m){make3DMats();const _M=R3.mats,_h=_M.hard,_s=_M.soft;if(G.map===MAPS.bank||G.map===MAPS.consulate||G.map===MAPS.kafe){_M.hard=_M.hardB||(_M.hardB=bankWallMats());_M.soft=_M.softB||(_M.softB=bankWallMats(true));}if(G.map===MAPS.clubhouse){_M.hard=_M.hardK||(_M.hardK=clubWallMats());_M.soft=_M.softK||(_M.softK=clubWallMats(true));}try{return buildStatic0(m);}finally{_M.hard=_h;_M.soft=_s;try{barBuild(m);}catch(e){console.warn('bar',e);}}}
 function buildStatic0(m){
   const g=R3.staticG;while(g.children.length){const o=g.children.pop();if(o.material&&o.material.map&&o.userData.own){const q=o.material;q.map.dispose();if(q.bumpMap)q.bumpMap.dispose();if(q.roughnessMap)q.roughnessMap.dispose();q.dispose();}}
   BOX3=BOX3||new THREE.BoxGeometry(1,1,1);SPH3=SPH3||new THREE.SphereGeometry(1,20,14);HSPH3=HSPH3||new THREE.SphereGeometry(1,20,10,0,Math.PI*2,0,Math.PI/2);CYL3=CYL3||new THREE.CylinderGeometry(1,1,1,16);
