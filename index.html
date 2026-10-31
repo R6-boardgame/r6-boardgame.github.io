@@ -9201,7 +9201,7 @@ function seg3(g,a,b,mat,w){const d=new THREE.Vector3().subVectors(b,a),L=d.lengt
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),d.normalize());m.castShadow=false;m.renderOrder=6;g.add(m);}
 function bolt3(g,a,b,mat,w,n){n=n||6;const d=new THREE.Vector3().subVectors(b,a),L=d.length();let p=a.clone();
   for(let i=1;i<=n;i++){const q=i===n?b.clone():a.clone().addScaledVector(d,i/n).add(new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5).multiplyScalar(L*.22));seg3(g,p,q,mat,w);p=q;}}
-const zapMats=()=>[gm('zapA3',()=>new THREE.MeshBasicMaterial({color:0x7fd6ff,transparent:true,opacity:.6,depthWrite:false,blending:THREE.AdditiveBlending})),gm('zapB3',()=>new THREE.MeshBasicMaterial({color:0x2a8cff,transparent:true,opacity:.55,depthWrite:false,blending:THREE.AdditiveBlending}))];
+const zapMats=()=>[gm('zapA4',()=>new THREE.MeshBasicMaterial({color:0x59b8ff,transparent:true,opacity:.7,depthWrite:false})),gm('zapB4',()=>new THREE.MeshBasicMaterial({color:0x1f7fff,transparent:true,opacity:.6,depthWrite:false}))];
 // v127: static electricity (no animation): fixed blue arcs drawn once from a seeded random
 function zapStatic(grp,make,seed){const zg=new THREE.Group();grp.add(zg);const [mA,mB]=zapMats(),rr=rng(seed),MR=Math.random;Math.random=rr;try{for(const [a,b,w] of make())bolt3(zg,a,b,rr()<.6?mA:mB,w||.014);}finally{Math.random=MR;}return zg;}
 // arcs that re-draw every ~70 ms; make() returns [from,to,width] pairs in the group's space
@@ -10957,8 +10957,8 @@ let STARM=null;function starMat(){if(STARM)return STARM;const c=document.createE
   g.beginPath();for(let i=0;i<10;i++){const r=i%2?12:28,a=-Math.PI/2+i*Math.PI/5;g.lineTo(32+Math.cos(a)*r,32+Math.sin(a)*r);}g.closePath();g.fill();g.stroke();
   const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return STARM=new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true});}
 function burnFx(){if(!R3||!R3.figs||!G)return;for(const id in R3.figs){const f=R3.figs[id],u=G.units.find(x=>x.id===id);const on=!!(u&&u.alive&&u.x>=0&&f.grp.visible&&inFire(u.x,u.y));
-  if(on&&!f.burnG){const g=new THREE.Group(),r=rng(id.length*7+(id.charCodeAt(1)||0));const mO=gm('brnO',()=>new THREE.MeshBasicMaterial({color:0xff6a10,transparent:true,opacity:.8,depthWrite:false,blending:THREE.AdditiveBlending})),mY=gm('brnY',()=>new THREE.MeshBasicMaterial({color:0xffd23a,transparent:true,opacity:.85,depthWrite:false,blending:THREE.AdditiveBlending})),cg=gm('brnC',()=>new THREE.ConeGeometry(1,1,7));
-    for(let k=0;k<11;k++){const a=k/11*6.28+r()*.4,y=.1+r()*1.05,h=.16+r()*.2,rad=.2+r()*.06;const m=new THREE.Mesh(cg,k%3?mO:mY);m.scale.set(h*.33,h,h*.33);m.position.set(Math.cos(a)*rad,y+h/2,Math.sin(a)*rad);m.renderOrder=8;g.add(m);}
+  if(on&&!f.burnG){const g=new THREE.Group(),r=rng(id.length*7+(id.charCodeAt(1)||0));const mO=gm('brnO2',()=>new THREE.MeshBasicMaterial({color:0xff5a0a,transparent:true,opacity:.85,depthWrite:false})),mY=gm('brnY2',()=>new THREE.MeshBasicMaterial({color:0xffb21a,transparent:true,opacity:.9,depthWrite:false})),cg=gm('brnC',()=>new THREE.ConeGeometry(1,1,7));
+    for(let k=0;k<14;k++){const a=k/14*6.28+r()*.4,y=.05+r()*.9,h=.12+r()*.16,rad=.17+r()*.06;const m=new THREE.Mesh(cg,k%3?mO:mY);m.scale.set(h*.33,h,h*.33);m.position.set(Math.cos(a)*rad,y+h/2,Math.sin(a)*rad);m.renderOrder=8;g.add(m);}
     f.grp.add(g);f.burnG=g;}
   if(f.burnG)f.burnG.visible=on;}}
 function stunFx(t){if(!R3||!R3.figs||!G)return;for(const id in R3.figs){const f=R3.figs[id],u=G.units.find(x=>x.id===id);const on=!!(u&&u.alive&&u.stun&&f.grp.visible);
