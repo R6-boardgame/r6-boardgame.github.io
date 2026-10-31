@@ -657,7 +657,7 @@ body[data-scr="setup"] header.top{visibility:hidden}
 .fbsend{padding:11px;font-size:16px;font-weight:800}
 .spheart{width:54px;height:54px;color:#ff5a6e;flex:none}
 .splist{display:flex;flex-direction:column;gap:8px}.splist a,.splist span{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:#121a22;border:1px solid #2a3a48;color:#e6edf2;text-decoration:none;font-size:15px}
-.splist a:hover{border-color:var(--accent)}.splist span{color:#7f8c97}.splist em{font-style:normal;font-size:12px;color:#9aa7b2}
+.splist a:hover{border-color:var(--accent)}.splist span{color:#7f8c97}.splist em{font-style:normal;white-space:nowrap;font-size:12px;color:#9aa7b2}
 @media (max-width:760px){.tside{right:12px;top:max(10px,env(safe-area-inset-top));gap:6px}.tsb{width:36px;height:36px}.tsb svg{width:19px;height:19px}}
 .psettings{position:fixed;inset:0;z-index:70;background:rgba(3,5,8,.72);display:grid;place-items:center;padding:16px}.psettings[hidden]{display:none}
 .psbox{width:min(560px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:#0e141a;border:1px solid #2c3a47;border-top:3px solid var(--accent);padding:18px 20px;display:flex;flex-direction:column;gap:14px;color:#e6edf2}
@@ -8295,13 +8295,13 @@ let PMSG='';
 // ---------- sponsor / feedback ----------
 const FB_TO='aesopfilmedit@gmail.com';
 // 贊助連結：填上網址就會變成可點的按鈕（url 空白時顯示「即將開放」）
-const SPONSOR=[{n:'贊助連結一',url:''},{n:'贊助連結二',url:''}];
+const SPONSOR=[{n:'Ko-fi（海外玩家）',url:'https://ko-fi.com/sonylin'},{n:'綠界（台灣玩家）',url:''}];
 function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement('div');el.id=id;el.className='psettings';el.setAttribute('role','dialog');el.setAttribute('aria-label',label);document.body.appendChild(el);
     el.addEventListener('click',e=>{if(e.target===el)el.hidden=true;});}
   el.hidden=false;el.innerHTML=html;el.querySelector('.tsX').onclick=()=>{el.hidden=true;};return el;}
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b><span>喜歡這款遊戲嗎？你的支持會讓它持續更新。</span></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
-  <p class="pshint">謝謝每一位玩家的支持！</p></div>`);}
+  <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。謝謝每一位玩家！</p></div>`);}
 function openFeedback(){const el=tsDlg('feedback','回報',`<div class="psbox"><div class="pshead"><div><b>回報</b><span>遇到問題或有想法，都歡迎告訴我們。</span></div><button class="tsX" aria-label="關閉">✕</button></div>
   <section><h4>類型</h4><select class="fbsel" id="fbType"><option value="bug">回報 Bug</option><option value="idea">遊戲建議</option></select></section>
   <section><h4>內容</h4><textarea class="fbtxt" id="fbText" maxlength="2000" placeholder="請描述發生了什麼、在哪個畫面，或你的建議…"></textarea><div class="fbcnt" id="fbCnt">0 / 2000</div></section>
