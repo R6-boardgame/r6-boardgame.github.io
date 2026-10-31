@@ -663,6 +663,15 @@ i.die.bolt{outline:1.5px dashed rgba(255,255,255,.85);outline-offset:-3px}
 .mfOp{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;text-align:center}
 .mfOp img{width:46px;height:46px;object-fit:cover;object-position:50% 12%}.mfOp span{font-size:11.5px;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mfOp.on{border-color:var(--accent);background:rgba(227,170,62,.14)}.mfOp span{color:#dfe7ee}.mfOp.on span{color:#ffe2a6}.mfOp em{position:absolute;right:3px;top:3px;width:18px;height:18px;border-radius:9px;background:var(--accent);color:#14100a;font:700 11px/18px 'IBM Plex Mono',monospace;font-style:normal}
+.mfDet{display:flex;gap:10px;min-height:0;flex:none;height:min(39vh,330px);padding:8px;background:rgba(255,255,255,.04);border:1px solid var(--line);overflow:hidden}
+.mfDA{width:34%;max-width:220px;height:100%;object-fit:contain;object-position:50% 100%;flex:none;-webkit-mask-image:linear-gradient(180deg,#000 80%,transparent);mask-image:linear-gradient(180deg,#000 80%,transparent)}
+.mfDI{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;overflow:hidden}.mfDI>*{flex:none}
+.mfDN b{font-size:19px;display:block;line-height:1.2}.mfDN small{font-size:12px;color:#9aa7b2}
+.mfDG{display:flex;gap:8px;align-items:flex-start}.mfDG img{width:30px;height:30px;flex:none}.mfDG b{font-size:13.5px;color:var(--accent)}.mfDG b i{font-style:normal;color:#9aa7b2;margin-left:6px;font-size:12px}.mfDG p{margin:2px 0 0;font-size:12px;line-height:1.45;color:#cfd8df;max-height:5.9em;overflow:auto}
+.mfDW{display:flex;flex-direction:column;gap:3px}.mfDW div{display:flex;align-items:center;gap:6px}.mfDW span{width:52px;flex:none;font-size:11.5px;color:#9aa7b2}.mfDW .hexd{width:19px;height:17px}
+.mfDS{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:#9aa7b2}.mfDS b{color:#e6edf2}
+.mfDI>button{margin-top:auto;padding:9px;text-align:center;font-size:14px}
+.mfOp.cur{box-shadow:0 0 0 2px #e6edf2}.mfOp img.cop,.mfSl img.cop{object-fit:cover;object-position:50% 4%}
 .mfInvs{display:flex;flex-direction:column;gap:6px}.mfInv{display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(16,23,30,.8);border:1px solid var(--line)}
 .mfInv>i{width:40px;height:40px;flex:none;display:grid;place-items:center}.mfInv>i svg,.mfInv>i img{width:40px;height:40px;object-fit:contain}
 .mfInv>div:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column}.mfInv>div:nth-child(2) span{font-size:11.5px;color:#9aa7b2;line-height:1.35}
@@ -4327,8 +4336,8 @@ async function step(u,x,y){DMGBY=null;
 async function riposte(u){
   for(const e of G.units){
     if(!u.alive||G.over)return false;
-    if(e.alive&&e.side!==u.side&&e.overwatch&&e.x>=0&&(e.mgOw||(u.x-e.x)*e.owd[0]+(u.y-e.y)*e.owd[1]>0)&&losAs(e,()=>inSight(e,u))&&(!u.hidden||u.spotted>0||los(e.x,e.y,u.x,u.y))&&!(e.owHit&&e.owHit.has(u.id))&&!rayBlk(e,u))
-      {(e.owHit||(e.owHit=new Set())).add(u.id);await shootUnit(e,u,true);}
+    if(e.alive&&e.side!==u.side&&e.overwatch&&e.x>=0&&(e.mgOw||(u.x-e.x)*e.owd[0]+(u.y-e.y)*e.owd[1]>0)&&losAs(e,()=>inSight(e,u))&&(!u.hidden||u.spotted>0||los(e.x,e.y,u.x,u.y))&&!(e.owHit&&e.owHit.has(u.id))&&!(e.owShot&&!e.mgOw)&&!rayBlk(e,u))
+      {(e.owHit||(e.owHit=new Set())).add(u.id);e.owShot=1;await shootUnit(e,u,true);}  // v112: overwatch fires once; the machine gun's 架槍 still sweeps everyone
   }
   return u.alive&&!G.over;
 }
@@ -4489,7 +4498,10 @@ async function doDestroy(u,x,y){useAct(u,'destroy');const g=G.gadgets.find(g=>g.
 const chargeTargets=u=>G.charges>0?adj4(u.x,u.y).filter(([x,y])=>['soft','bar'].includes(cell(x,y).t)&&!jammed(x,y)):[];
 const reinfTargets=u=>G.reinf>0?(G.phase==='setup'?allCells():adj4(u.x,u.y)).filter(([x,y])=>cell(x,y).t==='soft'):[];
 function defuseOK(u){return G.defuser&&!dfU()&&man(u.x,u.y,G.defuser.x,G.defuser.y)<=1;}
-function plantOK(u){return G.mission!=='hostage'&&!G.defuser&&cell(u.x,u.y).site;}
+// v112: the defuser can go down anywhere in a bomb site's room, not only on the 2×2 marked cells
+function siteAt(x,y){const c=cell(x,y);if(!c)return null;if(c.site)return c.site;if(!c.indoor)return null;let R=null;try{R=roomCells(x,y);}catch(e){return null;}
+  for(const [i,j] of allCells()){const s=cell(i,j).site;if(s&&R.has(j*G.W+i))return s;}return null;}
+function plantOK(u){return G.mission!=='hostage'&&!G.defuser&&siteAt(u.x,u.y);}
 function escortOK(u){return G.hostage&&!G.hostage.by&&u.side==='A'&&cheb(u.x,u.y,G.hostage.x,G.hostage.y)<=1;}
 
 function setupIndoor(x,y){const c=cell(x,y);return c.indoor&&!blocks(c)&&!c.obst;}
@@ -4638,13 +4650,13 @@ async function deployGadget(u,kind,x,y,w){
   render();if(G.phase==='play')await afterAct(u);
 }
 async function escort(u){useAct(u,'obj');G.hostage.known=true;note(u,'護送人質');G.hostage.by=u.id;G.hostage.x=u.x;G.hostage.y=u.y;SFX.alert();bigNote('人質已被帶走','送到任一出生區就能撤離','a',2200);log(`${nm(u)} 帶上人質，送到任一出生區就能撤離`,'ka');render();await afterAct(u);}
-function plant(u){if(u.side===G.player)G._pl=true;useAct(u,'obj');note(u,'安裝拆彈器');G.defuser={x:u.x,y:u.y,timer:3};SFX.siren();bigNote('拆彈器已安裝',`${cell(u.x,u.y).site} 點 · 第三個防守階段結束時引爆`,'bomb',2600);log(`${nm(u)} 在 ${cell(u.x,u.y).site} 點安裝了拆彈器！第三個防守階段結束時會引爆整個房間。`,'ka');render();}
+function plant(u){if(u.side===G.player)G._pl=true;useAct(u,'obj');note(u,'安裝拆彈器');G.defuser={x:u.x,y:u.y,timer:3};SFX.siren();bigNote('拆彈器已安裝',`${siteAt(u.x,u.y)} 點 · 第三個防守階段結束時引爆`,'bomb',2600);log(`${nm(u)} 在 ${siteAt(u.x,u.y)} 點安裝了拆彈器！第三個防守階段結束時會引爆整個房間。`,'ka');render();}
 function defuse(u){useAct(u,'obj');note(u,'開始拆彈');G.defuser.by=u.id;G.defuser.dleft=2;u.defusing=true;u.overwatch=false;u.ap=0;u.mp=0;u.activated=true;SFX.alert();bigNote('開始拆彈',`${OPS[u.op].name} 要撐一回合，期間不能行動`,'d',2200);log(`${nm(u)} 開始拆除拆彈器，要撐一回合，期間不能移動或射擊`,'kd');if(G.active===u&&u.side===G.player&&!G.ai)endAct(u);render();}
 function dfU(){const d=G&&G.defuser;if(!d||!d.by)return null;const u=G.units.find(x=>x.id===d.by);return u&&u.alive&&u.defusing?u:null;}
 function dfTxt(){const d=G.defuser;if(dfU())return d.timer<=0?`拆彈中 · 倒下就引爆 · 再撐 <b>${d.dleft}</b> 個防守階段`:`拆彈中 · 再撐 <b>${d.dleft}</b> 個防守階段`;return `拆彈器運作中 · 剩 <b>${d.timer}</b> 個防守階段`;}
 function dfDone(u){u.defusing=false;G.defuser=null;if(u.side===G.player){G._df=true;if(!G.tut)setTimeout(()=>achGive('defuse'),600);}SFX.round();bigNote('拆彈器已解除',`${OPS[u.op].name} 撐住了`,'d',2200);log(`${nm(u)} 解除了拆彈器！`,'kd');if(!alive('A').length)return finish('D','拆彈器已解除，進攻方全員陣亡');render();}
 function bombBoom(){if(G._boom||G.over)return;G._boom=1;G.busy=true;const {x,y}=G.defuser,c0=cell(x,y);const room=c0.indoor?roomOf(x,y):[[x,y]],R=new Set(room.map(([i,j])=>j*G.W+i));
-  log(`拆彈器在 ${c0.site||''} 點引爆，整個房間被炸毀！`,'ka');try{SFX.boom();setTimeout(()=>SFX.boom(),180);}catch(e){}bigNote('拆彈器引爆','整個房間被炸毀','bomb',2400);
+  log(`拆彈器在 ${siteAt(x,y)||''} 點引爆，整個房間被炸毀！`,'ka');try{SFX.boom();setTimeout(()=>SFX.boom(),180);}catch(e){}bigNote('拆彈器引爆','整個房間被炸毀','bomb',2400);
   try{boomFx3D(x,y,room);}catch(e){console.warn(e);}
   {const fl=document.createElement('div');fl.className='bombFlash';document.body.appendChild(fl);setTimeout(()=>fl.remove(),1500);const fr=document.getElementById('frame');if(fr){fr.classList.remove('bshk');void fr.offsetWidth;fr.classList.add('bshk');setTimeout(()=>fr.classList.remove('bshk'),1300);}}
   const W=new Set();room.forEach(([i,j])=>adj4(i,j).forEach(([a,b])=>{const c=cell(a,b);if(c&&['soft','bar','reinf'].includes(c.t))W.add(b*G.W+a);}));
@@ -4668,7 +4680,7 @@ function boomFx3D(x,y,room){if(!R3||!R3.fxG||document.hidden)return;const T=THRE
     if(age>2.8){R3.fxG.remove(g);[fb,core,...sm,...emb].forEach(m=>m.material.dispose());return false;}return true;});}
 function overwatch(u,silent,dir){
   let v=dir;if(!v){const t=G.units.filter(e=>e.alive&&e.side!==u.side&&e.x>=0&&(seenBy(u.side,e)||e.spotted>0)).sort((a,b)=>cheb(u.x,u.y,a.x,a.y)-cheb(u.x,u.y,b.x,b.y))[0];
-  v=t&&cheb(u.x,u.y,t.x,t.y)<=10?[t.x-u.x,t.y-u.y]:u.fd;}u.owd=dir8(v);u.overwatch=true;u.owHit=new Set();u.ap=0;u.mp=0;u.fd=u.owd.slice();if(R3&&R3.figs&&R3.figs[u.id])R3.figs[u.id].face=Math.atan2(u.owd[0],u.owd[1]);
+  v=t&&cheb(u.x,u.y,t.x,t.y)<=10?[t.x-u.x,t.y-u.y]:u.fd;}u.owd=dir8(v);u.overwatch=true;u.owHit=new Set();u.owShot=0;u.ap=0;u.mp=0;u.fd=u.owd.slice();if(R3&&R3.figs&&R3.figs[u.id])R3.figs[u.id].face=Math.atan2(u.owd[0],u.owd[1]);
   if(!silent){note(u,'掩護射擊');if(pub(u))log(`${nm(u)} 進入掩護射擊（標記放在${dirName(u.owd)}側，警戒前方 120° 扇形）`,u.side==='A'?'ka':'kd');}}
 // v111: overwatch faces any of the 8 directions (diagonals included)
 const DIR8=[[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]],dir8=v=>DIR8[((Math.round(Math.atan2(v[1],v[0])/(Math.PI/4))%8)+8)%8].slice();
@@ -4755,14 +4767,14 @@ function endPhase(){
   if(G.phaseIdx>=4){
     G.phaseIdx=0;
     if(G.round>=G.maxRounds&&!G.defuser){render();return finish('D',G.mission==='hostage'?'時間耗盡，人質沒有被救出':'時間耗盡，進攻方沒有完成任務');}
-    G.round++;G.units.forEach(u=>{u._k=0;u.activated=false;if(!(G.tut2&&u.side==='D')){u.spotted=0;u.wmark=0;}u.owHit=null;u.stun=false;if(u.defusing&&u.alive)u.activated=true;});G.gadgets.forEach(g=>{if(g.type==='smk')g.alive=false;});
+    G.round++;G.units.forEach(u=>{u._k=0;u.activated=false;if(!(G.tut2&&u.side==='D')){u.spotted=0;u.wmark=0;}u.owHit=null;u.owShot=0;u.stun=false;if(u.defusing&&u.alive)u.activated=true;});G.gadgets.forEach(g=>{if(g.type==='smk')g.alive=false;});
     log(`—— 第 ${G.round} 輪開始 ——`,'ks');SFX.round();{const rn=G.round,mx=G.maxRounds;setTimeout(()=>bigNote(`第 ${rn} 輪`,rn===mx?'最後一輪':`共 ${mx} 輪`,'r',1300),1250);}if(G.clock)clockReset();
   }
   startPhase();
 }
 function startPhase(){
   G.acts=0;G.sel=null;G.mode='move';
-  const s=curSide();
+  const s=curSide();if(G.clock&&(G.net||G.bot)){G.clock[s]=PHT;G.clockOut[s]=false;}
   if(!unspent(s).length||(G.clock&&G.clock[s]<=0)){render();return setTimeout(endPhase,50);}
   if(G.net&&s!==G.player){G.ai=false;G.busy=false;G.sel=null;render();return;}
   if(G.tut2&&s!==G.player)return tuDPhase();if(G.tut&&s!==G.player){log('防守方階段（教學中防守方不行動）','kd');render();return setTimeout(endPhase,400);}
@@ -5177,7 +5189,7 @@ function newGame(){
 const unplaced=()=>G?alive(G.player).filter(u=>u.x<0):[];
 function nextUnplaced(){const n=unplaced()[0];if(n){G.sel=n;G.mode='move';}}
 function startPlay(){if(G&&!G.reroll)G.reroll={A:0,D:0};try{playStartHooks();}catch(e){console.warn(e);}
-  if(!G.net&&G.phase==='setup'&&unplaced().length)return;
+  if(G.phase==='setup'&&unplaced().length)return;
   if(!G.net&&G.player==='D'&&!G.decoys.length)seedDecoys();
   G.phase='play';G.sel=null;G.mode='move';clockReset();
   for(const d of alive('D'))if(d.x>=0)d.fd=bestFace(d);
@@ -5760,7 +5772,7 @@ function drawBase(x,y,c){
   const px=x*S,py=y*S,h=S/2;
   if(isWallC(c)){[[-1,-1,0,0],[1,-1,h,0],[-1,1,0,h],[1,1,h,h]].forEach(([dx,dy,ox,oy])=>{ctx.fillStyle=quadCol(x,y,dx,dy);ctx.fillRect(px+ox,py+oy,h+.5,h+.5);});return;}
   ctx.fillStyle=regionCol(c);ctx.fillRect(px,py,S+.5,S+.5);
-  if(c.site){ctx.fillStyle=FP.site;ctx.fillRect(px,py,S,S);ctx.fillStyle=TEX.hazard;ctx.fillRect(px,py,S,S);}
+  if(c.site&&!bombHid(c.site)){ctx.fillStyle=FP.site;ctx.fillRect(px,py,S,S);ctx.fillStyle=TEX.hazard;ctx.fillRect(px,py,S,S);}
   if(c.rubble){const k=hash(x,y),r=rng(k);for(let i=0;i<9;i++){ctx.fillStyle=['#6d665b','#8f887a','#4d4842','#b3ab9b'][(r()*4)|0];const s=S*(.05+r()*.09);ctx.save();ctx.translate(px+r()*S,py+r()*S);ctx.rotate(r()*3);ctx.fillRect(-s/2,-s/2,s,s*.7);ctx.restore();}}
 }
 function shadeWalls(){ // ambient occlusion on floors next to walls
@@ -5859,7 +5871,7 @@ function drawMap(m,floorOnly){
   for(const z of m.spawns)for(const [x,y] of z.cells){ctx.strokeRect(x*S+S*.12,y*S+S*.12,S*.76,S*.76);}
   if(!floorOnly)(m.props||[]).forEach((p,i)=>{if(propOn(i))drawProp(p,i);});
   ctx.strokeStyle=FP.siteLine;ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.beginPath();
-  for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++){const s=G.grid[y][x].site;if(!s)continue;const o=(a,b)=>(cell(a,b)||{}).site!==s;
+  for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++){const s=G.grid[y][x].site;if(!s||bombHid(s))continue;const o=(a,b)=>(cell(a,b)||{}).site!==s;
     if(o(x,y-1)){ctx.moveTo(x*S,y*S+1);ctx.lineTo(x*S+S,y*S+1);}if(o(x,y+1)){ctx.moveTo(x*S,y*S+S-1);ctx.lineTo(x*S+S,y*S+S-1);}
     if(o(x-1,y)){ctx.moveTo(x*S+1,y*S);ctx.lineTo(x*S+1,y*S+S);}if(o(x+1,y)){ctx.moveTo(x*S+S-1,y*S);ctx.lineTo(x*S+S-1,y*S+S);}}
   ctx.stroke();ctx.setLineDash([]);
@@ -5871,7 +5883,7 @@ function drawMap(m,floorOnly){
   ctx.fillStyle=FP.labelOut;ctx.font=`500 ${Math.max(8,S*.28)}px ${BODYF}`;
   for(const z of m.spawns){const cx=(z.cells.reduce((a,c)=>a+c[0],0)/z.cells.length+.5)*S,cy=(z.cells.reduce((a,c)=>a+c[1],0)/z.cells.length+.5)*S;
     const vert=z.cells[0][0]===z.cells[1][0];if(vert){ctx.save();ctx.translate(cx,cy);ctx.rotate(-Math.PI/2);ctx.fillText(z.name,0,0);ctx.restore();}else ctx.fillText(z.name,cx,cy);}
-  if(!floorOnly)for(const s of ['A','B']){const cs=[];for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++)if(G.grid[y][x].site===s)cs.push([x,y]);if(!cs.length)continue;
+  if(!floorOnly)for(const s of ['A','B']){if(bombHid(s))continue;const cs=[];for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++)if(G.grid[y][x].site===s)cs.push([x,y]);if(!cs.length)continue;
     const cx=(cs.reduce((a,c)=>a+c[0],0)/cs.length+.5)*S,cy=(cs.reduce((a,c)=>a+c[1],0)/cs.length+.5)*S;
     ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.arc(cx+2,cy+2,S*.42,0,7);ctx.fill();
     const g=ctx.createRadialGradient(cx-S*.12,cy-S*.14,1,cx,cy,S*.42);g.addColorStop(0,'#f39a5c');g.addColorStop(1,'#b8501d');ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,S*.42,0,7);ctx.fill();
@@ -6544,7 +6556,7 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
       tac('charge','爆破炸藥',G.charges,chargeTargets(u));
       const th=throwTargets(u);tac('frag','破片手榴彈',G.frag,th);tac('flash','閃光彈',G.flash,th);tac('smk','煙霧彈',G.smk,th);tac('clay','闊刀地雷',G.clay,clayTargets(u));
       if(G.mission==='hostage')L.push(btn('護送人質',sub('obj','相鄰人質'),false,!can('obj')||!escortOK(u),wrap(()=>escort(u)),'primary'));
-      else L.push(btn('安裝拆彈器',sub('obj','站在 A/B 點'),false,!can('obj')||!plantOK(u),wrap(async()=>{plant(u);await afterAct(u);}),'primary'));
+      else L.push(btn('安裝拆彈器',sub('obj','在 A/B 點的房間'),false,!can('obj')||!plantOK(u),wrap(async()=>{plant(u);await afterAct(u);}),'primary'));
     } else {
       {const mg=mirOpenable(u);if(mg.length)L.push(btn('打開黑鏡',sub('mirror','1 行動 · 洞口變透明'),false,!can('mirror'),wrap(()=>mirOpen(u,mg[0])),'',`<img class="bic" src="${opIcon('mira')}" alt="">`));}
       tac('impact','衝擊手榴彈',G.impact,impactTargets(u));tac('nitro','C4 遙控炸藥',G.nitro,throwTargets(u));
@@ -6701,12 +6713,12 @@ function init3D(){
   const PLANE=new THREE.PlaneGeometry(1,1);PLANE.rotateX(-Math.PI/2);
   const N=48*36;
   const mkIM=(col,op)=>{const m=new THREE.InstancedMesh(PLANE,new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:op,depthWrite:false}),N);m.count=0;m.renderOrder=2;m.frustumCulled=false;scene.add(m);return m;};
-  const fogIM=mkIM(0x04070b,.55),reachIM=mkIM(0x46d17c,.38);
+  const fogIM=mkIM(0x04070b,.55),reachIM=mkIM(0x3dff7a,.5);reachIM.renderOrder=6; // v112: drawn over the red view fan so walkable cells stay readable
   const tgtIM=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.35,depthWrite:false}),N);tgtIM.count=0;tgtIM.frustumCulled=false;tgtIM.renderOrder=3;scene.add(tgtIM);
   // v111: reachable cells also give off a short green glow rising from each square's edges (open square tube, alpha fades upward)
   const reachEdge=(()=>{const c=document.createElement('canvas');c.width=4;c.height=64;const g=c.getContext('2d'),gr=g.createLinearGradient(0,64,0,0);gr.addColorStop(0,'#fff');gr.addColorStop(.35,'#777');gr.addColorStop(1,'#000');g.fillStyle=gr;g.fillRect(0,0,4,64);
     const geo=new THREE.CylinderGeometry(Math.SQRT1_2,Math.SQRT1_2,1,4,1,true);geo.rotateY(Math.PI/4);
-    const m=new THREE.InstancedMesh(geo,new THREE.MeshBasicMaterial({color:0x5cf08c,alphaMap:new THREE.CanvasTexture(c),transparent:true,opacity:.85,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending}),N);m.count=0;m.renderOrder=3;m.frustumCulled=false;scene.add(m);return m;})();
+    const m=new THREE.InstancedMesh(geo,new THREE.MeshBasicMaterial({color:0x5cff8f,alphaMap:new THREE.CanvasTexture(c),transparent:true,opacity:1,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending}),N);m.count=0;m.renderOrder=7;m.frustumCulled=false;scene.add(m);return m;})();
   const hover=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1,.06,1)),new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.9}));hover.visible=false;scene.add(hover);
   R3={env,renderer,scene,camera,controls,sun,staticG,unitG,dynG,fxG,fogIM,reachIM,reachEdge,tgtIM,hover,figs:{},sig:'',wall:'full',mats:null,clock:new THREE.Clock(),tracers:[],fxId:null,hoverCell:null,trailKey:''};
   const ro=new ResizeObserver(()=>size3D());ro.observe(frame);size3D();
@@ -6746,7 +6758,7 @@ function init3D(){
   const qb=$('#view-q');if(qb){qb.hidden=!R3.comp;const lab=()=>qb.textContent=R3.hq?'畫質：高':'畫質：標準';lab();qb.onclick=()=>{R3.hq=!R3.hq;lab();};}
 }
 function cellName(x,y){const c=cell(x,y);if(!c)return '';const t={hard:'承重牆',soft:'軟牆',reinf:c.elec&&elecVisible(x,y)?'通電加固牆':'加固牆',out:'室外'}[c.t];
-  if(t)return t;if(c.t==='bar')return c.kind==='window'?'窗（路障）':'門（路障）';return c.site?`${c.site} 炸彈點`:(c.rubble?'破口':'地板');}
+  if(t)return t;if(c.t==='bar')return c.kind==='window'?'窗（路障）':'門（路障）';return c.site&&!bombHid(c.site)?`${c.site} 炸彈點`:(c.rubble?'破口':'地板');}
 function size3D(){if(!R3)return;const f=$('#frame');const w=Math.max(200,f.clientWidth),h=Math.max(200,f.clientHeight);
   R3.renderer.setSize(w,h);R3.camera.aspect=w/h;R3.camera.updateProjectionMatrix();if(R3.comp){const pr=R3.renderer.getPixelRatio();R3.comp.setPixelRatio(pr);R3.comp.setSize(w,h);}}
 function setupPost(){
@@ -6845,7 +6857,7 @@ const ROUGH={chstrip:1,chpool:1,chbar:.5,chstage:.4,chhall:.55,chback:.7,chfront
 function roughCanvas(){const P=8,c=document.createElement('canvas');c.width=(G.W+2)*P;c.height=(G.H+2)*P;const g=c.getContext('2d');g.fillStyle='#e8e8e8';g.fillRect(0,0,c.width,c.height);
   for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++){const cl=G.grid[y][x],v=Math.round(255*(cl.rubble?.95:(ROUGH[cl.mat]??.8)));g.fillStyle=`rgb(${v},${v},${v})`;g.fillRect((x+1)*P,(y+1)*P,P,P);}return c;}
 function envTune(root,k){root.traverse(o=>{const ms=o.material?(Array.isArray(o.material)?o.material:[o.material]):[];for(const m of ms)if(m.isMeshStandardMaterial&&!m.userData.envT){m.userData.envT=1;m.envMapIntensity*=(k||.4);}});}
-function staticSig(){let s=R3.wall;for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++){const c=G.grid[y][x];s+=c.t[0]+(c.elec&&elecVisible(x,y)?'e':'')+(c.rubble?'r':'')+(c.hole?'h':'');}return s;}
+function staticSig(){let s=R3.wall+(G.mission==='bomb'&&G.player==='A'?'b'+bombHid('A')+bombHid('B'):'');for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++){const c=G.grid[y][x];s+=c.t[0]+(c.elec&&elecVisible(x,y)?'e':'')+(c.rubble?'r':'')+(c.hole?'h':'');}return s;}
 function addBox(parent,mats,x,y,z,sx,sy,sz,cc,shadow=true){const m=new THREE.Mesh(boxUV(sx,sy,sz),mats);m.position.set(x,y,z);m.castShadow=shadow;m.receiveShadow=true;if(cc)m.userData.cell=cc;parent.add(m);return m;}
 let BOX3=null,SPH3=null,HSPH3=null,CYL3=null;
 function buildStatic(m){make3DMats();const _M=R3.mats,_h=_M.hard,_s=_M.soft;if(G.map===MAPS.bank||G.map===MAPS.consulate||G.map===MAPS.kafe){_M.hard=_M.hardB||(_M.hardB=bankWallMats());_M.soft=_M.softB||(_M.softB=bankWallMats(true));}if(G.map===MAPS.clubhouse){_M.hard=_M.hardK||(_M.hardK=clubWallMats());_M.soft=_M.softK||(_M.softK=clubWallMats(true));}try{return buildStatic0(m);}finally{_M.hard=_h;_M.soft=_s;}}
@@ -6890,6 +6902,7 @@ function buildStatic0(m){
       const L=new THREE.PointLight(0xffb060,1.25,6.5,1.6);L.position.set(lx,ly-.1,lz);g.add(L);}}
   for(const s of ['A','B']){const cs=[];for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++)if(G.grid[y][x].site===s)cs.push([x,y]);if(!cs.length)continue;
     const cx=cs.reduce((a,c)=>a+c[0],0)/cs.length+.5,cz=cs.reduce((a,c)=>a+c[1],0)/cs.length+.5;
+    if(bombHid(s))continue;
     if(G.bombC&&G.bombC[s])bomb3D(g,G.bombC[s][0]+.5,G.bombC[s][1]+.5);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:canvasTex(siteBadge(s)),depthTest:false,transparent:true}));sp.scale.set(.9,.9,1);sp.position.set(cx,WH+1.1,cz);sp.renderOrder=9;sp.userData.own=true;sp.visible=!(R3.hero&&R3.hero.visible);g.add(sp);}
 }
@@ -7877,7 +7890,7 @@ function update3D(){
     for(const [x,y] of curTargets()){const c=cell(x,y);const wall=isWallC(c);if(rg){if(c.t==='soft'||c.rfR)tg.push([x,y,WH+.08,c.rfR?0x9aa4ad:0x22d860]);else glow.push([x,y,0,0x22d860,2.3]);continue;}if(!wall&&(unitAt(x,y)||prismaAt(x,y))){glow.push([x,y,0,col]);continue;}tg.push([x,y,wall?WH+.08:.08,col]);}}
   if(G.phase==='setup'&&G.player==='A')G.map.spawns.forEach((z,i)=>z.cells.forEach(([x,y])=>tg.push([x,y,.06,i===G.spawn?0xffa060:0xef7f3e])));
   if(G.scanFx&&performance.now()<G.scanFx.until){for(const [x,y] of G.scanFx.cells)if(!isWallC(cell(x,y)))tg.push([x,y,.05,G.scanFx.c||0x5ad0ff]);setTimeout(()=>{if(G&&G.scanFx&&performance.now()>=G.scanFx.until){G.scanFx=null;render();}},1450);}
-  setInst(R3.reachIM,reach,.02);setInst(R3.reachEdge,reach.map(([x,y])=>[x,y,.26]));setInst(R3.tgtIM,tg);tgtGlow(glow);R3.hl=new Set([...reach,...tg,...glow].map(c=>c[0]+','+c[1]));
+  setInst(R3.reachIM,reach,.065);setInst(R3.reachEdge,reach.map(([x,y])=>[x,y,.38]));setInst(R3.tgtIM,tg);tgtGlow(glow);R3.hl=new Set([...reach,...tg,...glow].map(c=>c[0]+','+c[1]));
   // gadgets, defuser, trail
   const dg=R3.dynG;while(dg.children.length)dg.remove(dg.children[0]);
   for(const g of G.gadgets){if(!g.alive||g.type==='prisma')continue;if(!G.over&&!gadgetVisibleTo(g,G.player))continue;const gm3=gadget3D(g);if(CAMT.includes(g.type))gm3.userData.cell=[g.x,g.y];dg.add(gm3);}
@@ -8025,16 +8038,17 @@ function netOnGame(d){
     return;}
   if(d.seq>NET.seq&&d.by!==NET.me)netApply(d);
 }
-function netStartGame(gp){if(RQ.q)rankLeaveQueue();if(NET.started)return;NET.started=true;SCREEN='game';mfEnd();
+function netStartGame(gp){if(RQ.q)rankLeaveQueue();if(NET.started)return;NET.started=true;SCREEN='game';if(NET.side==='A')mfEnd();
   if(!G||!G.warm)mkBoard(NET.map||ONLINE_MAPS[0],NET.mis||'bomb',NET.side,{});G.net=true;G.player=NET.side;
   const os=NET.side==='A'?'D':'A',my=NET.myPick||{p:cfg.picks[NET.side].slice(),inv:INV_DEF[NET.side]};
   const th=gp&&Array.isArray(gp.p)&&gp.p.length===5&&gp.p.every(k=>OPC[k]&&OPC[k].side===os)?gp:{p:rndPicks(os,false),inv:rndInv(os)};
   const A=NET.side==='A'?my:th,D=NET.side==='D'?my:th;
-  addTeams(A.p,D.p,invOK('A',A.inv),invOK('D',D.inv));
-  log(`連線對戰開始：房間 ${NET.code}，${MFMIS[G.mission]}任務，防守方已自動佈防，進攻方隨機出生點。`,'ks');
-  if(R3){R3.sig='';}
-  startPlay();if(R3){R3.camPhase='setup';}
-  G._handoff=true;netPush();
+  addTeams(A.p,D.p,invOK('A',A.inv),invOK('D',D.inv),true);
+  log(`連線對戰開始：房間 ${NET.code}，${MFMIS[G.mission]}任務，防守方已自動佈防，進攻方自己選出生位置。`,'ks');
+  if(R3){R3.sig='';R3.camPhase='setup';}
+  // the attacker deploys: the host does it here and pushes when they press start; otherwise the guest gets the setup board and the host waits on the pick screen
+  if(NET.side==='A'){G.sel=alive('A')[0];render();if(R3)setTimeout(()=>setView('top'),50);return;}
+  render();G._handoff=true;netPush();
 }
 function netSer(){
   const id=u=>u?u.id:null,o={};
@@ -8062,6 +8076,7 @@ function netApply(d){
   NET.applying=true;NET.seq=d.seq;const was=G&&G.over;
   G=netDes(d.state);(G.units||[]).forEach(u=>{try{if(!OPS[u.op])ensureOp(u.op);}catch(e){}});G.player=NET.side;G.busy=false;G.ai=false;G.mode='move';
   if(curSide()===G.player&&!G.over){if(G.sel&&(G.sel.side!==G.player||!G.sel.alive))G.sel=null;}else if(!G.over)G.sel=null;
+  if(MF&&G.phase==='setup'&&G.player!=='A'){render();NET.applying=false;return;}
   if(SCREEN!=='game'||MF){if(RQ.q)rankLeaveQueue();mfEnd();SCREEN='game';if(R3){R3.sig='';setTimeout(()=>G&&G.phase==='setup'?setView('top'):playCam(),50);}}
   if(G.over&&!was){G.over=false;finish(G.win,G.why);}else render();
   NET.applying=false;
@@ -8584,8 +8599,11 @@ function myProf(){const p={n:ign(),av:ME.avatar||'',st:ECO.streak|0};if(ME.usePh
   const a=!p.ph&&copAv(p.av);if(a){const c=copAll()[a.i];p.cop={nm:c.nm,k:c.k|0,sv:c.sv|0};}return p;}
 function profArt(p){if(p&&p.ph)return p.ph;const a=copAv(p&&p.av);if(a)return a.art;const k=String((p&&p.av)||'').replace(/^art:/,'');return OPC[k]?(opArt(k)||opIcon(k)):opArt('ash')||opIcon('ash');}
 function botProf(name){const ops=OPBASE.filter(k=>SCRIPTED.has(k)&&!copSlot(k)&&opArt(k));return {n:name,av:'art:'+ops[Math.floor(Math.random()*ops.length)],st:Math.random()<.6?0:2+Math.floor(Math.random()*5)};}
-const mfPool=(side,mine)=>{const seen=new Set();return OPBASE.filter(k=>OPC[k].side===side&&opPlayable(k)&&(!mine||owned(k))&&!seen.has(OPC[k].base)&&seen.add(OPC[k].base));};
-function rndPicks(side,mine){return shuffle(mfPool(side,mine)).slice(0,5);}
+const mfPool=(side,mine)=>{const seen=new Set(),o=[];for(const k of OPBASE){if(OPC[k].side!==side||!opPlayable(k)||(mine&&!owned(k))||seen.has(OPC[k].base))continue;seen.add(OPC[k].base);
+    if(copSlot(k)!=null)o.push(...OPCARDS.filter(c=>c.base===k&&copSlot(c.id)!=null).map(c=>c.id));else o.push(k);}return o;};
+const mfBase=k=>OPC[k]?OPC[k].base:k;
+const mfName=k=>{const i=copSlot(k);return i!=null?`${COPN[i]}・${copAll()[i].nm}`:OPC[k].name;};
+function rndPicks(side,mine){const b=new Set(),o=[];for(const k of shuffle(mfPool(side,mine))){if(o.length>=5)break;if(b.has(mfBase(k)))continue;b.add(mfBase(k));o.push(k);}return o;}
 function rndInv(side){const o={};for(const k in INV[side])o[k]=0;for(let n=0;n<INV_CAP[side];n++){const ks=Object.keys(o).filter(k=>o[k]<INV[side][k][1]);if(!ks.length)break;o[ks[Math.floor(Math.random()*ks.length)]]++;}return o;}
 const invOK=(side,v)=>{if(!v)return INV_DEF[side];const o=invFor(side,v);return Object.values(o).reduce((a,b)=>a+b,0)<=INV_CAP[side]?o:INV_DEF[side];};
 const invSum=v=>Object.values(v).reduce((a,b)=>a+b,0);
@@ -8596,15 +8614,14 @@ function mkBoard(mk,mis,side,extra){const m=MAPS[mk];cfg.map=mk;
   m.cams.forEach(([x,y])=>G.gadgets.push({type:'cam',x,y,side:'D',alive:true,fixed:true}));
   if(mis==='hostage')placeHostage();else placeBombsSafe();
   if(R3)R3.sig='';return G;}
-function addTeams(ap,dp,invA,invD){copPrep(false);
+function addTeams(ap,dp,invA,invD,atkDeploys){copPrep(false);
   ap.forEach((op,i)=>G.units.push(mkUnit(op,'A',i)));dp.forEach((op,i)=>G.units.push(mkUnit(op,'D',i)));
   if(dp.includes('rook'))alive('D').forEach(u=>{u.max++;u.hp++;});
   Object.assign(G,invFor('A',invA),invFor('D',invD));delete G.warm;
-  autoDefSetup(true);placeAttackers(Math.floor(Math.random()*G.map.spawns.length));}
+  autoDefSetup(true);if(!atkDeploys)placeAttackers(Math.floor(Math.random()*G.map.spawns.length));} // a human attacker places their own squad in the setup phase
 // o: {side, mk, mis, opp (profile), bot, onLock({p,inv}), ready()}
 function mfStart(o){mfEnd();const side=o.side;
-  const pool=mfPool(side,true),p0=(cfg.picks[side]||[]).filter(k=>pool.includes(k)).slice(0,5);
-  MF=Object.assign({me:myProf(),picks:p0,inv:invOK(side,cfg.inv[side]),lock:false,oppLock:false,tab:'op',t0:0,pick0:0},o);
+  MF=Object.assign({me:myProf(),picks:[],cur:mfPool(side,true)[0],inv:invOK(side,cfg.inv[side]),lock:false,oppLock:false,tab:'op',t0:0,pick0:0},o);
   const el=document.createElement('div');el.id='mflow';el.className='mflow';el.setAttribute('role','dialog');el.setAttribute('aria-label','配對成功');document.body.appendChild(el);MF.el=el;
   setTimeout(()=>{try{render();}catch(e){console.warn(e);}},30); // build the 3D board under the overlay
   mfVs();}
@@ -8642,18 +8659,31 @@ function mfPick(){MF.st='pick';MF.pick0=Date.now();mfDraw();
     if(s<=5&&s>0&&s!==beep&&!MF.lock){beep=s;try{SFX.soft&&SFX.soft();}catch(e){}}
     if(left<=0&&!MF.lock){MF.picks=rndPicks(MF.side,true);MF.inv=rndInv(MF.side);mfLock();}
     if(MF.tick)MF.tick(left);},200);}
+// tap an operator to see their card; tap the one on show again (or the button) to add or remove them
+function mfDet(k){if(!k||!OPC[k])return '';const c=OPC[k],i=MF.picks.indexOf(k),clash=i<0&&MF.picks.some(p=>mfBase(p)===mfBase(k)),gx=typeof GDX!=='undefined'&&GDX[k]?GDX[k][0]:cardText(c);
+  return `<div class="mfDet"><img class="mfDA" src="${opArt(k)||opIcon(k)}" alt="" onerror="this.style.visibility='hidden'"><div class="mfDI">
+    <div class="mfDN"><b>${esc(mfName(k))}</b><small>${c.zh.role||''}${c.org?` · ${c.org}`:''}</small></div>
+    <div class="mfDG"><img src="${opIcon(k)}" alt=""><div><b>${c.zh.g||'沒有專屬道具'}${c.g&&c.g.charges?`<i>× ${c.g.charges}</i>`:''}</b><p>${gx||''}</p></div></div>
+    <div class="mfDW">${['近 1-3','中 4-6','遠 7+'].map((r,n)=>`<div><span>${r}</span><em>${hexDice(c.w[n]||[])}</em></div>`).join('')}</div>
+    <div class="mfDS"><span>耐力 <b>${c.st??'—'}</b></span><span>${c.run?`奔跑 <b>+${c.run}</b>`:'不能奔跑'}</span><span>破壞 <b>${DZN[c.dz]||'—'}</b></span></div>
+    <button class="${i>=0?'':'primary'}" id="mfAdd"${MF.lock||(i<0&&(MF.picks.length>=5||clash))?' disabled':''}>${i>=0?'移出小隊':clash?'同一名幹員只能帶一張':MF.picks.length>=5?'小隊已滿':'加入小隊'}</button></div></div>`;}
+function mfToggle(k){const P=MF.picks,i=P.indexOf(k);if(i>=0)P.splice(i,1);else if(P.length<5&&!P.some(p=>mfBase(p)===mfBase(k)))P.push(k);try{SFX.ui&&SFX.ui();}catch(e){}}
 function mfDraw(){const el=MF.el,side=MF.side,pool=mfPool(side,true),P=MF.picks,inv=MF.inv,used=invSum(inv),cap=INV_CAP[side],L=MF.lock;
-  const left=Math.max(0,Math.ceil(MFT-(Date.now()-MF.pick0)/1000));
-  const ops=pool.map(k=>{const i=P.indexOf(k);return `<button class="mfOp${i>=0?' on':''}" data-k="${k}"${L?' disabled':''}><img src="${opIcon(k)}" alt=""><span>${esc(OPC[k].name)}</span>${i>=0?`<em>${i+1}</em>`:''}</button>`;}).join('');
+  const left=Math.max(0,Math.ceil(MFT-(Date.now()-MF.pick0)/1000));const sc=el.querySelector('.mfOps');const st=sc?sc.scrollTop:0;
+  const ops=pool.map(k=>{const i=P.indexOf(k);return `<button class="mfOp${i>=0?' on':''}${MF.cur===k?' cur':''}" data-k="${k}"${L?' disabled':''}><img src="${copSlot(k)!=null?(opArt(k)||opIcon(k)):opIcon(k)}" class="${copSlot(k)!=null?'cop':''}" alt=""><span>${esc(copSlot(k)!=null?COPN[copSlot(k)]:OPC[k].name)}</span>${i>=0?`<em>${i+1}</em>`:''}</button>`;}).join('');
   const invs=Object.entries(INV[side]).map(([k,[n,max,d]])=>`<div class="mfInv"><i>${WZI[k]||''}</i><div><b>${n}</b><span>${d}</span></div><div class="mfCnt"><button data-iv="${k}" data-d="-1"${L||inv[k]<=0?' disabled':''} aria-label="減少${n}">−</button><b>${inv[k]|0}</b><button data-iv="${k}" data-d="1"${L||inv[k]>=max||used>=cap?' disabled':''} aria-label="增加${n}">＋</button></div></div>`).join('');
+  const wait=MF.oppLock?(MF.bot||MF.side==='A'?'雙方已鎖定':'雙方已鎖定，等待進攻方部署…'):'已鎖定，等待對手…';
   el.innerHTML=`<div class="mfPick ${side==='A'?'a':'d'}"><header class="mfHd"><img class="mfThumb" src="${mapThumb(MF.mk)}" alt="${MAPS[MF.mk].name}格局圖"><div class="mfMap"><b>${MAPS[MF.mk].name}</b><span>${MFMIS[MF.mis]} · <i>${side==='A'?'進攻方':'防守方'}</i></span></div><div class="mfTm${left<=5&&!L?' hot':''}" id="mfTm">${left}</div></header>
     <div class="mfVsl"><span class="${MF.lock?'ok':''}">${esc(MF.me.n)} ${MF.lock?'已鎖定':'選角中'}</span><span class="${MF.oppLock?'ok':''}">${esc(MF.opp.n)} ${MF.oppLock?'已鎖定':'選角中'}</span></div>
     <div class="mfTabs"><button data-tab="op" class="${MF.tab==='op'?'on':''}">幹員 ${P.length}/5</button><button data-tab="inv" class="${MF.tab==='inv'?'on':''}">裝備 ${used}/${cap}</button></div>
+    ${MF.tab==='op'?mfDet(MF.cur):''}
     <div class="mfBody">${MF.tab==='op'?`<div class="mfOps">${ops}</div>`:`<div class="mfInvs">${invs}<p class="mfNote">${side==='A'?'另有 3 架無人機。':'另有 3 捲鐵絲網與地圖上的攝影機。'}</p></div>`}</div>
-    <div class="mfSlots">${[0,1,2,3,4].map(i=>`<div class="mfSl">${P[i]?`<img src="${opIcon(P[i])}" alt="${esc(OPC[P[i]].name)}">`:''}</div>`).join('')}</div>
-    <footer class="mfFt"><button id="mfRnd"${L?' disabled':''}>隨機</button><button class="primary" id="mfLock"${L||P.length!==5?' disabled':''}>${L?(MF.oppLock?'雙方已鎖定':'已鎖定，等待對手…'):P.length===5?'鎖定':`再選 ${5-P.length} 名`}</button></footer></div>`;
+    <div class="mfSlots">${[0,1,2,3,4].map(i=>`<div class="mfSl">${P[i]?`<img src="${copSlot(P[i])!=null?(opArt(P[i])||opIcon(P[i])):opIcon(P[i])}" class="${copSlot(P[i])!=null?'cop':''}" alt="${esc(mfName(P[i]))}">`:''}</div>`).join('')}</div>
+    <footer class="mfFt"><button id="mfRnd"${L?' disabled':''}>隨機</button><button class="primary" id="mfLock"${L||P.length!==5?' disabled':''}>${L?wait:P.length===5?'鎖定':`再選 ${5-P.length} 名`}</button></footer></div>`;
+  {const o=el.querySelector('.mfOps');if(o)o.scrollTop=st;}
   el.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{MF.tab=b.dataset.tab;mfDraw();});
-  el.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{if(MF.lock)return;const k=b.dataset.k,i=P.indexOf(k);if(i>=0)P.splice(i,1);else if(P.length<5)P.push(k);try{SFX.ui&&SFX.ui();}catch(e){}mfDraw();});
+  el.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{if(MF.lock)return;const k=b.dataset.k;if(MF.cur===k)mfToggle(k);else{MF.cur=k;try{SFX.ui&&SFX.ui();}catch(e){}}mfDraw();});
+  const ad=$('#mfAdd');if(ad)ad.onclick=()=>{if(!MF.lock&&MF.cur){mfToggle(MF.cur);mfDraw();}};
   el.querySelectorAll('[data-iv]').forEach(b=>b.onclick=()=>{if(MF.lock)return;const k=b.dataset.iv,v=(inv[k]|0)+(+b.dataset.d);if(v<0||v>INV[side][k][1]||(+b.dataset.d>0&&invSum(inv)>=cap))return;inv[k]=v;mfDraw();});
   const r=$('#mfRnd');if(r)r.onclick=()=>{if(MF.lock)return;MF.picks=rndPicks(side,true);if(MF.tab==='inv')MF.inv=rndInv(side);mfDraw();};
   const lk=$('#mfLock');if(lk)lk.onclick=()=>{if(!MF.lock&&MF.picks.length===5)mfLock();};}
@@ -8674,9 +8704,10 @@ function netAbort(){mfEnd();G=null;try{netLeave();}catch(e){}SCREEN='rank';NETMS
 function rankBotGo(pk){mfEnd();SCREEN='game';const side=G.player,en=side==='A'?'D':'A';
   const bases=new Set(),theirs=[];for(const k of shuffle(OPBASE.filter(k=>OPC[k].side===en&&SCRIPTED.has(k)))){if(theirs.length>=5)break;if(!bases.has(OPC[k].base)){bases.add(OPC[k].base);theirs.push(k);}}
   const ap=side==='A'?pk.p:theirs,dp=side==='D'?pk.p:theirs;
-  addTeams(ap,dp,side==='A'?pk.inv:INV_DEF.A,side==='D'?pk.inv:INV_DEF.D);
-  log(`線上對戰開始：對手 ${esc(G.bot.name)}，${MFMIS[G.mission]}任務，防守方已自動佈防，進攻方隨機出生點。`,'ks');
-  if(R3)R3.sig='';startPlay();if(R3){R3.camPhase='setup';setTimeout(()=>G&&G.phase==='setup'?setView('top'):playCam(),50);}
+  addTeams(ap,dp,side==='A'?pk.inv:INV_DEF.A,side==='D'?pk.inv:INV_DEF.D,side==='A');
+  log(`線上對戰開始：對手 ${esc(G.bot.name)}，${MFMIS[G.mission]}任務，防守方已自動佈防。${side==='A'?'點幹員，再點橘框出生格放下他。':'進攻方隨機出生點。'}`,'ks');
+  if(R3)R3.sig='';if(side==='A'){G.sel=alive('A')[0];render();if(R3){R3.camPhase='setup';setTimeout(()=>setView('top'),50);}return;}
+  startPlay();if(R3){R3.camPhase='setup';setTimeout(()=>G&&G.phase==='setup'?setView('top'):playCam(),50);}
 }
 setTimeout(()=>{renderPlayer();renderTopRight();placeOnline();if(SCREEN==='title'){const t=$('#title');if(t)t.dataset.s='';render();}},0);if(ME.mode==='account')acctLoad().then(ok=>{if(!ok)ME.mode='guest';renderPlayer();});if(ME.lang!=='zh')setTimeout(()=>setLang(ME.lang),0);
 // ---------- renown, operator unlocks, daily/weekly tasks, operator mastery ----------
@@ -9057,7 +9088,13 @@ function owqStart(s){if(G.over||s!==G.player||G.tut||G.tut2||G.owqDone||(G.clock
 function owqTap(x,y){const u=G.owq&&G.owq[0];if(!u)return;if(!adj8all(u.x,u.y).some(([a,b])=>a===x&&b===y))return render();
   overwatch(u,false,[x-u.x,y-u.y]);G.owq.shift();if(G.owq.length)return owqNext();G.owq=null;G.mode='move';G.sel=null;G.owqDone=true;endPhase();}
 // cameras start hidden from the attackers: an operator who sees one, or a drone rolling into its room, finds it
-function camDiscover(){if(!G||G.phase!=='play'||G.over)return;const atk=alive('A').filter(u=>u.x>=0),dr=G.gadgets.filter(g=>g.alive&&g.type==='drone');let got=[];
+// v112: a bomb site stays hidden from the attacking player until a drone or an attacker lays eyes on the bomb itself
+const bombHid=s=>!!(G&&G.mission==='bomb'&&G.player==='A'&&!G.over&&!G.tut&&!G.tut2&&G.bombC&&G.bombC[s]&&!(G.bombSeen&&G.bombSeen[s]));
+function bombDiscover(){if(!G||G.mission!=='bomb'||!G.bombC||G.over)return;G.bombSeen=G.bombSeen||{};const atk=alive('A').filter(u=>u.x>=0),dr=G.gadgets.filter(g=>g.alive&&g.type==='drone');let got=[];
+  for(const s of ['A','B']){const b=G.bombC[s];if(!b||G.bombSeen[s])continue;const [bx,by]=b;let R=null;try{R=roomCells(bx,by);}catch(e){}
+    if(atk.some(u=>inFan(u,bx,by)&&los(u.x,u.y,bx,by,false,true))||dr.some(d=>(R&&R.has(d.y*G.W+d.x))||(Math.hypot(d.x-bx,d.y-by)<=8&&los(d.x,d.y,bx,by,false,true)))){G.bombSeen[s]=1;got.push(s);}}
+  if(!got.length)return;if(R3)R3.sig='';if(G.player==='A'){try{SFX.alert&&SFX.alert();}catch(e){}bigNote('發現炸彈',got.map(s=>s+' 點').join('、'),'a',1600);}log(`進攻方發現了 ${got.join('、')} 點炸彈`,'ka');}
+function camDiscover(){try{bombDiscover();}catch(e){console.warn(e);}if(!G||G.phase!=='play'||G.over)return;const atk=alive('A').filter(u=>u.x>=0),dr=G.gadgets.filter(g=>g.alive&&g.type==='drone');let got=[];
   for(const g of G.gadgets){if(!g.alive||g.type!=='cam'||g.side!=='D'||g.found)continue;let R=null;try{R=roomCells(g.x,g.y);}catch(e){}
     if(atk.some(u=>inFan(u,g.x,g.y)&&los(u.x,u.y,g.x,g.y,false,true))||(R&&dr.some(d=>R.has(d.y*G.W+d.x)))){g.found=true;got.push(g);}}
   if(!got.length)return;if(G.player==='A'){SFX.alert&&SFX.alert();bigNote('發現監視器',got.map(g=>coord(g.x,g.y)).join('、'),'a',1500);}log(`進攻方發現了 ${got.length} 台監視器`,'ka');}
@@ -9416,7 +9453,9 @@ const CLK_SVG={A:'<svg viewBox="0 0 48 48"><path d="M8 6l3-2 15 15-3 3zM40 6l-3-
 const clockOn=()=>!!(G&&G.clock&&G.phase==='play');
 function clockReset(){if(!G)return;G.clockOut={A:false,D:false};
   const tpo=G.net||G.bot?45:cfg.timer;
-  G.clock=tpo&&!G.tut?{A:tpo*1000*Math.max(1,alive('A').length),D:tpo*1000*Math.max(1,alive('D').length)}:null;}
+  // v112: online play gives each side a flat 45 seconds per phase, refilled every time the turn changes hands (startPhase)
+  G.clock=tpo&&!G.tut?(G.net||G.bot?{A:PHT,D:PHT}:{A:tpo*1000*Math.max(1,alive('A').length),D:tpo*1000*Math.max(1,alive('D').length)}):null;}
+const PHT=45000;
 const fmtClock=ms=>{const t=Math.max(0,Math.ceil(ms/1000));return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');};
 function clockWho(s){if(G.net||G.bot)return s===G.player?'你':'對手';return s===G.player?'你':'電腦';}
 function renderClocks(){try{obClock();}catch(e){}
@@ -9438,7 +9477,7 @@ setInterval(()=>{const now=performance.now(),dt=now-CLK_LAST;CLK_LAST=now;
   const s=curSide(),rolling=document.querySelector('.dicebox:not([hidden])');
   if(!G.cPause&&!rolling&&!document.hidden&&G.clock[s]>0){G.clock[s]-=dt;
     if(G.clock[s]<=0){G.clock[s]=0;
-      if(s===G.player&&!G.busy){log(`${s==='A'?'進攻方':'防守方'}本輪的時間用完了，不能再啟動幹員`,'ks');G.clockOut[s]=true;if(G.active)endAct(G.active);endPhase();}}}
+      if(s===G.player&&!G.busy){log(`${s==='A'?'進攻方':'防守方'}${G.net||G.bot?'這個階段':'本輪'}的時間用完了，${G.net||G.bot?'換對手行動':'不能再啟動幹員'}`,'ks');G.clockOut[s]=true;if(G.active)endAct(G.active);endPhase();}}}
   renderClocks();},200);
 setInterval(()=>{const el=document.getElementById('clock');if(!G||!G.tEnd||!G.active||G.over){if(el)el.textContent='';return;}
   const left=Math.max(0,(G.tEnd-performance.now())/1000);if(el){el.textContent=`⏱ ${Math.ceil(left)}s`;el.classList.toggle('low',left<10);}
