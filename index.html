@@ -755,11 +755,12 @@ body[data-scr="setup"] header.top{visibility:hidden}
 .splist a:hover{border-color:var(--accent)}.splist span{color:#7f8c97}.splist em{font-style:normal;white-space:nowrap;font-size:12px;color:#9aa7b2}
 @media (max-width:760px){.tside{right:12px;top:max(10px,env(safe-area-inset-top));gap:6px}.tsb{width:36px;height:36px}.tsb svg{width:19px;height:19px}}
 .psettings{position:fixed;inset:0;z-index:70;background:rgba(3,5,8,.72);display:grid;place-items:center;padding:16px}.psettings[hidden]{display:none}
-.psbox{width:min(560px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:#0e141a;border:1px solid #2c3a47;border-top:3px solid var(--accent);padding:18px 20px;display:flex;flex-direction:column;gap:14px;color:#e6edf2}
+.psbox{width:min(560px,100%);max-height:calc(100dvh - 32px);overflow-x:hidden;overflow-y:auto;touch-action:pan-y;overscroll-behavior:contain;background:#0e141a;border:1px solid #2c3a47;border-top:3px solid var(--accent);padding:18px 20px;display:flex;flex-direction:column;gap:14px;color:#e6edf2}
 .pshead{display:flex;align-items:center;gap:12px}.pshead .pav{width:58px;height:58px;object-fit:cover;background:#10171e}.pshead div{flex:1;display:flex;flex-direction:column}.pshead b{font-size:20px}.pshead span{font-size:12.5px;color:#9aa7b2}
 .psbox section h4{margin:0 0 8px;font-size:13px;letter-spacing:.12em;color:var(--accent)}
 .psrow{display:flex;gap:8px;align-items:center;margin-bottom:6px}.psrow input{flex:1;background:#0f151b;color:#e6edf2;border:1px solid #2c3a47;padding:8px 10px;font:inherit}.psrow>span{min-width:80px;color:#c7d1da;font-size:14px}
-.avgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:6px;max-height:190px;overflow:auto;padding:2px}
+.avgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:6px;max-height:190px;overflow-x:hidden;overflow-y:auto;touch-action:pan-y;overscroll-behavior:contain;padding:2px}
+html.pg,html.pg body{touch-action:manipulation}html.pg .psbox,html.pg .avgrid{touch-action:pan-y}
 .avb{padding:3px;background:#121a22;border:1px solid #2a3a48;aspect-ratio:1}.avb img{width:100%;height:100%;object-fit:cover}.avb.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}.avb:hover{border-color:#cfe3f2}
 .pshint{margin:0 0 8px;font-size:13px;line-height:1.6;color:#aab6c0}
 .pslogin{display:flex;flex-direction:column;gap:8px}.pslogin button{display:flex;align-items:center;gap:10px;padding:10px 12px;font-size:14px;text-align:left}
@@ -8062,6 +8063,17 @@ function bindMenu(){
 function showMenu(){goTitle();}
 // ---------- screens: title / PvE setup / PvP lobby ----------
 let SCREEN='title',NET=null,NETMSG='';
+// v120: on phones, no page pinch / double-tap zoom before a match (in-game board zoom untouched)
+function preGame(){return !(typeof G!=='undefined'&&G);}
+(()=>{const vp=document.querySelector('meta[name=viewport]'),V0='width=device-width,initial-scale=1,viewport-fit=cover',V1=V0+',maximum-scale=1,user-scalable=no';let last=null;
+  const sync=()=>{const pg=preGame();if(pg===last)return;last=pg;document.documentElement.classList.toggle('pg',pg);if(vp)vp.setAttribute('content',pg?V1:V0);};
+  sync();setInterval(sync,300);
+  const stop=e=>{if(preGame()&&e.cancelable)e.preventDefault();};
+  document.addEventListener('touchstart',e=>{if(e.touches.length>1)stop(e);},{passive:false});
+  document.addEventListener('touchmove',e=>{if(e.touches.length>1||(e.scale!==undefined&&e.scale!==1))stop(e);},{passive:false});
+  ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,stop,{passive:false}));
+  let lt=0;document.addEventListener('touchend',e=>{const n=e.timeStamp;if(preGame()&&e.touches.length===0&&n-lt<320&&!e.target.closest('button,input,select,textarea,a,label,[data-av],canvas')&&e.cancelable)e.preventDefault();lt=n;},{passive:false});
+})();
 function goTitle(){{const a=$('#anal');if(a)a.remove();}if(NET)netLeave();G=null;SCREEN='title';$('#banner').hidden=true;if(R3){R3.sig='';}render();}
 function renderTitle(){
   const el=$('#tmenu');if(!el)return;if(SCREEN==='rank')SCREEN='title';{const tt=$('#title');if(tt)tt.dataset.s=SCREEN;}const B=(id,label,sub,cls)=>`<button id="${id}" class="tbtn ${cls||''}"><b>${label}</b>${sub?`<span>${sub}</span>`:''}</button>`;
