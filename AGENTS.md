@@ -6,7 +6,7 @@
 
 - 《Rainbow Six Siege – The Board Game》的網頁版，可對戰電腦、新手教學、自訂房間連線、排名戰、成就、商店。
 - 線上版：https://r6-boardgame.github.io/ （GitHub Pages，`main` 分支根目錄直接發佈，推上去就上線）。
-- 目前版本 v117（見 `git log`）。
+- 目前版本 v118（見 `git log`）。
 - 使用者要求：PR 做完、測完就直接合併上線，不用再問。
 
 ## 檔案結構
@@ -50,7 +50,7 @@
 1. 直接改 `index.html`（從現在起它就是唯一原始碼）。
 2. 本機測試：`python3 -m http.server` 後開 `http://localhost:8000/`。至少測兩種尺寸：**手機直式 390×844** 與 **桌機 1400×900**。
 3. 自動化測試建議用 Playwright：開頁 → `#t-pve` 進入對戰電腦 → 可在 `page.evaluate` 裡直接呼叫全域函式（例如 `WZ.step=2;renderWiz()` 跳到選地圖），截圖確認並收集 `pageerror`，必須沒有錯誤。
-4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v96）。
+4. `git commit` 後 `git push origin main` 就會上線。commit 訊息格式沿用 `vNN: 一句英文說明`（下一版是 v119）。
 
 ### 舊流程說明（只是背景，不需要照做）
 
@@ -137,3 +137,4 @@
 - 曾提議但未回覆：Echo、Flores、Mozzie 的無人機也改成一步一步走；全面核對幹員卡能力。
 - v75：銀行地板和牆改用 Poly Haven CC0 掃描材質（`R6_TEX` 的 `bkMarble`、`bkLime`、`bkVelvet`、`bkWool`、`bkWood`、`bkPlaster`，512px）。大廳／前廳大理石每塊取不同區域（`slabs`），檔案室改成橡木地板 `bwood`。`bankWallMats(soft)`：實心牆暖米色加石縫、可破壞牆淡色，都有深色木踢腳板（貼圖 repeat 0.5，一張涵蓋兩個牆高）。ambientCG 被雲端網路擋，Poly Haven 可以連。
 - v117：線上對決加回部署階段。PvP 防守方不再自動佈防（`addTeams` 第 6 參數 `defDeploys`），`G.dep` 記輪到誰部署：防守方先擺幹員與道具，按「部署完成」（`depDone`，順便 `seedDecoys`）推給進攻方，進攻方再選出生點按開始行動。等待的一方：進攻方留在選角頁（`MF.gotState` 防止 30 秒斷線判定），防守方看「等待進攻方」；`netDirty` 在別人部署時不推送。配對機器人局玩家當防守方也自己部署。
+- v118：選取幹員的扇形在分界弧線中間加上距離數字（3、6、最遠 10／狙擊 14），深色小圓牌，在 `visFx3D` 的 fanP 畫布裡；放在最靠近扇形正中、且視線真的到得了那條弧的射線上，被牆擋住就不畫。
