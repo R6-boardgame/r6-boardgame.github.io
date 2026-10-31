@@ -1938,7 +1938,21 @@ body.hasClk #tracker .seg{display:none}
 .cpBack{width:32px;height:32px;border:1px solid var(--ln)!important;display:grid;place-items:center;color:#8b9cad!important;font-size:18px!important;background:#0e141bcc!important}
 .cpTt small{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--accent)}
 .cpTt h2{margin:0;font-family:var(--display);font-size:21px;line-height:1}
-.cpSw{margin-left:auto;display:flex;border:1px solid var(--ln);background:#0b1016d8}
+#copAl{--ln:#2c3b4a;position:fixed;inset:0;z-index:118;background:linear-gradient(180deg,#0e141b,#090d12);color:#e2e8ee;font-family:var(--body);font-size:13px;animation:shIn .2s ease}
+#copAl button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.alBox{height:100%;display:flex;flex-direction:column;max-width:760px;margin:0 auto;padding-top:max(10px,env(safe-area-inset-top))}
+.alN{margin-left:auto;color:#8b9cad;font-size:12px}
+.alList{flex:1;overflow:auto;padding:6px 14px max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px}
+.alRow{display:flex;gap:12px;align-items:center;background:#111a23;border:1px solid #223140;padding:8px 10px}
+.alRow img{width:64px;height:64px;object-fit:cover;object-position:50% 4%;background:#0b1016;border:1px solid #2c3b4a;flex:none;filter:grayscale(.55)}
+.alI{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.alNm{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.alNm b{font-size:16px}
+.alRk{font-style:normal;font:700 12px/1 'Saira Condensed',sans-serif;border:1px solid;padding:2px 5px}
+.alKd{display:flex;gap:12px;color:#8b9cad}.alKd b{color:#e2e8ee}
+.alBy{color:#e8574e;font-size:12px}.alBy b{color:#ff9a8f}
+.alEmpty{margin:auto;text-align:center;display:flex;flex-direction:column;gap:8px;padding:40px 0}.alEmpty b{font-family:var(--display);font-size:26px;color:var(--accent);letter-spacing:.08em}.alEmpty span{color:#8b9cad}
+.cpSw button,.cpTt h2,.cpTt small{white-space:nowrap}#cop .cpAlB{margin-left:auto;padding:7px 9px!important;border:1px solid var(--accent)!important;color:var(--accent)!important;font-size:12px!important;font-weight:700;background:#0e141bcc!important;white-space:nowrap}
+.cpSw{margin-left:0;display:flex;border:1px solid var(--ln);background:#0b1016d8}
 .cpSw button{padding:8px 12px!important;font-size:12px!important;font-weight:700;color:#8b9cad!important}
 .cpSw button.on{background:var(--accent)!important;color:#1b1305!important}
 .cpStage{position:relative;flex:1 1 auto;min-height:200px;overflow:hidden;margin-top:-44px}
@@ -4269,7 +4283,7 @@ let DMGBY=null;const ST=u=>u.st||(u.st={k:0,dmg:0,taken:0,shots:0,hits:0,gad:0})
 const SRCOP={'毒氣':'smoke','電擊':'bandit','闊刀地雷':null,'集束炸彈':null};
 async function damage(u,n,src){
   if(!u.alive)return;n=dmgMod(u,n);if(u.w==='sh'&&n>0){const m=Math.min(2,n);n-=m;log(`${nm(u)} 的盾牌擋下 ${m} 傷`,u.side==='A'?'ka':'kd');}if(n<=0)return;{let by=DMGBY;if(!by&&src&&SRCOP[src])by=G.units.find(x=>x.op===SRCOP[src]&&x.side!==u.side);if(!by&&!src)by=null;
-    const real=Math.min(n,u.hp);ST(u).taken+=real;if(by&&by.side===u.side&&by!==u&&by.side===G.player&&u.hp-n<=0){G._ff=1;G._ffn=(G._ffn||0)+1;}if(by&&by.side!==u.side&&by.side===G.player&&u.hp-n<=0)(G._kl=G._kl||[]).push({s:src||'',d:cheb(by.x,by.y,u.x,u.y),op:by.op,t:performance.now()});if(by&&by.side!==u.side){ST(by).dmg+=real;if(u.hp-n<=0)ST(by).k++;}}if(u.hidden)reveal(u,'受傷後');u.exp=[u.x,u.y];u.hp-=n; if(src)log(`${nm(u)} 受到${src} ${n} 點傷害`,'ks');
+    const real=Math.min(n,u.hp);ST(u).taken+=real;if(by&&by.side===u.side&&by!==u&&by.side===G.player&&u.hp-n<=0){G._ff=1;G._ffn=(G._ffn||0)+1;}if(by&&by.side!==u.side&&by.side===G.player&&u.hp-n<=0)(G._kl=G._kl||[]).push({s:src||'',d:cheb(by.x,by.y,u.x,u.y),op:by.op,t:performance.now()});if(by&&by.side!==u.side){ST(by).dmg+=real;if(u.hp-n<=0)ST(by).k++;}if(by&&u.hp-n<=0)u.kby=by.op;}if(u.hidden)reveal(u,'受傷後');u.exp=[u.x,u.y];u.hp-=n; if(src)log(`${nm(u)} 受到${src} ${n} 點傷害`,'ks');
   if(u.hp<=0&&finkaSave(u))return render();if(u.hp<=0){SFX.kill();onKill(u);u.alive=false;u.hp=0;u.overwatch=false;if(G.hostage&&G.hostage.by===u.id){G.hostage.by=null;G.hostage.x=u.x;G.hostage.y=u.y;log('人質留在原地','ks');}log(`${nm(u)} 陣亡`,u.side==='A'?'kd':'ka');}
   render(); checkWin();
 }
@@ -7954,7 +7968,7 @@ function renderTitle(){
   const el=$('#tmenu');if(!el)return;if(SCREEN==='rank')SCREEN='title';{const tt=$('#title');if(tt)tt.dataset.s=SCREEN;}const B=(id,label,sub,cls)=>`<button id="${id}" class="tbtn ${cls||''}"><b>${label}</b>${sub?`<span>${sub}</span>`:''}</button>`;
   let h='';if(SCREEN==='task')h=taskHTML()+B('t-back','返回','',' ghost');
   const ops=k=>cfg.picks[k].map(x=>`<img src="${opIcon(x)}" alt="${(OPC[x]||OPS[x]).name}" title="${(OPC[x]||OPS[x]).name}">`).join('');
-  if(SCREEN==='title')h=B('t-rank','線上對戰','PVP · 自動配對對手','primary')+B('t-pve','對戰電腦','PVE · 選陣營、地圖與幹員')+B('t-shop','商店','用聲望解鎖幹員')+B('t-cop','自訂幹員','養成你的專屬幹員')+B('t-lib','作戰檔案',`規則 · ${OPBASE.length} 名幹員圖鑑 · 成就`);
+  if(SCREEN==='title')h=B('t-rank','線上對戰','PVP · 自動配對對手','primary')+B('t-pve','對戰電腦','PVE · 選陣營、地圖與幹員')+B('t-shop','商店','用聲望解鎖幹員')+B('t-cop','培養幹員','養成你的專屬幹員')+B('t-lib','作戰檔案',`規則 · ${OPBASE.length} 名幹員圖鑑 · 成就`);
   else if(SCREEN==='lib')h=`<h2 class="tsec">作戰檔案</h2>`+B('t-man','規則','本遊戲玩法','primary')+B('t-ops','幹員圖鑑',`共 ${OPBASE.length} 名幹員`)+B('t-ach','成就',`已解鎖 ${achCount()}/${ACH.length}`)+B('t-back','返回','',' ghost');
   else if(SCREEN==='rank'){if(ME.mode!=='account')h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(null,40)}<div><b>排名戰需要登入帳號</b><br><span>登入後，段位與戰績會存在這個遊戲的共用資料裡。訪客可以玩其他所有模式。</span></div></div></div>`+B('t-login','登入帳號','啟用線上身分','primary')+B('t-back','返回','',' ghost');
     else{fillPicks('A');fillPicks('D');h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(ME.rating,44)}<div><span>你的段位</span><br><b>${ME.rating==null?'—':tierName(tierOf(ME.rating))}</b> <span>${ME.rating??''} 分 · ${ME.w} 勝 ${ME.l} 敗</span></div></div>
@@ -8414,7 +8428,7 @@ function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;cons
   const ttls=OPBASE.filter(b=>mxLv(ECO.mx[b]||0)>=5);
   el.innerHTML=`<div class="psbox"><div class="pshead"><img class="pav" src="${meAvatar()}" alt=""><div><b>${esc(meName())}</b><span>${GA.u?'Google 帳號':acct?'線上身分':'訪客'}</span></div><button id="psClose" aria-label="關閉">✕</button></div>
   <section><h4>名稱</h4><div class="psrow"><input id="psNick" maxlength="16" value="${esc(ME.nick)}" placeholder="${esc(acct&&ME.acct.name?ME.acct.name:ME.guest)}"><button id="psNickOk">儲存</button></div></section>
-  <section><h4>頭貼</h4><div class="avgrid">${acct&&ME.acct.photo?`<button class="avb ${ME.usePhoto?'on':''}" data-av="__photo" title="帳號照片"><img src="${ME.acct.photo}" alt="帳號照片"></button>`:''}${avs}</div><p class="pshint">幹員熟練度 Lv1 解鎖頭像、Lv3 解鎖半身像、Lv5 解鎖稱號。自訂幹員轉職過的職業也能當頭像。</p></section><section><h4>稱號</h4>${ttls.length?`<div class="psrow wrap"><button class="ttl ${!ECO.title?'on':''}" data-ttl="">不顯示</button>${ttls.map(b=>`<button class="ttl ${ECO.title===b?'on':''}" data-ttl="${b}">${esc(mxTitle(b))}</button>`).join('')}</div>`:'<p class="pshint">把任一名幹員練到熟練度 Lv5，就能拿到他的專屬稱號。</p>'}</section>
+  <section><h4>頭貼</h4><div class="avgrid">${acct&&ME.acct.photo?`<button class="avb ${ME.usePhoto?'on':''}" data-av="__photo" title="帳號照片"><img src="${ME.acct.photo}" alt="帳號照片"></button>`:''}${avs}</div><p class="pshint">幹員熟練度 Lv1 解鎖頭像、Lv3 解鎖半身像、Lv5 解鎖稱號。培養幹員轉職過的職業也能當頭像。</p></section><section><h4>稱號</h4>${ttls.length?`<div class="psrow wrap"><button class="ttl ${!ECO.title?'on':''}" data-ttl="">不顯示</button>${ttls.map(b=>`<button class="ttl ${ECO.title===b?'on':''}" data-ttl="${b}">${esc(mxTitle(b))}</button>`).join('')}</div>`:'<p class="pshint">把任一名幹員練到熟練度 Lv5，就能拿到他的專屬稱號。</p>'}</section>
   <section><h4>成就與好友</h4><div class="psrow"><button id="psAch">🏆 成就 ${achCount()}/${ACH.length}</button><button id="psFr">好友 ${FR.list.length} 人</button></div></section>
   <section><h4>登入資料</h4>${window.R6FB?gaHTML():acct?`<p class="pshint">已用 線上身分登入。</p><div class="psrow"><button id="psLogout">改用訪客身分</button></div>`:
     `<p class="pshint">目前是訪客，所有模式都能玩。聲望、解鎖的幹員和熟練度存在這台裝置上。</p><div class="pslogin"><button class="primary" id="psLogin"><span class="lgico">C</span>啟用線上身分</button><button disabled title="Google 登入目前還沒開放"><span class="lgico g">G</span>Google 登入（此頁面不支援）</button><button class="on" disabled><span class="lgico">訪</span>訪客（目前）</button></div>`}${PMSG?`<p class="terr">${PMSG}</p>`:''}</section>
@@ -8992,7 +9006,7 @@ function renderShop(){const el=$('#shop');if(!el||el.hidden)return;const s=SHOP.
   const cnt=k=>{const a=shopAll(k);return [a.filter(owned).length,a.length];};
   el.dataset.side=s;
   el.innerHTML=`<div class="shBox">
-    <header class="shHd"><button class="shBack" id="shBack">‹ 返回</button><div class="shTt"><h2>商店</h2><span>${s==='S'?'自訂幹員的技能，每個 '+fmtN(SKPRICE):'用聲望解鎖新幹員'}</span></div><div class="shBal" id="shBal">${RNI}<b>${fmtN(ECO.rn)}</b></div></header>
+    <header class="shHd"><button class="shBack" id="shBack">‹ 返回</button><div class="shTt"><h2>商店</h2><span>${s==='S'?'培養幹員的技能，每個 '+fmtN(SKPRICE):'用聲望解鎖新幹員'}</span></div><div class="shBal" id="shBal">${RNI}<b>${fmtN(ECO.rn)}</b></div></header>
     <div class="shBar"><div class="shTabs three" role="tablist">${['A','D'].map(k=>{const [o,n]=cnt(k);return `<button role="tab" data-ss="${k}" class="${k} ${k===s?'on':''}" aria-selected="${k===s}">${emblem(k)}<span><b>${k==='A'?'進攻方':'防守方'}</b><small>已擁有 ${o}/${n}</small></span></button>`;}).join('')}<button role="tab" data-ss="S" class="skTab ${s==='S'?'on':''}" aria-selected="${s==='S'}"><i class="skI"><b>✦</b></i><span><b>技能</b><small>${copSkills().filter(b=>(ECO.sk||[]).includes(b)).length}/${copSkills().length}</small></span></button></div>
       <div class="shFil">${[['all','全部'],['new','未擁有']].map(([k,t])=>`<button data-sf="${k}" class="${SHOP.filter===k?'on':''}">${t}</button>`).join('')}</div></div>
     <div class="shStage" id="shStage"><div class="shGrid" id="shGrid"></div></div>
@@ -9217,8 +9231,8 @@ function renderOpSelect(anim){
 const COP_BASE=10,COP_CAP=34,COP_RT=500,SKPRICE=8000,COPN=['幹員一','幹員二'],COPART=['img/cop/f.webp','img/cop/m.webp'];
 const COPARM=[null,{hp:4,mv:6,run:5},{hp:5,mv:5,run:3},{hp:6,mv:4,run:2}],CDIEC={Y:1,O:2,R:3},CDIEA={Y:1,O:1.5,R:2},CDIEN={Y:'O',O:'R'};
 const COPG=['frag','charges','flash','smk','impact','clay','nitro','bpcam','shield'];
-const copNew=o=>({nm:'炮灰',e:0,k:0,sv:0,d:[['Y'],['Y'],['Y']],arm:1,run:0,vis:0,w:null,g:(o&&o.g)||[null,null],sk:(o&&o.sk)||null,gen:((o&&o.gen)||0)+1});
-function copAll(){if(!Array.isArray(ECO.cop)||ECO.cop.length!==2)ECO.cop=[copNew(),copNew()];ECO.cop=ECO.cop.map(c=>Object.assign(copNew(),c||{}));if(!Array.isArray(ECO.sk))ECO.sk=[];return ECO.cop;}
+const copNew=o=>({nm:'新進人員',e:0,k:0,sv:0,d:[['Y'],['Y'],['Y']],arm:1,run:0,vis:0,w:null,g:(o&&o.g)||[null,null],sk:(o&&o.sk)||null,gen:((o&&o.gen)||0)+1});
+function copAll(){if(!Array.isArray(ECO.cop)||ECO.cop.length!==2)ECO.cop=[copNew(),copNew()];ECO.cop=ECO.cop.map(c=>{const n=Object.assign(copNew(),c||{});if(n.nm==='炮灰')n.nm='新進人員';return n;});if(!Array.isArray(ECO.sk))ECO.sk=[];return ECO.cop;}
 const copTot=c=>Math.min(COP_CAP,COP_BASE+(c.e|0));
 const copSpent=c=>c.d.reduce((a,b)=>a+b.reduce((x,d)=>x+CDIEC[d],0),0)-3+(c.arm-1)*2+c.run+c.vis;
 const copLeft=c=>copTot(c)-copSpent(c);
@@ -9278,7 +9292,7 @@ function copPrep(on){copAll();for(const s of ['a','d'])['rifle','shotgun'].forEa
   if(!on){PROF[id]={...COPDEF[id].P};OPS[id]={...COPDEF[id].O};return;}
   const c=ECO.cop[i],st=copStat(c),sk=copSkOn(c,side);
   PROF[id]={run:st.run,st:st.hp,d:copDice(c).map(b=>b.join('')),dr:c.w==='sg'?'中':'低',dz:c.w==='sg'?2:1,shield:false,card:true,cop:i};
-  OPS[id]={...COPDEF[id].O,name:c.nm,role:c.w?WPN[c.w].t:'自訂幹員',g:sk?OPS[sk].g:'',gd:sk?OPS[sk].gd:'',ch:sk?OPS[sk].ch:0,...(sk?{}:{passive:'沒有裝備技能',pd:''})};});}
+  OPS[id]={...COPDEF[id].O,name:c.nm,role:c.w?WPN[c.w].t:'培養幹員',g:sk?OPS[sk].g:'',gd:sk?OPS[sk].gd:'',ch:sk?OPS[sk].ch:0,...(sk?{}:{passive:'沒有裝備技能',pd:''})};});}
 function copUnit(u,i){const c=ECO.cop[i],st=copStat(c);u.speed=st.mv;u.fh=st.fov/2;u.cop=i;u.w=c.w;if(st.vr>10)u.vr=st.vr;u.nmz=c.nm;const sk=copSkOn(c,u.side);if(sk)u.sk=sk;
   for(const g of c.g)if(g&&!INV[u.side][g]){u.gi=u.gi||{};u.gi[g]=(u.gi[g]|0)+1;}}
 // the other side's gadgets the custom operator carries live on the unit (u.gi); each use borrows the shared counter for that one call
@@ -9287,11 +9301,21 @@ function giBorrow(u,mode,fn){const k=mode==='charge'?'charges':mode;if(!u||!u.gi
   if(r&&typeof r.then==='function')return r.then(v=>{done();return v;},e=>{done();throw e;});done();return r;}
 const giTargets=(u,m)=>m==='charge'?chargeTargets(u):m==='clay'?clayTargets(u):m==='impact'?impactTargets(u):m==='shield'||m==='bpcam'?deployTargets(u):throwTargets(u);
 function copGear(){for(const k of cfg.picks[cfg.side]){const i=copSlot(k);if(i==null)continue;for(const g of ECO.cop[i].g)if(g&&INV[cfg.side][g])G[g]=(G[g]|0)+1;}}
-function copEnd(lines){if(!G||G.net||G.bot||G.tut)return;const u=G.units.find(u=>u.side===G.player&&u.cop!=null);if(!u)return;const c=ECO.cop[u.cop],k=ST(u).k|0,t0=copTot(c);
+function copEnd(lines){if(!G||G.tut||G.tut2)return;const u=G.units.find(u=>u.side===G.player&&copSlot(u.op)!=null);if(!u)return;const i=copSlot(u.op),c=copAll()[i],k=ST(u).k|0,t0=copTot(c);
   c.k+=k;c.e=Math.min(COP_CAP-COP_BASE,(c.e|0)+k);const got=copTot(c)-t0;
-  if(!u.alive){lines.push([`${c.nm} 陣亡，${COPN[u.cop]}要重新取名、從頭培養`,0]);ECO.cop[u.cop]=copNew(c);}
-  else{c.sv++;lines.push([`${c.nm} 存活${k?`，擊殺 ${k}`:''}${got?`，點數 +${got}`:''}`,0]);}
+  if(!u.alive){const by=u.kby&&OPC[u.kby]?(copSlot(u.kby)!=null?'新進人員':OPC[u.kby].name):'';
+    ECO.alum=(Array.isArray(ECO.alum)?ECO.alum:[]).concat([{i,w:c.w||null,nm:c.nm,rk:copScore(c).rk,k:c.k|0,sv:c.sv|0,by,ts:Date.now()}]).slice(-100);
+    lines.push([`${c.nm}　陣亡`,0]);ECO.cop[i]=copNew(c);}
+  else{c.sv++;lines.push([`${c.nm}　點數 +${got}`,0]);}
   CP.dr=null;}
+// 學長姐: every trained operator who fell, newest first
+function openAlum(){let el=$('#copAl');if(!el){el=document.createElement('div');el.id='copAl';el.setAttribute('role','dialog');el.setAttribute('aria-label','學長姐');document.body.appendChild(el);}
+  const L=(Array.isArray(ECO.alum)?ECO.alum:[]).slice().reverse();el.hidden=false;
+  el.innerHTML=`<div class="alBox"><div class="cpTop"><button class="cpBack" id="alBack" aria-label="返回">‹</button><div class="cpTt"><small>FALLEN SENIORS</small><h2>學長姐</h2></div><span class="alN">${L.length?`共 ${L.length} 位`:''}</span></div>
+    <div class="alList">${L.length?L.map(a=>`<div class="alRow"><img src="${copArt({w:a.w},a.i)}" alt=""><div class="alI"><div class="alNm"><b>${esc(a.nm)}</b><span class="cpTag${a.w?' w':''}">${a.w&&WPN[a.w]?WPN[a.w].t:'新進人員'}</span><em class="alRk" style="color:${RKC[a.rk]||'#8b9cad'};border-color:${RKC[a.rk]||'#8b9cad'}">${a.rk||'N'}</em></div>
+      <div class="alKd"><span>擊殺 <b>${a.k|0}</b></span><span>存活 <b>${a.sv|0}</b> 場</span></div><div class="alBy">${a.by?`陣亡 · 被 <b>${esc(a.by)}</b> 擊殺`:'陣亡'}</div></div></div>`).join('')
+      :'<div class="alEmpty"><b>你是第一屆新兵</b><span>還沒有學長姐。好好活下去。</span></div>'}</div></div>`;
+  el.querySelector('#alBack').onclick=()=>{el.hidden=true;};}
 // the skill button runs the borrowed operator's gadget code
 {const _gt=gTargets;gTargets=function(u){if(!u||!u.sk)return _gt(u);const o=u.op;u._op=o;u.op=u.sk;try{return _gt(u);}finally{u.op=o;delete u._op;}};}
 {const _ug=useGadget;useGadget=async function(u,x,y){if(!u||!u.sk)return _ug(u,x,y);const o=u.op;u._op=o;u.op=u.sk;try{return await _ug(u,x,y);}finally{u.op=o;delete u._op;}};}
@@ -9309,8 +9333,8 @@ function askPickDie(pool,rolls,hits){return new Promise(res=>{const el=document.
   el.querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>{const j=+b.dataset.j;fin(j<0?null:j);});setTimeout(()=>fin(null),9000);});}
 // card shown in operator select for the recruits: the player's own operator
 function copCard(c){const i=copSlot(c&&c.id);if(i==null)return c;const o=copAll()[i],st=copStat(o),sk=copSkOn(o,c.side);
-  return {...c,name:o.nm,org:'自訂幹員',real:'',w:copDice(o).map(b=>b.slice()),st:st.hp,run:st.run,dz:o.w==='sg'?'O':'Y',shield:false,up:null,
-    zh:{...c.zh,role:o.w?WPN[o.w].t:'自訂幹員',g:sk?skName(sk):'',x:sk?skText(sk):'到「自訂幹員」頁裝備技能'},g:{...c.g,name:'',charges:sk?OPS[sk].ch:0,ab:[]}};}
+  return {...c,name:o.nm,org:'培養幹員',real:'',w:copDice(o).map(b=>b.slice()),st:st.hp,run:st.run,dz:o.w==='sg'?'O':'Y',shield:false,up:null,
+    zh:{...c.zh,role:o.w?WPN[o.w].t:'培養幹員',g:sk?skName(sk):'',x:sk?skText(sk):'到「培養幹員」頁裝備技能'},g:{...c.g,name:'',charges:sk?OPS[sk].ch:0,ab:[]}};}
 
 // ---------- custom operator page ----------
 const CP={i:0,dr:null,st:{},sheet:null,skTab:'all',skPg:0,skSel:null,edit:false};
@@ -9319,7 +9343,7 @@ function copDraft(){CP.dr=cpCopy(copAll()[CP.i]);CP.st={};}
 const cpPend=()=>copSpent(CP.dr)-copSpent(copAll()[CP.i]);
 const cpDirty=()=>Object.values(CP.st).some(a=>a&&a.length);
 function openCop(){copAll();let el=$('#cop');
-  if(!el){el=document.createElement('div');el.id='cop';el.setAttribute('role','dialog');el.setAttribute('aria-label','自訂幹員');document.body.appendChild(el);
+  if(!el){el=document.createElement('div');el.id='cop';el.setAttribute('role','dialog');el.setAttribute('aria-label','培養幹員');document.body.appendChild(el);
     addEventListener('keydown',e=>{if(el.hidden||e.key!=='Escape')return;if(CP.sheet){CP.sheet=null;renderCop();}else closeCop();});}
   copDraft();CP.sheet=null;CP.edit=false;el.hidden=false;el.classList.remove('out');renderCop();}
 function closeCop(){const el=$('#cop');if(!el)return;el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');},180);if(SCREEN==='cop')SCREEN='title';renderTitle();}
@@ -9347,7 +9371,7 @@ function renderCop(){const el=$('#cop');if(!el||el.hidden)return;const cs=copAll
   const slot=k=>k?`<span class="cpGi">${WZI[k]||''}</span>`:'+';
   const sk=c.sk&&ECO.sk.includes(c.sk)?c.sk:null,skNo=sk&&!skFit(c,sk);
   el.innerHTML=`<div class="cpBox">
-  <div class="cpTop"><button class="cpBack" id="cpBack" aria-label="返回">‹</button><div class="cpTt"><small>CUSTOM OPERATOR</small><h2>自訂幹員</h2></div>
+  <div class="cpTop"><button class="cpBack" id="cpBack" aria-label="返回">‹</button><div class="cpTt"><small>TRAINING</small><h2>培養幹員</h2></div><button class="cpAlB" id="cpAlB">學長姐</button>
     <div class="cpSw" role="tablist">${COPN.map((n,i)=>`<button role="tab" data-ci="${i}" class="${i===CP.i?'on':''}" aria-selected="${i===CP.i}">${n}</button>`).join('')}</div></div>
   <div class="cpStage"><img class="cpArt${c.w&&WART[c.w]?' cw':''}" src="${copArt(c,CP.i)}" alt=""><div class="cpBig">${c.w?WPN[c.w].en:'RECRUIT'}</div>
     <div class="cpId">${CP.edit?`<div class="cpEd"><input id="cpNm" value="${esc(c.nm)}" autocomplete="off" aria-label="幹員名字"><span id="cpCnt">${copW(c.nm)}/12</span></div>`
@@ -9396,7 +9420,7 @@ function skUse(b,full){const n=OPS[b].ch,u=n>50?(full?'次數無限':'無限次'
 function skBuy(b){if(!b||ECO.sk.includes(b)||ECO.rn<SKPRICE)return false;ECO.rn-=SKPRICE;ECO.sk.push(b);ecoSave();try{SFX.round&&SFX.round();}catch(e){}try{renderPlayer();}catch(e){}return true;}
 function cpSave(f){const cs=copAll(),c=cs[CP.i];f(c);f(CP.dr);ecoSave();renderCop();}
 function cpBind(el){const q=s=>el.querySelector(s),on=(s,f)=>{const b=q(s);if(b)b.onclick=f;},d=CP.dr,c=copAll()[CP.i],push=(k,v)=>(CP.st[k]=CP.st[k]||[]).push(cpCopy(v)),left=()=>copLeft(d);
-  on('#cpBack',closeCop);
+  on('#cpBack',closeCop);on('#cpAlB',openAlum);
   el.querySelectorAll('[data-ci]').forEach(b=>b.onclick=()=>{const i=+b.dataset.ci;if(i===CP.i)return;CP.i=i;CP.edit=false;copDraft();renderCop();});
   el.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{const k=b.dataset.cp,st=copStat(d);
     if(k[0]==='d'){const i=+k[1];if(left()<1||d.d[i].length>=bMax(d,i)||d.d.flat().length>=dTot(d))return;push(k,d.d[i]);d.d[i].push('Y');}
@@ -9437,11 +9461,11 @@ function skDet(el,b){const own=ECO.sk.includes(b),ok=ECO.rn>=SKPRICE,n=OPS[b].ch
   const txt=String(skText(b)).split(/(?=〔)/).map(t=>{const m=t.match(/^〔(.+?)〕\s*(.*)$/s);return m?`<p><b>${m[1]}</b>${m[2]}</p>`:`<p>${t}</p>`;}).join('');
   el.innerHTML=`<div class="shDBox shKD ${sd}" role="dialog" aria-label="${esc(skName(b))}"><button class="shX" id="shX" aria-label="關閉">✕</button>
     <div class="shKDh"><span class="shKDi"><img src="${opIcon(b)}" alt=""></span><div><small><i class="sd ${sd}"></i>${sd==='A'?'進攻':'防守'}技能 · ${esc(OPC[b].name)}</small><h3>${esc(skName(b))}</h3></div></div>
-    <div class="shKDm">${tags}</div><div class="shKDt">${txt}</div><p class="shKDn">裝備在自訂幹員的技能格，買過可以隨時更換。</p>
-    ${own?`<div class="shCta own"><span class="shOwn"><i class="shOk">✓</i>已擁有</span><span class="shNote">到「自訂幹員」頁裝備</span></div>`
+    <div class="shKDm">${tags}</div><div class="shKDt">${txt}</div><p class="shKDn">裝備在培養幹員的技能格，買過可以隨時更換。</p>
+    ${own?`<div class="shCta own"><span class="shOwn"><i class="shOk">✓</i>已擁有</span><span class="shNote">到「培養幹員」頁裝備</span></div>`
       :`<div class="shCta"><div class="shPrice">${RNI}<b>${fmtN(SKPRICE)}</b></div><button class="shBuy" id="shBuy" ${ok?'':'disabled'}>${ok?'購買':'聲望不足'}</button><span class="shNote">${ok?`購買後剩 ${fmtN(ECO.rn-SKPRICE)}`:`還差 ${fmtN(SKPRICE-ECO.rn)}`}</span></div>`}</div>`;
   el.onclick=e=>{if(e.target===el){SHOP.sel=null;renderShopDet();}};$('#shX').onclick=()=>{SHOP.sel=null;renderShopDet();};
-  const by=$('#shBuy');if(by)by.onclick=()=>{if(skBuy(b)){achToastMsg(`已購買技能 ${skName(b)}`,'到「自訂幹員」頁裝備');const bal=$('#shBal b');if(bal)bal.textContent=fmtN(ECO.rn);shopLayout();renderShopDet();}};}
+  const by=$('#shBuy');if(by)by.onclick=()=>{if(skBuy(b)){achToastMsg(`已購買技能 ${skName(b)}`,'到「培養幹員」頁裝備');const bal=$('#shBal b');if(bal)bal.textContent=fmtN(ECO.rn);shopLayout();renderShopDet();}};}
 
 // ---------- round clocks: each squad gets (time per Operator x Operators in play) per round, shared by its two activation phases ----------
 const CLK_SVG={A:'<svg viewBox="0 0 48 48"><path d="M8 6l3-2 15 15-3 3zM40 6l-3-2-15 15 3 3z" opacity=".0"/><path d="M6 4h6l18 18-3 3L6 10zM42 4h-6L18 22l3 3L42 10zM14 30l4 4-6 6 2 2-3 3-2-2-3 3-2-2 3-3-2-2 3-3 2 2zm20 0l-4 4 6 6-2 2 3 3 2-2 3 3 2-2-3-3 2-2-3-3-2 2zM16 26l6 6-3 3-6-6zm16 0l-6 6 3 3 6-6z"/></svg>',
