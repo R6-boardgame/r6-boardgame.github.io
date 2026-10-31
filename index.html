@@ -1033,7 +1033,7 @@ html body #acts button.primary.owb.on,html body.actsR #actsR #acts button.primar
 @keyframes bnIn{from{transform:scaleY(0) skewX(-12deg);opacity:0}to{transform:none;opacity:1}}
 @keyframes bnOut{to{opacity:0;transform:translateX(8%)}}
 @keyframes bnFlash{50%{background-color:rgba(255,0,0,.12)}}
-#defchip{position:fixed;left:50%;top:max(54px,calc(env(safe-area-inset-top) + 48px));transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(40,6,6,.88);border:1px solid #ff4a4a;color:#ffd7d7;font:600 14px 'Noto Sans TC',sans-serif;letter-spacing:.06em;pointer-events:none;animation:dcPulse 1s infinite}
+#defchip{white-space:nowrap;position:fixed;left:50%;top:max(54px,calc(env(safe-area-inset-top) + 48px));transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(40,6,6,.88);border:1px solid #ff4a4a;color:#ffd7d7;font:600 14px 'Noto Sans TC',sans-serif;letter-spacing:.06em;pointer-events:none;animation:dcPulse 1s infinite}
 #defchip b{color:#fff;font-size:18px}#defchip i{width:10px;height:10px;border-radius:50%;background:#ff3030;box-shadow:0 0 10px #ff3030}
 @keyframes dcPulse{50%{box-shadow:0 0 22px rgba(255,40,40,.6)}}
 body.lowhp::after{content:'';position:fixed;inset:0;z-index:55;pointer-events:none;box-shadow:inset 0 0 120px 30px rgba(200,0,0,.45);animation:lhPulse 1.4s ease-in-out infinite}
@@ -5778,7 +5778,7 @@ function musicLevel(){if(!G||G.over||G.phase!=='play')return SFX.music(0);
 function renderTension(){
   const on=G&&G.phase==='play'&&!G.over;let c=document.getElementById('defchip');
   if(on&&G.defuser){if(!c){c=document.createElement('div');c.id='defchip';document.body.appendChild(c);}
-    c.innerHTML=`<i></i>${dfTxt()}`;}else if(c)c.remove();
+    c.innerHTML=`<i></i>${dfTxt()}`;requestAnimationFrame(()=>{const ob=document.getElementById('opsBar');if(c.isConnected&&ob&&!ob.hidden){const r=ob.getBoundingClientRect();if(r.height)c.style.top=Math.round(r.bottom+6)+'px';}});}else if(c)c.remove();
   const u=G&&(G.active||G.sel);document.body.classList.toggle('lowhp',!!(on&&u&&u.alive&&u.side===G.player&&u.hp===1));}
 function bigNote(t,sub,k,ms){if(!CINE.on||document.hidden)return;const el=document.createElement('div');el.className='bignote '+(k||'');
   el.innerHTML=`<div class="bnBand"><b>${t}</b>${sub?`<span>${sub}</span>`:''}</div>`;document.body.appendChild(el);setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),400);},ms||1900);}
@@ -5927,7 +5927,7 @@ async function step(u,x,y){DMGBY=null;
   if(occ){ if(occ.side!==u.side){occ.spotted=1;if(occ.hidden)reveal(occ,'被撞見，');log(`${nm(u)} 撞見了 ${nm(occ)}！`,'ks');} u.mp=Math.max(0,u.mp-1);return false; }
   const px=u.x,py=u.y;u.fd=[Math.sign(x-u.x),Math.sign(y-u.y)];u.x=x;u.y=y;u.exp=null;spotTrack(u);camDiscover();u.mp=Math.max(0,u.mp-cost);
   if(G.hostage&&G.hostage.by===u.id){G.hostage.x=x;G.hostage.y=y;}
-  if(G.cur&&G.cur.u===u)G.cur.path.push([x,y,pubNow(u)]); if(pub(u))SFX.step(); render(); await sleep(G.ai?(pub(u)?(G.bot?150:85):10):70);
+  if(G.cur&&G.cur.u===u)G.cur.path.push([x,y,pubNow(u)]); if(pub(u))SFX.step(); render(); await sleep(G.ai?(pub(u)?300:10):70);
   if(u.side==='A'){
     const tr=gadgetAt(x,y,'trap');
     if(tr){tr.alive=false;const n=1+Math.floor(Math.random()*2);try{SFX.boom();wallBlast3D(x,y,'floor');}catch(e){}log(`${nm(u)} 觸發了 Kapkan 的入口引爆裝置！擲出 ${n} 點`,'kd');await damage(u,n);if(!u.alive)return false;}
@@ -6603,7 +6603,7 @@ let BOTBR=null; // the defender currently allowed to path through light walls (i
 const rr=(a,b)=>a+Math.random()*(b-a);
 function botMake(){return {name:BOTNM[Math.floor(Math.random()*BOTNM.length)],shots:[],camDead:new Set(),seen:0,mood:rr(.35,.75)};}
 // a pause before each action; consecutive steps flow the way a finger drags along a path
-async function BH(u,k){if(!G||!G.bot||document.hidden)return;const prev=u._bk;u._bk=k;
+async function BH(u,k){if(!G||document.hidden)return;if(!G.bot){u._bk=k;if(k!=='step'&&pub(u))await sleep(600);return;}const prev=u._bk;u._bk=k;
   if(k==='step'&&prev==='step')return sleep(rr(40,160));const d=BOTDELAY[k]||[600,1400];await sleep(rr(d[0],d[1]));}
 function botNote(sh,t,tw,hits){if(!G||!G.bot||G.over||sh.side===curBotSide())return;
   G.bot.shots.push({by:sh.id,x:sh.x,y:sh.y,vic:t.id,vx:t.x,vy:t.y,tw:!!tw,hits,r:G.round,ph:G.phaseIdx,new:1});}
