@@ -210,7 +210,7 @@ button.primary .sub{color:#3d300c}
 [hidden]{display:none!important}
 canvas.gl{display:block;margin:0 auto;touch-action:none;cursor:pointer}
 .boardframe canvas.gl{filter:saturate(.74) contrast(1.12) brightness(.97) sepia(.06)}
-.grade{position:absolute;inset:8px;pointer-events:none;background:radial-gradient(ellipse at 50% 55%,rgba(0,0,0,0) 45%,rgba(10,5,2,.72) 100%),linear-gradient(180deg,rgba(255,190,150,.10),rgba(255,170,120,.10));mix-blend-mode:multiply;z-index:1}
+.grade{position:absolute;inset:8px;pointer-events:none;background:radial-gradient(ellipse at 50% 55%,rgba(0,0,0,0) 45%,rgba(10,5,2,.42) 100%),linear-gradient(180deg,rgba(255,200,165,.06),rgba(255,185,140,.06));mix-blend-mode:multiply;z-index:1}
 .tutbox{position:absolute;left:14px;bottom:14px;z-index:4;width:min(460px,calc(100% - 28px));background:rgba(14,19,25,.93);border:1px solid #e3aa3e;padding:12px 14px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
 .tutbox .tuthead{display:flex;gap:8px;align-items:center}.tutbox .tuthead b{flex:1;color:#e3aa3e;font-size:12.5px;letter-spacing:.06em}
 .tutbox .tuthead button{font-size:12px;padding:3px 8px}
@@ -8554,10 +8554,10 @@ let BOX3=null,SPH3=null,HSPH3=null,CYL3=null;
 const BARD='img/bar/';
 function barInit(){
   const T=THREE,S=R3.scene;R3.bar={key:'',g:null,ready:false,m:null};
-  S.background=new T.Color(0x0c0504);S.fog.color.set(0x1a0805);
-  S.traverse(o=>{if(o.isHemisphereLight){o.color.set(0xffc49a);o.groundColor.set(0x2a0e08);o.intensity=.12;}});
-  R3.sun.color.set(0xff9a6a);R3.sun.intensity=.95;
-  S.traverse(o=>{if(o.isDirectionalLight&&o!==R3.sun){o.color.set(0xff3a22);o.intensity=.35;o.position.set(-14,10,-12);}});
+  S.background=new T.Color(0x0c0504);S.fog.color.set(0x2a120a);
+  S.traverse(o=>{if(o.isHemisphereLight){o.color.set(0xffc49a);o.groundColor.set(0x3a160c);o.intensity=.32;}});
+  R3.sun.color.set(0xffb488);R3.sun.intensity=1.4;
+  S.traverse(o=>{if(o.isDirectionalLight&&o!==R3.sun){o.color.set(0xff4a2a);o.intensity=.45;o.position.set(-14,10,-12);}});
   const tl=new T.TextureLoader(),load=(u,srgb)=>new Promise(r=>tl.load(BARD+u,t=>{if(srgb)t.encoding=T.sRGBEncoding;t.anisotropy=8;r(t);},undefined,()=>r(null)));
   Promise.all([load('bar_bg.jpg',1),load('bar_env.jpg',1),load('wood_diff.jpg',1),load('wood_nor_gl.jpg'),load('wood_rough.jpg')]).then(([bg,envT,wd,wn,wr])=>{
     if(bg){// photo sphere that follows the camera and tilts with it, so the bar's back shelves stay behind the board
@@ -8583,7 +8583,7 @@ function barBuild(m){
   // lacquered bar counter
   const TOP=-.36,BACK=-14,FRONT=H+(PH?34:18),TX=W+120,TZ=FRONT-BACK,{wd,wn,wr}=B.tex;
   const rep=(t,x,y)=>{if(!t)return null;const q=t.clone();q.needsUpdate=true;q.wrapS=q.wrapT=T.RepeatWrapping;q.repeat.set(x,y);return q;};
-  const topM=new T.MeshPhysicalMaterial({map:rep(wd,TX/40,TZ/40),normalMap:rep(wn,TX/40,TZ/40),roughnessMap:rep(wr,TX/40,TZ/40),roughness:.55,clearcoat:1,clearcoatRoughness:.07,envMapIntensity:1.1,normalScale:new T.Vector2(.4,.4)});
+  const topM=new T.MeshPhysicalMaterial({map:rep(wd,TX/40,TZ/40),normalMap:rep(wn,TX/40,TZ/40),roughnessMap:rep(wr,TX/40,TZ/40),roughness:.55,clearcoat:1,clearcoatRoughness:.07,envMapIntensity:1.5,normalScale:new T.Vector2(.4,.4)});
   const sideM=new T.MeshStandardMaterial({map:rep(wd,TX/40,.15),color:0x8a6a5a,roughness:.5});
   const frontM=new T.MeshStandardMaterial({map:rep(wd,TX/30,1.4),color:0x4a2a20,roughness:.6,normalMap:rep(wn,TX/30,1.4)});
   const top=new T.Mesh(new T.BoxGeometry(TX,1.4,TZ),[sideM,sideM,topM,sideM,sideM,sideM]);top.position.set(cx,TOP-.7,(FRONT+BACK)/2);top.receiveShadow=true;g.add(top);
