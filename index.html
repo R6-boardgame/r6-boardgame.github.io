@@ -1010,6 +1010,25 @@ html.pg,html.pg body{touch-action:manipulation}html.pg .psbox,html.pg .avgrid{to
   #opsel .osX{top:8px;left:14px}
 }
 #opsel.browse .osSec.inv{display:none}
+/* Codex: encyclopedia scrolls vertically, with independent side/role filters. */
+#opsel.browse:not(.shop) .osL{min-height:0}
+#opsel.browse:not(.shop) .osBar{flex-wrap:wrap;gap:10px;flex-shrink:0}
+#opsel.browse:not(.shop) .osBar>.hint{flex-basis:100%;text-align:center}
+#opsel.browse:not(.shop) .osCats{flex-shrink:0;gap:10px;padding:12px}
+#opsel.browse:not(.shop) .osSides{display:flex;flex-wrap:wrap;gap:10px;width:100%;padding-bottom:12px;margin-bottom:2px;border-bottom:1px solid #33414d}
+#opsel.browse:not(.shop) .osCats button{min-height:38px;line-height:1.4;white-space:normal}
+#opsel.browse:not(.shop) .osCols{flex:1;min-height:0;flex-direction:column;gap:24px;overflow-x:hidden;overflow-y:auto;padding:14px 4px 24px;touch-action:pan-y}
+#opsel.browse:not(.shop) .osCol{flex:0 0 auto;width:100%}
+#opsel.browse:not(.shop) .osGrid{grid-template-columns:repeat(auto-fit,minmax(44px,1fr));gap:8px}
+#opsel.browse:not(.shop) .osInfo{overflow-x:hidden;overflow-y:auto;columns:auto;touch-action:pan-y;overflow-wrap:anywhere}
+#opsel.browse:not(.shop) .osName{flex-wrap:wrap}
+#opsel.browse:not(.shop) .osSide{display:flex;flex-wrap:wrap;gap:8px;line-height:1.5}
+#opsel.browse:not(.shop) .osG .gt{min-width:0}
+#opsel.browse:not(.shop) .osW{grid-template-columns:repeat(3,minmax(0,1fr))}
+#opsel.browse:not(.shop) .osStats{grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:10px}
+#opsel.browse:not(.shop) .osStats div{min-width:0;padding:10px 6px}
+#opsel.browse:not(.shop) .osStats b{line-height:1.4}
+#opsel.browse:not(.shop) .osStats small{display:block;line-height:1.5}
 /* v25: attack seen from the shooter's shoulder; the board stays visible under a dim layer and the cards pop in where the models stood */
 .sintro.w{background:radial-gradient(60% 55% at 30% 75%,rgba(var(--ca),.16),transparent 70%),radial-gradient(45% 40% at 72% 30%,rgba(var(--cd),.14),transparent 70%),rgba(4,7,10,.5);animation:siFade .16s ease-out both}
 .sintro.w::before{animation-duration:.4s;animation-delay:0s}
@@ -10324,7 +10343,7 @@ function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
-function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v135</b><span>規則與戰術互動更新</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑與角色資訊整理</span></div></section></div>`);}
+function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v136</b><span>規則與戰術互動更新</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑改為上下捲動，新增攻擊／防守篩選</span><span>培養幹員每個距離區段最多 4 顆骰子</span></div></section></div>`);}
 function openFeedback(){const el=tsDlg('feedback','回報',`<div class="psbox"><div class="pshead"><div><b>回報</b><span>遇到問題或有想法，都歡迎告訴我們。</span></div><button class="tsX" aria-label="關閉">✕</button></div>
   <section><h4>類型</h4><select class="fbsel" id="fbType"><option value="bug">回報 Bug</option><option value="idea">遊戲建議</option></select></section>
   <section><h4>內容</h4><textarea class="fbtxt" id="fbText" maxlength="2000" placeholder="請描述發生了什麼、在哪個畫面，或你的建議…"></textarea><div class="fbcnt" id="fbCnt">0 / 2000</div></section>
@@ -10476,6 +10495,7 @@ function trKey(k,ix,d){const e=I18X[k]||I18N[k];if(e&&e[ix])return e[ix];
     const out=tk.map(x=>{const y=x.trim();if(!y||!/[㐀-鿿]/.test(y))return x;const t=trKey(y,ix,d+1);if(t==null)ok=false;return x.replace(y,t);});
     if(ok)return out.join(ix?sep:({'：':': ','；':'; ','，':', ','、':', ','・':' · '}[sep]||sep));break;}
   return best;}
+Object.assign(I18X,{'攻擊':['Attack',''],'防守':['Defense',''],'全部類型':['All roles',''],'骰數仍受每段最多 4 顆、三段合計最多 10 顆限制。':['Maximum 4 dice per range and 10 dice across all three ranges.',''],'幹員圖鑑改為上下捲動，新增攻擊／防守篩選':['Operator codex now scrolls vertically, with Attack / Defense filters.',''],'培養幹員每個距離區段最多 4 顆骰子':['Trained operators can have at most 4 dice per range.','']});
 function trText(o){const k=o.trim();if(!k||!/[㐀-鿿]/.test(k))return null;const ix=ME.lang==='en'?0:1;
   const t=trKey(k.replace(/\s+/g,' '),ix,0);if(t==null){I18MISS.add(k);return null;}return o.replace(k,t);}
 // tt: translate a string that is drawn on a canvas or shown in a dialog (outside the page text the observer swaps)
@@ -11169,18 +11189,18 @@ function opFace(id){const k=artBase(id);return FACEM[k]?'img/face/'+k+'.webp':op
 const BOLT='<svg viewBox="0 0 10 14"><path d="M6 0L0 8h4l-1 6 7-9H6z"/></svg>';
 const hexDice=list=>list.length?list.map(d=>`<i class="hexd ${d[0]}">${d.includes('*')?BOLT:''}</i>`).join(''):'<span class="hint">—</span>';
 const DZN={Y:'輕',O:'中',R:'重'};
-const OSEL={side:'A',cur:null,en:false,cat:'all'};
+const OSEL={side:'A',cur:null,en:false,cat:'all',faction:'all'};
 const opCat=c=>/破|突破|硬破|爆破/.test(c.zh.role||'')?'breach':/情報|偵|追蹤|反情報/.test(c.zh.role||'')?'intel':/醫|支援|盾|增益/.test(c.zh.role||'')?'support':/陷阱|封鎖|控制|拖延|反進攻/.test(c.zh.role||'')?'control':'combat';
 function osEco(c){const b=c.base,m=mxInfo(b),ok=ECO.rn>=OPPRICE;return `<div class="osEco">${OSEL.shop?(owned(b)?'<span class="osOwn">已擁有</span>':`<button class="primary" id="osBuy" ${ok?'':'disabled'}>購買 ${RNI}${fmtN(OPPRICE)}</button>${ok?'':`<small class="osNeed">聲望不足，還差 ${fmtN(OPPRICE-ECO.rn)}</small>`}`):''}<span class="osMx"><b>熟練度 Lv${m.lv}</b><span class="tkBar"><i style="width:${m.pct}%"></i></span><small>${m.nx?`${fmtN(m.xp)}/${fmtN(m.nx)}${MXREW[m.lv+1]?' · 下一級'+MXREW[m.lv+1]:MXREW[m.lv+2]?' · Lv'+(m.lv+2)+MXREW[m.lv+2]:''}`:'已滿級'}</small></span></div>`;}
 function cardText(c){if(ME.lang==='en'&&c.g&&c.g.ab&&c.g.ab.length)return c.g.ab.map(a=>`${a.k==='PASSIVE'?'':`<em>[${a.k}${a.t?' · '+esc(a.t):''}]</em> `}${esc(a.x).replace(/\[(\w+):(\w+)\]/g,'[$2 $1]')}`).join('<br>').replace(/[^.]*lean[^.]*\.?/gi,'');let zh=c.zh.x||'';zh=zh.replace(/[^。\n]*探身[^。\n]*[。\n]?/g,'').replace(/〔(?:橙色|黃色|紅色)(破壞)〕/g,'〔$1〕');return zh.replace(/〔([^〕]+)〕/g,'<em>〔$1〕</em>');}
-function openOpSelect(side,onDone,browse){OSEL.side=side;OSEL.done=onDone;OSEL.browse=!!browse;OSEL.shop=browse==='shop';OSEL.cat='all';OSEL.cur=cfg.picks[side][0]||OPBASE.find(b=>OPC[b].side===side);let el=$('#opsel');
+function openOpSelect(side,onDone,browse){OSEL.side=side;OSEL.done=onDone;OSEL.browse=!!browse;OSEL.shop=browse==='shop';OSEL.cat='all';OSEL.faction='all';OSEL.cur=cfg.picks[side][0]||OPBASE.find(b=>OPC[b].side===side);let el=$('#opsel');
   if(!el){el=document.createElement('div');el.id='opsel';el.className='opsel';document.body.appendChild(el);}el.hidden=false;renderOpSelect(true);}
 function closeOpSelect(){const el=$('#opsel');if(el)el.hidden=true;if(OSEL.done)OSEL.done();}
 function renderOpSelect(anim){
   const _rs=scrollSnap($('#opsel'));
   const el=$('#opsel'),side=OSEL.side,picks=cfg.picks[side],cur=copCard(OPC[OSEL.cur]||OPCARDS[0]);
   const pickOf=b=>picks.findIndex(p=>OPC[p]&&OPC[p].base===b);
-  const col=s=>`<div class="osCol ${s!==side&&!OSEL.browse?'dim':''}"><h3>${s==='A'?'攻擊方':'防守方'}</h3><div class="osGrid">${OPBASE.filter(b=>OPC[b].side===s&&(OSEL.cat==='all'||opCat(OPC[b])===OSEL.cat)).map(b=>{const i=s===side&&!OSEL.browse?pickOf(b):-1;
+  const col=s=>OSEL.browse&&!OSEL.shop&&OSEL.faction!=='all'&&OSEL.faction!==s?'':`<div class="osCol ${s!==side&&!OSEL.browse?'dim':''}"><h3>${s==='A'?'攻擊方':'防守方'}</h3><div class="osGrid">${OPBASE.filter(b=>OPC[b].side===s&&(OSEL.cat==='all'||opCat(OPC[b])===OSEL.cat)).map(b=>{const i=s===side&&!OSEL.browse?pickOf(b):-1;
     return `<button class="osT ${cur.base===b?'cur':''} ${i>=0?'on':''} ${opPlayable(b)?'':'na'}${owned(b)?'':' lk'}" data-ob="${b}" title="${OPC[b].name}"><img src="${opIcon(b)}" alt="${OPC[b].name}">${i>=0?`<span class="n">${i+1}</span>`:''}</button>`;}).join('')}</div></div>`;
   const vars=OPCARDS.filter(c=>c.base===cur.base);const mine=cur.side===side;const pi=pickOf(cur.base);
   const sideIc=emblem(cur.side);
@@ -11196,13 +11216,14 @@ function renderOpSelect(anim){
     <div class="osSec inv"><h4>攜帶裝備</h4><p style="margin:0;font-size:13px;line-height:1.7;color:#cfd8df">${cur.zh.g||'無特殊裝置'}${cur.g.charges?` × ${cur.g.charges}`:''}<br>${(()=>{const iv=cfg.inv[cur.side];const l=Object.entries(INV[cur.side]).filter(([k])=>iv[k]>0).map(([k,v])=>v[0]+' × '+iv[k]).join('、');return '小隊戰術裝備（全隊共用，在選單調整）：'+(l||'未選')+(cur.side==='A'?'、無人機 × 3':'、鐵絲網 × 3');})()}</p>
       <button style="margin-top:8px;font-size:12px" id="osEn" ${ME.lang==='en'?'hidden':''}>${OSEL.en?'隱藏英文原文':'顯示英文原文'}</button></div>
     </div></div>`;
-  const cats=OSEL.browse&&!OSEL.shop?`<div class="osCats">${[['all','全部'],['breach','破牆'],['intel','情報'],['combat','火力'],['support','支援'],['control','控制']].map(([k,n])=>`<button data-ocat="${k}" class="${OSEL.cat===k?'on':''}">${n}</button>`).join('')}</div>`:'';
+  const cats=OSEL.browse&&!OSEL.shop?`<div class="osCats"><div class="osSides">${[['all','全部'],['A','攻擊'],['D','防守']].map(([k,n])=>`<button data-oside="${k}" class="${OSEL.faction===k?'on':''}">${n}</button>`).join('')}</div>${[['all','全部類型'],['breach','破牆'],['intel','情報'],['combat','火力'],['support','支援'],['control','控制']].map(([k,n])=>`<button data-ocat="${k}" class="${OSEL.cat===k?'on':''}">${n}</button>`).join('')}</div>`:'';
   el.innerHTML=`<div class="osL"><div class="osBar"><button id="osBack">‹ 返回</button><h2>${OSEL.shop?'商店':OSEL.browse?'幹員圖鑑':'選擇幹員'}</h2><span class="hint">${OSEL.shop?`<span class="osBal">${RNI}${fmtN(ECO.rn)}</span> · 點幹員看技能，再按購買`:OSEL.browse?`共 ${OPBASE.length} 名幹員`:side==='A'?'你是進攻方':'你是防守方'}</span></div>${cats}
     <div class="osCols">${col('A')}${col('D')}</div></div><div class="osR">${det}</div>
     ${OSEL.browse?'':`<div class="osFoot"><div class="osSlots">${[0,1,2,3,4].map(i=>`<div class="osSlot">${picks[i]?`<img src="${opIcon(picks[i])}" alt="">`:''}</div>`).join('')}</div>
       ${mine?`<button class="pick" id="osPick" ${opPlayable(cur.base)&&owned(cur.base)?'':'disabled'}>${!owned(cur.base)?'尚未解鎖（到商店購買）':!opPlayable(cur.base)?'尚未實作，不能選':pi>=0?'移出小隊':picks.length>=5?'小隊已滿':'加入小隊'}</button>`:`<span class="hint">敵方幹員，只能查看</span>`}
       <button class="primary pick" id="osDone" ${picks.length!==5?'disabled':''}>完成（${picks.length}/5）</button></div>`}`;
   el.querySelectorAll('[data-ob]').forEach(b=>b.onclick=()=>{const bs=b.dataset.ob;const p=picks.find(x=>OPC[x]&&OPC[x].base===bs);OSEL.cur=p||bs;el.classList.add('showD');renderOpSelect(true);});
+  el.querySelectorAll('[data-oside]').forEach(b=>b.onclick=()=>{OSEL.faction=b.dataset.oside;renderOpSelect(false);});
   el.querySelectorAll('[data-ocat]').forEach(b=>b.onclick=()=>{OSEL.cat=b.dataset.ocat;renderOpSelect(false);});
   el.querySelectorAll('[data-ov]').forEach(b=>b.onclick=()=>{const v=b.dataset.ov;const i=pickOf(cur.base);if(i>=0)picks[i]=v;OSEL.cur=v;renderOpSelect(false);});
   const pk=$('#osPick');if(pk)pk.onclick=()=>{if(!opPlayable(cur.base)||!owned(cur.base))return;const i=pickOf(cur.base);if(i>=0)picks.splice(i,1);else if(picks.length<5)picks.push(cur.id);renderOpSelect(false);};
@@ -11217,7 +11238,7 @@ const COP_BASE=10,COP_CAP=34,COP_RT=500,SKPRICE=8000,COPN=['幹員一','幹員�
 const COPARM=[null,{hp:4,mv:6,run:5},{hp:5,mv:5,run:3},{hp:6,mv:4,run:2}],CDIEC={Y:1,O:2,R:3},CDIEA={Y:1,O:1.5,R:2},CDIEN={Y:'O',O:'R'};
 const COPG=['frag','charges','flash','smk','impact','clay','nitro','bpcam','shield'];
 const copNew=o=>({nm:'新進人員',e:0,k:0,sv:0,d:[['Y'],['Y'],['Y']],arm:1,run:0,vis:0,w:null,g:(o&&o.g)||[null,null],sk:(o&&o.sk)||null,gen:((o&&o.gen)||0)+1});
-function copAll(){if(!Array.isArray(ECO.cop)||ECO.cop.length!==2)ECO.cop=[copNew(),copNew()];ECO.cop=ECO.cop.map(c=>{const n=Object.assign(copNew(),c||{});if(n.nm==='炮灰')n.nm='新進人員';return n;});if(!Array.isArray(ECO.sk))ECO.sk=[];return ECO.cop;}
+function copAll(){if(!Array.isArray(ECO.cop)||ECO.cop.length!==2)ECO.cop=[copNew(),copNew()];ECO.cop=ECO.cop.map(c=>{const n=Object.assign(copNew(),c||{});if(n.nm==='炮灰')n.nm='新進人員';n.d=n.d.map(L=>L.length>4?L.slice().sort((a,b)=>CDIEC[b]-CDIEC[a]).slice(0,4):L.slice());return n;});if(!Array.isArray(ECO.sk))ECO.sk=[];return ECO.cop;}
 const copTot=c=>Math.min(COP_CAP,COP_BASE+(c.e|0));
 const copSpent=c=>c.d.reduce((a,b)=>a+b.reduce((x,d)=>x+CDIEC[d],0),0)-3+(c.arm-1)*2+c.run+c.vis;
 const copLeft=c=>copTot(c)-copSpent(c);
@@ -11227,15 +11248,15 @@ const WSVG=p=>`<svg viewBox="0 0 48 48" fill="none" stroke="#e3aa3e" stroke-widt
 const nOR=L=>L.filter(d=>d==='O'||d==='R').length,nR=L=>L.filter(d=>d==='R').length;
 const WPN={
   mg:{n:'機槍',t:'機槍手',en:'GUNNER',ic:WSVG('<circle cx="24" cy="24" r="16"/><circle cx="24" cy="15" r="3.2"/><circle cx="32.6" cy="21.2" r="3.2"/><circle cx="29.3" cy="31.3" r="3.2"/><circle cx="18.7" cy="31.3" r="3.2"/><circle cx="15.4" cy="21.2" r="3.2"/>'),
-    trig:c=>c.arm>=3&&[0,1,2].every(b=>c.d[b].length>=3&&nOR(c.d[b])>=1),fx:'骰數仍受每段最多 5 顆、三段合計最多 10 顆限制。'},
+    trig:c=>c.arm>=3&&[0,1,2].every(b=>c.d[b].length>=3&&nOR(c.d[b])>=1),fx:'骰數仍受每段最多 4 顆、三段合計最多 10 顆限制。'},
   sh:{n:'盾牌',t:'盾牌兵',en:'SHIELD',ic:WSVG('<path d="M24 5l15 6v11c0 10-6.5 17-15 21C15.5 39 9 32 9 22V11z"/><path d="M17 20h14"/>'),
     trig:c=>c.arm>=3&&[0,1].every(b=>c.d[b].length>=4&&nOR(c.d[b])>=1),fx:'受到的傷害固定 −2。不能奔跑。',lim:{2:{max:2,noR:1}}},
   sg:{n:'散彈槍',t:'散彈槍手',en:'BREACHER',ic:WSVG('<rect x="17" y="6" width="14" height="26" rx="2"/><path d="M17 32h14v8a2 2 0 0 1-2 2H19a2 2 0 0 1-2-2z"/><path d="M17 14h14"/>'),
-    trig:c=>c.d[0].length>=5&&nR(c.d[0])>=2,fx:'射擊會打爛路障；隔牆射擊會直接把軟牆打掉（這一槍仍然 −2）。',lim:{2:{max:2,noR:1},1:{max:3}}},
+    trig:c=>c.d[0].length>=4&&nR(c.d[0])>=2,fx:'射擊會打爛路障；隔牆射擊會直接把軟牆打掉（這一槍仍然 −2）。',lim:{2:{max:2,noR:1},1:{max:3}}},
   rf:{n:'步槍',t:'步槍兵',en:'RIFLEMAN',ic:WSVG('<circle cx="24" cy="24" r="13"/><path d="M24 5v8M24 35v8M5 24h8M35 24h8"/><path d="M19 26a5 5 0 1 0 1-6"/><path d="M19 17v4h4"/>'),
-    trig:c=>c.d[1].length>=5&&nOR(c.d[1])>=3&&c.vis>=4,fx:'視野 180°。穩定射擊：每次射擊後可以點一顆骰子重擲。'},
+    trig:c=>c.d[1].length>=4&&nOR(c.d[1])>=3&&c.vis>=4,fx:'視野 180°。穩定射擊：每次射擊後可以點一顆骰子重擲。'},
   sn:{n:'狙擊槍',t:'狙擊手',en:'MARKSMAN',ic:WSVG('<circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="3"/><path d="M24 4v10M24 34v10M4 24h10M34 24h10"/>'),
-    trig:c=>c.d[2].length>=5&&nR(c.d[2])>=2,fx:'視野距離 14 格。',lim:{0:{max:2,noR:1},1:{max:3}}},
+    trig:c=>c.d[2].length>=4&&nR(c.d[2])>=2,fx:'視野距離 14 格。',lim:{0:{max:2,noR:1},1:{max:3}}},
   smg:{n:'衝鋒槍',t:'衝鋒槍手',en:'RUSHER',ic:WSVG('<path d="M10 14l10 10-10 10"/><path d="M24 14l10 10-10 10"/>'),
     trig:c=>c.run>=5&&[0,1].every(b=>c.d[b].length>=3&&nOR(c.d[b])>=1),fx:'每回合可以開兩槍。第二槍擲一半的骰子（從紅骰開始捨棄，至少留 1 顆）。'}};
 // class skills (職業技能): one use per round, button in the action panel
@@ -11247,7 +11268,7 @@ const CSK={mg:{n:'掃射',ap:'1 行動',d:'不用指定目標；選擇一個方�
   sg:{n:'榴彈發射',ap:'1 行動',d:'對 3×3 範圍造成 2 傷，敵我都會受傷。範圍內除了鐵牆和轉角柱，牆、路障、掩護和道具全部炸毀。'}};
 const CSKM={mg:'mgscan',sn:'heat',sh:'bash',sg:'gl'};
 const WORD=['mg','sh','sg','rf','sn','smg'],WART={rf:1,sn:1,sg:1,mg:1,smg:1},RANKD={R:3,O:2,Y:1};
-const bMax=(c,b)=>{const l=WPN[c.w]&&WPN[c.w].lim&&WPN[c.w].lim[b];return l?l.max:5;};
+const bMax=(c,b)=>{const l=WPN[c.w]&&WPN[c.w].lim&&WPN[c.w].lim[b];return Math.min(4,l?l.max:4);};
 const bNoR=(c,b)=>{const l=WPN[c.w]&&WPN[c.w].lim&&WPN[c.w].lim[b];return !!(l&&l.noR);};
 const dTot=c=>10;
 const runCap=c=>c.w==='sh'?0:COPARM[c.arm].run;
