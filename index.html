@@ -3506,8 +3506,8 @@ Sledge 從目前所在的格子：
 
 **Frag Grenade（破片手榴彈）—— 投擲**
 
-- 在目標格進行一次〔破壞：黃〕破壞行動。該格中的任何幹員，承受 2 顆〔黃骰〕擲出的命中。
-- 在目標格的相鄰格進行〔破壞：黃〕破壞行動。這些格子中的幹員，各承受 1 顆〔黃骰〕擲出的命中。
+- 在目標格與相鄰格進行一次〔破壞：黃〕破壞行動。每名受影響的幹員各擲 1 顆手榴彈骰，受到 1 或 2 點傷害。
+- 六面為 1、1、1、2、2、2；骰面的手榴彈圖案數量就是傷害點數。
 
 **Flashbang Grenade（閃光彈）—— 投擲**
 
@@ -5069,8 +5069,7 @@ The Tactical Drone follows the rules of the "Drone" keyword (see "Drone", p. 27)
 
 **Frag Grenade — Throwable**
 
-- Take a 〔Destroy: yellow〕 Destroy action on the targeted space. Any Operator in that space takes the hits rolled on 2 〔Yellow die〕.
-- Take 〔Destroy: yellow〕 Destroy actions on the spaces adjacent to the targeted space. Operators in those spaces each take the hits rolled on 1 〔Yellow die〕.
+- Take a 〔Destroy: yellow〕 Destroy action on the targeted space and adjacent spaces. Roll one grenade die per affected Operator for 1 or 2 damage. The six faces are 1, 1, 1, 2, 2, 2; each grenade symbol represents one damage.
 
 **Flashbang Grenade — Throwable**
 
@@ -6310,9 +6309,10 @@ const impactTargets=u=>within(u.x,u.y,6).filter(([x,y])=>{const c=cell(x,y);retu
 // one victim of a frag: thrower's card bottom-left, victim's card top-right, the grenade arcs across and bursts, then the yellow dice
 const FGSVG='<svg viewBox="0 0 40 40"><rect x="17" y="3" width="9" height="7" rx="1.5" fill="#9aa3a8"/><path d="M25 6c6 0 9 4 9 9" stroke="#c9d0d4" stroke-width="2.6" fill="none" stroke-linecap="round"/><circle cx="33" cy="8" r="3" fill="none" stroke="#c9d0d4" stroke-width="2"/><ellipse cx="21" cy="24" rx="12" ry="13" fill="#4d5a3a"/><path d="M10 20h22M9.5 26h23M14 13v22M21 11v26M28 13v22" stroke="#2f3824" stroke-width="1.6"/><ellipse cx="17" cy="19" rx="4" ry="5" fill="#fff" opacity=".18"/></svg>';
 const GRENADE_DIE=[1,1,1,2,2,2],FUZE_DIE=[0,1,1,2,2,3];
+const grenadePips=n=>Array.from({length:n},()=>FGSVG.replace('<svg ','<svg style="width:18px;height:22px;display:inline-block;vertical-align:middle" ')).join('')||'—';
 async function fragShow(u,a,pool,idx,r,ctr,faces=GRENADE_DIE,label='破片手榴彈'){
-  if(!CINE.on||document.hidden||a===u||!u.alive){const dice=[...pool].map((ch,i)=>`<i class="die" style="background:${DIEC.Y}">${faces[idx[i]]}</i>`).join('');
-    await rollDice3D(pool,idx,`<small>${label} → ${OPS[a.op].name}${ctr?' · 正中':' · 波及'}</small><span>${dice} = ${r}</span><b class="${r?'hit':'miss'}">${r?r+' 傷':'未受傷'}</b>`,G.ai);diceHide();return;}
+  if(!CINE.on||document.hidden||a===u||!u.alive){const dice=[...pool].map((ch,i)=>`<i class="die" style="background:${DIEC.Y}">${grenadePips(faces[idx[i]])}</i>`).join('');
+    await rollDice3D(pool,idx,`<small>${label} → ${OPS[a.op].name}${ctr?' · 正中':' · 波及'}</small><span>${dice} = ${r}</span><b class="${r?'hit':'miss'}">${r?r+' 傷':'未受傷'}</b>`,G.ai,faces);diceHide();return;}
   const fast=!!G.ai,si=await shotIntro(u,a,fast,false);
   const el=si&&$('.sintro:not(.out)');
   if(el){el.classList.add('fg');const A=el.querySelector('.siA'),T=el.querySelector('.siT'),bb=e=>({left:e.offsetLeft,top:e.offsetTop,width:e.offsetWidth,height:e.offsetHeight}),ra=bb(A),rt=bb(T);
@@ -6323,8 +6323,8 @@ async function fragShow(u,a,pool,idx,r,ctr,faces=GRENADE_DIE,label='破片手榴
     g.remove();const b=document.createElement('div');b.className='fgB';b.style.left=x1+'px';b.style.top=y1+'px';el.appendChild(b);SFX.boom();el.classList.add('boom');
     el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');await sleep(fast?320:480);}
   else SFX.boom();
-  const dice=[...pool].map((ch,i)=>`<i class="die" style="background:${DIEC.Y}">${faces[idx[i]]}</i>`).join('');
-  await rollDice3D(pool,idx,`<small>${label} → ${OPS[a.op].name} · ${ctr?'正中':'波及'}</small><span>${dice} = ${r}</span><b class="${r?'hit':'miss'}">${r?r+' 傷':'未受傷'}</b>`,fast);
+  const dice=[...pool].map((ch,i)=>`<i class="die" style="background:${DIEC.Y}">${grenadePips(faces[idx[i]])}</i>`).join('');
+  await rollDice3D(pool,idx,`<small>${label} → ${OPS[a.op].name} · ${ctr?'正中':'波及'}</small><span>${dice} = ${r}</span><b class="${r?'hit':'miss'}">${r?r+' 傷':'未受傷'}</b>`,fast,faces);
   diceHide();if(si)si.fire(r);if(r)SFX.hit();else SFX.miss();await shotFX(r,!!si);if(si)si.kill();}
 async function throwGadget(u,kind,x,y){ST(u).gad++;DMGBY=u;aimCam(u,[[x,y]]);
   useAct(u,'tactical');const side=u.side==='A'?'ka':'kd';
@@ -6336,7 +6336,7 @@ async function throwGadget(u,kind,x,y){ST(u).gad++;DMGBY=u;aimCam(u,[[x,y]]);
     if(hostHarm(area,u.side,fr?'破片手榴彈':'C4')){SFX.boom();return;}
     const hit=G.units.filter(inA);if(!fr||!hit.length)SFX.boom();G.scanFx={cells:area,until:performance.now()+900,c:0xff7a2a};if(fr)for(const [i,j] of area)await blastDestroy(i,j,1);
     if(!fr){prismaHit(area,'C4 炸開');droneHit(area,'C4');await volcBlast(area);}
-    for(const a of hit){if(!a.alive)continue;const ctr=a.x===x&&a.y===y;let r;if(fr){const idx=[...Array(ctr?2:1)].map(()=>Math.floor(Math.random()*6));r=idx.reduce((t,i)=>t+GRENADE_DIE[i],0);await fragShow(u,a,ctr?'YY':'Y',idx,r,ctr);}else r=roll('O',ctr?2:1);if(r)await damage(a,r,fr?'破片':'C4');}if(fr&&hit.length){diceHide();shotCamEnd();}}
+    for(const a of hit){if(!a.alive)continue;const ctr=a.x===x&&a.y===y;let r;if(fr){const idx=[Math.floor(Math.random()*6)];r=GRENADE_DIE[idx[0]];await fragShow(u,a,'Y',idx,r,ctr);}else r=roll('O',ctr?2:1);if(r)await damage(a,r,fr?'破片':'C4');}if(fr&&hit.length){diceHide();shotCamEnd();}}
   else if(kind==='impact'){G.impact--;note(u,'衝擊手榴彈');const c=cell(x,y),w=c.t==='soft'?'軟牆':c.t==='bar'?(c.kind==='window'?'窗戶路障':'門路障'):'道具';await blastDestroy(x,y,2);log(`${nm(u)} 的衝擊手榴彈炸掉了${w}`,side);}
   else if(kind==='flash'){SFX.flash();G.flash--;note(u,'閃光彈');let n=0;for(const a of G.units)if(inA(a)){stunU(a);if(a.hidden)reveal(a,'被閃光彈');n++;}
     log(`${nm(u)} 丟出閃光彈，${n} 名幹員被震暈（射擊只擲兩顆黃骰，到回合結束）`,side);}
@@ -6864,7 +6864,7 @@ function placeHostage(){const s=allCells().filter(([x,y])=>cell(x,y).site==='A')
 function placeAttackers(zi){
   const z=G.map.spawns[zi];G.spawn=zi;alive('A').forEach((u,i)=>{u.x=z.cells[i][0];u.y=z.cells[i][1];});
 }
-const INV={A:{frag:['破片手榴彈',3,'投擲 6 格：目標格 2 黃骰、相鄰格各 1 黃骰傷害，並破壞路障'],charges:['爆破炸藥',3,'相鄰：炸開軟牆或路障（D3）'],flash:['閃光彈',2,'投擲：目標格與相鄰格所有幹員震暈'],clay:['闊刀地雷',2,'放在相鄰格並選面向；三條紅線照到前方與左右斜前方各一格，防守方碰到就爆炸，九宮格內的人全部陣亡'],smk:['煙霧彈',2,'投擲：2×2 煙霧擋視線到回合結束']},
+const INV={A:{frag:['破片手榴彈',3,'投擲 6 格：目標格與相鄰格每人擲 1 顆手榴彈骰（三面 1、三面 2），並破壞路障'],charges:['爆破炸藥',3,'相鄰：炸開軟牆或路障（D3）'],flash:['閃光彈',2,'投擲：目標格與相鄰格所有幹員震暈'],clay:['闊刀地雷',2,'放在相鄰格並選面向；三條紅線照到前方與左右斜前方各一格，防守方碰到就爆炸，九宮格內的人全部陣亡'],smk:['煙霧彈',2,'投擲：2×2 煙霧擋視線到回合結束']},
   D:{bpcam:['防彈攝影機',3,'部署階段：放在室內，360° 監看房間，但牆角後面看不到；只能從相鄰格破壞'],shield:['可部署盾牌',2,'部署時選正面方向，只擋前方半圓，相鄰目標 −2'],impact:['衝擊手榴彈',3,'投擲 6 格：破壞軟牆、路障與道具（D2）'],nitro:['C4 遙控炸藥',2,'投擲 6 格：目標 2 橙骰、相鄰各 1 橙骰傷害']}};
 const INV_CAP={A:6,D:4};
 function invFor(side,inv){const o={};for(const k in INV[side])o[k]=Math.max(0,Math.min(INV[side][k][1],(inv&&inv[k])|0));return o;}
@@ -9449,7 +9449,7 @@ function shotCamEnd(){if(!R3||!R3.cineSave)return;const s=R3.cineSave;R3.cineSav
 
 // ---------- 3D dice: thrown straight onto the board view, physics decides how they tumble ----------
 const DICE={};
-function dieFace(col,v,bolt){
+function dieFace(col,v,bolt,grenade=false){
   const N=256,c=document.createElement('canvas');c.width=c.height=N;const g=c.getContext('2d');
   const gr=g.createRadialGradient(N*.35,N*.3,N*.1,N/2,N/2,N*.75);gr.addColorStop(0,shade(col,12));gr.addColorStop(1,shade(col,-30));g.fillStyle=gr;g.fillRect(0,0,N,N);
   for(let i=0;i<500;i++){g.fillStyle=Math.random()<.5?'rgba(255,255,255,.035)':'rgba(0,0,0,.05)';g.fillRect(Math.random()*N,Math.random()*N,2,2);}
@@ -9459,14 +9459,15 @@ function dieFace(col,v,bolt){
   // hit marks: a crosshair per hit, like the board game's hit icons
   const pos={1:[[128,128]],2:[[84,172],[172,84]],3:[[76,180],[128,128],[180,76]]}[v]||[];
   for(const [x,y] of pos){g.save();g.translate(x,y);g.fillStyle='#121314';g.strokeStyle='#121314';g.lineWidth=9;
+    if(grenade){g.beginPath();g.ellipse(0,6,23,29,0,0,Math.PI*2);g.fill();g.fillRect(-9,-32,18,12);g.lineWidth=5;g.beginPath();g.moveTo(6,-29);g.lineTo(22,-26);g.lineTo(31,-8);g.stroke();g.beginPath();g.arc(24,-31,8,0,Math.PI*2);g.stroke();g.strokeStyle=col;g.lineWidth=2;for(const yy of [-6,6,18]){g.beginPath();g.moveTo(-19,yy);g.lineTo(19,yy);g.stroke();}g.beginPath();g.moveTo(0,-17);g.lineTo(0,31);g.stroke();g.restore();continue;}
     g.beginPath();g.arc(0,0,30,0,7);g.stroke();g.lineWidth=7;for(const a of [0,1,2,3]){g.save();g.rotate(a*Math.PI/2);g.beginPath();g.moveTo(0,-44);g.lineTo(0,-18);g.stroke();g.restore();}
     g.beginPath();g.arc(0,0,7,0,7);g.fill();g.restore();}
   if(!v){g.fillStyle='rgba(0,0,0,.28)';g.font="700 64px 'Saira Condensed',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('—',N/2,N/2+4);}
   return c;
 }
-function dieMats(L){
-  const key='m'+L;if(DICE[key])return DICE[key];const U=L.toUpperCase(),bolt=L!==U,col=DIEC[U];
-  return DICE[key]=DIE[U].map(v=>{const cv=dieFace(col,v,bolt),t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;
+function dieMats(L,faces){
+  const key='m'+L+(faces?'grenade'+faces.join(''):'');if(DICE[key])return DICE[key];const U=L.toUpperCase(),bolt=L!==U,col=DIEC[U];
+  return DICE[key]=(faces||DIE[U]).map(v=>{const cv=dieFace(col,v,bolt,!!faces),t=new THREE.CanvasTexture(cv);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;
     return new THREE.MeshPhysicalMaterial({map:t,bumpMap:t,bumpScale:-.012,roughness:.28,metalness:0,clearcoat:1,clearcoatRoughness:.12,envMapIntensity:.45});});
 }
 let FACEN_;const faceN=()=>FACEN_||(FACEN_=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]].map(a=>new THREE.Vector3(...a))); // BoxGeometry material order
@@ -9531,7 +9532,7 @@ function diceSim(D,n,rnd){
   return {frames,ends};
 }
 // rolls: face indices (0..5) already decided by the game; the dice tumble for real and the face that lands on top shows that value
-function rollDice3D(pool,idx,caption,fast){
+function rollDice3D(pool,idx,caption,fast,faces){
   return new Promise(res=>{
     if(!R3||!window.THREE||!CINE.on||document.hidden)return res();
     const D=diceInit();if(!D)return res();try{
@@ -9544,7 +9545,7 @@ function rollDice3D(pool,idx,caption,fast){
       for(const e of sim.ends){const p=e.x.clone().project(D.cam);sc+=Math.max(0,Math.abs(p.x)-.62)*9+Math.max(0,p.y-.45)*9+Math.max(0,-.62-p.y)*9;}
       if(sc<bs){bs=sc;best=sim;}if(sc===0)break;}
     const {frames,ends}=best;
-    [...pool].forEach((L,i)=>{const base=dieMats(L),mats=base.slice(),u=ends[i].up,want=idx[i];mats[u]=base[want];mats[want]=base[u];
+    [...pool].forEach((L,i)=>{const base=dieMats(L,faces),mats=base.slice(),u=ends[i].up,want=idx[i];mats[u]=base[want];mats[want]=base[u];
       const m=new THREE.Mesh(D.geo,mats);m.castShadow=true;m.receiveShadow=true;D.sc.add(m);D.dice.push({m});});
     const place=f=>{frames[f].forEach(([p,q],i)=>{D.dice[i].m.position.copy(p);D.dice[i].m.quaternion.copy(q);});};
     let t0=performance.now(),skip=false;D.box.querySelector('.dskip').onclick=()=>{skip=true;};
@@ -10343,7 +10344,7 @@ function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
-function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v136</b><span>規則與戰術互動更新</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑改為上下捲動，新增攻擊／防守篩選</span><span>培養幹員每個距離區段最多 4 顆骰子</span></div></section></div>`);}
+function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v137</b><span>規則與戰術互動更新</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑改為上下捲動，新增攻擊／防守篩選</span><span>培養幹員每個距離區段最多 4 顆骰子</span></div></section></div>`);}
 function openFeedback(){const el=tsDlg('feedback','回報',`<div class="psbox"><div class="pshead"><div><b>回報</b><span>遇到問題或有想法，都歡迎告訴我們。</span></div><button class="tsX" aria-label="關閉">✕</button></div>
   <section><h4>類型</h4><select class="fbsel" id="fbType"><option value="bug">回報 Bug</option><option value="idea">遊戲建議</option></select></section>
   <section><h4>內容</h4><textarea class="fbtxt" id="fbText" maxlength="2000" placeholder="請描述發生了什麼、在哪個畫面，或你的建議…"></textarea><div class="fbcnt" id="fbCnt">0 / 2000</div></section>
@@ -10496,6 +10497,7 @@ function trKey(k,ix,d){const e=I18X[k]||I18N[k];if(e&&e[ix])return e[ix];
     if(ok)return out.join(ix?sep:({'：':': ','；':'; ','，':', ','、':', ','・':' · '}[sep]||sep));break;}
   return best;}
 Object.assign(I18X,{'攻擊':['Attack',''],'防守':['Defense',''],'全部類型':['All roles',''],'骰數仍受每段最多 4 顆、三段合計最多 10 顆限制。':['Maximum 4 dice per range and 10 dice across all three ranges.',''],'幹員圖鑑改為上下捲動，新增攻擊／防守篩選':['Operator codex now scrolls vertically, with Attack / Defense filters.',''],'培養幹員每個距離區段最多 4 顆骰子':['Trained operators can have at most 4 dice per range.','']});
+Object.assign(I18X,{'投擲 6 格：目標格與相鄰格每人擲 1 顆手榴彈骰（三面 1、三面 2），並破壞路障':['Throw up to 6 spaces: each affected operator rolls one grenade die (three 1 faces, three 2 faces). Destroys barricades.','']});
 function trText(o){const k=o.trim();if(!k||!/[㐀-鿿]/.test(k))return null;const ix=ME.lang==='en'?0:1;
   const t=trKey(k.replace(/\s+/g,' '),ix,0);if(t==null){I18MISS.add(k);return null;}return o.replace(k,t);}
 // tt: translate a string that is drawn on a canvas or shown in a dialog (outside the page text the observer swaps)
