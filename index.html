@@ -11447,6 +11447,8 @@ const bMax=(c,b)=>{const l=WPN[c.w]&&WPN[c.w].lim&&WPN[c.w].lim[b];return Math.m
 const bNoR=(c,b)=>{const l=WPN[c.w]&&WPN[c.w].lim&&WPN[c.w].lim[b];return !!(l&&l.noR);};
 const dTot=c=>10;
 const runCap=c=>c.w==='hs'?0:COPARM[c.arm].run;
+/* v152: adding armor auto-trims run to the new cap; those refunded run points count toward the 2-point armor cost */
+const armFree=c=>c.arm>=3?0:Math.max(0,c.run-(c.w==='hs'?0:COPARM[c.arm+1].run));
 const copDice=c=>c.d;
 const copArt=(c,i)=>c.w&&WART[c.w]?`img/cop/${i?'m':'f'}_${c.w}.${['hs','sh'].includes(c.w)?'png':'webp'}`:COPART[i];
 function wApply(c,w){const n=JSON.parse(JSON.stringify(c));n.w=w;if(!n.sk||classOf(n.sk))n.sk=classKey(w);
@@ -11547,7 +11549,7 @@ function cpRows(){const d=CP.dr,c=copAll()[CP.i],st=copStat(d),left=copLeft(d),n
     if(d.w==='mg')cs+='<span class="cpC Y gift" title="機槍送的黃骰"></span>';
     const av=copDice(d)[b].reduce((a,x)=>a+CDIEA[x],0);
     h+=row('dice','d'+b,lb,cs,`平均 ${+av.toFixed(1)}`,left>=1&&d.d[b].length<mx&&nd<dTot(d));});
-  {let cs='';for(let j=0;j<3;j++)cs+=`<span class="cpC ${j<d.arm?'G':''}${j<d.arm&&j>=c.arm?' pend':''}"></span>`;h+=row('arm','arm','裝甲',cs,`血 ${st.hp} · ${st.mv} 步`,left>=2&&d.arm<3);}
+  {let cs='';for(let j=0;j<3;j++)cs+=`<span class="cpC ${j<d.arm?'G':''}${j<d.arm&&j>=c.arm?' pend':''}"></span>`;h+=row('arm','arm','裝甲',cs,`血 ${st.hp} · ${st.mv} 步`,d.arm<3&&left+armFree(d)>=2);}
   {let cs='';for(let j=0;j<5;j++)cs+=j>=st.cap?`<span class="cpC cap">${LOCKI}</span>`:`<span class="cpC ${j<d.run?'B':''}${j<d.run&&j>=c.run?' pend':''}"></span>`;h+=row('spd','run','速度',cs,`奔跑 +${st.run}`,left>=1&&d.run<st.cap);}
   {let cs='';for(let j=0;j<4;j++)cs+=d.w==='rf'?`<span class="cpC cap">${LOCKI}</span>`:`<span class="cpC ${j<d.vis?'V':''}${j<d.vis&&j>=c.vis?' pend':''}"></span>`;h+=row('vis','vis','視野',cs,`${st.fov}°${st.vr>10?' · '+st.vr+' 格':''}`,left>=1&&d.vis<4&&d.w!=='rf');}
   return h;}
@@ -11609,7 +11611,7 @@ function cpBind(el){const q=s=>el.querySelector(s),on=(s,f)=>{const b=q(s);if(b)
   el.querySelectorAll('[data-ci]').forEach(b=>b.onclick=()=>{const i=+b.dataset.ci;if(i===CP.i)return;CP.i=i;CP.edit=false;copDraft();renderCop();});
   el.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{const k=b.dataset.cp,st=copStat(d);
     if(k[0]==='d'){const i=+k[1];if(left()<1||d.d[i].length>=bMax(d,i)||d.d.flat().length>=dTot(d))return;push(k,d.d[i]);d.d[i].push('Y');}
-    else if(k==='arm'){if(left()<2||d.arm>=3)return;push(k,{arm:d.arm,run:d.run});d.arm++;d.run=Math.min(d.run,runCap(d));}
+    else if(k==='arm'){if(d.arm>=3||left()+armFree(d)<2)return;push(k,{arm:d.arm,run:d.run});d.arm++;d.run=Math.min(d.run,runCap(d));}
     else if(k==='run'){if(left()<1||d.run>=st.cap)return;push(k,d.run);d.run++;}
     else if(k==='vis'){if(left()<1||d.vis>=4||d.w==='rf')return;push(k,d.vis);d.vis++;}
     try{SFX.click&&SFX.click();}catch(e){}renderCop();});
