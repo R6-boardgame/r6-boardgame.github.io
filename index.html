@@ -5611,12 +5611,13 @@ function segCells(x0,y0,x1,y1){const o=[],dx=x1-x0,dy=y1-y0,nx=Math.abs(dx),ny=M
   while(ix<nx||iy<ny){const d=(1+2*ix)*ny-(1+2*iy)*nx;if(d===0){o.push({c:[x+sx,y],c2:[x,y+sy]});x+=sx;y+=sy;ix++;iy++;}else if(d<0){x+=sx;ix++;}else{y+=sy;iy++;}
     if(!(x===x1&&y===y1))o.push({c:[x,y]});}return o;}
 const hardC=([x,y])=>{const c=cell(x,y);return !!c&&(c.t==='hard'||c.t==='reinf')&&!c.mOpen;};
-function los(x0,y0,x1,y1,located,noOps){
-  if(!located&&!LOSW&&(smokeAt(x0,y0)||smokeAt(x1,y1)))return false;
+function smokeBlocks(x0,y0,x1,y1){return smokeAt(x0,y0)||smokeAt(x1,y1)||lineCells(x0,y0,x1,y1).some(([x,y])=>smokeAt(x,y));}
+function los(x0,y0,x1,y1,located,noOps,ignoreSmoke=false){
+  if(!ignoreSmoke&&smokeBlocks(x0,y0,x1,y1))return false;
   if(located)for(const s of segCells(x0,y0,x1,y1))if(s.c2?hardC(s.c)&&hardC(s.c2):hardC(s.c))return false;
   for(const [x,y] of lineCells(x0,y0,x1,y1)){const c=cell(x,y);
     if(located){if((c.t==='hard'||c.t==='reinf')&&!(c&&c.mOpen))return false;if(!noOps&&G.units.some(u=>u.alive&&u.x===x&&u.y===y&&!u.hidden))return false;continue;}
-    if((blocks(c)&&!(c&&(c.mOpen||(c.t==='soft'&&c.hole))))||(smokeAt(x,y)&&!LOSW))return false;
+    if((blocks(c)&&!(c&&(c.mOpen||(c.t==='soft'&&c.hole)))))return false;
     if(!noOps&&G.units.some(u=>u.alive&&u.x===x&&u.y===y&&!u.hidden))return false;}
   return true;
 }
@@ -5715,7 +5716,7 @@ function mkUnit(op,side,i){
 function viewers(side){return G.units.filter(u=>u.alive&&u.side===side&&u.x>=0).map(u=>[u.x,u.y,14]);}
 // like the miniatures on the table, every operator is public except hidden defenders (shown as tokens among decoys)
 // fog of war: an enemy shows only while one of your operators has line of sight to it, or after it was hit (until it moves); a located enemy is only a marker on the map
-function seenBy(side,e){if(e.side===side||G.over)return true;if(!e.alive||e.x<0||G.phase==='setup')return false;if(e.exp&&e.exp[0]===e.x&&e.exp[1]===e.y)return true;return G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&inSight(a,e))||sharedCells(side).has(e.y*G.W+e.x);}
+function seenBy(side,e){if(G.over)return true;if(smokeAt(e.x,e.y))return false;if(e.side===side)return true;if(!e.alive||e.x<0||G.phase==='setup')return false;if(e.exp&&e.exp[0]===e.x&&e.exp[1]===e.y&&G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&!smokeBlocks(a.x,a.y,e.x,e.y)))return true;return G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&inSight(a,e))||sharedCells(side).has(e.y*G.W+e.x);}
 function sees(side){if(G.phase==='setup'&&!G.over)return new Set();const s=new Set();for(const e of G.units){if(!e.alive||e.side===side||e.x<0)continue;if(seenBy(side,e))s.add(e.id);}return s;}
 // v89: every operator sees a 120° fan in front of him (10 cells, snipers 14), straight-line distance, nothing behind; seeing an enemy is what lets you shoot him
 const SNIPE=new Set(['glaz','kali']),VR=u=>u.vr||(SNIPE.has(u.op)?14:10),edist=(a,b,c,d)=>Math.round(Math.hypot(a-c,b-d));
@@ -5726,11 +5727,11 @@ function fanCells(u){const s=new Set([u.y*G.W+u.x]),r=VR(u);
   for(let y=Math.max(0,u.y-r);y<=Math.min(G.H-1,u.y+r);y++)for(let x=Math.max(0,u.x-r);x<=Math.min(G.W-1,u.x+r);x++)if(inFan(u,x,y,r)&&los(u.x,u.y,x,y))s.add(y*G.W+x);return s;}
 // shared sight: drones and room cameras light their whole room; wall cameras, Black Mirrors and the outside cameras look out over a half-plane
 function sharedCells(side){if(!G||!G.grid)return new Set();
-  const k=side+'|'+(G._wv||0)+'|'+G.gadgets.map(g=>g.alive&&['drone','cam','mirror'].includes(g.type)?g.type+g.x+','+g.y+(g.open?'o':'')+(jammed(g.x,g.y)?'j':''):'').join(';');
+  const k=side+'|'+(G._wv||0)+'|'+G.gadgets.map(g=>g.alive&&['drone','cam','mirror','smk'].includes(g.type)?g.type+g.x+','+g.y+(g.open?'o':'')+(jammed(g.x,g.y)?'j':''):'').join(';');
   const C=G._shc||(G._shc={});if(C[side]&&C[side].k===k)return C[side].s;const s=new Set();
   const look=(g,r,ok)=>{for(let y=Math.max(0,g.y-r);y<=Math.min(G.H-1,g.y+r);y++)for(let x=Math.max(0,g.x-r);x<=Math.min(G.W-1,g.x+r);x++)if(ok(x,y)&&los(g.x,g.y,x,y,false,true))s.add(y*G.W+x);};
   for(const g of G.gadgets){if(!g.alive||g.side!==side&&!(side==='D'&&((g.type==='cam'&&!(g.bp&&g.side==='A'))||g.type==='mirror')))continue;
-    if(g.type==='drone'){const c=cell(g.x,g.y);if(c&&c.indoor)for(const q of roomCells(g.x,g.y))s.add(q);else look(g,3,()=>true);s.add(g.y*G.W+g.x);}
+    if(g.type==='drone'){const c=cell(g.x,g.y);if(c&&c.indoor)for(const q of roomCells(g.x,g.y)){if(los(g.x,g.y,q%G.W,Math.floor(q/G.W),false,true))s.add(q);}else look(g,3,()=>true);s.add(g.y*G.W+g.x);}
     else if(g.type==='cam'&&!jammed(g.x,g.y)){
       if(g.wall)look(g,10,(x,y)=>(x-g.x)*g.wall[0]+(y-g.y)*g.wall[1]<=0);
       else if(outCam(g))look(g,8,()=>true);
@@ -6308,7 +6309,7 @@ function droneScanNow(u,d){
   log(jammed(x,y)?`${nm(u)} 的無人機被訊號干擾器癱瘓`:`${nm(u)} 的無人機在 ${coord(x,y)} 掃描，標記了這個房間裡的 ${n} 名防守方`,'ka');
 }
 // throwables reach 6 spaces in line of sight
-const throwTargets=u=>within(u.x,u.y,6).filter(([x,y])=>!blocks(cell(x,y))&&los(u.x,u.y,x,y,false,true));
+const throwTargets=u=>within(u.x,u.y,6).filter(([x,y])=>!blocks(cell(x,y))&&los(u.x,u.y,x,y,false,true,smokeAt(x,y)));
 const impactTargets=u=>within(u.x,u.y,6).filter(([x,y])=>{const c=cell(x,y);return c.t!=='hard'&&c.t!=='reinf'&&!(x===u.x&&y===u.y)&&los(u.x,u.y,x,y,false,true)&&(['soft','bar'].includes(c.t)||G.gadgets.some(g=>g.alive&&g.side!==u.side&&g.x===x&&g.y===y&&GSTR[g.type]));});
 // one victim of a frag: thrower's card bottom-left, victim's card top-right, the grenade arcs across and bursts, then the yellow dice
 const FGSVG='<svg viewBox="0 0 40 40"><rect x="17" y="3" width="9" height="7" rx="1.5" fill="#9aa3a8"/><path d="M25 6c6 0 9 4 9 9" stroke="#c9d0d4" stroke-width="2.6" fill="none" stroke-linecap="round"/><circle cx="33" cy="8" r="3" fill="none" stroke="#c9d0d4" stroke-width="2"/><ellipse cx="21" cy="24" rx="12" ry="13" fill="#4d5a3a"/><path d="M10 20h22M9.5 26h23M14 13v22M21 11v26M28 13v22" stroke="#2f3824" stroke-width="1.6"/><ellipse cx="17" cy="19" rx="4" ry="5" fill="#fff" opacity=".18"/></svg>';
@@ -7048,7 +7049,7 @@ async function onCell(x,y){
   if(o&&o.side!==G.player&&u&&u.side===G.player&&G.mode==='move'&&canAct(u)&&(G.active!==u||canDo(u,'shoot'))&&shootables(u).some(t=>t.t===o)&&commit(u)){
     return act(async()=>{await doShoot(u,shootables(u).find(t=>t.t===o));});
   }
-  if(o&&(o.side===G.player||pub(o))){
+  if(o&&!smokeAt(o.x,o.y)&&(o.side===G.player||pub(o))){
     if(o.side===G.player&&G.active&&G.active!==o&&canAct(o)){ // switching ends the current activation
       endAct(G.active);if(G.acts>=3){G.sel=o;return endPhase();}
     }
@@ -7887,7 +7888,7 @@ var GDX={
  amaru:['〔行動〕Garra 鉤爪：飛到 10 格內任一扇窗（有路障就直接撞破）。每輪一次，護送人質時不能用。',99],
  kali:['〔行動〕LV 長矛：丟進 6 格內的房間（可越過一面牆），摧毀那個房間的所有防守道具和門窗路障。',2],
  mozzie:['〔被動〕害蟲：開場偷走進攻方一台無人機；之後進攻方每用一台無人機，Mozzie 就多一次。〔行動〕用偷來的無人機偵查房間，標記裡面的進攻方。',1],
- warden:['〔被動〕智慧眼鏡：永遠不會被震暈，而且可以看穿煙霧。',0],
+ warden:['〔被動〕智慧眼鏡：永遠不會被震暈，煙霧仍會遮擋視線。',0],
  goyo:['〔佈防〕Volcán 燃燒盾：可部署盾牌，紅色燃料罐裝在內側；進攻方走到旁邊、從燃料罐那一面把盾打爆，或被手榴彈、C4 等爆炸物波及時爆燃，周圍 3×3 燒一回合（四階段），裡面的人立刻扣 1 血，火燒完時還在火圈裡再扣 1 血。',2],
  wamai:['〔佈防〕Mag-NET：放在室內；進攻方丟進同一房間的投擲道具都會被吸走作廢。',2],
  iana:['〔被動〕Gemini：永遠不會被攝影機標記；射擊 Iana 的人少擲一顆骰。',0],
@@ -8158,7 +8159,7 @@ function render(){trackMovement();try{syncElec();}catch(e){}try{const a=G&&G.act
     ctx.fillStyle=col;pts.forEach(([x,y],i)=>{ctx.beginPath();ctx.arc(x*S+S/2,y*S+S/2,(i===0||i===pts.length-1)?S*.15:S*.08,0,7);ctx.fill();});}
   // units
   const vis=sees(G.player);
-  for(const u of G.units){if(!u.alive||u.x<0)continue;if(u.side!==G.player&&!vis.has(u.id)&&!G.over)continue;
+  for(const u of G.units){if(!u.alive||u.x<0)continue;if(!G.over&&smokeAt(u.x,u.y))continue;if(u.side!==G.player&&!vis.has(u.id)&&!G.over)continue;
     const cx=u.x*S+S/2,cy=u.y*S+S/2,r=S*.38;ctx.globalAlpha=(u.activated&&u!==G.active&&G.phase==='play')?.55:1;
     drawToken(u,cx,cy,r);
     ctx.globalAlpha=1;
@@ -8170,7 +8171,7 @@ function render(){trackMovement();try{syncElec();}catch(e){}try{const a=G&&G.act
   for(const g of G.gadgets)if(g.alive&&g.type==='prisma'){const mine=G.player==='D'||G.over;if(!mine&&!projSeen(g,G.player))continue;const p=projU(g),cx=g.x*S+S/2,cy=g.y*S+S/2;
     ctx.globalAlpha=mine?.45:1;drawToken(p,cx,cy,S*.38);ctx.fillStyle='rgba(10,14,18,.75)';ctx.fillRect(g.x*S+2,g.y*S+S-6,S-4,5);for(let i=0;i<p.max;i++){ctx.fillStyle=i<p.hp?COL.ok:'#3a2a2a';ctx.fillRect(g.x*S+3+i*(S-6)/p.max,g.y*S+S-5,(S-6)/p.max-1,3);}ctx.globalAlpha=1;}
   if(G.mode==='pdir'){const g=pdirG();if(g){ctx.fillStyle='#ffc84a';for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){const L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,cx=(g.x+.5+dx*.75)*S,cy=(g.y+.5+dy*.75)*S,px=-uy,py=ux;ctx.beginPath();ctx.moveTo(cx+ux*S*.22,cy+uy*S*.22);ctx.lineTo(cx-ux*S*.1+px*S*.2,cy-uy*S*.1+py*S*.2);ctx.lineTo(cx-ux*S*.1-px*S*.2,cy-uy*S*.1-py*S*.2);ctx.closePath();ctx.fill();}}}
-  if(!G.over)for(const u of G.units)if(u.alive&&u.x>=0&&u.side!==G.player&&u.spotted>0&&!vis.has(u.id)){const cx=u.x*S+S/2,cy=u.y*S+S/2;ctx.fillStyle=COL.danger;ctx.beginPath();ctx.arc(cx,cy-S*.08,S*.2,Math.PI*.8,Math.PI*2.2);ctx.lineTo(cx,cy+S*.32);ctx.closePath();ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy-S*.08,S*.07,0,7);ctx.fill();}
+  if(!G.over)for(const u of G.units)if(u.alive&&u.x>=0&&u.side!==G.player&&u.spotted>0&&!smokeAt(u.x,u.y)&&!vis.has(u.id)){const cx=u.x*S+S/2,cy=u.y*S+S/2;ctx.fillStyle=COL.danger;ctx.beginPath();ctx.arc(cx,cy-S*.08,S*.2,Math.PI*.8,Math.PI*2.2);ctx.lineTo(cx,cy+S*.32);ctx.closePath();ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy-S*.08,S*.07,0,7);ctx.fill();}
   if(!G.over)for(const h of heatPins()){const cx=h.x*S+S/2,cy=h.y*S+S/2;ctx.fillStyle='#ff7a2e';ctx.beginPath();ctx.arc(cx,cy-S*.08,S*.2,Math.PI*.8,Math.PI*2.2);ctx.lineTo(cx,cy+S*.32);ctx.closePath();ctx.fill();ctx.fillStyle='#fff';ctx.font=`700 ${S*.24|0}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('?',cx,cy-S*.08);}
   if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash'||G.mode==='mgscan')&&G.sel&&G.sel.x>=0){const u=G.sel;ctx.fillStyle='#ffc84a';for(const [dx,dy] of (G.mode==='owdir'||G.mode==='owq'?DIR8:[[1,0],[-1,0],[0,1],[0,-1]])){const L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,cx=(u.x+.5+dx*.75)*S,cy=(u.y+.5+dy*.75)*S,px=-uy,py=ux;ctx.beginPath();ctx.moveTo(cx+ux*S*.22,cy+uy*S*.22);ctx.lineTo(cx-ux*S*.1+px*S*.2,cy-uy*S*.1+py*S*.2);ctx.lineTo(cx-ux*S*.1-px*S*.2,cy-uy*S*.1-py*S*.2);ctx.closePath();ctx.fill();}}
   if(G.fx&&performance.now()<G.fx.until){ctx.strokeStyle=G.fx.c;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(G.fx.x0*S+S/2,G.fx.y0*S+S/2);ctx.lineTo(G.fx.x1*S+S/2,G.fx.y1*S+S/2);ctx.stroke();setTimeout(()=>G&&G.fx&&performance.now()>=G.fx.until&&(G.fx=null,render()),520);}
@@ -9600,10 +9601,10 @@ const DIEV={Y:1,O:1.5,R:2};
 function wallSolid(x,y){const cx=Math.floor(x),cy=Math.floor(y),c=cell(cx,cy);if(!blocks(c)||c.mOpen||(c.t==='soft'&&c.hole))return false;
   const h=({hard:.4,soft:.3,reinf:.42}[c.t]||.3)/2+.02,fx=x-cx-.5,fy=y-cy-.5;if(Math.abs(fx)<=h&&Math.abs(fy)<=h)return true;
   return (Math.abs(fy)<=h&&(fx>0?wj(cell(cx+1,cy)):wj(cell(cx-1,cy))))||(Math.abs(fx)<=h&&(fy>0?wj(cell(cx,cy+1)):wj(cell(cx,cy-1))));}
-function visRays(u){const R=VR(u),f=u.fd||[0,1],a0=Math.atan2(f[1],f[0]),n=150,o=[u.x+.5,u.y+.5],pts=[],hit=[],W=u.op==='warden';
+function visRays(u){const R=VR(u),f=u.fd||[0,1],a0=Math.atan2(f[1],f[0]),n=150,o=[u.x+.5,u.y+.5],pts=[],hit=[];if(smokeAt(u.x,u.y))return {o,pts:Array.from({length:n+1},()=>o.slice()),hit:Array(n+1).fill(false),R};
   for(let i=0;i<=n;i++){const fh=u.fh||60,a=a0+(-fh+2*fh*i/n)*Math.PI/180,dx=Math.cos(a),dy=Math.sin(a);let t=0,px=o[0]+dx*R,py=o[1]+dy*R,h=false;
     while(t<R){t+=.03;const x=o[0]+dx*t,y=o[1]+dy*t,cx=Math.floor(x),cy=Math.floor(y);if(!inB(cx,cy)){px=x;py=y;break;}
-      if(cx===u.x&&cy===u.y)continue;if(wallSolid(x,y)){px=x;py=y;h=true;break;}if(smokeAt(cx,cy)&&!W){px=x;py=y;break;}}
+      if(cx===u.x&&cy===u.y)continue;if(wallSolid(x,y)){px=x;py=y;h=true;break;}if(smokeAt(cx,cy)){px=x;py=y;break;}}
     pts.push([px,py]);hit.push(h);}
   return {o,pts,hit,R};}
 // the stretch of wall the selected operator's sight lands on glows: a soft vertical ribbon along the hit points
@@ -9819,7 +9820,7 @@ function update3D(){
   const sig=staticSig();if(sig!==R3.sig){R3.sig=sig;buildStatic(G.map);}
   const vis=sees(G.player);
   for(const u of G.units){if(u.x<0){if(R3.figs[u.id])R3.figs[u.id].grp.visible=false;continue;}
-    const f=unit3D(u);const seen=u.side===G.player||G.over||vis.has(u.id);void vis;
+    const f=unit3D(u);const seen=G.over||(!smokeAt(u.x,u.y)&&(u.side===G.player||vis.has(u.id)));void vis;
     if(u.alive&&seen)f.seenDead=true;
     const show=u.alive?seen:(f.seenDead||G.over);
     if(!f.grp.visible&&show)f.placed=false;
@@ -9843,14 +9844,14 @@ function update3D(){
   if(G.mode==='move'&&G.sel&&G.phase==='play')for(const [x,y] of camClicks(G.sel))tg.push([x,y,.08,0xe8574e]);
   else if(!(G.phase==='setup'&&G.mode==='move')){const col=G.mode==='shoot'?0xe8574e:G.mode==='dronemove'?0x46d17c:0xe3aa3e;
     const rg=G.phase==='setup'&&G.mode==='rearr'&&!G.rearrCam;
-    for(const [x,y] of curTargets()){const c=cell(x,y);const wall=isWallC(c);if(rg){if(c.t==='soft'||c.rfR)tg.push([x,y,WH+.08,c.rfR?0x9aa4ad:0x22d860]);else glow.push([x,y,0,0x22d860,2.3]);continue;}if(!wall&&(unitAt(x,y)||prismaAt(x,y))){glow.push([x,y,0,col]);continue;}tg.push([x,y,wall?WH+.08:.08,col]);}}
+    for(const [x,y] of curTargets()){const c=cell(x,y);const wall=isWallC(c);if(rg){if(c.t==='soft'||c.rfR)tg.push([x,y,WH+.08,c.rfR?0x9aa4ad:0x22d860]);else glow.push([x,y,0,0x22d860,2.3]);continue;}if(!wall&&!smokeAt(x,y)&&((unitAt(x,y)&&pub(unitAt(x,y)))||prismaAt(x,y))){glow.push([x,y,0,col]);continue;}tg.push([x,y,wall?WH+.08:.08,col]);}}
   if(G.phase==='setup'&&G.player==='A')G.map.spawns.forEach((z,i)=>z.cells.forEach(([x,y])=>tg.push([x,y,.06,i===G.spawn?0xffa060:0xef7f3e])));
   if(G.scanFx&&performance.now()<G.scanFx.until){for(const [x,y] of G.scanFx.cells)if(!isWallC(cell(x,y)))tg.push([x,y,.05,G.scanFx.c||0x5ad0ff]);setTimeout(()=>{if(G&&G.scanFx&&performance.now()>=G.scanFx.until){G.scanFx=null;render();}},1450);}
   setInst(R3.reachIM,reach,.065);setInst(R3.reachEdge,reach.map(([x,y])=>[x,y,.38]));setInst(R3.tgtIM,tg);tgtGlow(glow);R3.hl=new Set([...reach,...tg,...glow].map(c=>c[0]+','+c[1]));
   // gadgets, defuser, trail
   const dg=R3.dynG;while(dg.children.length)dg.remove(dg.children[0]);
   for(const g of G.gadgets){if(!g.alive||g.type==='prisma')continue;if(!G.over&&!gadgetVisibleTo(g,G.player))continue;const gm3=gadget3D(g);if(CAMT.includes(g.type))gm3.userData.cell=[g.x,g.y];dg.add(gm3);}
-  if(G.phase==='play'&&!G.over){for(const u of G.units)if(u.alive&&u.x>=0&&u.side!==G.player&&u.spotted>0&&!vis.has(u.id))dg.add(pin3D(u.x,u.y));
+  if(G.phase==='play'&&!G.over){for(const u of G.units)if(u.alive&&u.x>=0&&u.side!==G.player&&u.spotted>0&&!smokeAt(u.x,u.y)&&!vis.has(u.id))dg.add(pin3D(u.x,u.y));
     if(G.player==='D')for(const k of G.decoys||[])if(k.alive)dg.add(token3D(k.x,k.y,true));
     for(const h of heatPins())dg.add(pin3D(h.x,h.y));}
   if(G.mode==='cdir'&&cdirG())dg.add(owArrows(cdirG(),[[1,0],[-1,0],[0,1],[0,-1]]));else if(G.mode==='pdir'&&pdirG())dg.add(owArrows(pdirG(),[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]));else if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash'||G.mode==='mgscan'||G.mode==='face')&&G.sel&&G.sel.x>=0&&G.phase==='play')dg.add(owArrows(G.sel,G.mode==='face'||G.mode==='owdir'||G.mode==='owq'?[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]:null));else R3.owA=null;
@@ -10364,7 +10365,7 @@ function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
-function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v139</b><span>盾兵職業更新</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人</span><span>新增重盾兵與機動盾兵，接入男女角色圖與護盾特效</span><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑改為上下捲動，新增攻擊／防守篩選</span><span>培養幹員每個距離區段最多 4 顆骰子</span></div></section></div>`);}
+function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v140</b><span>盾兵職業更新</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷</span><span>監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人</span><span>新增重盾兵與機動盾兵，接入男女角色圖與護盾特效</span><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑改為上下捲動，新增攻擊／防守篩選</span><span>培養幹員每個距離區段最多 4 顆骰子</span></div></section></div>`);}
 function openFeedback(){const el=tsDlg('feedback','回報',`<div class="psbox"><div class="pshead"><div><b>回報</b><span>遇到問題或有想法，都歡迎告訴我們。</span></div><button class="tsX" aria-label="關閉">✕</button></div>
   <section><h4>類型</h4><select class="fbsel" id="fbType"><option value="bug">回報 Bug</option><option value="idea">遊戲建議</option></select></section>
   <section><h4>內容</h4><textarea class="fbtxt" id="fbText" maxlength="2000" placeholder="請描述發生了什麼、在哪個畫面，或你的建議…"></textarea><div class="fbcnt" id="fbCnt">0 / 2000</div></section>
@@ -10519,7 +10520,7 @@ function trKey(k,ix,d){const e=I18X[k]||I18N[k];if(e&&e[ix])return e[ix];
 Object.assign(I18X,{'攻擊':['Attack',''],'防守':['Defense',''],'全部類型':['All roles',''],'骰數仍受每段最多 4 顆、三段合計最多 10 顆限制。':['Maximum 4 dice per range and 10 dice across all three ranges.',''],'幹員圖鑑改為上下捲動，新增攻擊／防守篩選':['Operator codex now scrolls vertically, with Attack / Defense filters.',''],'培養幹員每個距離區段最多 4 顆骰子':['Trained operators can have at most 4 dice per range.','']});
 Object.assign(I18X,{'投擲 6 格：目標格與相鄰格每人擲 1 顆手榴彈骰（三面 1、三面 2），並破壞路障':['Throw up to 6 spaces: each affected operator rolls one grenade die (three 1 faces, three 2 faces). Destroys barricades.','']});
 Object.assign(I18X,{'重盾':['Heavy shield',''],'機動盾':['Mobile shield',''],'重盾兵':['Heavy shield soldier',''],'機動盾兵':['Mobile shield soldier',''],'機槍兵':['Gunner',''],'散彈兵':['Breacher',''],'狙擊兵':['Marksman',''],'衝鋒兵':['Rusher',''],'此路不通':['You shall not pass',''],'鎮壓暴徒':['Riot suppression',''],'解除重盾防禦':['Lower heavy shield',''],'免費切換':['Free toggle',''],'切換模式':['Toggle mode',''],'已啟用 · 點擊關閉':['Active · Tap to disable',''],'點擊切換模式：免疫正面 120° 的武器攻擊；仍可被道具鎖定及範圍攻擊波及。啟用時可以移動、轉向，但不能攻擊或使用道具；關閉後恢復。':['Toggle immunity to weapon attacks from the front 120°. Gadgets and area attacks can still affect you. You may move and turn, but cannot attack or use gadgets while active.',''],'受到的傷害固定 −2。不能奔跑。此路不通可切換正面防禦模式。':['Incoming damage −2. Cannot sprint. Toggle frontal defense with You shall not pass.',''],'受到的傷害固定 −2。可以奔跑，鎮壓暴徒向前衝刺並撞擊。':['Incoming damage −2. Can sprint. Riot suppression charges forward and strikes.','']});
-Object.assign(I18X,{'盾兵職業更新':['Shield class update',''],'新增重盾兵與機動盾兵，接入男女角色圖與護盾特效':['Added heavy and mobile shield classes, male/female artwork and shield effects.','']});
+Object.assign(I18X,{'盾兵職業更新':['Shield class update',''],'新增重盾兵與機動盾兵，接入男女角色圖與護盾特效':['Added heavy and mobile shield classes, male/female artwork and shield effects.',''],'煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷':['Smoke blocks sight and hides operators inside it. Smoke tiles remain throwable targets; smoke grants no damage reduction.',''],'〔被動〕智慧眼鏡：永遠不會被震暈，煙霧仍會遮擋視線。':['[Passive] Smart glasses: immune to stun. Smoke still blocks vision.','']});
 Object.assign(I18X,{'標示上一個階段曾移動位置的敵人；只標示掃描當下的位置，不揭露角色，保留到本階段結束。':['Mark enemies who changed spaces during the previous phase. Shows their positions at scan time, not their identities, until this phase ends.',''],'監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人':['Overwatch triggers only after moving in the current activation; Lion marks enemies who moved in the previous phase.','']});
 I18T.push(['{0} 啟動 EE-ONE-D，標示上一階段移動的 {1} 名敵人','{0} activated EE-ONE-D, marking {1} enemies who moved in the previous phase','']);
 function trText(o){const k=o.trim();if(!k||!/[㐀-鿿]/.test(k))return null;const ix=ME.lang==='en'?0:1;

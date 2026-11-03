@@ -1,0 +1,32 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
+const cut=(a,b)=>html.slice(html.indexOf(a),html.indexOf(b,html.indexOf(a)));
+const ctx=vm.createContext({assert,console});
+vm.runInContext(`
+let G={W:10,H:10,grid:true,phase:'play',gadgets:[],units:[]};
+const floor={t:'floor',indoor:true},walls=new Set();
+const cell=(x,y)=>walls.has(x+','+y)?{t:'hard'}:floor;
+const blocks=c=>c.t==='hard',jammed=()=>false,outCam=()=>true;
+const roomCells=()=>Array.from({length:100},(_,i)=>i);
+const roomOf=()=>roomCells().map(q=>[q%10,Math.floor(q/10)]);
+const inFan=()=>true,inSight=(a,b)=>los(a.x,a.y,b.x,b.y);
+const within=()=>roomOf(),shieldAt=()=>null,adj8=()=>[],PROF={};
+`+html.match(/const smokeAt=.*;/)[0]+cut('function lineCells(','function segCells(')+cut('function smokeBlocks(','// light protection:')+cut('function seenBy(','function sees(')+cut('function sharedCells(','// attackers with line of sight')+html.match(/const throwTargets=.*;/)[0]+cut('function protection(sh,t){','const OBSTK=')+`
+const a={side:'A',alive:true,x:0,y:2},e={side:'D',alive:true,x:5,y:2};G.units=[a,e];
+assert(seenBy('A',e));
+const smoke={alive:true,type:'smk',x:2,y:2};G.gadgets.push(smoke);
+assert(!los(0,2,5,2));assert(!los(0,2,2,2));assert(!los(2,2,5,2));
+assert(!los(0,2,5,2,true));assert(!seenBy('A',e));
+e.exp=[5,2];assert(!seenBy('A',e));delete e.exp;
+const teammate={side:'A',alive:true,x:5,y:0};G.units.push(teammate);assert(seenBy('A',e));
+e.x=2;assert(!seenBy('A',e));assert(!seenBy('D',e));e.x=5;G.units.pop();
+G.gadgets.push({alive:true,type:'cam',side:'A',x:5,y:0});assert(seenBy('A',e));
+G.gadgets[1].x=0;G.gadgets[1].y=2;smoke.alive=false;assert(sharedCells('A').has(25));
+smoke.alive=true;assert(!sharedCells('A').has(25));smoke.alive=false;assert(sharedCells('A').has(25));
+smoke.alive=true;G.gadgets[1].type='drone';assert(!sharedCells('A').has(25));
+assert(throwTargets(a).some(([x,y])=>x===2&&y===2));assert(!throwTargets(a).some(([x,y])=>x===5&&y===2));
+walls.add('1,2');assert(!throwTargets(a).some(([x,y])=>x===2&&y===2));walls.clear();
+const withSmoke=protection(a,e);smoke.alive=false;assert.equal(protection(a,e),withSmoke);assert.equal(withSmoke,0);
+`,ctx);
+for(const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi))if(!/type=["'](?:text\/plain|application\/json)/i.test(m[1]))new vm.Script(m[2]);
+console.log('PASS: smoke endpoints/rays, located targets, shared teammate/camera vision, camera cache invalidation, indoor drones, throwable smoke tiles, solid walls, no smoke protection, script syntax');
