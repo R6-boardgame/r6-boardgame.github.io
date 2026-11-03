@@ -139,6 +139,9 @@
 - v131：鐵絲網可以和 Frost 捕獸夾疊在同一格（`stackOK`，佈防與對戰都可，捕獸夾也能放到鐵絲網那格），踩進去兩個都觸發。捕獸夾改成進攻方視線內看得到（拿掉 `gadgetVisibleTo` 的隱藏），看到後可遠距點選破壞（`camClicks` 加 mat）；`canHitG` 抽出單一道具的破壞判定，`doDestroy` 疊放時優先打能打到的捕獸夾。
 - v132：捕獸夾改回對進攻方隱形。踩到時血量減半（剩 floor(hp/2)，扣 hp−floor(hp/2)），`u.matStuck` 定在原地（`reach` 只剩原地），不再結束啟動；行動欄「拆掉捕獸夾」花 1 行動（`unMat`，AI 啟動時會先拆）。3D：`matSnap` 夾住動畫、`matFx` 讓捕獸夾一直夾在腳上（`matBuild`）。
 - v133：捕獸夾在地上改成半透明（g3x `mat` 用 `matpT` 等透明材質）。鐵絲網不再結束啟動：踩進去扣 1 血、這次啟動剩下的移動點 -1，剛好是最後一步（移動點已 0）就不扣；規則書那條也改了。
+- v134（Claude）：Vigil 不會被發現、也不能被選為穿牆射擊目標；佈防時點軟牆會問要加固還是破壞（`wallAsk`）。
+- v135～v143（使用者在 Codex 做的）：v135 Sledge／Thermite／Ash／IQ／Fuze／Zofia 能力改寫、同格地上道具最多疊 2 個（`stackOK`/`gadgetOffset`）、圖鑑分類與「公告」按鈕（`openNews`）；v136 培養骰每段上限 4 顆（`bMax`）；v137 破片手榴彈擲手榴彈骰（`GRENADE_DIE`）；v138 機動盾（減 1）／重盾（減 2）；v139 監視只對有移動的敵人觸發（`trackMovement`）；v140 煙霧擋視線（`smokeBlocks`）；v141 防守方打掉拆彈器即獲勝；v142～v143 職業主動技佔技能格（`classKey`/`hasClassSkill`），衝鋒兵被動「衝鋒陷陣」鎖骰（`lockRushDie`）。測試在 `tests/*.cjs`，用 `node tests/xxx.cjs` 跑。
+- v144：踩到捕獸夾時 `matCine` 把鏡頭切到角色側面 45 度、看腳的特寫（借用 `R3.cineSave`/`shotCamEnd`），`matSnap(u,true)` 播慢版：張開 0.5 秒 → 夾上、白色衝擊圈、角色下沉前傾抖動，扣血後回到原鏡頭。爆破炸藥（`chargePlant3D`）改成依牆厚貼在牆面（軟 .15／加固 .21／硬 .2／路障 .04 + .012），高度不超過牆高的 55%。
 - 使用者偏好（v119 起）：改完**先上線再測試**，有問題再改，沒問題就不動。
 
 ## 尚未完成 / 等使用者回覆
