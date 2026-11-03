@@ -11267,7 +11267,7 @@ function owqTap(x,y){const u=G.owq&&G.owq[0];if(!u)return;if(!adj8all(u.x,u.y).s
   overwatch(u,false,[x-u.x,y-u.y]);G.owq.shift();if(G.owq.length)return owqNext();G.owq=null;G.mode='move';G.sel=null;G.owqDone=true;endPhase();}
 // cameras start hidden from the attackers: an operator who sees one, or a drone rolling into its room, finds it
 // v112: a bomb site stays hidden from the attacking player until a drone or an attacker lays eyes on the bomb itself
-const bombHid=s=>!!(G&&G.mission==='bomb'&&G.player==='A'&&!G.over&&!G.tut&&!G.tut2&&G.bombC&&G.bombC[s]&&!(G.bombSeen&&G.bombSeen[s]));
+const bombHid=s=>!!(G&&G.mission==='hostage')||!!(G&&G.mission==='bomb'&&G.player==='A'&&!G.over&&!G.tut&&!G.tut2&&G.bombC&&G.bombC[s]&&!(G.bombSeen&&G.bombSeen[s]));
 function bombDiscover(){if(!G||G.mission!=='bomb'||!G.bombC||G.over)return;G.bombSeen=G.bombSeen||{};const atk=alive('A').filter(u=>u.x>=0),dr=G.gadgets.filter(g=>g.alive&&g.type==='drone');let got=[];
   for(const s of ['A','B']){const b=G.bombC[s];if(!b||G.bombSeen[s])continue;const [bx,by]=b;let R=null;try{R=roomCells(bx,by);}catch(e){}
     if(atk.some(u=>inFan(u,bx,by)&&los(u.x,u.y,bx,by,false,true))||dr.some(d=>(R&&R.has(d.y*G.W+d.x))||(Math.hypot(d.x-bx,d.y-by)<=8&&los(d.x,d.y,bx,by,false,true)))){G.bombSeen[s]=1;got.push(s);}}
