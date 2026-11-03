@@ -929,6 +929,32 @@ html.pg,html.pg body{touch-action:manipulation}html.pg .psbox,html.pg .avgrid{to
 @media (max-width:700px) and (max-height:640px){
  .wzOg{max-height:21dvh}.wzInv .wzCard>span:not(:last-child){-webkit-line-clamp:2}.wzInv .wzCard .ic{width:28px;height:28px}
  .wzOd.tight .art{width:34%}.wzOd.tight .hint{display:none}.wzOd.tight .wzOdIn>*{margin-bottom:3px}}
+/* v148 squad card: tap-once picks; recruit version switch; phone: text left, numbers right */
+.wzOd .odH,.wzOd .odL,.wzOd .odR{display:contents}
+.wzOd .osVar.cop{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:420px}
+.wzOd .osVar.cop button{position:relative;display:flex;align-items:center;gap:8px;padding:6px 8px;text-align:left;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.16);color:#8b98a4;filter:grayscale(.7);opacity:.8;transition:all .15s}
+.wzOd .osVar.cop button img{flex:0 0 auto;width:34px;height:34px;object-fit:cover;object-position:50% 6%;border-radius:50%;background:#1b2430;border:1px solid rgba(255,255,255,.18)}
+.wzOd .osVar.cop button span{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.wzOd .osVar.cop button small{font-size:10px;letter-spacing:.04em}
+.wzOd .osVar.cop button b{font-size:14px;color:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wzOd .osVar.cop button.on{filter:none;opacity:1;border:2px solid var(--accent);background:linear-gradient(135deg,rgba(227,170,62,.32),rgba(227,170,62,.08));color:#fff;box-shadow:0 0 12px rgba(227,170,62,.35)}
+.wzOd .osVar.cop button.on img{border-color:var(--accent)}.wzOd .osVar.cop button.on small{color:var(--accent)}
+.wzOd .osVar.cop button em{position:absolute;top:-8px;right:-4px;font:700 10px/1 sans-serif;font-style:normal;padding:3px 6px;background:var(--accent);color:#111;border-radius:2px}
+@media (max-width:700px){
+ .wzOg{flex:0 1 auto;max-height:none;min-height:120px;overflow-y:auto}
+ .wzOd{flex:0 0 auto;overflow:hidden}
+ .wzOd .art{position:absolute;right:0;top:0;bottom:auto;float:none;margin:0;width:40%;max-width:none;height:100%;object-fit:cover;object-position:50% 0;opacity:.6;mask-image:linear-gradient(180deg,#000 25%,rgba(0,0,0,.15) 80%);-webkit-mask-image:linear-gradient(180deg,#000 25%,rgba(0,0,0,.15) 80%)}
+ .wzOdIn{display:grid;grid-template-columns:minmax(0,1fr) 38%;grid-template-areas:"h ." "v v" "g r";gap:0 10px;padding:8px 10px}.wzOdIn>*{margin:0}
+ .wzOd .odH{display:block;grid-area:h;min-width:0;padding-bottom:4px}.wzOd .odH .hint{margin-top:2px}
+ .wzOd .osVar{grid-area:v;margin:2px 0 8px;max-width:none}
+ .wzOd .odL{display:block;grid-area:g;min-width:0}
+ .wzOd .odR{display:flex;grid-area:r;flex-direction:column;justify-content:flex-end;gap:6px;padding-top:24px;min-width:0}
+ .wzOd .odR .osW{gap:3px;background:rgba(10,15,20,.55);padding:4px 0 0}.wzOd .odR .osW div{gap:4px}.wzOd .odR .osW span{min-width:40px;font-size:10.5px;color:#b9c4cd}
+ .wzOd .odR .hexd{width:19px;height:17px;margin-right:1px}
+ .wzOd .odR .st{display:grid;grid-template-columns:auto auto;gap:2px 8px;font-size:11px;background:rgba(10,15,20,.55)}
+ .wzOd.tight .odR{padding-top:8px}
+}
+@media (orientation:landscape) and (max-height:520px){.wzOd .odH>*,.wzOd .odL>*,.wzOd .odR>*{margin-bottom:3px}.wzOd .osVar.cop{gap:6px}.wzOd .osVar.cop button{padding:3px 6px;gap:5px}.wzOd .osVar.cop button img{width:22px;height:22px}.wzOd .osVar.cop button b{font-size:11px}.wzOd .osVar.cop button small{font-size:9px}.wzOd .osVar.cop button em{font-size:9px;padding:2px 4px;top:-6px}}
 /* shot intro */
 .sintro{--pr:0px;--pb:0px;--ca:239,127,62;--cd:74,168,226;position:fixed;inset:0;z-index:300;pointer-events:none;overflow:hidden;
  background:radial-gradient(55% 50% at 22% 80%,rgba(var(--ca),.28),transparent 70%),radial-gradient(45% 40% at 80% 18%,rgba(var(--cd),.24),transparent 70%),
@@ -10266,12 +10292,15 @@ const WZSTEPS=[
   {t:'幹員',ok:()=>cfg.picks[cfg.side].length===5&&cfg.picks[cfg.side].every(owned),why:'請選滿 5 名已解鎖的幹員'},
   {t:'裝備',ok:()=>true},{t:'計時',ok:()=>true},{t:'確認',ok:()=>true}];
 function wzOpDetail(c){c=copCard(c);const vars=OPCARDS.filter(v=>v.base===c.base);
-  return `${opArt(c.id)?`<img class="art" src="${opArt(c.id)}" alt="">`:''}<div class="wzOdIn"><div class="nm"><img src="${opIcon(c.id)}" alt=""><b>${c.name}</b></div>
-  <div class="hint">${c.org||''}${c.zh.role?' · '+c.zh.role:''}</div>
-  ${vars.length>1?`<div class="osVar">${vars.map((v,i)=>`<button data-wz-var="${v.id}" class="${v.id===c.id?'on':''}">${copSlot(v.id)!=null?COPN[i]:'卡片版本 '+(i+1)}</button>`).join('')}</div>`:''}
-  <div class="g"><b>${c.zh.g||'（無特殊裝置）'}</b>${SCRIPTED.has(c.id)?'<span class="osImp ok">遊戲內已實作</span>':c.g.ab&&c.g.ab.some(a=>a.k!=='PASSIVE')?'<span class="osImp">尚未實作</span>':''}<p>${cardText(c)}</p></div>
+  const inSq=cfg.picks[cfg.side].includes(c.id);
+  const vb=(v,i)=>{const sl=copSlot(v.id),o=sl!=null?copAll()[sl]:null,on=v.id===c.id;
+    return `<button data-wz-var="${v.id}" class="${on?'on':''}" aria-pressed="${on}">${o?`<img src="${opArt(v.id)}" alt="">`:''}<span><small>${o?COPN[i]:'卡片版本'}</small><b>${o?o.nm:'版本 '+(i+1)}</b>${o&&o.w&&WPN[o.w]?`<small>${WPN[o.w].t}</small>`:''}</span>${on?`<em>${inSq?'已入隊':'選這位'}</em>`:''}</button>`;};
+  return `${opArt(c.id)?`<img class="art" src="${opArt(c.id)}" alt="">`:''}<div class="wzOdIn"><div class="odH"><div class="nm"><img src="${opIcon(c.id)}" alt=""><b>${c.name}</b></div>
+  <div class="hint">${c.org||''}${c.zh.role?' · '+c.zh.role:''}</div></div>
+  ${vars.length>1?`<div class="osVar${copSlot(c.id)!=null?' cop':''}">${vars.map(vb).join('')}</div>`:''}
+  <div class="odL"><div class="g"><b>${c.zh.g||'（無特殊裝置）'}</b>${SCRIPTED.has(c.id)?'<span class="osImp ok">遊戲內已實作</span>':c.g.ab&&c.g.ab.some(a=>a.k!=='PASSIVE')?'<span class="osImp">尚未實作</span>':''}<p>${cardText(c)}</p></div></div><div class="odR">
   <div class="osW">${['1-3','4-6','7+'].map((r,i)=>`<div><span>${['近','中','遠'][i]} ${r}</span>${hexDice(c.w[i])}</div>`).join('')}</div>
-  <div class="st"><span>耐力 <b>${c.st??'—'}</b></span><span>${c.run?'奔跑 <b>+'+c.run+'</b>':'不能奔跑'}</span><span>破壞力 <b>${DZN[c.dz]}</b></span>${c.g.charges?`<span>裝置 <b>${c.g.charges}</b> 次</span>`:''}</div></div>`;}
+  <div class="st"><span>耐力 <b>${c.st??'—'}</b></span><span>${c.run?'奔跑 <b>+'+c.run+'</b>':'不能奔跑'}</span><span>破壞力 <b>${DZN[c.dz]}</b></span>${c.g.charges?`<span>裝置 <b>${c.g.charges}</b> 次</span>`:''}</div></div></div>`;}
 function wzCard(attr,on,inner,cls){return `<button class="wzCard ${cls||''} ${on?'on':''}" ${attr}>${inner}</button>`;}
 function wzStepHTML(){const s=cfg.side,st=WZ.step;
   switch(st){
@@ -10286,9 +10315,9 @@ function wzStepHTML(){const s=cfg.side,st=WZ.step;
   case 3:{const p=cfg.picks[s],pickOf=b=>p.findIndex(k=>OPC[k]&&OPC[k].base===b);
     const cur=OPC[WZ.cur]&&OPC[WZ.cur].side===s?OPC[WZ.cur]:OPC[p[0]||OPBASE.find(b=>OPC[b].side===s)];
     return `<div class="wzOpHead"><div><h3 class="wzQ">組成你的小隊</h3><p class="wzHint">點頭像加入小隊，再點一次移出。滑鼠移過去可以看能力。</p></div>
-    <div class="wzSlots" aria-label="小隊 ${p.length}/5">${[0,1,2,3,4].map(i=>p[i]&&OPC[p[i]]?`<button class="wzS on ${WZ.peekSlot===p[i]?'peek':''}" data-wz-un="${i}" title="移出 ${OPC[p[i]].name}"><img src="${opIcon(p[i])}" alt="${OPC[p[i]].name}"></button>`:'<span class="wzS"></span>').join('')}</div></div>
+    <div class="wzSlots" aria-label="小隊 ${p.length}/5">${[0,1,2,3,4].map(i=>p[i]&&OPC[p[i]]?`<button class="wzS on" data-wz-un="${i}" title="移出 ${OPC[p[i]].name}"><img src="${opIcon(p[i])}" alt="${OPC[p[i]].name}"></button>`:'<span class="wzS"></span>').join('')}</div></div>
     <div class="wzOps"><div class="wzOg">${OPBASE.filter(b=>OPC[b].side===s).map(b=>{const i=pickOf(b);
-      return `<button class="wzOt ${i>=0?'on':''} ${cur&&cur.base===b?'cur':''} ${WZ.peek===b?'peek':''} ${opPlayable(b)?'':'na'}${owned(b)?'':' lk'}" data-wz-op="${b}" aria-pressed="${i>=0}" ${opPlayable(b)?'':'aria-disabled="true"'} title="${OPC[b].name}${opPlayable(b)?'':'（尚未實作，暫時不能選）'}"><img src="${opIcon(b)}" alt=""><span>${OPC[b].name}</span>${i>=0?`<i>${i+1}</i>`:''}</button>`;}).join('')}</div>
+      return `<button class="wzOt ${i>=0?'on':''} ${cur&&cur.base===b?'cur':''} ${opPlayable(b)?'':'na'}${owned(b)?'':' lk'}" data-wz-op="${b}" aria-pressed="${i>=0}" ${opPlayable(b)?'':'aria-disabled="true"'} title="${OPC[b].name}${opPlayable(b)?'':'（尚未實作，暫時不能選）'}"><img src="${opIcon(b)}" alt=""><span>${i>=0&&copSlot(p[i])!=null?copCard(OPC[p[i]]).name:OPC[b].name}</span>${i>=0?`<i>${i+1}</i>`:''}</button>`;}).join('')}</div>
       <div class="wzOd" id="wzOd">${cur?wzOpDetail(cur):''}</div></div>
     <div class="wzRow"><button id="wzRand">隨機補滿</button>${p.length?'<button id="wzClear">清空</button>':''}</div>`;}
   case 4:{const inv=cfg.inv[s],used=invUsed(s),cap=INV_CAP[s];return `<h3 class="wzQ">分配戰術裝備</h3><p class="wzHint">全隊共用 ${cap} 個方塊，任何幹員都能用。${s==='A'?'另外固定有 3 架無人機。':'任務另給 3 捲鐵絲網，地圖上也有固定攝影機。'}</p>
@@ -10323,7 +10352,7 @@ function renderWiz(){let el=$('#wiz');const _rs=WZ.lastStep===WZ.step?scrollSnap
     <div class="wzBody">${wzStepHTML()}</div>
     <div class="wzFoot"><button id="wzBack">${st?'‹ 上一步':'‹ 返回主畫面'}</button><span class="msg">${[0,1,2,5].includes(st)?(WZ.arm?'再點一次確定':'點一下看說明，再點一次確定'):ok?`第 ${st+1} 步，共 ${WZSTEPS.length} 步`:WZSTEPS[st].why}</span><button class="primary${last?' start':''}" id="wzNext" ${ok?'':'disabled'} >${last?'開始任務':'下一步 ›'}</button></div>`;
   if(keep.length&&WZ.lastStep===st)el.querySelectorAll('.wzBody,.wzOg').forEach((e,i)=>{if(keep[i]!=null)e.scrollTop=keep[i];});if(_rs)_rs();WZ.lastStep=st;
-  const go=i=>{WZ.step=i;WZ.arm=null;WZ.peek=null;WZ.peekSlot=null;renderWiz();el.querySelector('.wzBody').scrollTop=0;};
+  const go=i=>{WZ.step=i;WZ.arm=null;renderWiz();el.querySelector('.wzBody').scrollTop=0;};
   const twice=(key,set,after)=>{if(WZ.arm===key){WZ.arm=null;after();return;}WZ.arm=key;set();renderWiz();};
   const pick=()=>{const r=WZ.ret;WZ.ret=null;go(r!=null?r:st+1);};
   el.querySelectorAll('[data-wz-go]').forEach(b=>b.onclick=()=>{WZ.ret=st===WZSTEPS.length-1&&b.closest('.wzSum')?st:null;go(+b.dataset.wzGo);});
@@ -10335,9 +10364,12 @@ function renderWiz(){let el=$('#wiz');const _rs=WZ.lastStep===WZ.step?scrollSnap
   {const p=cfg.picks[cfg.side],od=$('#wzOd');
     el.querySelectorAll('[data-wz-op]').forEach(b=>{const bs=b.dataset.wzOp;
       b.onmouseenter=b.onfocus=()=>{const k=p.find(x=>OPC[x]&&OPC[x].base===bs)||bs;if(WZ.cur===k)return;WZ.cur=k;el.querySelectorAll('.wzOt.cur').forEach(e=>e.classList.remove('cur'));b.classList.add('cur');if(od){od.innerHTML=wzOpDetail(OPC[k]);bindVar();}};
-      b.onclick=()=>{if(WZ.peek!==bs){WZ.peek=bs;WZ.peekSlot=null;WZ.cur=null;b.onmouseenter();el.querySelectorAll('.wzOt.peek,.wzS.peek').forEach(e=>e.classList.remove('peek'));b.classList.add('peek');const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=(p.some(x=>OPC[x]&&OPC[x].base===bs)?'再點一次移出 ':owned(bs)?'再點一次加入 ':'尚未解鎖，可到首頁「商店」購買 ')+OPC[bs].name;return;}if(!opPlayable(bs)){b.onmouseenter();const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=`${OPC[bs].name} 的能力還沒做進遊戲，暫時不能選`;return;}if(!owned(bs)){const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=`${OPC[bs].name} 尚未解鎖，可到首頁「商店」購買`;return;}const i=p.findIndex(x=>OPC[x]&&OPC[x].base===bs);if(i>=0)p.splice(i,1);else if(p.length<5)p.push(WZ.cur&&OPC[WZ.cur]&&OPC[WZ.cur].base===bs?WZ.cur:bs);else{const m=el.querySelector('.wzFoot .msg');if(m)m.textContent='小隊已滿 5 人，先點右上角的頭像移出一位';return;}WZ.cur=p.find(x=>OPC[x].base===bs)||bs;renderWiz();};});
-    el.querySelectorAll('[data-wz-un]').forEach(b=>b.onclick=()=>{const i=+b.dataset.wzUn;if(WZ.peekSlot!==p[i]){WZ.peekSlot=p[i];WZ.peek=null;WZ.cur=p[i];renderWiz();const m=el.querySelector('.wzFoot .msg');if(m)m.textContent='再點一次把 '+OPC[p[i]].name+' 移出小隊';return;}WZ.peekSlot=null;p.splice(i,1);renderWiz();});
-    const bindVar=()=>wzFit()||el.querySelectorAll('[data-wz-var]').forEach(b=>b.onclick=()=>{const v=b.dataset.wzVar,i=p.findIndex(x=>OPC[x]&&OPC[x].base===OPC[v].base);if(i>=0)p[i]=v;WZ.cur=v;renderWiz();});bindVar();}
+      b.onclick=()=>{const msg=t=>{const m=el.querySelector('.wzFoot .msg');if(m)m.textContent=t;};const pv=WZ.cur;WZ.cur=null;b.onmouseenter();
+        if(!opPlayable(bs))return msg(`${OPC[bs].name} 的能力還沒做進遊戲，暫時不能選`);if(!owned(bs))return msg(`${OPC[bs].name} 尚未解鎖，可到首頁「商店」購買`);
+        const i=p.findIndex(x=>OPC[x]&&OPC[x].base===bs);if(i>=0)p.splice(i,1);else if(p.length<5)p.push(pv&&OPC[pv]&&OPC[pv].base===bs?pv:bs);else return msg('小隊已滿 5 人，先點一下右上角的頭像移出一位');
+        WZ.cur=p.find(x=>OPC[x].base===bs)||WZ.cur||bs;renderWiz();};});
+    el.querySelectorAll('[data-wz-un]').forEach(b=>b.onclick=()=>{const i=+b.dataset.wzUn;WZ.cur=p[i];p.splice(i,1);renderWiz();});
+    const bindVar=()=>wzFit()||el.querySelectorAll('[data-wz-var]').forEach(b=>b.onclick=()=>{const v=b.dataset.wzVar,i=p.findIndex(x=>OPC[x]&&OPC[x].base===OPC[v].base);if(i>=0)p[i]=v;else if(p.length<5&&opPlayable(OPC[v].base)&&owned(OPC[v].base))p.push(v);WZ.cur=v;renderWiz();});bindVar();}
   el.querySelectorAll('[data-inv]').forEach(b=>b.onclick=()=>{const s=cfg.side,k=b.dataset.inv,v=cfg.inv[s][k]+(+b.dataset.dv);if(v<0||v>INV[s][k][1]||(+b.dataset.dv>0&&invUsed(s)>=INV_CAP[s]))return;cfg.inv[s][k]=v;render();});
   const r=$('#wzRand');if(r)r.onclick=()=>{const p=cfg.picks[cfg.side],bases=new Set(p.map(k=>OPC[k].base));for(const b of shuffle(OPBASE.filter(k=>OPC[k].side===cfg.side&&!bases.has(k)&&opPlayable(k)&&owned(k)))){if(p.length>=5)break;p.push(b);}render();};
   const c=$('#wzClear');if(c)c.onclick=()=>{cfg.picks[cfg.side]=[];render();};
