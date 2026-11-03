@@ -142,6 +142,7 @@
 - v134（Claude）：Vigil 不會被發現、也不能被選為穿牆射擊目標；佈防時點軟牆會問要加固還是破壞（`wallAsk`）。
 - v135～v143（使用者在 Codex 做的）：v135 Sledge／Thermite／Ash／IQ／Fuze／Zofia 能力改寫、同格地上道具最多疊 2 個（`stackOK`/`gadgetOffset`）、圖鑑分類與「公告」按鈕（`openNews`）；v136 培養骰每段上限 4 顆（`bMax`）；v137 破片手榴彈擲手榴彈骰（`GRENADE_DIE`）；v138 機動盾（減 1）／重盾（減 2）；v139 監視只對有移動的敵人觸發（`trackMovement`）；v140 煙霧擋視線（`smokeBlocks`）；v141 防守方打掉拆彈器即獲勝；v142～v143 職業主動技佔技能格（`classKey`/`hasClassSkill`），衝鋒兵被動「衝鋒陷陣」鎖骰（`lockRushDie`）。測試在 `tests/*.cjs`，用 `node tests/xxx.cjs` 跑。
 - v144：踩到捕獸夾時 `matCine` 把鏡頭切到角色側面 45 度、看腳的特寫（借用 `R3.cineSave`/`shotCamEnd`），`matSnap(u,true)` 播慢版：張開 0.5 秒 → 夾上、白色衝擊圈、角色下沉前傾抖動，扣血後回到原鏡頭。爆破炸藥（`chargePlant3D`）改成依牆厚貼在牆面（軟 .15／加固 .21／硬 .2／路障 .04 + .012），高度不超過牆高的 55%。
+- v145：窗戶路障（`c.t==='bar'&&c.kind==='window'`）在 `protection` 只給 1 點掩護（門路障、軟牆仍是 2）；隔窗射擊跟門一樣會把窗戶路障打掉（`shootUnit` 的 `dr` 也收窗戶）。測試 `tests/window-cover.cjs`。
 - 使用者偏好（v119 起）：改完**先上線再測試**，有問題再改，沒問題就不動。
 
 ## 尚未完成 / 等使用者回覆
