@@ -10365,7 +10365,7 @@ function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
-function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v141</b><span>盾兵職業更新</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>拆彈器遭防守方破壞後，立即結束對局，防守方勝利</span><span>煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷</span><span>監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人</span><span>新增重盾兵與機動盾兵，接入男女角色圖與護盾特效</span><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑改為上下捲動，新增攻擊／防守篩選</span><span>培養幹員每個距離區段最多 4 顆骰子</span></div></section></div>`);}
+function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v142</b><span>盾兵職業更新</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>修正培養幹員以借用技能結束對局時，點數與存活場次未入帳</span><span>拆彈器遭防守方破壞後，立即結束對局，防守方勝利</span><span>煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷</span><span>監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人</span><span>新增重盾兵與機動盾兵，接入男女角色圖與護盾特效</span><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑改為上下捲動，新增攻擊／防守篩選</span><span>培養幹員每個距離區段最多 4 顆骰子</span></div></section></div>`);}
 function openFeedback(){const el=tsDlg('feedback','回報',`<div class="psbox"><div class="pshead"><div><b>回報</b><span>遇到問題或有想法，都歡迎告訴我們。</span></div><button class="tsX" aria-label="關閉">✕</button></div>
   <section><h4>類型</h4><select class="fbsel" id="fbType"><option value="bug">回報 Bug</option><option value="idea">遊戲建議</option></select></section>
   <section><h4>內容</h4><textarea class="fbtxt" id="fbText" maxlength="2000" placeholder="請描述發生了什麼、在哪個畫面，或你的建議…"></textarea><div class="fbcnt" id="fbCnt">0 / 2000</div></section>
@@ -10964,9 +10964,9 @@ function ecoGame(w){if(!G||G._eco)return G&&G._eco;ecoRoll();const P=G.player,wi
     const m={games:1,wins:win?1:0,winA:win&&P==='A'?1:0,winD:win&&P==='D'?1:0,kills:t.k,gad:t.gad,walls:G._wb||0,plant:G._pl?1:0,online:quick?1:0};
     const before=tkClaimable();
     for(const k in m){ECO.dp[k]=(ECO.dp[k]||0)+m[k];if(k!=='ops')ECO.wp[k]=(ECO.wp[k]||0)+m[k];}
-    ECO.wops=[...new Set([...ECO.wops,...mine.map(u=>OPC[u.op]?OPC[u.op].base:u.op)])];ECO.wp.ops=ECO.wops.length;
+    ECO.wops=[...new Set([...ECO.wops,...mine.map(u=>OPC[unitOp(u)]?OPC[unitOp(u)].base:unitOp(u))])];ECO.wp.ops=ECO.wops.length;
     const after=tkClaimable();if(after>before)lines.push([`${after-before} 個任務完成，到「任務」領取`,0]);
-    const ups=[];mine.forEach(u=>{const b=OPC[u.op]?OPC[u.op].base:u.op;if(!OPC[b])return;const q=ST(u),l0=mxLv(ECO.mx[b]||0);
+    const ups=[];mine.forEach(u=>{const b=OPC[unitOp(u)]?OPC[unitOp(u)].base:unitOp(u);if(!OPC[b])return;const q=ST(u),l0=mxLv(ECO.mx[b]||0);
       ECO.mx[b]=(ECO.mx[b]||0)+100+(win?60:0)+(q.k||0)*25+(q.gad||0)*10;const l1=mxLv(ECO.mx[b]);
       if(l1>l0)ups.push([OPC[b].name,l1]);});
     if(ups.length){lines.push([`熟練度升級：${ups.map(([n,l])=>n+' Lv'+l).join('、')}`,0]);const rw=[...new Set(ups.map(u=>MXREW[u[1]]).filter(Boolean))];try{achToastMsg(ups.length>1?`${ups.length} 名幹員熟練度升級`:`${ups[0][0]} 熟練度 Lv${ups[0][1]}`,rw.length?rw.join('、')+'（到設定查看）':'繼續使用這些幹員來升級');}catch(e){}}}
@@ -10977,6 +10977,7 @@ function ecoBanner(){const b=$('#banner');if(!b||b.hidden||!G||!G._eco||b.queryS
   d.innerHTML=`${e.earn?`<b class="ecoE">${RNI}+${fmtN(e.earn)}${(e.bonus||[]).length?`<em class="ecoB">${e.bonus.map(([t,v])=>`${esc(t)} ${v>0?'+':'−'}${Math.abs(v)}`).join('　')}</em>`:''}</b>`:''}${e.lines.map(([t,v])=>`<span>${esc(t)}${v?` <i>+${fmtN(v)}</i>`:''}</span>`).join('')}`;
   const row=b.querySelector('.row');row?b.insertBefore(d,row):b.appendChild(d);}
 {const _fin=finish;finish=function(w,why){G&&(G._why=why);try{ecoGame(w);}catch(e){console.warn(e);}_fin(w,why);try{ecoBanner();}catch(e){}};}
+Object.assign(I18X,{'修正培養幹員以借用技能結束對局時，點數與存活場次未入帳':['Fixed missing trained-operator points and survival counts when a borrowed skill ends the match.','']});
 // unlock dialog: one tap on a locked operator explains, the dialog's button confirms
 function buyOp(b,after){const c=OPC[b];if(!c||owned(b))return after&&after();let el=$('#buyDlg');if(!el){el=document.createElement('div');el.id='buyDlg';el.className='buyDlg';document.body.appendChild(el);}
   const ok=ECO.rn>=OPPRICE;el.hidden=false;
@@ -11310,6 +11311,9 @@ function wApply(c,w){const n=JSON.parse(JSON.stringify(c));n.w=w;
   if(n.run>runCap(n))n.run=runCap(n);return n;}
 const copStat=c=>{const A=COPARM[c.arm],cap=runCap(c);return {hp:A.hp,mv:A.mv,cap,run:Math.min(c.run,cap),fov:c.w==='rf'?180:120+5*c.vis,vr:c.w==='sn'?14:10};};
 const copSlot=id=>/^recruit_[ad]_/.test(id||'')?(/shotgun$/.test(id)?1:0):null;
+// Borrowed skills may temporarily change op; progression always belongs to the original unit.
+const unitOp=u=>u._op||u.op;
+const unitCopSlot=u=>Number.isInteger(u.cop)&&u.cop>=0&&u.cop<2?u.cop:copSlot(unitOp(u));
 const copW=s=>[...s].reduce((a,ch)=>a+(/[\x00-\x7f]/.test(ch)?1:2),0);
 function copScore(c){const s=copStat(c),ax=[copDice(c).flat().reduce((a,d)=>a+CDIEA[d],0)/20*100,c.w==='sg'?67:33,40+(s.fov-120)/5*10+(s.vr>10?20:0),(s.mv+s.run)/11*100,s.hp/6*100].map(v=>Math.round(Math.max(0,Math.min(100,v))));
   const sc=Math.round(ax.reduce((a,b)=>a+b,0)/5);return {ax,sc,rk:sc>=86?'UR':sc>=73?'SSR':sc>=60?'SR':sc>=45?'R':'N'};}
@@ -11337,7 +11341,7 @@ function giBorrow(u,mode,fn){const k=mode==='charge'?'charges':mode;if(!u||!u.gi
   if(r&&typeof r.then==='function')return r.then(v=>{done();return v;},e=>{done();throw e;});done();return r;}
 const giTargets=(u,m)=>m==='charge'?chargeTargets(u):m==='clay'?clayTargets(u):m==='impact'?impactTargets(u):m==='shield'||m==='bpcam'?deployTargets(u):throwTargets(u);
 function copGear(){for(const k of cfg.picks[cfg.side]){const i=copSlot(k);if(i==null)continue;for(const g of ECO.cop[i].g)if(g&&INV[cfg.side][g])G[g]=(G[g]|0)+1;}}
-function copEnd(lines){if(!G||G.tut||G.tut2)return;const u=G.units.find(u=>u.side===G.player&&copSlot(u.op)!=null);if(!u)return;const i=copSlot(u.op),c=copAll()[i],k=ST(u).k|0,t0=copTot(c);
+function copEnd(lines){if(!G||G.tut||G.tut2)return;const u=G.units.find(u=>u.side===G.player&&unitCopSlot(u)!=null);if(!u)return;const i=unitCopSlot(u),c=copAll()[i],k=ST(u).k|0,t0=copTot(c);
   c.k+=k;c.e=Math.min(COP_CAP-COP_BASE,(c.e|0)+k);const got=copTot(c)-t0;
   if(!u.alive){const by=u.kby&&OPC[u.kby]?(copSlot(u.kby)!=null?'新進人員':OPC[u.kby].name):'';
     ECO.alum=(Array.isArray(ECO.alum)?ECO.alum:[]).concat([{i,w:c.w||null,nm:c.nm,rk:copScore(c).rk,k:c.k|0,sv:c.sv|0,by,ts:Date.now()}]).slice(-100);
@@ -11353,8 +11357,8 @@ function openAlum(){let el=$('#copAl');if(!el){el=document.createElement('div');
       :'<div class="alEmpty"><b>你是第一屆新兵</b><span>還沒有學長姐。好好活下去。</span></div>'}</div></div>`;
   el.querySelector('#alBack').onclick=()=>{el.hidden=true;};}
 // the skill button runs the borrowed operator's gadget code
-{const _gt=gTargets;gTargets=function(u){if(!u||!u.sk)return _gt(u);const o=u.op;u._op=o;u.op=u.sk;try{return _gt(u);}finally{u.op=o;delete u._op;}};}
-{const _ug=useGadget;useGadget=async function(u,x,y){if(!u||!u.sk)return _ug(u,x,y);const o=u.op;u._op=o;u.op=u.sk;try{return await _ug(u,x,y);}finally{u.op=o;delete u._op;}};}
+{const _gt=gTargets;gTargets=function(u){if(!u||!u.sk)return _gt(u);const o=u.op,root=u._op;u._op=root||o;u.op=u.sk;try{return _gt(u);}finally{u.op=o;if(root===undefined)delete u._op;else u._op=root;}};}
+{const _ug=useGadget;useGadget=async function(u,x,y){if(!u||!u.sk)return _ug(u,x,y);const o=u.op,root=u._op;u._op=root||o;u.op=u.sk;try{return await _ug(u,x,y);}finally{u.op=o;if(root===undefined)delete u._op;else u._op=root;}};}
 {const _oa=opArt;opArt=function(id){const i=copSlot(id);return i!=null?copArt(copAll()[i],i):_oa(id);};}
 // Glaz: the flip sight swaps the mid and long dice and gives a rifle's view (180°, 10 cells); press again to flip back
 OPS.glaz.g='翻轉瞄具';GDX.glaz=['切換瞄具：中距離和遠距離的骰子互換，視野改成 180°、10 格；再按一次切回狙擊鏡。',99];OPS.glaz.gd=GDX.glaz[0];OPS.glaz.ch=99;
