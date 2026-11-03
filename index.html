@@ -791,6 +791,10 @@ body[data-scr="setup"] header.top{visibility:hidden}
 .fbsel,.fbtxt{width:100%;background:#0f151b;color:#e6edf2;border:1px solid #2c3a47;padding:9px 10px;font:inherit;font-size:15px;box-sizing:border-box}
 .fbtxt{min-height:150px;resize:vertical;line-height:1.55}.fbsel:focus,.fbtxt:focus{outline:none;border-color:var(--accent)}
 .fbcnt{font-size:12px;color:#7f8c97;text-align:right;margin-top:4px}
+.fbimgs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.fbadd,.fbth{width:64px;height:64px;flex:none;box-sizing:border-box}
+.fbadd{display:grid;place-items:center;padding:0;background:#0f151b;border:1.5px dashed #3d4f60;color:#9fb0bd;cursor:pointer}.fbadd:hover{border-color:var(--accent);color:var(--accent)}.fbadd svg{width:26px;height:26px}
+.fbth{position:relative;border:1px solid #2c3a47;background:#0f151b}.fbth img{width:100%;height:100%;object-fit:cover;display:block}.fbth button{position:absolute;top:-7px;right:-7px;width:22px;height:22px;padding:0;border-radius:50%;background:#0e141a;border:1px solid #3d4f60;color:#e6edf2;font-size:12px;line-height:1;cursor:pointer}
+.fbimgs .fbhint{align-self:center;font-size:12px;color:#7f8c97}
 .fbmsg{margin:0;font-size:13.5px;line-height:1.5}.fbmsg.ok{color:#7fdc8f}.fbmsg.err{color:#ff8a7a}
 .fbsend{padding:11px;font-size:16px;font-weight:800}
 .spheart{width:54px;height:54px;color:#ff5a6e;flex:none}
@@ -10440,18 +10444,36 @@ function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
 function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v147</b><span>衝鋒兵新立繪</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>衝鋒兵（男）換上新立繪與頭貼</span><span>銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角</span><span>隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎</span><span>踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫</span><span>爆破炸藥改為貼在牆面上，不再浮在牆前</span><span>職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2</span><span>衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次</span><span>修正培養幹員以借用技能結束對局時，點數與存活場次未入帳</span><span>拆彈器遭防守方破壞後，立即結束對局，防守方勝利</span><span>煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷</span><span>監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人</span><span>新增重盾兵與機動盾兵，接入男女角色圖與護盾特效</span><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑改為上下捲動，新增攻擊／防守篩選</span><span>培養幹員每個距離區段最多 4 顆骰子</span></div></section></div>`);}
+// 回報附圖：縮到長邊 1600px 的 JPEG，避免超過寄信附件上限
+const FB_MAXI=3;
+function fbShrink(f){return new Promise((ok,no)=>{const u=URL.createObjectURL(f),im=new Image();
+  im.onload=()=>{URL.revokeObjectURL(u);const k=Math.min(1,1600/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(im.naturalWidth*k));c.height=Math.max(1,Math.round(im.naturalHeight*k));const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);
+    c.toBlob(b=>b?ok(b):no(new Error('blob')),'image/jpeg',.82);};
+  im.onerror=()=>{URL.revokeObjectURL(u);no(new Error('img'));};im.src=u;});}
 function openFeedback(){const el=tsDlg('feedback','回報',`<div class="psbox"><div class="pshead"><div><b>回報</b><span>遇到問題或有想法，都歡迎告訴我們。</span></div><button class="tsX" aria-label="關閉">✕</button></div>
   <section><h4>類型</h4><select class="fbsel" id="fbType"><option value="bug">回報 Bug</option><option value="idea">遊戲建議</option></select></section>
-  <section><h4>內容</h4><textarea class="fbtxt" id="fbText" maxlength="2000" placeholder="請描述發生了什麼、在哪個畫面，或你的建議…"></textarea><div class="fbcnt" id="fbCnt">0 / 2000</div></section>
+  <section><h4>內容</h4><textarea class="fbtxt" id="fbText" maxlength="2000" placeholder="請描述發生了什麼、在哪個畫面，或你的建議…"></textarea><div class="fbcnt" id="fbCnt">0 / 2000</div><div class="fbimgs" id="fbImgs"></div><input type="file" id="fbFile" accept="image/*" multiple hidden></section>
   <p class="fbmsg" id="fbMsg"></p><button class="primary fbsend" id="fbSend">發送</button></div>`);
   const tx=el.querySelector('#fbText'),cnt=el.querySelector('#fbCnt'),msg=el.querySelector('#fbMsg'),bt=el.querySelector('#fbSend');
   tx.oninput=()=>{cnt.textContent=tx.value.length+' / 2000';};
+  const fi=el.querySelector('#fbFile'),box=el.querySelector('#fbImgs');let imgs=[];
+  const drawImgs=()=>{box.innerHTML=imgs.map((m,i)=>`<div class="fbth"><img src="${m.url}" alt="附圖 ${i+1}"><button data-i="${i}" aria-label="移除圖片">✕</button></div>`).join('')+(imgs.length<FB_MAXI?`<button class="fbadd" id="fbAdd" aria-label="上傳圖片" title="上傳圖片"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>`:'')+(imgs.length?'':'<span class="fbhint">可附上截圖（最多 '+FB_MAXI+' 張）</span>');
+    box.querySelectorAll('.fbth button').forEach(b=>b.onclick=()=>{const m=imgs.splice(+b.dataset.i,1)[0];if(m)URL.revokeObjectURL(m.url);drawImgs();});
+    const ad=box.querySelector('#fbAdd');if(ad)ad.onclick=()=>fi.click();};
+  fi.onchange=async()=>{const fs=[...fi.files].filter(f=>/^image\//.test(f.type)||/\.(heic|heif)$/i.test(f.name));fi.value='';
+    for(const f of fs){if(imgs.length>=FB_MAXI){msg.className='fbmsg err';msg.textContent='最多只能附 '+FB_MAXI+' 張圖片。';break;}
+      try{const b=await fbShrink(f);imgs.push({blob:b,url:URL.createObjectURL(b),name:'screenshot'+(imgs.length+1)+'.jpg'});}catch(e){msg.className='fbmsg err';msg.textContent='這張圖片讀不出來，請換一張（建議 JPG 或 PNG）。';}}
+    drawImgs();};
+  drawImgs();
   bt.onclick=async()=>{const t=tx.value.trim();if(t.length<3){msg.className='fbmsg err';msg.textContent='請先寫一下內容再發送。';tx.focus();return;}
     const ty=el.querySelector('#fbType').value==='bug'?'回報 Bug':'遊戲建議';bt.disabled=true;bt.textContent='發送中…';msg.className='fbmsg';msg.textContent='';
-    try{const r=await fetch('https://formsubmit.co/ajax/'+FB_TO,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
-        body:JSON.stringify({_subject:`[虹彩六號桌遊] ${ty}`,_template:'table',_captcha:'false','類型':ty,'內容':t,'玩家':meName(),'版本':(document.title||'')+' · '+location.href,'裝置':navigator.userAgent,'時間':new Date().toLocaleString('zh-TW')})});
+    try{const data={_subject:`[虹彩六號桌遊] ${ty}`,_template:'table',_captcha:'false','類型':ty,'內容':t,'玩家':meName(),'版本':(document.title||'')+' · '+location.href,'裝置':navigator.userAgent,'時間':new Date().toLocaleString('zh-TW')};
+      let r;if(imgs.length){const fd=new FormData();data['附圖']=imgs.length+' 張';for(const k in data)fd.append(k,data[k]);imgs.forEach((m,i)=>fd.append(i?'attachment'+(i+1):'attachment',m.blob,m.name));
+        r=await fetch('https://formsubmit.co/ajax/'+FB_TO,{method:'POST',headers:{Accept:'application/json'},body:fd});}
+      else r=await fetch('https://formsubmit.co/ajax/'+FB_TO,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(data)});
       const j=await r.json().catch(()=>({}));if(!r.ok||j.success==='false'||j.success===false)throw {m:/activat/i.test(j.message||'')?'回報信箱還沒啟用，請稍後再試。':(j.message?'送出失敗：'+j.message:'')};
-      msg.className='fbmsg ok';msg.textContent='已送出，謝謝你的回報！';tx.value='';cnt.textContent='0 / 2000';bt.textContent='已送出';setTimeout(()=>{bt.disabled=false;bt.textContent='發送';},2500);}
+      msg.className='fbmsg ok';msg.textContent='已送出，謝謝你的回報！';tx.value='';cnt.textContent='0 / 2000';imgs.forEach(m=>URL.revokeObjectURL(m.url));imgs=[];drawImgs();bt.textContent='已送出';setTimeout(()=>{bt.disabled=false;bt.textContent='發送';},2500);}
     catch(e){msg.className='fbmsg err';msg.textContent=(e&&e.m)||'送出失敗，請檢查網路後再試一次。';bt.disabled=false;bt.textContent='發送';}};}
 {const s=$('#tside'),a=$('#t-love'),b=$('#t-fb');let n=$('#t-news');if(s&&!n){n=document.createElement('button');n.id='t-news';n.className='tsb news';n.textContent='公告';n.setAttribute('aria-label','版本公告');s.insertBefore(n,a);}if(n)n.onclick=openNews;if(a)a.onclick=openSponsor;if(b)b.onclick=openFeedback;}
 function renderPlayer(){const el=$('#tplayer');if(!el)return;const acct=ME.mode==='account';
