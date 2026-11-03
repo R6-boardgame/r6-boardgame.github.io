@@ -11355,7 +11355,7 @@ function renderOpSelect(anim){
 // ---------- custom operators (v91): two self-trained recruits per player; kills give points, one death starts them over ----------
 // they play as the recruit cards (rifle card = 幹員一, shotgun card = 幹員二) and only in games against the computer
 const COP_BASE=10,COP_CAP=34,COP_RT=500,SKPRICE=8000,COPN=['幹員一','幹員二'],COPART=['img/cop/f.webp','img/cop/m.webp'];
-const COPARM=[null,{hp:4,mv:6,run:5},{hp:5,mv:5,run:3},{hp:6,mv:3,run:2}],CDIEC={Y:1,O:2,R:3},CDIEA={Y:1,O:1.5,R:2},CDIEN={Y:'O',O:'R'};
+const COPARM=[null,{hp:4,mv:6,run:5},{hp:5,mv:5,run:4},{hp:6,mv:4,run:2}],CDIEC={Y:1,O:2,R:3},CDIEA={Y:1,O:1.5,R:2},CDIEN={Y:'O',O:'R'};
 const COPG=['frag','charges','flash','smk','impact','clay','nitro','bpcam','shield'];
 const copNew=o=>({nm:'新進人員',e:0,k:0,sv:0,d:[['Y'],['Y'],['Y']],arm:1,run:0,vis:0,w:null,g:(o&&o.g)||[null,null],sk:classOf(o&&o.sk)?null:(o&&o.sk)||null,classSlotV1:1,gen:((o&&o.gen)||0)+1});
 function copAll(){if(!Array.isArray(ECO.cop)||ECO.cop.length!==2)ECO.cop=[copNew(),copNew()];ECO.cop=ECO.cop.map(c=>{const n=Object.assign(copNew(),c||{});if(!c?.classSlotV1){if(n.w&&!n.sk)n.sk=classKey(n.w);n.classSlotV1=1;}if(n.nm==='炮灰')n.nm='新進人員';n.d=n.d.map(L=>L.length>4?L.slice().sort((a,b)=>CDIEC[b]-CDIEC[a]).slice(0,4):L.slice());return n;});if(!Array.isArray(ECO.sk))ECO.sk=[];return ECO.cop;}
