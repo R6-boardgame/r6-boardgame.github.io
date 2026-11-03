@@ -2,7 +2,7 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
 for(const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi))if(!/src=|text\/plain|application\/json/.test(m[1]))new vm.Script(m[2]);
 const section=(a,b)=>html.slice(html.indexOf(a),html.indexOf(b,html.indexOf(a)));
-const ctx=vm.createContext({assert,console,ECO:{}});
+const ctx=vm.createContext({assert,console,ECO:{},I18X:{},I18T:[]});
 vm.runInContext(section('const COP_BASE=','const copSlot=')+section('function heavyShieldBlocks(','async function shootUnit(')+section('const canDo=','function useAct(')+`
 const heavy={...copNew(),arm:3,d:[['Y','Y','Y'],['O','Y','Y','Y'],['Y']]};
 assert(WPN.hs.trig(heavy));assert(!WPN.hs.trig({...heavy,arm:2}));

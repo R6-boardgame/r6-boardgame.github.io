@@ -11,7 +11,7 @@ closeMovementPhase();G.phaseIdx=2;trackMovement();assert.equal(lionScan(a).lengt
 G.phaseIdx=3;trackMovement();G.active=d;d.x=4;trackMovement();closeMovementPhase();G.round=2;G.phaseIdx=0;trackMovement();assert.equal(lionScan(a).length,1);
 G.active=d;d._actMoved=false;trackMovement();assert(!d._actMoved);d.x=5;trackMovement();assert(d._actMoved);
 `,ctx);
-vm.runInContext(cut('async function riposte(u){','// ---- v88:'),ctx);
+vm.runInContext(cut('async function riposte(u,','// ---- v88:'),ctx);
 (async()=>{await vm.runInContext(`(async()=>{
 let shots=0;globalThis.shootUnit=async()=>shots++;globalThis.losAs=(e,fn)=>fn();globalThis.inSight=()=>true;globalThis.los=()=>true;globalThis.rayBlk=()=>false;
 Object.assign(a,{overwatch:true,owd:[1,1],owHit:new Set(),owShot:0});d._actMoved=false;G.active=d;
