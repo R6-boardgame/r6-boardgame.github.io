@@ -5627,7 +5627,7 @@ function shDef(x,y){let b=null,bd=1e9;for(const z of G.map.spawns||[])for(const 
 const shFaces=(g,sh)=>{const D=g.dir||(g.dir=shDef(g.x,g.y));return (sh.x-g.x)*D[0]+(sh.y-g.y)*D[1]>0;};
 // cover: every wall face the shot passes −2, furniture or a wall edge beside the target −1, a deployable shield facing the shooter −2; sources add up
 function protection(sh,t){let n=PROF[t.op]&&PROF[t.op].shield?2:0,ob=0,sd=0;const L=lineCells(sh.x,sh.y,t.x,t.y),on=new Set(L.map(([x,y])=>x+','+y));
-  for(const [x,y] of L){const c=cell(x,y);if(c.shotOut)continue;if(c.t==='soft'&&c.hole){n+=1;continue;}if(c.breach||c.t==='soft'||c.t==='bar'){n+=2;continue;}
+  for(const [x,y] of L){const c=cell(x,y);if(c.shotOut)continue;if(c.t==='soft'&&c.hole){n+=1;continue;}if(c.t==='bar'&&c.kind==='window'&&!c.breach){n+=1;continue;}/* v145: a window gives 1 */if(c.breach||c.t==='soft'||c.t==='bar'){n+=2;continue;}
     const g=shieldAt(x,y);if(g&&cheb(x,y,t.x,t.y)<=1){if(!sd&&shFaces(g,sh)){sd=1;n+=2;}continue;}
     if(c.obst&&!ob&&cheb(x,y,t.x,t.y)<=1){ob=1;n++;}}
   if(!ob){const vx=sh.x-t.x,vy=sh.y-t.y,l=Math.hypot(vx,vy)||1;
@@ -5896,9 +5896,9 @@ async function shootUnit(sh,t,ow,moving=false){
   ST(sh).shots++;if(hits)ST(sh).hits++;
   if(hits&&t.op==='blackbeard'&&t.ch>0){const c=Math.min(2,hits);hits-=c;t.ch--;log(`${nm(t)} 的步槍護盾擋下 ${c} 傷（剩 ${t.ch}）`,t.side==='A'?'ka':'kd');}
   DMGBY=sh;if(t.proj)prismaBreak(t.proj,`子彈直接穿過了 ${nm(sh)} 瞄準的目標`);else if(hits)await damage(t,hits);DMGBY=null;if(G.bot&&!t.proj)botNote(sh,t,tw,hits);
-  {const dr=lineCells(sh.x,sh.y,t.x,t.y).filter(([x,y])=>{const c=cell(x,y);return c&&c.t==='bar'&&c.kind==='door';});
+  {const dr=lineCells(sh.x,sh.y,t.x,t.y).filter(([x,y])=>{const c=cell(x,y);return c&&c.t==='bar'&&(c.kind==='door'||c.kind==='window');}),dw=dr.some(([x,y])=>cell(x,y).kind==='window'),dd=dr.some(([x,y])=>cell(x,y).kind!=='window');
    if(dr.length){const bm=SFX.boom;SFX.boom=()=>{};try{for(const [x,y] of dr)if(cell(x,y).t==='bar')destroyCell(x,y);}finally{SFX.boom=bm;}SFX.hit();
-     log(`子彈打穿了門路障，門已經被打爛（之後從這裡穿過不再有掩護）`,'ks');render();}}
+     if(dd)log(`子彈打穿了門路障，門已經被打爛（之後從這裡穿過不再有掩護）`,'ks');if(dw)log(`子彈打碎了窗戶（之後從這裡穿過不再有掩護）`,'ks');render();}}
   {const sw=lineCells(sh.x,sh.y,t.x,t.y).filter(([x,y])=>{const c=cell(x,y);return c&&c.t==='soft'&&!c.mirror;});
    if(sw.length){const bm=SFX.boom;SFX.boom=()=>{};let holed=0,out=0;
      try{for(const [x,y] of sw){const c=cell(x,y);if(c.hole||sh.w==='sg'){destroyCell(x,y);c.hole=false;c.shotOut=true;out++;}else{c.hole=true;G._wv=(G._wv||0)+1;holed++;}}}finally{SFX.boom=bm;}
@@ -10370,7 +10370,7 @@ function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
-function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v144</b><span>捕獸夾特寫與炸藥貼牆</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫</span><span>爆破炸藥改為貼在牆面上，不再浮在牆前</span><span>職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2</span><span>衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次</span><span>修正培養幹員以借用技能結束對局時，點數與存活場次未入帳</span><span>拆彈器遭防守方破壞後，立即結束對局，防守方勝利</span><span>煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷</span><span>監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人</span><span>新增重盾兵與機動盾兵，接入男女角色圖與護盾特效</span><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑改為上下捲動，新增攻擊／防守篩選</span><span>培養幹員每個距離區段最多 4 顆骰子</span></div></section></div>`);}
+function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v145</b><span>隔窗射擊</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎</span><span>踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫</span><span>爆破炸藥改為貼在牆面上，不再浮在牆前</span><span>職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2</span><span>衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次</span><span>修正培養幹員以借用技能結束對局時，點數與存活場次未入帳</span><span>拆彈器遭防守方破壞後，立即結束對局，防守方勝利</span><span>煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷</span><span>監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人</span><span>新增重盾兵與機動盾兵，接入男女角色圖與護盾特效</span><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑改為上下捲動，新增攻擊／防守篩選</span><span>培養幹員每個距離區段最多 4 顆骰子</span></div></section></div>`);}
 function openFeedback(){const el=tsDlg('feedback','回報',`<div class="psbox"><div class="pshead"><div><b>回報</b><span>遇到問題或有想法，都歡迎告訴我們。</span></div><button class="tsX" aria-label="關閉">✕</button></div>
   <section><h4>類型</h4><select class="fbsel" id="fbType"><option value="bug">回報 Bug</option><option value="idea">遊戲建議</option></select></section>
   <section><h4>內容</h4><textarea class="fbtxt" id="fbText" maxlength="2000" placeholder="請描述發生了什麼、在哪個畫面，或你的建議…"></textarea><div class="fbcnt" id="fbCnt">0 / 2000</div></section>
@@ -11322,6 +11322,9 @@ const CSK={mg:{n:'掃射',ap:'1 行動',d:'不用指定目標；選擇一個方�
   sg:{n:'榴彈發射',ap:'1 行動',d:'對 3×3 範圍造成 2 傷，敵我都會受傷。範圍內除了鐵牆和轉角柱，牆、路障、掩護和道具全部炸毀。'}};
 const CSKM={mg:'mgscan',sn:'heat',sh:'bash',sg:'gl'};
 Object.assign(I18X,{
+ '隔窗射擊':['Shooting through windows',''],
+ '子彈打碎了窗戶（之後從這裡穿過不再有掩護）':['The bullet shattered the window (no more cover through here)',''],
+ '隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎':['Shooting through a window only gives 1 cover, and the shot shatters the window',''],
  '捕獸夾特寫與炸藥貼牆':['Welcome Mat close-up and flush breach charges',''],
  '踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫':['Stepping on a Welcome Mat cuts to a 45-degree side close-up of the trap snapping shut',''],
  '爆破炸藥改為貼在牆面上，不再浮在牆前':['Breach charges now sit flush on the wall instead of floating in front of it',''],
