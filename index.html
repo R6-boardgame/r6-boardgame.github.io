@@ -787,7 +787,7 @@ body[data-scr="setup"] header.top{visibility:hidden}
 .tside{position:absolute;top:max(16px,env(safe-area-inset-top));right:max(18px,env(safe-area-inset-right));z-index:3;display:flex;gap:8px}
 .tsb{display:grid;place-items:center;width:40px;height:40px;padding:0;background:rgba(8,11,14,.72);border:1px solid rgba(255,255,255,.22);color:#e6edf2;cursor:pointer;clip-path:var(--cham)}
 .tsb svg{width:21px;height:21px}.tsb.heart{color:#ff5a6e}.tsb:hover{border-color:var(--accent);background:rgba(30,24,10,.85)}
-.tsb.news{width:auto;min-width:62px;padding:0 10px;color:#ffd36b;font:800 11px var(--mono);letter-spacing:.06em}
+.tsb.news{color:#ffd36b}
 .fbsel,.fbtxt{width:100%;background:#0f151b;color:#e6edf2;border:1px solid #2c3a47;padding:9px 10px;font:inherit;font-size:15px;box-sizing:border-box}
 .fbtxt{min-height:150px;resize:vertical;line-height:1.55}.fbsel:focus,.fbtxt:focus{outline:none;border-color:var(--accent)}
 .fbcnt{font-size:12px;color:#7f8c97;text-align:right;margin-top:4px}
@@ -10475,7 +10475,7 @@ function openFeedback(){const el=tsDlg('feedback','回報',`<div class="psbox"><
       const j=await r.json().catch(()=>({}));if(!r.ok||j.success==='false'||j.success===false)throw {m:/activat/i.test(j.message||'')?'回報信箱還沒啟用，請稍後再試。':(j.message?'送出失敗：'+j.message:'')};
       msg.className='fbmsg ok';msg.textContent='已送出，謝謝你的回報！';tx.value='';cnt.textContent='0 / 2000';imgs.forEach(m=>URL.revokeObjectURL(m.url));imgs=[];drawImgs();bt.textContent='已送出';setTimeout(()=>{bt.disabled=false;bt.textContent='發送';},2500);}
     catch(e){msg.className='fbmsg err';msg.textContent=(e&&e.m)||'送出失敗，請檢查網路後再試一次。';bt.disabled=false;bt.textContent='發送';}};}
-{const s=$('#tside'),a=$('#t-love'),b=$('#t-fb');let n=$('#t-news');if(s&&!n){n=document.createElement('button');n.id='t-news';n.className='tsb news';n.textContent='公告';n.setAttribute('aria-label','版本公告');s.insertBefore(n,a);}if(n)n.onclick=openNews;if(a)a.onclick=openSponsor;if(b)b.onclick=openFeedback;}
+{const s=$('#tside'),a=$('#t-love'),b=$('#t-fb');let n=$('#t-news');if(s&&!n){n=document.createElement('button');n.id='t-news';n.className='tsb news';n.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 10v4a1 1 0 0 0 1 1h1.6l1.3 4.3a1 1 0 0 0 1 .7h1.3a.7.7 0 0 0 .7-.9L8.2 15H9l9.5 4.6V4.4L9 9H3.5a1 1 0 0 0-1 1Z" fill="currentColor"/><path d="M21 10v4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';n.setAttribute('aria-label','版本公告');n.title='版本公告';s.insertBefore(n,a);}if(n)n.onclick=openNews;if(a)a.onclick=openSponsor;if(b)b.onclick=openFeedback;}
 function renderPlayer(){const el=$('#tplayer');if(!el)return;const acct=ME.mode==='account';
   el.innerHTML=`<button class="pcard" id="pcard" aria-label="玩家資料與設定"><img class="pav" src="${meAvatar()}" alt=""><span class="pinfo"><b>${esc(meName())}</b><span class="prank">${ecoTag()}</span></span><i class="pgear" aria-hidden="true">⚙</i></button>`;
   el.insertAdjacentHTML('beforeend',`<button class="pach" id="pach" aria-label="成就與好友"><i>🏆</i><b>${achCount()}/${ACH.length}</b></button>`);$('#pach').onclick=()=>openAch();{const n=tkClaimable();el.insertAdjacentHTML('beforeend',`<button class="ptask" id="ptask" aria-label="任務"><i>📋</i><b>任務</b>${n?`<em>${n}</em>`:''}</button>`);$('#ptask').onclick=()=>{if(typeof G!=='undefined'&&G&&!G.over&&SCREEN!=='title'&&SCREEN!=='task')return;SCREEN='task';NETMSG='';renderTitle();};}
