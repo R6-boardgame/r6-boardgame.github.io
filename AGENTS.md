@@ -178,3 +178,7 @@
 - 棋盤底下是黑色遊戲墊，放在亮漆木吧台上；背景是酒吧實景照片（跟著鏡頭傾斜的照片球 `R3.bar.sky`）。程式：`barInit`（init3D 結尾，載入素材、換燈光與環境貼圖）、`barBuild(m)`（buildStatic 結尾與 size3D 呼叫，依地圖尺寸與直／橫式重建）。
 - 素材都在 `img/bar/`，全部來自 Poly Haven（CC0，可商用、免標註）：`cowboy_town_saloon` HDRI（已調暗紅色調、轉成 `bar_bg.jpg`／`bar_env.jpg`）、`lacquered_cherry_wood` 貼圖（`wood_*.jpg`）、`Lantern_01`、`wine_bottles_01` glTF 模型。
 - `.grade` 改成暖色暗角。
+
+## v155：人質局不顯示 A／B 點
+
+- 人質局地圖上不再畫 A、B 炸彈點標記（地板色塊、外框、3D 徽章、格子名稱都走 `bombHid`，人質局一律回傳 true）。人質本身照舊由 `hostSeen` 決定：防守方一直看得到，進攻方要發現（`hostFound`）或護送後才看得到。
