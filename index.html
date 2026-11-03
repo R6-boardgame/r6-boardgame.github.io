@@ -2193,7 +2193,7 @@ body.hasClk #tracker .seg{display:none}
         <div class="rqDiaRow"><span class="rqDia ap"><i class="f"></i><i class="f"></i><em>移動 5</em></span><p><b>下方幹員卡的行動點</b>：每名幹員啟動一次有 2 個行動點，射擊、奔跑、破壞、用道具各花 1 點，用掉就暗一格。旁邊的「移動」是這次還能走的格數。</p></div>
         <p class="rqP">右側的行動按鈕：</p><ul class="rqAct"><li><img data-ua="shoot" alt=""><b>射擊</b><span>打視線內的敵人，花 1 行動。</span></li><li><img data-ua="run" alt=""><b>奔跑</b><span>多走幾格，花 1 行動。</span></li><li><img data-ua="destroy" alt=""><b>破壞</b><span>打掉門窗路障、軟牆或敵方道具；鐵絲網要站在旁邊。行動點夠就能連續破壞。</span></li><li><img data-eq="drone" alt=""><b>無人機</b><span>開進去偵查，標記看到的防守方。</span></li><li><img data-eq="charge" alt=""><b>爆破炸藥</b><span>炸開相鄰的軟牆或路障。</span></li><li><img data-eq="frag" alt=""><b>破片手榴彈</b><span>丟出去造成傷害。</span></li><li><img data-eq="flash" alt=""><b>閃光彈</b><span>震暈目標和旁邊的幹員。</span></li><li><img data-eq="smk" alt=""><b>煙霧彈</b><span>擋住視線到回合結束。</span></li><li><img data-ua="plant" alt=""><b>安裝／解除拆彈器</b><span>在 A、B 點安裝；防守方站旁邊開始拆。</span></li><li><img data-ua="overwatch" alt=""><b>監視</b><span>選方向後結束，敵人進入前方半圓會被射擊。移動點用完時會自動要你選監視方向。</span></li></ul><p class="rqP"><b>專屬道具</b>：下方幹員卡會顯示幹員和他的專屬道具，以 Ash 為例：</p><div id="rqOpCard"></div></section>
       <section id="m-fire"><h3>射擊與視線</h3><ul>
-        <li><b>視線</b>：每名幹員只看得到面前 120° 的扇形，一般 10 格、狙擊手（Glaz、Kali）14 格，背後看不到。看得到的敵人才能點來射擊。轉向不花行動。隊友、無人機、攝影機看到的區域會亮起來，但要自己轉過去才打得到。</li>
+        <li><b>視線</b>：每名幹員只看得到面前 120° 的扇形，一般 10 格、狙擊兵（Glaz、Kali）14 格，背後看不到。看得到的敵人才能點來射擊。轉向不花行動。隊友、無人機、攝影機看到的區域會亮起來，但要自己轉過去才打得到。</li>
         <li><b>距離</b>：直線距離，近 1～3 格、中 4～6 格、遠 7 格以上；選取幹員時扇形的紅色越深，代表那一段的骰子越強。幹員卡上寫著三種距離各擲哪些骰：<i class="die" style="background:#e8574e"></i>紅骰平均 2、<i class="die" style="background:#ef8a3a"></i>橙骰平均 1.5、<i class="die" style="background:#e8c840"></i>黃骰平均 1，點數加總就是命中數。</li>
         <li><b>掩護</b>：每隔一面牆 −2；目標緊貼障礙物（桌子、書櫃、牆邊）−1；可部署盾牌從正面打來 −2，側邊或背後沒有掩護。各項可以相加。</li>
         <li><b>隔牆射擊</b>：目標被標記時，軟牆、路障和煙霧不擋視線，可以隔著打；承重牆和加固牆仍然會擋。隔牆打中不會讓目標現身，但雙方都會被標記。第一槍會在軟牆上打出破洞，之後穿過這面牆只扣 1；再打一槍牆就崩掉，可以通過，也不再提供掩護。</li></ul></section>
@@ -5583,7 +5583,7 @@ function clayRays(g){const dx=g.dx||0,dy=g.dy||0;if(!dx&&!dy)return [];const px=
   return out;}
 const clayZone=(x,y,side)=>G.gadgets.find(g=>g.alive&&g.type==='clay'&&g.side!==side&&clayRays(g).some(r=>r.ok&&r.x===x&&r.y===y));
 const cdirG=()=>G&&G.cdir&&G.gadgets.find(g=>g.alive&&g.cid===G.cdir);
-const canDo=(u,k)=>u.ap>0&&!(k==='shoot'&&u.noShoot)&&(k==='destroy'||!u.used.has(k)||(k==='shoot'&&u.w==='smg'&&!u._s2));
+const canDo=(u,k)=>u.ap>0&&!(k==='shoot'&&u.noShoot)&&!(u.heavyGuard&&['shoot','destroy','special','tactical','ow'].includes(k))&&(k==='destroy'||!u.used.has(k)||(k==='shoot'&&u.w==='smg'&&!u._s2));
 function useAct(u,k){if(k==='tactical'||k==='special')G._ghCap={u,msgs:[],name:''};u.ap--;u.used.add(k);if(u.hidden&&k!=='run')reveal(u,'行動時');}
 const decoyOf=u=>(G.decoys||[]).find(k=>k.alive&&k.owner===u.id);
 // Alibi's Prisma: holograms that look exactly like her (the owner sees them faded); a shot, a blast, a gadget-clearing skill or walking into one makes it flicker out
@@ -5862,7 +5862,10 @@ function askWall(){return new Promise(res=>{document.querySelectorAll('.rerollAs
 function askReroll(hits){return new Promise(res=>{const el=document.createElement('div');el.className='rerollAsk';
   el.innerHTML=`<b>${hits?`這一槍 ${hits} 傷`:'沒打中'}</b><span>要用掉唯一一次重擲嗎？會保留點數最高的一顆，其他重擲</span><div><button class="primary" data-r="1">重擲</button><button data-r="0">不用</button></div>`;
   document.body.appendChild(el);let done=false;const fin=v=>{if(done)return;done=true;el.remove();res(v);};el.querySelectorAll('button').forEach(b=>b.onclick=()=>fin(b.dataset.r==='1'));setTimeout(()=>fin(false),9000);});}
+function heavyShieldBlocks(t,sh){if(!t||t.w!=='hs'||!t.heavyGuard||!t.alive||!sh)return false;const f=t.fd||[0,t.side==='A'?-1:1],dx=sh.x-t.x,dy=sh.y-t.y,len=Math.hypot(dx,dy)*Math.hypot(...f);return len>0&&(dx*f[0]+dy*f[1])/len>=.5-1e-9;}
 async function shootUnit(sh,t,ow){
+  if(sh.heavyGuard)return;
+  if(heavyShieldBlocks(t,sh)){sh.fd=[Math.sign(t.x-sh.x),Math.sign(t.y-sh.y)];ST(sh).shots++;log(`${nm(t)}：此路不通，擋下正面武器攻擊`,t.side==='A'?'ka':'kd');SFX.shoot();render();await sleep(350);return;}
   const {d,b,p,pool}=shotPool(sh,t),tw=thruWall(sh,t);try{fxEv({k:'shot',x0:sh.x,y0:sh.y,x1:t.x,y1:t.y,side:sh.side});}catch(e){}if(tw&&!t.proj)t.hitFrom=[sh.x,sh.y];if(tw){if(!NOLOC.has(sh.op)){if(!sh.spotted)log(`${nm(sh)} 隔牆開火，位置被標記`,'ks');sh.spotted=1;sh.wmark=1;}}else if(sh.hidden)reveal(sh,ow?'還擊時':'開火時');
   let idx=[...pool].map(()=>Math.floor(Math.random()*6)),rolls=[...pool].map((ch,i)=>DIE[ch.toUpperCase()][idx[i]]),sum=rolls.reduce((a,c)=>a+c,0),hits=Math.max(0,sum-p);
   if(G.tut2){const w=tuRigW(sh,t);if(w!=null){idx=tuRig(pool,p,w);rolls=[...pool].map((ch,i)=>DIE[ch.toUpperCase()][idx[i]]);sum=rolls.reduce((a,c)=>a+c,0);hits=Math.max(w,sum-p);}}
@@ -5938,7 +5941,7 @@ function shotFX(hits,cine){return new Promise(res=>{
 let DMGBY=null;const ST=u=>u.st||(u.st={k:0,dmg:0,taken:0,shots:0,hits:0,gad:0});
 const SRCOP={'毒氣':'smoke','電擊':'bandit','闊刀地雷':null,'集束炸彈':null};
 async function damage(u,n,src){
-  if(!u.alive)return;n=dmgMod(u,n);if(u.w==='sh'&&n>0){const m=Math.min(2,n);n-=m;log(`${nm(u)} 的盾牌擋下 ${m} 傷`,u.side==='A'?'ka':'kd');}if(n<=0)return;{let by=DMGBY;if(!by&&src&&SRCOP[src])by=G.units.find(x=>x.op===SRCOP[src]&&x.side!==u.side);if(!by&&!src)by=null;
+  if(!u.alive)return;n=dmgMod(u,n);if(['sh','hs'].includes(u.w)&&n>0){const m=Math.min(2,n);n-=m;log(`${nm(u)} 的盾牌擋下 ${m} 傷`,u.side==='A'?'ka':'kd');}if(n<=0)return;{let by=DMGBY;if(!by&&src&&SRCOP[src])by=G.units.find(x=>x.op===SRCOP[src]&&x.side!==u.side);if(!by&&!src)by=null;
     const real=Math.min(n,u.hp);ST(u).taken+=real;if(by&&by.side===u.side&&by!==u&&by.side===G.player&&u.hp-n<=0){G._ff=1;G._ffn=(G._ffn||0)+1;}if(by&&by.side!==u.side&&by.side===G.player&&u.hp-n<=0)(G._kl=G._kl||[]).push({s:src||'',d:cheb(by.x,by.y,u.x,u.y),op:by.op,t:performance.now()});if(by&&by.side!==u.side){ST(by).dmg+=real;if(u.hp-n<=0)ST(by).k++;}if(by&&u.hp-n<=0)u.kby=by.op;}if(u.hidden)reveal(u,'受傷後');u.exp=[u.x,u.y];u.hp-=n; if(src)log(`${nm(u)} 受到${src} ${n} 點傷害`,'ks');
   if(u.hp<=0&&finkaSave(u))return render();if(u.hp<=0){SFX.kill();onKill(u);u.alive=false;u.hp=0;u.overwatch=false;if(G.hostage&&G.hostage.by===u.id){G.hostage.by=null;G.hostage.x=u.x;G.hostage.y=u.y;log('人質留在原地','ks');}log(`${nm(u)} 陣亡`,u.side==='A'?'kd':'ka');}
   render(); checkWin();
@@ -6382,17 +6385,18 @@ function boomFx3D(x,y,room){if(!R3||!R3.fxG||document.hidden)return;const T=THRE
     emb.forEach(m=>{const v=m.userData.v;v.y-=9.8*dt;m.position.addScaledVector(v,dt);if(m.position.y<.03){m.position.y=.03;v.multiplyScalar(.3);}m.material.opacity=Math.max(0,1-age/1.6);});
     if(age>2.8){R3.fxG.remove(g);[fb,core,...sm,...emb].forEach(m=>m.material.dispose());return false;}return true;});}
 function overwatch(u,silent,dir){
+  if(u.heavyGuard){u.overwatch=false;u.ap=0;u.mp=0;return;}
   let v=dir;if(!v){const t=G.units.filter(e=>e.alive&&e.side!==u.side&&e.x>=0&&(seenBy(u.side,e)||e.spotted>0)).sort((a,b)=>cheb(u.x,u.y,a.x,a.y)-cheb(u.x,u.y,b.x,b.y))[0];
   v=t&&cheb(u.x,u.y,t.x,t.y)<=10?[t.x-u.x,t.y-u.y]:u.fd;}u.owd=dir8(v);u.overwatch=true;u.owHit=new Set();u.owShot=0;u.ap=0;u.mp=0;u.fd=u.owd.slice();if(R3&&R3.figs&&R3.figs[u.id])R3.figs[u.id].face=Math.atan2(u.owd[0],u.owd[1]);
   if(!silent){note(u,'掩護射擊');if(pub(u))log(`${nm(u)} 進入掩護射擊（標記放在${dirName(u.owd)}側，警戒前方 120° 扇形）`,u.side==='A'?'ka':'kd');}}
 // v111: overwatch faces any of the 8 directions (diagonals included)
 const DIR8=[[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]],dir8=v=>DIR8[((Math.round(Math.atan2(v[1],v[0])/(Math.PI/4))%8)+8)%8].slice();
 const dirName=([dx,dy])=>{const a=Math.atan2(dy,dx)*180/Math.PI;return ['東','東南','南','西南','西','西北','北','東北'][((Math.round(a/45)%8)+8)%8];};
-async function useCsk(u){const w=u.w,s=u.side==='A'?'ka':'kd';if(!CSK[w]||u.csk===G.round)return;u.csk=G.round;
+async function useCsk(u){const w=u.w,s=u.side==='A'?'ka':'kd';if(w==='hs'){u.heavyGuard=!u.heavyGuard;u.overwatch=false;u.mgOw=0;G.mode='move';note(u,u.heavyGuard?'此路不通':'解除重盾防禦');render();await afterAct(u);return;}if(!CSK[w]||u.csk===G.round)return;u.csk=G.round;
   if(w==='rf'){u.aim=1;note(u,'精準射擊');log(`${nm(u)} 穩住準心：下一槍無視掩護`,s);}
   else if(w==='smg'){useAct(u,'cls');u.mp=u.speed;u.noShoot=1;note(u,'衝刺');log(`${nm(u)} 衝刺，移動點補滿（這回合不能再射擊）`,s);}
   render();await afterAct(u);}
-async function machineSweep(u,v){if(u.csk===G.round)return;u.csk=G.round;useAct(u,'cls');note(u,'機槍掃射');const f=Math.abs(v[0])>=Math.abs(v[1])?[Math.sign(v[0])||1,0]:[0,Math.sign(v[1])];u.fd=f.slice();const cells=[];for(let i=1;i<=10;i++){const x=u.x+f[0]*i,y=u.y+f[1]*i,c=cell(x,y);if(!c||blocks(c))break;cells.push([x,y]);}for(let i=1;i<=cells.length;i++){G.scanFx={cells:cells.slice(0,i),until:performance.now()+180,c:0xffc23c};render();await sleep(70);}const K=new Map(cells.map((p,i)=>[p.join(),i])),t=G.units.filter(a=>a.alive&&a.side!==u.side&&K.has([a.x,a.y].join())).sort((a,b)=>K.get([a.x,a.y].join())-K.get([b.x,b.y].join()))[0];SFX.shoot();if(t){if(t.hidden)reveal(t,'被機槍掃射，');await damage(t,2,'機槍掃射');log(`${nm(u)} 朝${dirName(f)}方掃射，第一個目標 ${nm(t)} 受到 2 傷`,u.side==='A'?'ka':'kd');}else log(`${nm(u)} 朝${dirName(f)}方掃射，路徑上沒有目標`,u.side==='A'?'ka':'kd');G.mode='move';render();await afterAct(u);}
+async function machineSweep(u,v){if(u.csk===G.round)return;u.csk=G.round;useAct(u,'cls');note(u,'機槍掃射');const f=Math.abs(v[0])>=Math.abs(v[1])?[Math.sign(v[0])||1,0]:[0,Math.sign(v[1])];u.fd=f.slice();const cells=[];for(let i=1;i<=10;i++){const x=u.x+f[0]*i,y=u.y+f[1]*i,c=cell(x,y);if(!c||blocks(c))break;cells.push([x,y]);}for(let i=1;i<=cells.length;i++){G.scanFx={cells:cells.slice(0,i),until:performance.now()+180,c:0xffc23c};render();await sleep(70);}const K=new Map(cells.map((p,i)=>[p.join(),i])),t=G.units.filter(a=>a.alive&&a.side!==u.side&&K.has([a.x,a.y].join())).sort((a,b)=>K.get([a.x,a.y].join())-K.get([b.x,b.y].join()))[0];SFX.shoot();if(t){if(t.hidden)reveal(t,'被機槍掃射，');if(!heavyShieldBlocks(t,u))await damage(t,2,'機槍掃射');log(`${nm(u)} 朝${dirName(f)}方掃射，第一個目標 ${nm(t)} ${heavyShieldBlocks(t,u)?'以重盾擋下攻擊':'受到 2 傷'}`,u.side==='A'?'ka':'kd');}else log(`${nm(u)} 朝${dirName(f)}方掃射，路徑上沒有目標`,u.side==='A'?'ka':'kd');G.mode='move';render();await afterAct(u);}
 // thermal sight: enemies in the chosen direction's fan show as unnamed pins until the round ends (a snapshot, not a live track)
 async function heatScan(u,v){if(u.csk===G.round)return;u.csk=G.round;useAct(u,'cls');note(u,'熱感瞄準');
   const f=Math.abs(v[0])>=Math.abs(v[1])?[Math.sign(v[0])||1,0]:[0,Math.sign(v[1])],o=u.fd;u.fd=f;if(R3&&R3.figs&&R3.figs[u.id])R3.figs[u.id].face=Math.atan2(f[0],f[1]);
@@ -6401,7 +6405,7 @@ async function heatScan(u,v){if(u.csk===G.round)return;u.csk=G.round;useAct(u,'c
   G.scanFx={cells,until:performance.now()+1400,c:0xff7a2e};
   log(`${nm(u)} 熱感瞄準${dirName(f)}方：${found.length?`發現 ${found.length} 個熱源`:'沒有熱源'}`,u.side==='A'?'ka':'kd');G.mode='move';render();await afterAct(u);}
 // shield bash: dash up to two cells, the hit reaches the third
-async function shieldBash(u,v){if(u.csk===G.round)return;u.csk=G.round;useAct(u,'cls');note(u,'盾牌猛擊');DMGBY=u;const s=u.side==='A'?'ka':'kd';
+async function shieldBash(u,v){if(u.csk===G.round)return;u.csk=G.round;useAct(u,'cls');note(u,'鎮壓暴徒');DMGBY=u;const s=u.side==='A'?'ka':'kd';u.shieldRushUntil=Date.now()+1600;
   const f=Math.abs(v[0])>=Math.abs(v[1])?[Math.sign(v[0])||1,0]:[0,Math.sign(v[1])];u.fd=f.slice();if(R3&&R3.figs&&R3.figs[u.id])R3.figs[u.id].face=Math.atan2(f[0],f[1]);
   let what='';
   for(let i=1;i<=3;i++){const x=u.x+f[0],y=u.y+f[1],c=cell(x,y);if(!c){what='';break;}
@@ -6412,13 +6416,13 @@ async function shieldBash(u,v){if(u.csk===G.round)return;u.csk=G.round;useAct(u,
     const sg=G.gadgets.find(g=>g.alive&&g.x===x&&g.y===y&&g.type==='shield');
     if(sg){sg.alive=false;what='撞爆可部署盾牌';break;}
     if(c.obst&&!c.stand){if(c.bomb){what='撞到炸彈';break;}wreckCover(x,y);what='撞爆掩護';break;}
-    if(i===3)break;u.x=x;u.y=y;if(u.side==='D'&&clayZone(x,y,'D')){await clayCheck(u);break;}}
+    if(i===3)break;u.x=x;u.y=y;render();await sleep(220);if(u.side==='D'&&clayZone(x,y,'D')){await clayCheck(u);break;}}
   G.scanFx={cells:[[u.x+f[0],u.y+f[1]]],until:performance.now()+700,c:0xffc84a};
-  log(`${nm(u)} 盾牌猛擊${what?'，'+what:''}`,s);G.mode='move';render();await afterAct(u);}
+  log(`${nm(u)} 鎮壓暴徒${what?'，'+what:''}`,s);G.mode='move';render();await afterAct(u);}
 async function bashHit(u,t,f){const bx=t.x+f[0],by=t.y+f[1],bc=cell(bx,by),wall=!bc||blocks(bc),o=G.units.find(e=>e.alive&&e!==t&&e.x===bx&&e.y===by);
-  if(t.hidden)reveal(t,'被撞到，');await damage(t,2,'盾牌猛擊');let m=`撞到 ${nm(t)}（2 傷`;
+  if(t.hidden)reveal(t,'被撞到，');await damage(t,2,'鎮壓暴徒');let m=`撞到 ${nm(t)}（2 傷`;
   if(wall&&t.alive){await damage(t,1,'夾擊');stunU(t);m+='，夾在牆邊再 1 傷並暈眩';}
-  m+='）';if(o){await damage(o,1,'盾牌猛擊');stunU(o);m+=`，連後面的 ${nm(o)} 也受 1 傷並暈眩`;}return m;}
+  m+='）';if(o){await damage(o,1,'鎮壓暴徒');stunU(o);m+=`，連後面的 ${nm(o)} 也受 1 傷並暈眩`;}return m;}
 // grenade launcher: 2 damage in 3x3; everything but reinforced walls and corner pillars is wrecked
 const pillarC=(x,y)=>{const c=cell(x,y),w=(a,b)=>{const d=cell(a,b);return !!d&&isWallC(d);};return !!c&&c.t==='hard'&&(w(x-1,y)||w(x+1,y))&&(w(x,y-1)||w(x,y+1));};
 async function grenadeLaunch(u,x,y){if(u.csk===G.round)return;u.csk=G.round;useAct(u,'cls');note(u,'榴彈發射');DMGBY=u;aimCam(u,[[x,y]]);const s=u.side==='A'?'ka':'kd';
@@ -8290,8 +8294,8 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
     const o=OPS[u.op];GB=null;
     if(o.g&&!NOBTN.has(u.op)){const t=gTargets(u);const none=t!=='self'&&!t.length;
       GB=btn(GSH[u.op]||o.g,'',G.mode==='gadget',!can('special')||u.ch<=0||none,t==='self'?wrap(()=>useGadget(u)):tmode('gadget',t));GB.self=t==='self';}
-    if(u.w&&CSK[u.w]){const K=CSK[u.w],used=u.csk===G.round,free=K.ap==='免費',dis=!ok||used||(isA&&!free&&!canDo(u,'cls'))||(u.w==='rf'&&u.aim);
-      const md=CSKM[u.w];L.push(btn(K.n,used?'本回合已用':`${K.ap} · 每回合 1 次`,!!md&&G.mode===md,dis||(md==='gl'&&!throwTargets(u).length),md?()=>{if(G.mode===md)return setMode('move');if(commit(u))setMode(md);}:wrap(()=>useCsk(u)),'',`<span class="bic csk">${WPN[u.w].ic}</span>`));}
+    if(u.w&&CSK[u.w]){const K=CSK[u.w],used=u.w!=='hs'&&u.csk===G.round,free=K.ap==='免費',dis=!ok||used||(isA&&!free&&!canDo(u,'cls'))||(u.w==='rf'&&u.aim);
+      const md=CSKM[u.w];L.push(btn(K.n,u.w==='hs'?(u.heavyGuard?'已啟用 · 點擊關閉':'免費切換'):used?'本回合已用':`${K.ap} · 每回合 1 次`,u.w==='hs'?!!u.heavyGuard:!!md&&G.mode===md,dis||(md==='gl'&&!throwTargets(u).length),md?()=>{if(G.mode===md)return setMode('move');if(commit(u))setMode(md);}:wrap(()=>useCsk(u)),'',`<span class="bic csk">${WPN[u.w].ic}</span>`));}
     const tac=(m,label,n,list)=>n>0&&L.push(btn(label,sub('tactical',`戰術 · 剩 ${n}`),G.mode===m,!can('tactical')||n<=0||!list.length,tmode(m,list),'',eqIc(m)));
     if(u.side==='A'){
       if(u.matStuck)L.push(btn('拆掉捕獸夾',sub('unmat','1 行動 · 解除定身'),false,!can('unmat'),wrap(()=>unMat(u))));
@@ -9185,9 +9189,17 @@ function badgeDraw(f,u){
   if(u.stun&&u.alive){g.strokeStyle='#ff3b30';g.lineWidth=5;g.setLineDash([8,6]);g.beginPath();g.arc(64,64,58,0,7);g.stroke();g.setLineDash([]);g.fillStyle='#ff3b30';g.fillRect(2,4,44,22);g.fillStyle='#fff';g.font='700 17px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(tt('震暈'),24,16);}
   g.restore();f.btex.needsUpdate=true;
 }
+function shieldClassFx(f,u,t){
+  if(!f.shieldFx&&!['sh','hs'].includes(u.w))return;
+  if(!f.shieldFx){const group=new THREE.Group();group.position.set(0,.8,.54);const heavy=u.w==='hs',color=heavy?0xffb329:0x48baff,mat=new THREE.MeshBasicMaterial({color,transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false});
+    if(heavy){const shape=new THREE.Shape();for(let i=0;i<6;i++){const a=Math.PI/6+i*Math.PI/3,x=Math.cos(a)*.22,y=Math.sin(a)*.22;i?shape.lineTo(x,y):shape.moveTo(x,y);}shape.closePath();const geo=new THREE.ShapeGeometry(shape);for(let row=-1;row<=1;row++)for(let col=-2;col<=2;col++){const x=col*.39+(row%2?.195:0);if(Math.abs(x)>.9)continue;const tile=new THREE.Mesh(geo,mat);tile.position.set(x,row*.34,-x*x*.32);tile.rotation.y=-x*.5;group.add(tile);const edge=new THREE.LineSegments(new THREE.EdgesGeometry(geo),new THREE.LineBasicMaterial({color:0xffdc7c,transparent:true,opacity:0,depthWrite:false}));tile.add(edge);}}
+    else{const dome=new THREE.Mesh(new THREE.SphereGeometry(.67,24,16,0,Math.PI),mat);dome.scale.set(1,1.15,.32);group.add(dome);const rim=new THREE.Mesh(new THREE.TorusGeometry(.67,.018,6,40),new THREE.MeshBasicMaterial({color:0xa3e8ff,transparent:true,opacity:0,depthWrite:false}));rim.scale.y=1.15;group.add(rim);}
+    f.body.add(group);f.shieldFx=group;f.shieldFade=0;}
+  const active=u.alive&&(u.w==='hs'?u.heavyGuard:Date.now()<(u.shieldRushUntil||0));f.shieldFade+=(Number(!!active)-f.shieldFade)*.12;f.shieldFx.visible=f.shieldFade>.01;const pulse=.65+.35*Math.sin(t*3);f.shieldFx.traverse(o=>{if(o.material)o.material.opacity=f.shieldFade*(o.isLineSegments?.8:.3)*pulse;});
+}
 function unit3D(u){
   let f=R3.figs[u.id];if(f)return f;
-  f=makeFigure(u.op,u.side);envTune(f.grp,.5);f.grp.userData.cell=null;f.grp.traverse(o=>o.userData.unit=u.id);
+  f=makeFigure(u.w==='hs'?'montagne':u.w==='sh'?'blitz':u.op,u.side);envTune(f.grp,.5);f.grp.userData.cell=null;f.grp.traverse(o=>o.userData.unit=u.id);
   f.bc=document.createElement('canvas');f.bc.width=128;f.bc.height=148;f.btex=canvasTex(f.bc);f.btex.wrapS=f.btex.wrapT=THREE.ClampToEdgeWrapping;
   f.badge=new THREE.Sprite(new THREE.SpriteMaterial({map:f.btex,depthTest:false,transparent:true}));f.badge.scale.set(.78,.9,1);f.badge.position.y=1.75;f.badge.renderOrder=12;f.grp.add(f.badge);
   f.target=new THREE.Vector3();f.face=u.side==='A'?Math.PI:0;f.placed=false;
@@ -9715,6 +9727,7 @@ function tick3D(){
   R3.controls.update();
   const camD=R3.camera.position.distanceTo(R3.controls.target),bs=Math.max(.32,Math.min(1,camD/15));
   for(const k in R3.figs){const f=R3.figs[k];if(!f.grp.visible)continue;
+    const shieldUnit=G&&G.units.find(u=>u.id===k);if(shieldUnit)shieldClassFx(f,shieldUnit,t);
     if(f.badge){f.badge.scale.set(.78*bs,.9*bs,1);f.badge.position.y=1.3+.45*bs;}
     if(!f.placed){f.grp.position.copy(f.target);f.placed=true;}else f.grp.position.lerp(f.target,.28);
     let d=f.face-f.body.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));f.body.rotation.y+=d*.25;
@@ -10344,7 +10357,7 @@ function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
-function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v137</b><span>規則與戰術互動更新</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑改為上下捲動，新增攻擊／防守篩選</span><span>培養幹員每個距離區段最多 4 顆骰子</span></div></section></div>`);}
+function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v138</b><span>盾兵職業更新</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>新增重盾兵與機動盾兵，接入男女角色圖與護盾特效</span><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑改為上下捲動，新增攻擊／防守篩選</span><span>培養幹員每個距離區段最多 4 顆骰子</span></div></section></div>`);}
 function openFeedback(){const el=tsDlg('feedback','回報',`<div class="psbox"><div class="pshead"><div><b>回報</b><span>遇到問題或有想法，都歡迎告訴我們。</span></div><button class="tsX" aria-label="關閉">✕</button></div>
   <section><h4>類型</h4><select class="fbsel" id="fbType"><option value="bug">回報 Bug</option><option value="idea">遊戲建議</option></select></section>
   <section><h4>內容</h4><textarea class="fbtxt" id="fbText" maxlength="2000" placeholder="請描述發生了什麼、在哪個畫面，或你的建議…"></textarea><div class="fbcnt" id="fbCnt">0 / 2000</div></section>
@@ -10498,6 +10511,8 @@ function trKey(k,ix,d){const e=I18X[k]||I18N[k];if(e&&e[ix])return e[ix];
   return best;}
 Object.assign(I18X,{'攻擊':['Attack',''],'防守':['Defense',''],'全部類型':['All roles',''],'骰數仍受每段最多 4 顆、三段合計最多 10 顆限制。':['Maximum 4 dice per range and 10 dice across all three ranges.',''],'幹員圖鑑改為上下捲動，新增攻擊／防守篩選':['Operator codex now scrolls vertically, with Attack / Defense filters.',''],'培養幹員每個距離區段最多 4 顆骰子':['Trained operators can have at most 4 dice per range.','']});
 Object.assign(I18X,{'投擲 6 格：目標格與相鄰格每人擲 1 顆手榴彈骰（三面 1、三面 2），並破壞路障':['Throw up to 6 spaces: each affected operator rolls one grenade die (three 1 faces, three 2 faces). Destroys barricades.','']});
+Object.assign(I18X,{'重盾':['Heavy shield',''],'機動盾':['Mobile shield',''],'重盾兵':['Heavy shield soldier',''],'機動盾兵':['Mobile shield soldier',''],'機槍兵':['Gunner',''],'散彈兵':['Breacher',''],'狙擊兵':['Marksman',''],'衝鋒兵':['Rusher',''],'此路不通':['You shall not pass',''],'鎮壓暴徒':['Riot suppression',''],'解除重盾防禦':['Lower heavy shield',''],'免費切換':['Free toggle',''],'切換模式':['Toggle mode',''],'已啟用 · 點擊關閉':['Active · Tap to disable',''],'點擊切換模式：免疫正面 120° 的武器攻擊；仍可被道具鎖定及範圍攻擊波及。啟用時可以移動、轉向，但不能攻擊或使用道具；關閉後恢復。':['Toggle immunity to weapon attacks from the front 120°. Gadgets and area attacks can still affect you. You may move and turn, but cannot attack or use gadgets while active.',''],'受到的傷害固定 −2。不能奔跑。此路不通可切換正面防禦模式。':['Incoming damage −2. Cannot sprint. Toggle frontal defense with You shall not pass.',''],'受到的傷害固定 −2。可以奔跑，鎮壓暴徒向前衝刺並撞擊。':['Incoming damage −2. Can sprint. Riot suppression charges forward and strikes.','']});
+Object.assign(I18X,{'盾兵職業更新':['Shield class update',''],'新增重盾兵與機動盾兵，接入男女角色圖與護盾特效':['Added heavy and mobile shield classes, male/female artwork and shield effects.','']});
 function trText(o){const k=o.trim();if(!k||!/[㐀-鿿]/.test(k))return null;const ix=ME.lang==='en'?0:1;
   const t=trKey(k.replace(/\s+/g,' '),ix,0);if(t==null){I18MISS.add(k);return null;}return o.replace(k,t);}
 // tt: translate a string that is drawn on a canvas or shown in a dialog (outside the page text the observer swaps)
@@ -10584,7 +10599,7 @@ const MFT=45,MFMIS={bomb:'炸彈',hostage:'人質'};
 let MF=null;
 const ign=()=>ME.nick||ME.guest; // the in-game name, never the Google account name
 // custom operator avatars: cop:<slot> is the recruit art, cop:<slot>:<class> a class the player has unlocked (ECO.wu keeps them after a death)
-function copAv(k){const m=/^cop:([01])(?::(\w+))?$/.exec(k||'');if(!m)return null;const i=+m[1],w=m[2]&&WPN[m[2]]?m[2]:null;return {i,w,art:w&&WART[w]?`img/cop/${i?'m':'f'}_${w}.webp`:COPART[i],av:`img/av/cop_${i?'m':'f'}${w&&WART[w]?'_'+w:''}.webp`};}
+function copAv(k){const m=/^cop:([01])(?::(\w+))?$/.exec(k||'');if(!m)return null;const i=+m[1],w=m[2]&&WPN[m[2]]?m[2]:null,art=copArt({w},i);return {i,w,art,av:['hs','sh'].includes(w)?art:`img/av/cop_${i?'m':'f'}${w&&WART[w]?'_'+w:''}.webp`};}
 // v116: pic:<op> = chest-up photo crop of an owned operator (img/av/<op>.webp, made from img/face/)
 const opPic=b=>'img/av/'+artBase(b)+'.webp';
 function copWU(){const s=new Set(Array.isArray(ECO.wu)?ECO.wu:[]);copAll().forEach((c,i)=>{if(c.w)s.add(i+':'+c.w);});return s;}
@@ -11249,33 +11264,36 @@ const WSVG=p=>`<svg viewBox="0 0 48 48" fill="none" stroke="#e3aa3e" stroke-widt
 // orange-or-better and red dice in one range
 const nOR=L=>L.filter(d=>d==='O'||d==='R').length,nR=L=>L.filter(d=>d==='R').length;
 const WPN={
-  mg:{n:'機槍',t:'機槍手',en:'GUNNER',ic:WSVG('<circle cx="24" cy="24" r="16"/><circle cx="24" cy="15" r="3.2"/><circle cx="32.6" cy="21.2" r="3.2"/><circle cx="29.3" cy="31.3" r="3.2"/><circle cx="18.7" cy="31.3" r="3.2"/><circle cx="15.4" cy="21.2" r="3.2"/>'),
+  mg:{n:'機槍',t:'機槍兵',en:'GUNNER',ic:WSVG('<circle cx="24" cy="24" r="16"/><circle cx="24" cy="15" r="3.2"/><circle cx="32.6" cy="21.2" r="3.2"/><circle cx="29.3" cy="31.3" r="3.2"/><circle cx="18.7" cy="31.3" r="3.2"/><circle cx="15.4" cy="21.2" r="3.2"/>'),
     trig:c=>c.arm>=3&&[0,1,2].every(b=>c.d[b].length>=3&&nOR(c.d[b])>=1),fx:'骰數仍受每段最多 4 顆、三段合計最多 10 顆限制。'},
-  sh:{n:'盾牌',t:'盾牌兵',en:'SHIELD',ic:WSVG('<path d="M24 5l15 6v11c0 10-6.5 17-15 21C15.5 39 9 32 9 22V11z"/><path d="M17 20h14"/>'),
-    trig:c=>c.arm>=3&&[0,1].every(b=>c.d[b].length>=4&&nOR(c.d[b])>=1),fx:'受到的傷害固定 −2。不能奔跑。',lim:{2:{max:2,noR:1}}},
-  sg:{n:'散彈槍',t:'散彈槍手',en:'BREACHER',ic:WSVG('<rect x="17" y="6" width="14" height="26" rx="2"/><path d="M17 32h14v8a2 2 0 0 1-2 2H19a2 2 0 0 1-2-2z"/><path d="M17 14h14"/>'),
+  hs:{n:'重盾',t:'重盾兵',en:'HEAVY SHIELD',ic:WSVG('<path d="M10 5h28v29L24 44 10 34z"/><path d="M17 15h14M17 23h14"/>'),
+    trig:c=>c.arm===3&&c.d[1].length>=4&&nOR(c.d[1])>=1&&c.d[0].length>=3,fx:'受到的傷害固定 −2。不能奔跑。此路不通可切換正面防禦模式。',lim:{2:{max:2,noR:1}}},
+  sh:{n:'機動盾',t:'機動盾兵',en:'MOBILE SHIELD',ic:WSVG('<path d="M24 5l15 6v11c0 10-6.5 17-15 21C15.5 39 9 32 9 22V11z"/><path d="M17 20h14"/>'),
+    trig:c=>c.arm===2&&c.run>=3&&[0,1].every(b=>c.d[b].length>=3&&nOR(c.d[b])>=1),fx:'受到的傷害固定 −2。可以奔跑，鎮壓暴徒向前衝刺並撞擊。',lim:{2:{max:2,noR:1}}},
+  sg:{n:'散彈槍',t:'散彈兵',en:'BREACHER',ic:WSVG('<rect x="17" y="6" width="14" height="26" rx="2"/><path d="M17 32h14v8a2 2 0 0 1-2 2H19a2 2 0 0 1-2-2z"/><path d="M17 14h14"/>'),
     trig:c=>c.d[0].length>=4&&nR(c.d[0])>=2,fx:'射擊會打爛路障；隔牆射擊會直接把軟牆打掉（這一槍仍然 −2）。',lim:{2:{max:2,noR:1},1:{max:3}}},
   rf:{n:'步槍',t:'步槍兵',en:'RIFLEMAN',ic:WSVG('<circle cx="24" cy="24" r="13"/><path d="M24 5v8M24 35v8M5 24h8M35 24h8"/><path d="M19 26a5 5 0 1 0 1-6"/><path d="M19 17v4h4"/>'),
     trig:c=>c.d[1].length>=4&&nOR(c.d[1])>=3&&c.vis>=4,fx:'視野 180°。穩定射擊：每次射擊後可以點一顆骰子重擲。'},
-  sn:{n:'狙擊槍',t:'狙擊手',en:'MARKSMAN',ic:WSVG('<circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="3"/><path d="M24 4v10M24 34v10M4 24h10M34 24h10"/>'),
+  sn:{n:'狙擊槍',t:'狙擊兵',en:'MARKSMAN',ic:WSVG('<circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="3"/><path d="M24 4v10M24 34v10M4 24h10M34 24h10"/>'),
     trig:c=>c.d[2].length>=4&&nR(c.d[2])>=2,fx:'視野距離 14 格。',lim:{0:{max:2,noR:1},1:{max:3}}},
-  smg:{n:'衝鋒槍',t:'衝鋒槍手',en:'RUSHER',ic:WSVG('<path d="M10 14l10 10-10 10"/><path d="M24 14l10 10-10 10"/>'),
+  smg:{n:'衝鋒槍',t:'衝鋒兵',en:'RUSHER',ic:WSVG('<path d="M10 14l10 10-10 10"/><path d="M24 14l10 10-10 10"/>'),
     trig:c=>c.run>=5&&[0,1].every(b=>c.d[b].length>=3&&nOR(c.d[b])>=1),fx:'每回合可以開兩槍。第二槍擲一半的骰子（從紅骰開始捨棄，至少留 1 顆）。'}};
 // class skills (職業技能): one use per round, button in the action panel
 const CSK={mg:{n:'掃射',ap:'1 行動',d:'不用指定目標；選擇一個方位後沿直線掃射。路徑上的第一名敵人受到 2 點傷害，後方目標不受傷。'},
+  hs:{n:'此路不通',ap:'免費',d:'點擊切換模式：免疫正面 120° 的武器攻擊；仍可被道具鎖定及範圍攻擊波及。啟用時可以移動、轉向，但不能攻擊或使用道具；關閉後恢復。'},
   rf:{n:'精準射擊',ap:'免費',d:'下一次射擊無視掩護減傷。'},
   sn:{n:'熱感瞄準',ap:'1 行動',d:'選一個方向，視野範圍內隔著牆也能看到敵人的位置（看不出是誰），標記留到這回合結束。'},
   smg:{n:'衝刺',ap:'1 行動',d:'移動點補滿，可以再走一次，但這回合不能再射擊。'},
-  sh:{n:'盾牌猛擊',ap:'1 行動',d:'朝一個方向衝刺兩格，攻擊到第三格。撞到軟牆或路障會撞破，撞到掩護會撞爆。撞到敵人固定 2 傷；敵人背後是牆，再 1 傷並暈眩；敵人背後還有人，那個人也受 1 傷並暈眩。'},
+  sh:{n:'鎮壓暴徒',ap:'1 行動',d:'朝一個方向衝刺兩格，攻擊到第三格。撞到軟牆或路障會撞破，撞到掩護會撞爆。撞到敵人固定 2 傷；敵人背後是牆，再 1 傷並暈眩；敵人背後還有人，那個人也受 1 傷並暈眩。'},
   sg:{n:'榴彈發射',ap:'1 行動',d:'對 3×3 範圍造成 2 傷，敵我都會受傷。範圍內除了鐵牆和轉角柱，牆、路障、掩護和道具全部炸毀。'}};
 const CSKM={mg:'mgscan',sn:'heat',sh:'bash',sg:'gl'};
-const WORD=['mg','sh','sg','rf','sn','smg'],WART={rf:1,sn:1,sg:1,mg:1,smg:1},RANKD={R:3,O:2,Y:1};
+const WORD=['hs','sh','mg','sg','rf','sn','smg'],WART={hs:1,sh:1,rf:1,sn:1,sg:1,mg:1,smg:1},RANKD={R:3,O:2,Y:1};
 const bMax=(c,b)=>{const l=WPN[c.w]&&WPN[c.w].lim&&WPN[c.w].lim[b];return Math.min(4,l?l.max:4);};
 const bNoR=(c,b)=>{const l=WPN[c.w]&&WPN[c.w].lim&&WPN[c.w].lim[b];return !!(l&&l.noR);};
 const dTot=c=>10;
-const runCap=c=>c.w==='sh'?0:COPARM[c.arm].run;
+const runCap=c=>c.w==='hs'?0:COPARM[c.arm].run;
 const copDice=c=>c.d;
-const copArt=(c,i)=>c.w&&WART[c.w]?`img/cop/${i?'m':'f'}_${c.w}.webp`:COPART[i];
+const copArt=(c,i)=>c.w&&WART[c.w]?`img/cop/${i?'m':'f'}_${c.w}.${['hs','sh'].includes(c.w)?'png':'webp'}`:COPART[i];
 function wApply(c,w){const n=JSON.parse(JSON.stringify(c));n.w=w;
   for(let b=0;b<3;b++){let L=n.d[b].slice().sort((x,y)=>RANKD[y]-RANKD[x]).slice(0,bMax(n,b));if(bNoR(n,b))L=L.map(x=>x==='R'?'O':x);n.d[b]=L.length?L:['Y'];}
   while(n.d.flat().length>dTot(n)){let bi=-1;n.d.forEach((L,b)=>{if(L.length>1&&(bi<0||L.length>n.d[bi].length))bi=b;});if(bi<0)break;n.d[bi].sort((x,y)=>RANKD[y]-RANKD[x]).pop();}
@@ -11409,7 +11427,7 @@ function cpSheet(){const s=CP.sheet;if(!s)return '';const c=copAll()[CP.i];
     if(s.w==='mg')ch.push(`三段各多 ${chip(['Y'])} 免費黃骰`);if(s.w==='rf')ch.push(`視野：${120+5*c.vis}° → 180°${c.vis?`（視野點數 ${c.vis} 點保留）`:''}`);if(s.w==='sn')ch.push('視野距離：10 → 14 格');
     if(c.w)ch.push(`放棄目前的${WPN[c.w].n}`);
     return `<div class="cpOv" data-ov="1"><div class="cpSheet cpW" role="dialog" aria-label="轉職"><small class="e">CLASS CHANGE · 轉職</small><h3>要轉職成${W.t}嗎？</h3>
-      <div class="cpWB"><div class="cpWArt"><img src="${copArt({w:s.w},CP.i)}" alt=""></div><div class="cpWI"><div class="cpWS"><span class="cpWIc">${W.ic}</span><div><b>${CSK[s.w]?CSK[s.w].n:W.n}</b><small>${CSK[s.w]?`職業技能 · ${CSK[s.w].ap} · 每回合 1 次`:'職業技能還沒開放'}</small></div></div>${CSK[s.w]?`<p>${CSK[s.w].d}</p>`:''}<p class="cpWT"><small>${W.n}特性</small>${W.fx}</p>
+      <div class="cpWB"><div class="cpWArt"><img src="${copArt({w:s.w},CP.i)}" alt=""></div><div class="cpWI"><div class="cpWS"><span class="cpWIc">${W.ic}</span><div><b>${CSK[s.w]?CSK[s.w].n:W.n}</b><small>${CSK[s.w]?`職業技能 · ${CSK[s.w].ap} · ${s.w==='hs'?'切換模式':'每回合 1 次'}`:'職業技能還沒開放'}</small></div></div>${CSK[s.w]?`<p>${CSK[s.w].d}</p>`:''}<p class="cpWT"><small>${W.n}特性</small>${W.fx}</p>
       <div class="cpWC"><small>異動</small>${ch.length?ch.map(t=>`<div>${t}</div>`).join(''):'<div>點數沒有變化</div>'}${back>0?`<div class="cpWR">退回 ${back} 點，可以拿去點別的</div>`:''}</div></div></div>
       <div class="cpFoot in"><button class="cpBtn g" id="cpWNo">${c.w?`維持${WPN[c.w].t}`:'維持新進人員'}</button><button class="cpBtn p" id="cpWYes">轉職</button></div></div></div>`;}
   if(s.t==='s')return cpSkillPage();return '';}
