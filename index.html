@@ -5375,7 +5375,7 @@ const OPS={
   thatcher:{name:'Thatcher',side:'A',armor:2,role:'反制',g:'EMP 手榴彈',gd:'投向 3 格內任一格（可越牆），摧毀半徑 2 內的攝影機、干擾器、陷阱並解除電擊線。',ch:2},
   iq:{name:'IQ',side:'A',armor:1,role:'偵查',g:'電子脈衝掃描',gd:'站在牆邊發動，摧毀牆另一側房間內、距離 5 格內的所有防守道具。',ch:2},
   glaz:{name:'Glaz',side:'A',armor:2,role:'狙擊',passive:'熱成像瞄準鏡',pd:'被動：遠距離擲紅＋橙骰，中距離擲兩顆橙骰，比其他幹員更適合遠射。'},
-  lion:{name:'Lion',side:'A',armor:2,role:'情報',g:'EE-ONE-D 掃描',gd:'全圖掃描：所有防守方現形，直到我方下一個進攻階段結束。',ch:1},
+  lion:{name:'Lion',side:'A',armor:2,role:'情報',g:'EE-ONE-D 掃描',gd:'標示上一個階段曾移動位置的敵人；只標示掃描當下的位置，不揭露角色，保留到本階段結束。',ch:1},
   fuze:{name:'Fuze',side:'A',armor:3,role:'清場',g:'集束炸彈',gd:'裝在相鄰牆面，牆後延伸 5×5 爆炸；每個目標擲 3 顆手榴彈骰（0、1、1、2、2、3）。',ch:2},
   mute:{name:'Mute',side:'D',armor:2,role:'反情報',g:'訊號干擾器',gd:'放在自己或相鄰格。半徑 2 內：爆破炸藥、放熱炸藥失效，無人機看不到防守方。',ch:2},
   bandit:{name:'Bandit',side:'D',armor:1,role:'反破牆',g:'CED-1 電瓶',gd:'放在加固牆旁讓那面牆通電（兩面都電人，Thermite 等無法破壞），或放進鐵絲網讓鐵絲網通電；進攻方走進通電的格子扣 1 血。電瓶可被遠距破壞。',ch:2},
@@ -5985,7 +5985,7 @@ function finish(w,why){if(G&&G.tut2)return tuFinish(w,why);
 }
 async function step(u,x,y){DMGBY=null;
   ECU=u;const occ=unitAt(x,y),cost=enterCost(x,y,u.x,u.y);
-  if(occ&&occ.side===u.side&&u.mp>cost){u.fd=[Math.sign(x-u.x),Math.sign(y-u.y)];u.x=x;u.y=y;u.exp=null;spotTrack(u);camDiscover();u.mp-=cost;if(G.cur&&G.cur.u===u)G.cur.path.push([x,y,pubNow(u)]);render();await sleep(70);return true;} // pass through teammates
+  if(occ&&occ.side===u.side&&u.mp>cost){u.fd=[Math.sign(x-u.x),Math.sign(y-u.y)];u.x=x;u.y=y;u.exp=null;spotTrack(u);camDiscover();u.mp-=cost;if(G.cur&&G.cur.u===u)G.cur.path.push([x,y,pubNow(u)]);render();await sleep(70);return await riposte(u);} // pass through teammates
   if(occ){ if(occ.side!==u.side){if(!NOLOC.has(occ.op))occ.spotted=1;if(occ.hidden)reveal(occ,'被撞見，');log(`${nm(u)} 撞見了 ${nm(occ)}！`,'ks');} u.mp=Math.max(0,u.mp-1);return false; }
   const px=u.x,py=u.y;u.fd=[Math.sign(x-u.x),Math.sign(y-u.y)];u.x=x;u.y=y;u.exp=null;spotTrack(u);camDiscover();u.mp=Math.max(0,u.mp-cost);
   if(G.hostage&&G.hostage.by===u.id){G.hostage.x=x;G.hostage.y=y;}
@@ -6006,6 +6006,7 @@ async function step(u,x,y){DMGBY=null;
 }
 // overwatch covers a 180° arc; every enemy that enters or acts inside it draws a free shot (riposte)
 async function riposte(u){
+  trackMovement();if(!u._actMoved)return u.alive&&!G.over;
   for(const e of G.units){
     if(!u.alive||G.over)return false;
     if(e.alive&&e.side!==u.side&&e.overwatch&&e.x>=0&&(e.mgOw||(u.x-e.x)*e.owd[0]+(u.y-e.y)*e.owd[1]>0)&&losAs(e,()=>inSight(e,u))&&(!u.hidden||u.spotted>0||los(e.x,e.y,u.x,u.y))&&!(e.owHit&&e.owHit.has(u.id))&&!(e.owShot&&!e.mgOw)&&!rayBlk(e,u))
@@ -6251,7 +6252,7 @@ async function useGadget(u,x,y){ST(u).gad++;DMGBY=u;if(x!=null)aimCam(u,[[x,y]])
       log(`${nm(u)} 的 EMP 癱瘓了 ${n} 個防守道具`,side);break;}
     case 'iq':{const dx=x-u.x,dy=y-u.y,bx=x+dx,by=y+dy,R=cell(bx,by)&&cell(bx,by).indoor?roomCells(bx,by):new Set();let n=0;for(const g of G.gadgets)if(g.alive&&g.side==='D'&&R.has(g.y*G.W+g.x)&&cheb(u.x,u.y,g.x,g.y)<=5){g.alive=false;n++;}syncElec();log(`${nm(u)} 的電子脈衝摧毀牆後 ${n} 個道具`,side);break;}
     case 'fuze':{const dx=x-u.x,dy=y-u.y,sidev=[-dy,dx],area=[];for(let d=1;d<=5;d++)for(let q=-2;q<=2;q++){const a=x+dx*d+sidev[0]*q,b=y+dy*d+sidev[1]*q;if(cell(a,b))area.push([a,b]);}log(`${nm(u)} 在牆後引爆集束炸彈`,side);G.scanFx={cells:area,until:performance.now()+1300,c:0xff7a24};SFX.boom();render();await sleep(700);droneHit(area,'集束炸彈');await volcBlast(area);prismaHit(area,'集束炸彈炸開');if(hostHarm(area,u.side,'集束炸彈'))break;const K=new Set(area.map(([a,b])=>b*G.W+a));const hit=G.units.filter(a=>a.alive&&K.has(a.y*G.W+a.x));for(const a of hit){const idx=[0,0,0].map(()=>Math.floor(Math.random()*6)),r=idx.reduce((n,i)=>n+FUZE_DIE[i],0);await fragShow(u,a,'YYY',idx,r,true,FUZE_DIE,'集束炸彈');if(r)await damage(a,r,'集束炸彈');}diceHide();shotCamEnd();break;}
-    case 'lion':alive('D').filter(d=>!NOLOC.has(d.op)).forEach(d=>{d.spotted=1;d.hidden=false;});(G.decoys||[]).forEach(k=>k.alive=false);log(`${nm(u)} 啟動 EE-ONE-D，所有防守方被標記到回合結束！`,side);break;
+    case 'lion':{const hit=lionScan(u);log(`${nm(u)} 啟動 EE-ONE-D，標示上一階段移動的 ${hit.length} 名敵人`,side);break;}
     case 'mute':G.gadgets.push({type:'jammer',x,y,side:'D',alive:true});if(pub(u))log(`${nm(u)} 放置了訊號干擾器`,side);break;
     case 'bandit':{let w=null;if(!gadgetAt(x,y,'wire')){const ws=cedWalls(x,y);if(ws.length>1&&u.side===G.player&&!G.ai){const r=await wfAsk(x,y,'電瓶',ws,false);if(r&&r.w)w=r.w;}}
       const g=cedMake(x,y,w);G.gadgets.push(g);syncElec();if(pub(u)||G.player==='D')log(g.wire?`${nm(u)} 把電瓶接上鐵絲網，鐵絲網通電了`:`${nm(u)} 把電瓶接上加固牆，牆的兩面都通電了`,side);break;}
@@ -6443,13 +6444,17 @@ function wreckCover(x,y){const m=G.map;let n=0;
     (G.propGone||(G.propGone=new Set())).add(i);n++;for(const [a,b] of cs){const c=cell(a,b);if(c&&!c.bomb){c.obst=false;c.tall=false;c.stand=0;}}});
   const c=cell(x,y);if(c&&c.obst&&!c.bomb){c.obst=false;c.tall=false;c.stand=0;n++;}if(n){G._wv=(G._wv||0)+1;if(R3)R3.sig='';}return n>0;}
 const propOn=i=>!(G&&G.propGone&&G.propGone.has(i));
-const heatPins=()=>(G&&G.heat||[]).filter(h=>h.r===G.round&&h.side===G.player&&!G.units.some(e=>e.alive&&e.x===h.x&&e.y===h.y&&e.side!==G.player&&seenBy(G.player,e)));
+const heatPins=()=>!G?[]:[...(G.heat||[]).filter(h=>h.r===G.round),...(G.lionMarks||[]).filter(h=>h.phase===movementPhase()&&G.units.some(u=>u.id===h.id&&u.alive))].filter(h=>h.side===G.player&&!G.units.some(e=>e.alive&&e.x===h.x&&e.y===h.y&&e.side!==G.player&&seenBy(G.player,e)));
 function sprint(u){note(u,'奔跑');useAct(u,'run');u.mp+=u.run;}
 
 // ---------- phases ----------
+const movementPhase=()=>`${G.round}:${G.phaseIdx}`;
+function trackMovement(){if(!G||G.phase!=='play')return;const phase=movementPhase();for(const u of G.units){const p=u._movementPos;if(p&&p.phase===phase&&p.x>=0&&p.y>=0&&u.x>=0&&u.y>=0&&(p.x!==u.x||p.y!==u.y)){u._movedPhase=phase;if(G.active===u)u._actMoved=true;}u._movementPos={phase,x:u.x,y:u.y};}}
+function closeMovementPhase(){trackMovement();const phase=movementPhase();G.previousMovers=G.units.filter(u=>u._movedPhase===phase).map(u=>u.id);G.lionMarks=[];}
+function lionScan(u){trackMovement();const ids=new Set(G.previousMovers||[]),hit=G.units.filter(e=>e.alive&&e.side!==u.side&&e.x>=0&&ids.has(e.id));G.lionMarks=(G.lionMarks||[]).filter(h=>h.side!==u.side).concat(hit.map(e=>({id:e.id,x:e.x,y:e.y,side:u.side,phase:movementPhase()})));return hit;}
 const pubNow=u=>pub(u);
 function note(u,t){if(G._ghCap&&G._ghCap.u===u&&!G._ghCap.name)G._ghCap.name=t;if(G.cur&&G.cur.u===u)G.cur.acts.push(t);}
-function beginAct(u){u.activated=true;u._s2=0;u.mgOw=0;u.noShoot=0;u.mp=u.speed;u.ap=2;u.used=new Set();u.overwatch=false;u.gassed=false;u.shocked=false;u.burned=false;u._eye=0;u._trax=0;G.acts++;G.active=u;G.tEnd=0;
+function beginAct(u){trackMovement();u._actMoved=false;u.activated=true;u._s2=0;u.mgOw=0;u.noShoot=0;u.mp=u.speed;u.ap=2;u.used=new Set();u.overwatch=false;u.gassed=false;u.shocked=false;u.burned=false;u._eye=0;u._trax=0;G.acts++;G.active=u;G.tEnd=0;
   G.cur={u,side:u.side,round:G.round,ph:G.phaseIdx,path:[[u.x,u.y,pubNow(u)]],acts:[]};}
 function recordAct(){const r=G.cur;G.cur=null;if(!r||(r.path.length<2&&!r.acts.length))return;G.moves.push(r);
   if(r.side===G.player||r.path.some(p=>p[2]))G.hl=G.moves.length-1;}
@@ -6470,7 +6475,7 @@ function endPhase(){
   G.gadgets.forEach(g=>{if((g.type==='gas'||g.type==='fire')&&g.alive&&--g.life<=0){g.alive=false;if(g.goyo)goyoOut(g);}});
   if(s==='D'&&G.defuser){const du=dfU();if(du){if(--G.defuser.dleft<=0){render();dfDone(du);if(G.over)return;}}else G.defuser.by=null;if(G.defuser&&--G.defuser.timer<=0&&!dfU()){render();return bombBoom();}}
   bigNote(`${s==='A'?'進攻方':'防守方'}<wbr>第${'一二'[G.phaseIdx>>1]}階段結束`,'',s==='A'?'a':'d',1100);// v104: say who just finished
-  G.phaseIdx++;
+  closeMovementPhase();G.phaseIdx++;
   if(G.phaseIdx>=4){
     G.phaseIdx=0;
     if(G.round>=G.maxRounds&&!G.defuser){render();return finish('D',G.mission==='hostage'?'時間耗盡，人質沒有被救出':'時間耗盡，進攻方沒有完成任務');}
@@ -6480,6 +6485,7 @@ function endPhase(){
   startPhase();
 }
 function startPhase(){
+  trackMovement();
   G.acts=0;G.sel=null;G.mode='move';
   const s=curSide();if(G.clock&&(G.net||G.bot)){G.clock[s]=PHT;G.clockOut[s]=false;}
   if(!unspent(s).length||(G.clock&&G.clock[s]<=0)){render();return setTimeout(endPhase,50);}
@@ -7840,6 +7846,7 @@ var NOBTN=new Set(['blackbeard','jager','vigil','nokk','iana','warden','aruni','
 var SETUPOPS=['alibi','jager','castle','thunderbird','frost','lesion','ela','mira','maestro','kaid','goyo','wamai','melusi'];
 var BRK={buck:1,hibana:1,ace:1,maverick:1,oryx:1},BRKR={hibana:1,ace:1,maverick:1};
 var GDX={
+ lion:['標示上一個階段曾移動位置的敵人；只標示掃描當下的位置，不揭露角色，保留到本階段結束。',1],
  sledge:['〔行動〕選擇相鄰軟牆，砸開後直接踏入；若此時視線內有敵人，先攻擊最近一位，再判定監視。',99],
  thermite:['〔行動〕炸開相鄰的加固牆或軟牆；爆點相鄰格的所有幹員各受 1 傷。',2],
  ash:['〔行動〕炸開 6 格內看得到的軟牆或門；爆點相鄰格的所有幹員各受 1 傷。',2],
@@ -8120,7 +8127,7 @@ function barBtnUpd(){let b=document.getElementById('barBtn');const u=G&&G.sel;
   if(!b){b=document.createElement('button');b.id='barBtn';b.innerHTML='<svg viewBox="0 0 48 48" fill="none" stroke="#e3aa3e" stroke-width="3" stroke-linecap="round"><rect x="9" y="5" width="30" height="38" rx="2"/><path d="M9 16l30 9M9 30l30-9"/></svg><span>封門</span>';document.body.appendChild(b);}
   const sh=document.getElementById('sheetT'),r0=sh&&sh.getBoundingClientRect(),r=r0&&r0.width?r0:null;b.style.bottom=(r&&r.top>innerHeight*.4?Math.round(innerHeight-r.top+10):Math.round(innerHeight*.3))+'px';
   b.onclick=ev=>{ev.stopPropagation();const v=G.sel;if(!v||!commit(v))return;act(async()=>{const tt=barTargets(v);if(tt.length&&canDo(v,'barr'))await rebar(v,...tt[0]);});};}
-function render(){try{syncElec();}catch(e){}try{const a=G&&G.active;if(a&&G.sel===a&&G.mode==='move'&&!G.busy&&owAuto(a)&&a.ap<=0)G.mode='owdir';}catch(e){}setTimeout(()=>{try{noApTag();}catch(e){}},0);setTimeout(()=>{try{barBtnUpd();}catch(e){}},0);try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{renderTension();}catch(e){}
+function render(){trackMovement();try{syncElec();}catch(e){}try{const a=G&&G.active;if(a&&G.sel===a&&G.mode==='move'&&!G.busy&&owAuto(a)&&a.ap<=0)G.mode='owdir';}catch(e){}setTimeout(()=>{try{noApTag();}catch(e){}},0);setTimeout(()=>{try{barBtnUpd();}catch(e){}},0);try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{renderTension();}catch(e){}
   const scr=G?'game':(SCREEN==='setup'?'setup':'title');document.body.dataset.scr=scr;{const wz=$('#wiz');if(wz&&(G||SCREEN!=='setup'))wz.hidden=true;}
   const tt=$('#title');if(tt){const show=scr==='title';if(tt.hidden===show)tt.hidden=!show;if(show&&tt.dataset.s!==SCREEN){tt.dataset.s=SCREEN;renderTitle();}}
   if(R3){heroScene(scr==='title');if(R3.lastScr!==scr){R3.lastScr=scr;R3.sig='';if(scr!=='title')setTimeout(()=>R3&&!R3.camGoal&&setView(G&&G.phase==='setup'?'top':'angle'),0);}}
@@ -10357,7 +10364,7 @@ function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
-function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v138</b><span>盾兵職業更新</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>新增重盾兵與機動盾兵，接入男女角色圖與護盾特效</span><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑改為上下捲動，新增攻擊／防守篩選</span><span>培養幹員每個距離區段最多 4 顆骰子</span></div></section></div>`);}
+function openNews(){tsDlg('versionNews','版本公告',`<div class="psbox"><div class="pshead"><div><b>版本公告 · v139</b><span>盾兵職業更新</span></div><button class="tsX" aria-label="關閉">✕</button></div><section><h4>本次更新</h4><div class="splist"><span>監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人</span><span>新增重盾兵與機動盾兵，接入男女角色圖與護盾特效</span><span>炸彈點、煙霧視線與已發現道具規則修正</span><span>機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新</span><span>地面道具可放兩個，牆面道具不再占用地面位置</span><span>幹員圖鑑改為上下捲動，新增攻擊／防守篩選</span><span>培養幹員每個距離區段最多 4 顆骰子</span></div></section></div>`);}
 function openFeedback(){const el=tsDlg('feedback','回報',`<div class="psbox"><div class="pshead"><div><b>回報</b><span>遇到問題或有想法，都歡迎告訴我們。</span></div><button class="tsX" aria-label="關閉">✕</button></div>
   <section><h4>類型</h4><select class="fbsel" id="fbType"><option value="bug">回報 Bug</option><option value="idea">遊戲建議</option></select></section>
   <section><h4>內容</h4><textarea class="fbtxt" id="fbText" maxlength="2000" placeholder="請描述發生了什麼、在哪個畫面，或你的建議…"></textarea><div class="fbcnt" id="fbCnt">0 / 2000</div></section>
@@ -10513,6 +10520,8 @@ Object.assign(I18X,{'攻擊':['Attack',''],'防守':['Defense',''],'全部類型
 Object.assign(I18X,{'投擲 6 格：目標格與相鄰格每人擲 1 顆手榴彈骰（三面 1、三面 2），並破壞路障':['Throw up to 6 spaces: each affected operator rolls one grenade die (three 1 faces, three 2 faces). Destroys barricades.','']});
 Object.assign(I18X,{'重盾':['Heavy shield',''],'機動盾':['Mobile shield',''],'重盾兵':['Heavy shield soldier',''],'機動盾兵':['Mobile shield soldier',''],'機槍兵':['Gunner',''],'散彈兵':['Breacher',''],'狙擊兵':['Marksman',''],'衝鋒兵':['Rusher',''],'此路不通':['You shall not pass',''],'鎮壓暴徒':['Riot suppression',''],'解除重盾防禦':['Lower heavy shield',''],'免費切換':['Free toggle',''],'切換模式':['Toggle mode',''],'已啟用 · 點擊關閉':['Active · Tap to disable',''],'點擊切換模式：免疫正面 120° 的武器攻擊；仍可被道具鎖定及範圍攻擊波及。啟用時可以移動、轉向，但不能攻擊或使用道具；關閉後恢復。':['Toggle immunity to weapon attacks from the front 120°. Gadgets and area attacks can still affect you. You may move and turn, but cannot attack or use gadgets while active.',''],'受到的傷害固定 −2。不能奔跑。此路不通可切換正面防禦模式。':['Incoming damage −2. Cannot sprint. Toggle frontal defense with You shall not pass.',''],'受到的傷害固定 −2。可以奔跑，鎮壓暴徒向前衝刺並撞擊。':['Incoming damage −2. Can sprint. Riot suppression charges forward and strikes.','']});
 Object.assign(I18X,{'盾兵職業更新':['Shield class update',''],'新增重盾兵與機動盾兵，接入男女角色圖與護盾特效':['Added heavy and mobile shield classes, male/female artwork and shield effects.','']});
+Object.assign(I18X,{'標示上一個階段曾移動位置的敵人；只標示掃描當下的位置，不揭露角色，保留到本階段結束。':['Mark enemies who changed spaces during the previous phase. Shows their positions at scan time, not their identities, until this phase ends.',''],'監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人':['Overwatch triggers only after moving in the current activation; Lion marks enemies who moved in the previous phase.','']});
+I18T.push(['{0} 啟動 EE-ONE-D，標示上一階段移動的 {1} 名敵人','{0} activated EE-ONE-D, marking {1} enemies who moved in the previous phase','']);
 function trText(o){const k=o.trim();if(!k||!/[㐀-鿿]/.test(k))return null;const ix=ME.lang==='en'?0:1;
   const t=trKey(k.replace(/\s+/g,' '),ix,0);if(t==null){I18MISS.add(k);return null;}return o.replace(k,t);}
 // tt: translate a string that is drawn on a canvas or shown in a dialog (outside the page text the observer swaps)
@@ -11209,7 +11218,7 @@ const DZN={Y:'輕',O:'中',R:'重'};
 const OSEL={side:'A',cur:null,en:false,cat:'all',faction:'all'};
 const opCat=c=>/破|突破|硬破|爆破/.test(c.zh.role||'')?'breach':/情報|偵|追蹤|反情報/.test(c.zh.role||'')?'intel':/醫|支援|盾|增益/.test(c.zh.role||'')?'support':/陷阱|封鎖|控制|拖延|反進攻/.test(c.zh.role||'')?'control':'combat';
 function osEco(c){const b=c.base,m=mxInfo(b),ok=ECO.rn>=OPPRICE;return `<div class="osEco">${OSEL.shop?(owned(b)?'<span class="osOwn">已擁有</span>':`<button class="primary" id="osBuy" ${ok?'':'disabled'}>購買 ${RNI}${fmtN(OPPRICE)}</button>${ok?'':`<small class="osNeed">聲望不足，還差 ${fmtN(OPPRICE-ECO.rn)}</small>`}`):''}<span class="osMx"><b>熟練度 Lv${m.lv}</b><span class="tkBar"><i style="width:${m.pct}%"></i></span><small>${m.nx?`${fmtN(m.xp)}/${fmtN(m.nx)}${MXREW[m.lv+1]?' · 下一級'+MXREW[m.lv+1]:MXREW[m.lv+2]?' · Lv'+(m.lv+2)+MXREW[m.lv+2]:''}`:'已滿級'}</small></span></div>`;}
-function cardText(c){if(ME.lang==='en'&&c.g&&c.g.ab&&c.g.ab.length)return c.g.ab.map(a=>`${a.k==='PASSIVE'?'':`<em>[${a.k}${a.t?' · '+esc(a.t):''}]</em> `}${esc(a.x).replace(/\[(\w+):(\w+)\]/g,'[$2 $1]')}`).join('<br>').replace(/[^.]*lean[^.]*\.?/gi,'');let zh=c.zh.x||'';zh=zh.replace(/[^。\n]*探身[^。\n]*[。\n]?/g,'').replace(/〔(?:橙色|黃色|紅色)(破壞)〕/g,'〔$1〕');return zh.replace(/〔([^〕]+)〕/g,'<em>〔$1〕</em>');}
+function cardText(c){if(c.base==='lion')return ME.lang==='en'?'Mark enemies who changed spaces during the previous phase. Position markers last until this phase ends; identities remain hidden.':OPS.lion.gd;if(ME.lang==='en'&&c.g&&c.g.ab&&c.g.ab.length)return c.g.ab.map(a=>`${a.k==='PASSIVE'?'':`<em>[${a.k}${a.t?' · '+esc(a.t):''}]</em> `}${esc(a.x).replace(/\[(\w+):(\w+)\]/g,'[$2 $1]')}`).join('<br>').replace(/[^.]*lean[^.]*\.?/gi,'');let zh=c.zh.x||'';zh=zh.replace(/[^。\n]*探身[^。\n]*[。\n]?/g,'').replace(/〔(?:橙色|黃色|紅色)(破壞)〕/g,'〔$1〕');return zh.replace(/〔([^〕]+)〕/g,'<em>〔$1〕</em>');}
 function openOpSelect(side,onDone,browse){OSEL.side=side;OSEL.done=onDone;OSEL.browse=!!browse;OSEL.shop=browse==='shop';OSEL.cat='all';OSEL.faction='all';OSEL.cur=cfg.picks[side][0]||OPBASE.find(b=>OPC[b].side===side);let el=$('#opsel');
   if(!el){el=document.createElement('div');el.id='opsel';el.className='opsel';document.body.appendChild(el);}el.hidden=false;renderOpSelect(true);}
 function closeOpSelect(){const el=$('#opsel');if(el)el.hidden=true;if(OSEL.done)OSEL.done();}
