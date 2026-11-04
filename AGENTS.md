@@ -271,3 +271,8 @@
 ## v174
 - 訓練關卡（lvStart）進場鏡頭：`lvIntroCam(hero)` 從主角正面低角度特寫（半徑 2.3、仰角 .16）開始，繞一圈多並拉高，目標點從主角滑到棋盤中心，最後停在 `setView('top')` 的俯視位置。
 - 透過 `R3.intro` 的 `ta`（起始目標）與 `r0`（起始半徑）欄位擴充 introStep；`lock:1` 讓過場中其他 flyTo 不打斷，使用者拖曳仍可中斷。
+
+## v175
+- 玩家設定面板 `.psettings` z-index 70 → 130，蓋在底部選單 #gnav（125）之上，手機上最下面的設定不再被擋。
+- 音效解鎖：iOS 的觸控 pointerdown/touchstart 不算使用者手勢，AudioContext 一直是 suspended。改成 touchend/pointerup/click 也會呼叫 init()，並在手勢內播一個 1 樣本的靜音 buffer；回到前景時重新 resume（處理 interrupted）。
+- iPhone 靜音開關打開時 Web Audio 本來就不會出聲。
