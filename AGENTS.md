@@ -200,3 +200,7 @@
 
 - `SCREEN==='lib'` 也由 `lobRender()` 畫在 `#tlob`（`libHTML`），`#tmenu` 隱藏。左邊大塊是幹員圖鑑：已擁有／總數、進度條、分頁（全部／進攻／防守／已擁有，`LIBF`）、頭像牆（`img/face/*.webp`，新進人員用 `img/av/cop_f|m.webp`；沒擁有的灰暗；點頭像開 `openOpSelect(...,true)` 並選中那名幹員；頭像牆可以在框內捲動）。右邊兩張小卡：規則（`#t-man` → `openManual`）、成就（`#t-ach`，進度環＋最近解鎖）。
 - 手機底部分頁列改成共用的 `lobNav(目前分頁)`（`t-home`、`t-train2`、`t-cop`、`t-shop`、`t-lib`）；電腦版左上「‹」回大廳。
+
+## v160：手機底部分頁列常駐
+
+- 手機（`lobMob()`）在選單畫面（`body[data-scr="title"]`，含大廳、訓練、作戰檔案）一直顯示 `#gnav`（`gnavSync` 每 250ms 依 `gnavState()` 亮對應分頁，`gnavGo` 切換：幹員開 `openCop`、商店開 `openShop`，其餘關掉這兩頁再換 `SCREEN`）。`#gnav` z-index 125，蓋在 `#cop`(115)、`#shop`(120) 上；顯示時 `html.gnav` 讓 `#shop`、`#cop`、`#copAl`、`.manual` 的底邊抬高 `--gnH`、`#title` 底部留白，原本的按鈕不會被擋到。幹員圖鑑 `#opsel`（z 200）會蓋過分頁列。
