@@ -195,3 +195,8 @@
 - 電腦（`.lob.d`）：左邊單一幹員＋名牌與戰績牌；右邊磚塊：線上對戰（大）、排行榜（前三名＋我的排名）、對戰電腦、訓練任務、培養幹員、商店、作戰檔案、活動（紫色，準備中，不能點）。
 - 按鈕 id 沿用 `t-pve`、`t-rank`、`t-cop`、`t-shop`、`t-lib`（新手教學會找這些 id）。新畫面：`SCREEN='train'`（`trainHTML`，「新手教學」`t-tu2` 呼叫 `tuStart()` 重玩腳本教學）、`SCREEN='board'`（`boardHTML`，前 10 名＋我的排名）。
 - 排行榜：每個玩家把兩名自訂幹員寫到共用資料 `board/<uid>_<slot>`（`{nm,k,sv,by,ts}`，`lbPush`，擊殺與存活都 0 時刪掉）；`lbLoad` 讀整個 `board` 集合（60 秒快取），自己的幹員用本機最新數值（`lbMine`）。排序：擊殺多的在前，同分比存活場數。
+
+## v159：作戰檔案改成「圖鑑主打」
+
+- `SCREEN==='lib'` 也由 `lobRender()` 畫在 `#tlob`（`libHTML`），`#tmenu` 隱藏。左邊大塊是幹員圖鑑：已擁有／總數、進度條、分頁（全部／進攻／防守／已擁有，`LIBF`）、頭像牆（`img/face/*.webp`，新進人員用 `img/av/cop_f|m.webp`；沒擁有的灰暗；點頭像開 `openOpSelect(...,true)` 並選中那名幹員；頭像牆可以在框內捲動）。右邊兩張小卡：規則（`#t-man` → `openManual`）、成就（`#t-ach`，進度環＋最近解鎖）。
+- 手機底部分頁列改成共用的 `lobNav(目前分頁)`（`t-home`、`t-train2`、`t-cop`、`t-shop`、`t-lib`）；電腦版左上「‹」回大廳。
