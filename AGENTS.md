@@ -217,3 +217,7 @@
 - 關卡資料在 `LVL` 陣列，主角數值在 `LVHERO[cls]`。欄位：map、mission(hostage|bomb)、rounds、zone(出生區 index)、passive(防守方不行動，只會自動監視)、goal:'plant'(安裝就算過)、hero:'live'(主角倒下就失敗)、def(手動擺放的防守方 [op,x,y,fd])或 foes(交給 autoDefSetup)、allies。
 - 主角用 `recruit_a_rifle` 暫時改 PROF/OPS（`lvHero`），離開時 `lvRestore()`。關卡對局 `G.lv` 存在時，最外層的 `finish` 包裝直接走 `lvFinish`，不會跑一般對戰的聲望、成就、培養幹員結算（也不會讓培養幹員陣亡重置）。包裝寫在主 script 最後面，新加的 finish 包裝要放在它之前。
 - 目前只做了衝鋒兵 3 關（smg1–3），其他職業和兩個炸彈篇顯示「敬請期待」。新增職業時記得補 `LVHERO` 和 `CSK` 的職業技能。
+
+## v163 底部分頁列順暢度
+- 點分頁時先立刻把那顆標成選中，下一個畫面幀才真正切頁（`requestAnimationFrame` + `setTimeout`），手指放開就有反應。按鈕加了 `touch-action:manipulation`。
+- 商店卡片改用 `opArtU(b)`（base64 立繪轉成快取的 blob URL，登入 3 秒後閒置時預先轉好），不再每次重畫都把幾 MB 的 base64 塞進 innerHTML。

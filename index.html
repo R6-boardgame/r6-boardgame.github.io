@@ -177,8 +177,8 @@ window.claude={use:async name=>{
 :root{--gnH:calc(57px + env(safe-area-inset-bottom))}
 html.gnav #shop,html.gnav #cop,html.gnav #copAl,html.gnav .manual{bottom:var(--gnH)!important}
 html.gnav #title{padding-bottom:calc(var(--gnH) + 12px)!important}
-#gnav button{font:inherit;cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 9px;font-size:11px;background:none;border:0;color:#8b97a3}
-#gnav svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8}
+#gnav button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:color .1s;font:inherit;cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 9px;font-size:11px;background:none;border:0;color:#8b97a3}
+#gnav svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8}#gnav button:active svg{transform:scale(.88)}
 #gnav button.on{color:#ffcf6b;box-shadow:inset 0 2px 0 #e3aa3e;cursor:default}
 @media (max-height:700px){#tlob .m .lobKD .kb em{font-size:40px}#tlob .m .lobKD .sb em{font-size:24px}#tlob .m .lobSide{gap:5px}#tlob .lobEv i{height:32px}}
 /* ===== desktop: tile board ===== */
@@ -10397,7 +10397,7 @@ function gnavSync(){let el=$('#gnav');const show=lobMob()&&preGame()&&document.b
   if(!el){if(!show)return;el=document.createElement('nav');el.id='gnav';el.setAttribute('aria-label','主選單');document.body.appendChild(el);}
   document.documentElement.classList.toggle('gnav',show);if(!show){if(!el.hidden){el.hidden=true;el.innerHTML='';}return;}
   if(el.hidden||!el.firstChild){el.hidden=false;el.innerHTML=[['home','t-home','home','大廳'],['train','t-train2','flag','訓練'],['cop','t-cop','user','幹員'],['shop','t-shop','shop','商店'],['lib','t-lib','book','作戰檔案']].map(([k,id,ic,l])=>`<button id="${id}" data-gn="${k}">${lobIc(ic)}<span>${l}</span></button>`).join('');
-    el.querySelectorAll('[data-gn]').forEach(b=>b.onclick=()=>gnavGo(b.dataset.gn));}
+    el.querySelectorAll('[data-gn]').forEach(b=>b.onclick=()=>{if(b.classList.contains('on')&&b.dataset.gn!=='home')return;el.querySelectorAll('[data-gn]').forEach(x=>x.classList.toggle('on',x===b));requestAnimationFrame(()=>setTimeout(()=>gnavGo(b.dataset.gn),0));});}
   const st=gnavState();el.querySelectorAll('[data-gn]').forEach(b=>b.classList.toggle('on',b.dataset.gn===st));}
 setInterval(gnavSync,250);
 function lobRender(){const t=$('#title');if(!t)return;let el=$('#tlob');if(!el){el=document.createElement('div');el.id='tlob';const bg=t.querySelector('.tbg');if(bg)bg.after(el);else t.prepend(el);}
@@ -11536,8 +11536,11 @@ function openShop(side){SHOP.side=side||cfg.side||'A';SHOP.pg=0;SHOP.sel=null;le
     addEventListener('keydown',e=>{if(el.hidden||e.key!=='Escape')return;if(SHOP.sel){SHOP.sel=null;renderShopDet();}else closeShop();});}
   el.hidden=false;el.classList.remove('out');renderShop();}
 function closeShop(){const el=$('#shop');if(!el)return;el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');},180);renderPlayer();{const c=$('#cop');if(c&&!c.hidden)renderCop();}if(SCREEN==='title')renderTitle();}
+// v163: shop cards use cached blob URLs instead of re-inserting every base64 portrait on each render
+const OPARTU={};function opArtU(b){const k=artBase(b);if(OPARTU[k])return OPARTU[k];if(!OPART[k])return '';try{const bin=atob(OPART[k]),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);return OPARTU[k]=URL.createObjectURL(new Blob([u8],{type:'image/webp'}));}catch(e){return opArt(b);}}
+{const warm=()=>{const L=Object.keys(OPART);let i=0;const step=d=>{while(i<L.length&&(!d||d.timeRemaining()>4)){opArtU(L[i++]);if(!d)break;}if(i<L.length)(window.requestIdleCallback||(f=>setTimeout(()=>f(null),60)))(step);};(window.requestIdleCallback||(f=>setTimeout(()=>f(null),60)))(step);};setTimeout(warm,3000);}
 function shopCard(b){const c=OPC[b],own=owned(b),play=opPlayable(b),st=own?'own':play?'buy':'soon';
-  return `<button class="shC ${st} ${c.side}" data-sb="${b}" aria-label="${esc(c.name)}"><span class="shArtW"><img class="shArt" src="${opArt(b)||opIcon(b)}" alt="" loading="lazy"></span>
+  return `<button class="shC ${st} ${c.side}" data-sb="${b}" aria-label="${esc(c.name)}"><span class="shArtW"><img class="shArt" src="${opArtU(b)||opIcon(b)}" alt="" loading="lazy"></span>
     <span class="shNmRow"><img class="shIc" src="${opIcon(b)}" alt=""><span class="shNm" style="--n:${c.name.length+2}">${esc(c.name)}</span></span>
     <span class="shTag">${own?'<i class="shOk">✓</i>已擁有':play?`${RNI}${fmtN(OPPRICE)}`:'即將開放'}</span></button>`;}
 function renderShop(){const el=$('#shop');if(!el||el.hidden)return;const s=SHOP.side;
