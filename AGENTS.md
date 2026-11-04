@@ -300,3 +300,7 @@
 
 ## v181
 - 培養幹員取名（#cpNm）：注音/拼音輸入法組字中（compositionstart～compositionend、isComposing、keyCode 229）不計字數也不截斷，選字完成後才套用 12 寬度上限（中文字算 2）；組字中按 Enter 不會送出。
+
+## v182
+- 教學最後一步「作戰檔案」的目標改成 `#gnav [data-gn=lib],#t-lib`（手機大廳已經沒有 #t-lib，原本整個畫面被遮住點不到）。
+- 教學中（G.tut2）鏡頭不再旋轉：aimCam/followCam 固定朝北（與 setView('angle') 同方向）、仰角改 70° 比較接近俯視，只會平移；射擊特寫在教學裡關閉。

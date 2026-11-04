@@ -8997,10 +8997,10 @@ function playCam(){if(!R3||!G)return;const u=(G.active&&G.active.side===G.player
   R3.followId=u.id;followCam(u,true);}
 // angled close-up on a unit, keeping the current compass direction; the unit sits clear of the panel (bottom sheet upright, right column sideways/desktop)
 function followCam(u,reset){if(!R3||!u||u.x<0)return;const c=R3.controls,cam=R3.camera,ph=cam.aspect<1;
-  let h=reset?new THREE.Vector3(-.5,0,.866):cam.position.clone().sub(c.target);h.y=0;if(h.lengthSq()<1e-4)h.set(0,0,1);h.normalize();
+  let h=reset?new THREE.Vector3(-.5,0,.866):cam.position.clone().sub(c.target);h.y=0;if(h.lengthSq()<1e-4||(G&&G.tut2))h.set(0,0,1);h.normalize();
   const right=new THREE.Vector3(h.z,0,-h.x),t=new THREE.Vector3(cwx(u.x,u.y),.4,cwz(u.x,u.y));
   // wider view; the unit sits at the centre of the part of the screen the panel leaves free
-  const e=48*Math.PI/180,d=ph?16:15,tV=Math.tan(cam.fov*Math.PI/360),tH=tV*cam.aspect;
+  const e=(G&&G.tut2?70:48)*Math.PI/180,d=ph?16:15,tV=Math.tan(cam.fov*Math.PI/360),tH=tV*cam.aspect;
   const fr=$('#frame').getBoundingClientRect(),pn=document.querySelector('.panel'),pr=pn&&!pn.hidden&&fr.width?pn.getBoundingClientRect():null;
   let cx=0,cy=0;if(pr&&pr.width){if(pr.left>fr.left+fr.width*.5)cx=((pr.left-fr.left)/fr.width*2-1-1)/2;else if(pr.top>fr.top+fr.height*.4)cy=(1-((pr.top-fr.top)/fr.height*2-1))/2;}
   t.addScaledVector(right,-cx*tH*d);t.addScaledVector(h,cy*tV*d/Math.sin(e));
@@ -9009,8 +9009,10 @@ function aimCam(u,pts,force){if(!force)return;if(!R3||!u||u.x<0||!pts||!pts.leng
   const P=pts.map(q=>Array.isArray(q)?q:[q.x,q.y]).filter(q=>q[0]>=0);if(!P.length)return;
   const U=new V(cwx(u.x,u.y),0,cwz(u.x,u.y)),C=new V(P.reduce((a,q)=>a+q[0],0)/P.length+.5,0,P.reduce((a,q)=>a+q[1],0)/P.length+.5);
   let h=U.clone().sub(C);h.y=0;if(h.lengthSq()<.01){h=cam.position.clone().sub(c.target);h.y=0;}h.normalize();
+  // v182: in the tutorial the camera never turns: same compass heading, steeper look, it only slides
+  const TUC=!!(G&&G.tut2);if(TUC)h=new V(0,0,1);
   const t=U.clone().lerp(C,.5);let span=U.distanceTo(t);P.forEach(q=>span=Math.max(span,t.distanceTo(new V(q[0]+.5,0,q[1]+.5))));
-  const e=54*Math.PI/180,d=Math.min(30,Math.max(ph?15:13,span*(ph?3:2.3)+4)),tV=Math.tan(cam.fov*Math.PI/360),tH=tV*cam.aspect,right=new V(h.z,0,-h.x);t.y=.4;
+  const e=(TUC?70:54)*Math.PI/180,d=Math.min(30,Math.max(ph?15:13,span*(ph?3:2.3)+4)),tV=Math.tan(cam.fov*Math.PI/360),tH=tV*cam.aspect,right=new V(h.z,0,-h.x);t.y=.4;
   const fr=$('#frame').getBoundingClientRect(),pn=document.querySelector('.panel'),pr=pn&&!pn.hidden&&fr.width?pn.getBoundingClientRect():null;
   let cx=0,cy=0;if(pr&&pr.width){if(pr.left>fr.left+fr.width*.5)cx=((pr.left-fr.left)/fr.width*2-1-1)/2;else if(pr.top>fr.top+fr.height*.4)cy=(1-((pr.top-fr.top)/fr.height*2-1))/2;}
   t.addScaledVector(right,-cx*tH*d);t.addScaledVector(h,cy*tV*d/Math.sin(e));
@@ -9855,7 +9857,7 @@ function clay3D(gd,grp){const dx=gd.dx||0,dy=gd.dy||1,sg=new THREE.Group();grp.a
 // ---------- shot cinematics: over-the-shoulder close-up (first person when a wall is behind) ----------
 const CINE={on:true,mode:'fp'};
 async function shotCam(sh,t){
-  if(!R3||!CINE.on||document.hidden)return false;
+  if(!R3||!CINE.on||document.hidden||(G&&G.tut2))return false;
   const c=R3.controls,cam=R3.camera,V3=THREE.Vector3;
   if(!R3.cineSave)R3.cineSave={p:(R3.camGoal?R3.camGoal.p:cam.position).clone(),t:(R3.camGoal?R3.camGoal.t:c.target).clone()};
   const S=new V3(cwx(sh.x,sh.y),0,cwz(sh.x,sh.y)),T=new V3(cwx(t.x,t.y),0,cwz(t.x,t.y)),dir=T.clone().sub(S);dir.y=0;dir.normalize();
@@ -11554,7 +11556,7 @@ const TU_GAME=[
   {t:'逃離',d:'直接從破口出去：點亮起的出生區格子。',cell:[14,4],wait:()=>!G.busy,ok:()=>G.over},
   {t:'教學完成',d:'你救出了人質！點「回主頁」。',el:'#menu'}];
 const TU_POST=[
-  {t:'作戰檔案',d:'最後帶你看規則。點「作戰檔案」。',el:'#t-lib',ok:()=>SCREEN==='lib'},
+  {t:'作戰檔案',d:'最後帶你看規則。點「作戰檔案」。',el:'#gnav [data-gn=lib],#t-lib',ok:()=>SCREEN==='lib'},
   {t:'規則',d:'點「規則」。',el:'#t-man',ok:()=>{const m=$('#manual');return !!m&&!m.hidden;}},
   {t:'準備實戰',d:'這就是本遊戲的規則。下一場就是實戰，會以這份規則為主。',free:1,next:'知道了',go:()=>tuEnd()}];
 const tuSteps=()=>TU.ph==='pre'?TU_PRE:TU.ph==='game'?TU_GAME:TU_POST;
