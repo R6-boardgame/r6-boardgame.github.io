@@ -1388,6 +1388,9 @@ html.pg,html.pg body{touch-action:manipulation}html.pg .psbox,html.pg .avgrid{to
 #barBtn svg{width:30px;height:30px}
 #escBtn{position:fixed;left:max(12px,env(safe-area-inset-left));z-index:9;width:62px;height:62px;padding:4px;border:2px solid #3fbf6a;border-radius:4px;background:#0a1710;color:#bff5cf;display:grid;place-items:center;grid-template-rows:1fr auto;gap:0;font:700 11px 'Noto Sans TC',sans-serif;cursor:pointer;box-shadow:0 0 14px rgba(63,191,106,.5);animation:bnIn .3s ease-out}
 #escBtn svg{width:30px;height:30px}
+.flowBtn{position:fixed;left:max(12px,env(safe-area-inset-left));z-index:9;width:62px;height:62px;padding:4px;border:2px solid #5aa9d6;border-radius:4px;background:#0b121a;color:#cfe9ff;display:grid;place-items:center;grid-template-rows:1fr auto;gap:0;font:700 11px 'Noto Sans TC',sans-serif;cursor:pointer;box-shadow:0 0 12px rgba(90,169,214,.4);animation:bnIn .3s ease-out}
+.flowBtn svg{width:30px;height:30px}.flowBtn.on{background:#173247;box-shadow:0 0 0 2px #cfe9ff,0 0 14px rgba(90,169,214,.7)}
+#doneBtn{border-color:#e3aa3e;color:#ffe2a6;box-shadow:0 0 14px rgba(227,170,62,.45)}
 #scanBtn{position:fixed;left:max(12px,env(safe-area-inset-left));z-index:9;width:62px;height:62px;padding:4px;border:2px solid #5ad0ff;border-radius:4px;background:#0b121a;color:#bfeaff;display:grid;place-items:center;grid-template-rows:1fr auto;gap:0;font:700 11px 'Noto Sans TC',sans-serif;cursor:pointer;box-shadow:0 0 14px rgba(90,208,255,.45);animation:bnIn .3s ease-out}
 #scanBtn svg{width:30px;height:30px}
 #scanBtn:disabled{opacity:.5;cursor:default}
@@ -7381,6 +7384,10 @@ function curTargets(){if(G&&G.wfPend)return G.wfPend;if(G&&G.mode==='cdir'&&cdir
   return [];
 }
 // v107: the active operator has no movement left (and is not already on overwatch): prompt for an overwatch direction
+// v183: finish an activation: overwatch toward where the unit faces, no arrow to pick
+function owFinish(u){if(!u||!G||G.busy||G.active!==u||!u.alive)return;
+  if(u.overwatch||u.defusing||u.heavyGuard||u.x<0){u.ap=0;u.mp=0;G.mode='move';return playerAfterAct();}
+  act(async()=>{overwatch(u,false,u.fd||[0,1]);await afterAct(u);});}
 function owAuto(u){return !!(u&&G&&G.active===u&&u.alive&&!u.overwatch&&!u.defusing&&u.mp<=0&&G.phase==='play'&&!G.over&&u.side===G.player&&curSide()===G.player&&!dmOf()&&!(TU&&TU.ph==='game'));}
 function noApTag(){let el=document.getElementById('noAp');const u=G&&G.active;const on=G&&!G.busy&&G.sel===u&&owAuto(u);
   if(!on){if(el)el.remove();return;}
@@ -7404,7 +7411,7 @@ async function act(fn){G.busy=true;render();try{await fn();}finally{G.busy=false
   if(dmOf()&&curSide()===G.player){G.mode='dronemove';return render();}
   const u=G.active;
   if(u&&((u.overwatch&&!u.mgOw)||!u.alive))playerAfterAct();
-  else if(owAuto(u)){G.sel=u;G.mode='owdir';render();} // v107: out of movement, ask for an overwatch direction
+  else if(owAuto(u)&&u.ap<=0&&!u.heavyGuard){G.mode='move';owFinish(u);} // v183: out of actions and movement, overwatch toward the facing direction and end
   else if(u&&u.ap<=0&&u.mp<=0)playerAfterAct();else{G.mode='move';render();}
   revealCheck();
 }
@@ -7418,7 +7425,7 @@ async function onCell(x,y){
   if(G.mode==='owq')return owqTap(x,y);
   if(G.mode==='pdir'){const g=pdirG();if(g&&adj8all(g.x,g.y).some(([a,b])=>a===x&&b===y)){g.fd=[x-g.x,y-g.y];G.pdir=null;const a=G.units.find(q=>q.id===g.owner);
     G.mode=G.phase==='setup'&&a&&a.ch>0?'gadget':'move';if(G.phase==='play'&&a&&G.active===a&&a.ap<=0&&a.mp<=0&&!owAuto(a))playerAfterAct();}else if(!g){G.pdir=null;G.mode='move';}return render();}
-  if(G.mode==='face'){const f=G.sel;G.mode='move';if(f&&adj8all(f.x,f.y).some(([a,b])=>a===x&&b===y)){f.fd=[x-f.x,y-f.y];revealCheck();camDiscover();}return render();}
+  if(G.mode==='face'){const f=G.sel;G.mode='move';if(f&&adj8all(f.x,f.y).some(([a,b])=>a===x&&b===y)){f.fd=[x-f.x,y-f.y];if(f.overwatch){f.owd=dir8(f.fd);f.fd=f.owd.slice();}if(R3&&R3.figs&&R3.figs[f.id])R3.figs[f.id].face=Math.atan2(f.fd[0],f.fd[1]);revealCheck();camDiscover();}return render();}
   const u=G.sel,c=cell(x,y),k=`${x},${y}`;
   if(G.phase==='setup'&&G.mode==='bpface'&&G.bpEye){const h=(G.bpPend||[]).find(p=>p.w[0]===x&&p.w[1]===y),e=G.bpEye;G.bpPend=null;G.bpEye=null;G.mode='move';if(h){G._eyeW=h;try{await useGadget(e,h.x,h.y);}finally{G._eyeW=null;}}if(e.ch>0){G.sel=e;G.mode='gadget';}return render();}
   if(G.phase==='setup'&&G.mode==='bpface'){const h=(G.bpPend||[]).find(p=>p.w[0]===x&&p.w[1]===y);G.bpPend=null;G.mode='bpcam';if(h){await deployGadget(u,'bpcam',h.x,h.y,h.w);if(!G.bpcam)G.mode='move';return render();}}
@@ -8564,6 +8571,18 @@ function escBtnUpd(){let b=document.getElementById('escBtn');const u=G&&G.sel;
   if(!b){b=document.createElement('button');b.id='escBtn';b.innerHTML='<svg viewBox="0 0 48 48" fill="none" stroke="#5fe08a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="10" r="5"/><circle cx="32" cy="13" r="4"/><path d="M17 15v14l-5 13M17 29l6 13M17 20l8 4 7-5M32 17v11l4 13M32 28l-4 13"/></svg><span>'+tt('護送人質')+'</span>';document.body.appendChild(b);}
   const sh=document.getElementById('sheetT'),r0=sh&&sh.getBoundingClientRect(),r=r0&&r0.width?r0:null;b.style.bottom=(r&&r.top>innerHeight*.4?Math.round(innerHeight-r.top+10):Math.round(innerHeight*.3))+'px';
   b.onclick=ev=>{ev.stopPropagation();const v=G.sel;if(!v||!escortOK(v)||!commit(v))return;act(()=>escort(v));};}
+// v183: floating 轉向 (any of your units, even spent ones) and 完成 (overwatch toward the facing direction, then end) buttons, stacked above the barricade slot
+function flowBtnUpd(){const scr=document.body.dataset.scr==='game',u=G&&G.sel,a=G&&G.active;
+  const base=G&&scr&&G.phase==='play'&&!G.over&&!G.busy&&curSide()===G.player&&!dmOf()&&!(TU&&TU.ph==='game');
+  const showT=base&&u&&u.side===G.player&&u.alive&&u.x>=0&&!u.defusing;
+  const showD=base&&a&&a===u&&a.side===G.player&&a.alive;
+  const mk=(id,html)=>{let b=document.getElementById(id);if(!b){b=document.createElement('button');b.id=id;b.className='flowBtn';b.innerHTML=html;document.body.appendChild(b);}return b;};
+  let t=document.getElementById('turnBtn'),d=document.getElementById('doneBtn');
+  if(!showT){if(t)t.remove();t=null;}else{t=mk('turnBtn','<svg viewBox="0 0 48 48" fill="none" stroke="#8fd3ff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M38 24a14 14 0 1 1-4.1-9.9"/><path d="M35 6v9h-9"/></svg><span>'+tt('轉向')+'</span>');t.classList.toggle('on',G.mode==='face');t.onclick=ev=>{ev.stopPropagation();if(!G.busy)setMode('face');};}
+  if(!showD){if(d)d.remove();d=null;}else{d=mk('doneBtn','<svg viewBox="0 0 48 48" fill="none" stroke="#ffd27a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 25l9 9 19-20"/></svg><span>'+tt('完成')+'</span>');d.onclick=ev=>{ev.stopPropagation();const v=G.active;if(v&&!G.busy){G.mode='move';owFinish(v);}};}
+  const sh=document.getElementById('sheetT'),r0=sh&&sh.getBoundingClientRect(),r=r0&&r0.width?r0:null;let y=r&&r.top>innerHeight*.4?Math.round(innerHeight-r.top+10):Math.round(innerHeight*.3);
+  if(['barBtn','escBtn','scanBtn'].some(i=>document.getElementById(i)))y+=70;
+  for(const b of [t,d])if(b){b.style.bottom=y+'px';y+=70;}}
 // v156: the moving drone's scan button sits where the barricade button does, same size
 function scanBtnUpd(){let b=document.getElementById('scanBtn');const d=dmOf(),u=G&&G.active;
   if(!d||!u||u.side!==G.player||document.body.dataset.scr!=='game'){if(b)b.remove();return;}
@@ -8571,7 +8590,7 @@ function scanBtnUpd(){let b=document.getElementById('scanBtn');const d=dmOf(),u=
   b.disabled=!!G.busy;
   const sh=document.getElementById('sheetT'),r0=sh&&sh.getBoundingClientRect(),r=r0&&r0.width?r0:null;b.style.bottom=(r&&r.top>innerHeight*.4?Math.round(innerHeight-r.top+10):Math.round(innerHeight*.3))+'px';
   b.onclick=ev=>{ev.stopPropagation();const a=G.active;if(!dmOf()||!a||G.busy)return;act(()=>droneFinish(a));};}
-function render(){trackMovement();try{syncElec();}catch(e){}try{const a=G&&G.active;if(a&&G.sel===a&&G.mode==='move'&&!G.busy&&owAuto(a)&&a.ap<=0)G.mode='owdir';}catch(e){}setTimeout(()=>{try{noApTag();}catch(e){}},0);setTimeout(()=>{try{barBtnUpd();}catch(e){}try{escBtnUpd();}catch(e){}try{scanBtnUpd();}catch(e){}},0);try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{renderTension();}catch(e){}
+function render(){trackMovement();try{syncElec();}catch(e){}try{const a=G&&G.active;if(a&&G.mode==='move'&&!G.busy&&owAuto(a)&&a.ap<=0&&!a.heavyGuard&&!G._owF){G._owF=1;setTimeout(()=>{G._owF=0;if(G.active===a&&G.mode==='move'&&!G.busy&&owAuto(a)&&a.ap<=0)owFinish(a);},200);}}catch(e){}setTimeout(()=>{try{noApTag();}catch(e){}},0);setTimeout(()=>{try{barBtnUpd();}catch(e){}try{escBtnUpd();}catch(e){}try{scanBtnUpd();}catch(e){}try{flowBtnUpd();}catch(e){}},0);try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{renderTension();}catch(e){}
   const scr=G?'game':(SCREEN==='setup'?'setup':'title');document.body.dataset.scr=scr;{const wz=$('#wiz');if(wz&&(G||SCREEN!=='setup'))wz.hidden=true;}
   const tt=$('#title');if(tt){const show=scr==='title';if(tt.hidden===show)tt.hidden=!show;if(show&&tt.dataset.s!==SCREEN){tt.dataset.s=SCREEN;renderTitle();}}
   if(R3){heroScene(scr==='title');if(R3.lastScr!==scr){R3.lastScr=scr;R3.sig='';if(scr!=='title')setTimeout(()=>R3&&!R3.camGoal&&setView(G&&G.phase==='setup'?'top':'angle'),0);}}
@@ -8761,8 +8780,9 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
       if(G.mission!=='hostage'&&G.defuser)L.push(btn('解除拆彈器',sub('obj','站上或相鄰'),false,!can('obj')||!defuseOK(u),wrap(async()=>{defuse(u);await afterAct(u);}),'primary'));
     }
     if(u.gi)for(const [k,n] of Object.entries(u.gi)){const m=k==='charges'?'charge':k;tac(m,INV[u.side==='A'?'D':'A'][k][0],n,giBorrow(u,m,()=>giTargets(u,m)));}
-    if(curSide()===G.player&&!G.busy&&!u.defusing)L.push(btn('轉向',G.mode==='face'?'點箭頭選方向':'免費 · 不花行動',G.mode==='face',false,()=>setMode('face'),'','<span class="bic" style="display:inline-grid;place-items:center;font-size:1.1em">⟳</span>'));
-    if(ok)L.push(btn('監視',G.mode==='owdir'?'點箭頭選方向':'選方向後結束',G.mode==='owdir',G.busy,()=>{if(G.mode==='owdir')return setMode('move');if(commit(u))setMode('owdir');},'primary owb'));
+    const TUG=!!(TU&&TU.ph==='game');
+    if(TUG&&curSide()===G.player&&!G.busy&&!u.defusing)L.push(btn('轉向',G.mode==='face'?'點箭頭選方向':'免費 · 不花行動',G.mode==='face',false,()=>setMode('face'),'','<span class="bic" style="display:inline-grid;place-items:center;font-size:1.1em">⟳</span>'));
+    if(TUG&&ok)L.push(btn('監視',G.mode==='owdir'?'點箭頭選方向':'選方向後結束',G.mode==='owdir',G.busy,()=>{if(G.mode==='owdir')return setMode('move');if(commit(u))setMode('owdir');},'primary owb'));
   }} else {el.remove();return;}
   el.innerHTML='';
   L.forEach(b=>{if(!b.ic&&GADIC[b.label])b.ic=`<img class="bic gic" src="${GADIC[b.label]}" alt="">`;if(!b.ic&&ACTIC[b.label])b.ic=`<img class="bic act" src="${uiImg('act_'+ACTIC[b.label])}" alt="">`;const e=document.createElement('button');e.innerHTML=`${b.ic?`<span class="bwrap">${b.ic}<span>`:''}${b.label}${b.sub?`<span class="sub">${actSub(b.sub)}</span>`:''}${b.ic?'</span></span>':''}`;if(b.ic)e.classList.add('hasic');if(b.on)e.classList.add('on');if(b.cls)e.classList.add(...b.cls.split(" "));e.disabled=!!b.dis||G.busy;e.onclick=b.fn;el.appendChild(e);});bindGB();
