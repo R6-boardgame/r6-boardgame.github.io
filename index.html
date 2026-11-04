@@ -8626,10 +8626,10 @@ function escBtnUpd(){let b=document.getElementById('escBtn');const u=G&&G.sel;
   if(!b){b=document.createElement('button');b.id='escBtn';b.innerHTML='<svg viewBox="0 0 48 48" fill="none" stroke="#5fe08a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="10" r="5"/><circle cx="32" cy="13" r="4"/><path d="M17 15v14l-5 13M17 29l6 13M17 20l8 4 7-5M32 17v11l4 13M32 28l-4 13"/></svg><span>'+tt('護送人質')+'</span>';document.body.appendChild(b);}
   const sh=document.getElementById('sheetT'),r0=sh&&sh.getBoundingClientRect(),r=r0&&r0.width?r0:null;b.style.bottom=(r&&r.top>innerHeight*.4?Math.round(innerHeight-r.top+10):Math.round(innerHeight*.3))+'px';
   b.onclick=ev=>{ev.stopPropagation();const v=G.sel;if(!v||!escortOK(v)||!commit(v))return;act(()=>escort(v));};}
-// v183: floating 轉向 (any of your units, even spent ones) and 完成 (overwatch toward the facing direction, then end) buttons, stacked above the barricade slot
+// v183/v184: floating 轉向 (the active unit, or one that already acted this round; not ones still waiting to act) and 完成 (overwatch toward the facing direction, then end) buttons, stacked above the barricade slot
 function flowBtnUpd(){const scr=document.body.dataset.scr==='game',u=G&&G.sel,a=G&&G.active;
   const base=G&&scr&&G.phase==='play'&&!G.over&&!G.busy&&curSide()===G.player&&!dmOf()&&!(TU&&TU.ph==='game');
-  const showT=base&&u&&u.side===G.player&&u.alive&&u.x>=0&&!u.defusing;
+  const showT=base&&u&&u.side===G.player&&u.alive&&u.x>=0&&!u.defusing&&(u===a||u.activated);
   const showD=base&&a&&a===u&&a.side===G.player&&a.alive;
   const mk=(id,html)=>{let b=document.getElementById(id);if(!b){b=document.createElement('button');b.id=id;b.className='flowBtn';b.innerHTML=html;document.body.appendChild(b);}return b;};
   let t=document.getElementById('turnBtn'),d=document.getElementById('doneBtn');
