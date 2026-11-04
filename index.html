@@ -420,16 +420,17 @@ html,body{background:#06090d}
   // v168: flavour lines instead of "loading"
   let lg='zh';try{lg=(JSON.parse(localStorage.getItem('r6bg.profile')||'{}').lang)||'zh';}catch(e){}
   const LN=[['Sledge 正在磨他的錘子','Sledge is sharpening his hammer','Sledgeがハンマーを研いでいる'],['Twitch 正在幫電車充電','Twitch is charging her shock drone','Twitchがドローンを充電中'],['Thermite 正在調配鋁熱劑','Thermite is mixing thermite','Thermiteがテルミットを調合中'],['Mute 正在調干擾器的頻率','Mute is tuning his jammers','Muteがジャマーの周波数を調整中'],['Castle 正在釘防彈板','Castle is nailing up armor panels','Castleが防弾パネルを打ち付けている'],['Smoke 正在檢查毒氣罐（偷偷聞了一下）','Smoke is checking his gas canisters (and sniffing one)','Smokeがガス缶を点検中（ちょっと嗅いだ）'],['Ash 正在裝填破牆彈','Ash is loading breaching rounds','Ashがブリーチング弾を装填中'],['Jäger 正在擦亮他的 ADS','Jäger is polishing his ADS','JägerがADSを磨いている'],['Pulse 正在校準心跳感應器','Pulse is calibrating his heartbeat sensor','Pulseが心拍センサーを調整中'],['Thatcher 又在找他的 EMP','Thatcher is looking for his EMP again','ThatcherがまたEMPを探している'],['Bandit 正在幫電線通電','Bandit is wiring up the batteries','Banditがバッテリーをつないでいる'],['Montagne 正在擦他的盾牌','Montagne is polishing his shield','Montagneが盾を磨いている']],li=lg==='en'?1:lg==='ja'?2:0;
-  let k=Math.floor(Math.random()*LN.length);const say=()=>{ln.textContent=LN[k][li]+'…';k=(k+1)%LN.length;};say();const sayT=setInterval(()=>{ln.style.opacity=0;setTimeout(()=>{say();ln.style.opacity=1;},250);},1700);
+  let k=-1;const say=()=>{let j;do j=Math.floor(Math.random()*LN.length);while(j===k&&LN.length>1);k=j;ln.textContent=LN[k][li]+'…';};say();const sayT=setInterval(()=>{ln.style.opacity=0;setTimeout(()=>{say();ln.style.opacity=1;},250);},1700);
   const set=v=>{v=Math.max(p,Math.min(1,v));if(v===p)return;p=v;bar.style.width=(p*100).toFixed(1)+'%';pc.textContent=Math.floor(p*100)+'%';};
   const mo=new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.tagName==='SCRIPT')sc++;});mo.observe(document.documentElement,{childList:true,subtree:true});
   const tick=()=>{if(done)return;const t=(Date.now()-t0)/1000;
     if(!dcl)set(Math.min(.8,Math.max(.75*(1-Math.exp(-t/5)),.8*Math.min(1,sc/N))));
     else if(!tl){const im=[...document.images],ok=im.filter(i=>i.complete).length;set(.8+.1*(im.length?ok/im.length:1));}
-    else set(.9+.09*(1-Math.exp(-(Date.now()-tl)/2500)));
+    else{const w=window.__warm,f=w?(w.done?1:w.n/w.tot):1;set(.9+.09*Math.max(f,.5*(1-Math.exp(-(Date.now()-tl)/2500))));}
     setTimeout(tick,120);};tick();
   document.addEventListener('DOMContentLoaded',()=>{dcl=true;mo.disconnect();});
   const fin=()=>{if(done)return;const go=()=>{if(done)return;if(!tl)tl=Date.now();if(!document.getElementById('login')&&Date.now()-t0<30000)return setTimeout(go,50);
+      {const w=window.__warm;if(w&&!w.done&&Date.now()-tl<15000)return setTimeout(go,80);}
       {const fb=window.R6FB,wait=Date.now()-tl<8000&&fb&&fb.settled&&(!fb.settled()||(fb.user()&&window.GA&&(GA.busy||!GA.u)));if(wait)return setTimeout(go,80);}
       done=true;set(1);clearInterval(sayT);setTimeout(()=>{el.classList.add('out');el.setAttribute('aria-busy','false');setTimeout(()=>el.remove(),400);},180);};
     (document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,3000))]):Promise.resolve()).then(go);};
@@ -10371,7 +10372,7 @@ const LVL=[
 const LVSET={job:{n:'職前訓練',en:'JOB TRAINING'},def:{n:'固若金湯',en:'DEFENSE',sk:'castle',cnt:6,ls:['築牆固守','請君入甕','天眼監控','寸土不讓','絕地回防','實戰']},atk:{n:'破門攻堅',en:'BREACH',sk:'sledge',cnt:6,ls:['破門而入','無人偵察','熱熔破牆','掩護安裝','分秒必爭','實戰']}};
 // v166: which picture each class card uses (sniper female, gunner male per 吾主)
 const LVART={smg:'m',hs:'m',sh:'f',sg:'m',rf:'f',sn:'f',mg:'m'};
-const lvArt=w=>`img/cop/${LVART[w]}_${w}.${['hs','sh'].includes(w)?'png':'webp'}`;
+const lvArt=w=>`img/cop/${LVART[w]}_${w}.webp`;
 let TRS={v:'cats',pk:null};try{const s=JSON.parse(localStorage.getItem('r6bg.trs')||'null');if(s&&(s.v==='cats'||LVSET[s.v]))TRS.v=s.v;}catch(e){}
 const lvDone=id=>!!(ECO.lv&&ECO.lv[id]);
 const lvOf=cls=>LVL.filter(l=>l.cls===cls).sort((a,b)=>a.t-b.t);
@@ -10484,9 +10485,10 @@ function lobHTML(){const cs=copAll(),i=LOBI%2,c=cs[i],rk=copScore(c).rk,art=copA
 
 // v160: phone bottom tabs stay on every menu page (lobby, training, operators, shop, files); pages they sit over get their bottom raised by --gnH
 function gnavState(){const vis=s=>{const e=$(s);return !!e&&!e.hidden;};if(vis('#shop'))return 'shop';if(vis('#cop')||vis('#copAl'))return 'cop';return SCREEN==='train'?'train':SCREEN==='lib'?'lib':SCREEN==='title'?'home':'';}
-function gnavGo(k){const shop=$('#shop'),cop=$('#cop'),al=$('#copAl');const closeAll=keep=>{if(keep!=='shop'&&shop&&!shop.hidden)closeShop();if(keep!=='cop'){if(al&&!al.hidden)al.hidden=true;if(cop&&!cop.hidden)closeCop();}};
+let GNSW=false;// v169: while switching tabs, closing the shop or operators page doesn't redraw the lobby underneath first
+function gnavGo(k){const shop=$('#shop'),cop=$('#cop'),al=$('#copAl');let sw=false;const closeAll=keep=>{GNSW=true;try{if(keep!=='shop'&&shop&&!shop.hidden)closeShop();if(keep!=='cop'){if(al&&!al.hidden)al.hidden=true;if(cop&&!cop.hidden){closeCop();sw=true;}}if(keep!=='shop'&&shop&&!shop.hidden)sw=true;}finally{GNSW=false;}};
   NETMSG='';if(k==='cop'){closeAll('cop');CP.i=LOBI;openCop();}else if(k==='shop'){closeAll('shop');if(!shop||shop.hidden)openShop();}
-  else{closeAll();const s={home:'title',train:'train',lib:'lib'}[k];if(SCREEN!==s){SCREEN=s;renderTitle();}}gnavSync();}
+  else{closeAll();const s={home:'title',train:'train',lib:'lib'}[k];if(SCREEN!==s||sw){SCREEN=s;renderTitle();}}gnavSync();}
 function gnavSync(){let el=$('#gnav');const show=lobMob()&&preGame()&&document.body.dataset.scr==='title';
   if(!el){if(!show)return;el=document.createElement('nav');el.id='gnav';el.setAttribute('aria-label','主選單');document.body.appendChild(el);}
   document.documentElement.classList.toggle('gnav',show);if(!show){if(!el.hidden){el.hidden=true;el.innerHTML='';}return;}
@@ -11639,10 +11641,23 @@ function openShop(side){SHOP.side=side||cfg.side||'A';SHOP.pg=0;SHOP.sel=null;le
     addEventListener('resize',()=>{if(!el.hidden)renderShop();});
     addEventListener('keydown',e=>{if(el.hidden||e.key!=='Escape')return;if(SHOP.sel){SHOP.sel=null;renderShopDet();}else closeShop();});}
   el.hidden=false;el.classList.remove('out');renderShop();}
-function closeShop(){const el=$('#shop');if(!el)return;el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');},180);renderPlayer();{const c=$('#cop');if(c&&!c.hidden)renderCop();}if(SCREEN==='title')renderTitle();}
+function closeShop(){const el=$('#shop');if(!el)return;el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');},180);renderPlayer();{const c=$('#cop');if(c&&!c.hidden)renderCop();}if(SCREEN==='title'&&!GNSW)renderTitle();}
 // v163: shop cards use cached blob URLs instead of re-inserting every base64 portrait on each render
 const OPARTU={};function opArtU(b){const k=artBase(b);if(OPARTU[k])return OPARTU[k];if(!OPART[k])return '';try{const bin=atob(OPART[k]),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);return OPARTU[k]=URL.createObjectURL(new Blob([u8],{type:'image/webp'}));}catch(e){return opArt(b);}}
-{const warm=()=>{const L=Object.keys(OPART);let i=0;const step=d=>{while(i<L.length&&(!d||d.timeRemaining()>4)){opArtU(L[i++]);if(!d)break;}if(i<L.length)(window.requestIdleCallback||(f=>setTimeout(()=>f(null),60)))(step);};(window.requestIdleCallback||(f=>setTimeout(()=>f(null),60)))(step);};setTimeout(warm,3000);}
+// v169: warm every picture while the loading screen is up, so menus open without fetching or decoding
+window.__warm=(()=>{const W={done:false,n:0,tot:1,keep:[]};setTimeout(()=>{try{
+  const U=new Set();Object.keys(OPART).forEach(b=>{const u=opArtU(b);if(u)U.add(u);});
+  Object.keys(OPC).forEach(b=>{try{U.add(libFace(b));}catch(e){}});
+  Object.keys(WPN).forEach(w=>['f','m'].forEach(g=>U.add(`img/cop/${g}_${w}.webp`)));COPART.forEach(u=>U.add(u));
+  Object.keys(MAPS).forEach(k=>U.add(`img/map/${k}_bg.webp`));
+  const L=[...U].filter(Boolean);W.tot=L.length||1;let i=0;
+  const one=()=>{if(i>=L.length)return Promise.resolve();const im=new Image();im.decoding='async';W.keep.push(im);const u=L[i++];
+    return new Promise(r=>{im.onload=()=>{(im.decode?im.decode():Promise.resolve()).catch(()=>{}).then(r);};im.onerror=r;im.src=u;}).then(()=>{W.n++;return one();});};
+  Promise.all(Array.from({length:6},one)).then(()=>{
+    // build the shop and operators pages once under the loading screen, so their first open is quick
+    for(const [o,id] of [[openShop,'shop'],[openCop,'cop']])try{if(document.getElementById(id))continue;o();const e=document.getElementById(id);void e.offsetHeight;e.hidden=true;}catch(e){}
+    W.done=true;});
+  }catch(e){W.done=true;}},0);setTimeout(()=>{W.done=true;},15000);return W;})();
 function shopCard(b){const c=OPC[b],own=owned(b),play=opPlayable(b),st=own?'own':play?'buy':'soon';
   return `<button class="shC ${st} ${c.side}" data-sb="${b}" aria-label="${esc(c.name)}"><span class="shArtW"><img class="shArt" src="${opArtU(b)||opIcon(b)}" alt="" loading="lazy"></span>
     <span class="shNmRow"><img class="shIc" src="${opIcon(b)}" alt=""><span class="shNm" style="--n:${c.name.length+2}">${esc(c.name)}</span></span>
@@ -11988,7 +12003,7 @@ const runCap=c=>c.w==='hs'?0:COPARM[c.arm].run;
 /* v152: adding armor auto-trims run to the new cap; those refunded run points count toward the 2-point armor cost */
 const armFree=c=>c.arm>=3?0:Math.max(0,c.run-(c.w==='hs'?0:COPARM[c.arm+1].run));
 const copDice=c=>c.d;
-const copArt=(c,i)=>c.w&&WART[c.w]?`img/cop/${i?'m':'f'}_${c.w}.${['hs','sh'].includes(c.w)?'png':'webp'}`:COPART[i];
+const copArt=(c,i)=>c.w&&WART[c.w]?`img/cop/${i?'m':'f'}_${c.w}.webp`:COPART[i];
 function wApply(c,w){const n=JSON.parse(JSON.stringify(c));n.w=w;if(!n.sk||classOf(n.sk))n.sk=classKey(w);
   for(let b=0;b<3;b++){let L=n.d[b].slice().sort((x,y)=>RANKD[y]-RANKD[x]).slice(0,bMax(n,b));if(bNoR(n,b))L=L.map(x=>x==='R'?'O':x);n.d[b]=L.length?L:['Y'];}
   while(n.d.flat().length>dTot(n)){let bi=-1;n.d.forEach((L,b)=>{if(L.length>1&&(bi<0||L.length>n.d[bi].length))bi=b;});if(bi<0)break;n.d[bi].sort((x,y)=>RANKD[y]-RANKD[x]).pop();}
@@ -12070,7 +12085,7 @@ function openCop(){copAll();let el=$('#cop');
   if(!el){el=document.createElement('div');el.id='cop';el.setAttribute('role','dialog');el.setAttribute('aria-label','培養幹員');document.body.appendChild(el);
     addEventListener('keydown',e=>{if(el.hidden||e.key!=='Escape')return;if(CP.sheet){CP.sheet=null;renderCop();}else closeCop();});}
   copDraft();CP.sheet=null;CP.edit=false;el.hidden=false;el.classList.remove('out');renderCop();}
-function closeCop(){const el=$('#cop');if(!el)return;el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');},180);if(SCREEN==='cop')SCREEN='title';renderTitle();}
+function closeCop(){const el=$('#cop');if(!el)return;el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');},180);if(SCREEN==='cop')SCREEN='title';if(!GNSW)renderTitle();}
 function cpPenta(sc){const ax=['火力','破壞力','視野','速度','裝甲'],cx=69,cy=70,R=46,pt=(i,r)=>{const a=-Math.PI/2+i*2*Math.PI/5;return [+(cx+r*Math.cos(a)).toFixed(1),+(cy+r*Math.sin(a)).toFixed(1)];};let s='';
   for(const f of [1,.66,.33])s+=`<polygon points="${ax.map((_,i)=>pt(i,R*f).join(',')).join(' ')}" fill="${f===1?'#0e141bcc':'none'}" stroke="#2c3b4a"/>`;
   ax.forEach((_,i)=>{const [x,y]=pt(i,R);s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2c3b4a"/>`;});
