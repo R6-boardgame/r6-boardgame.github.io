@@ -317,7 +317,8 @@ body:not([data-scr="game"]) #lvGoal{display:none}
 #tlob .trnCd .sl svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.4}
 #tlob .trnCd .sl button.ok{box-shadow:inset 0 -3px 0 #e3aa3e}
 #tlob .trnCd .sl button.lk{cursor:default;background:linear-gradient(rgba(5,8,10,.55),rgba(5,8,10,.9))}#tlob .trnCd .sl button.lk b,#tlob .trnCd .sl button.lk em{color:#6c7680}
-#tlob .trnCd.tu{cursor:pointer}#tlob .trnCd.tu .ar{background-size:auto 200%;opacity:.35}
+#tlob .trnCd.tu{cursor:pointer}#tlob .trnCd.tu .tuTx{text-shadow:0 1px 4px #000}#tlob .trnCd.tu:after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 55%,rgba(0,0,0,.85));pointer-events:none}
+#tlob .trnCd[data-w=smg] .ar{background-size:auto 150%;background-position:center 6%}/* v171: the rusher crouches, so his half-body reads bigger than the others */
 #tlob .trnCd.tu:hover{border-color:#e3aa3e}
 #tlob .trnCd.tu .tuTx{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;font-size:13px;color:#b9c3cc;line-height:1.5}
 #tlob .trnSet{position:relative;height:100%;max-width:1000px;margin:0 auto;overflow:hidden;border:1px solid rgba(255,255,255,.15);background:#1a232a}
@@ -10388,10 +10389,10 @@ function trnHTML(){const M=lobMob(),cs=copAll(),i=LOBI%2,v=TRS.v;
     body=`<div class="trnCats">${Object.entries(LVSET).map(([k,S])=>{const [a,b]=prog[k];return `<button class="trnCat" data-trv="${k}"><span class="ar" style="background-image:url(${art[k]})"></span><span class="tx"><small>${S.en}</small><b>${S.n}</b><span class="sb">${sub[k]}</span><span class="rw">${rw[k]}</span><span class="bar"><i style="width:${a/b*100}%"></i></span><span class="ct">${a} / ${b}</span></span></button>`;}).join('')}</div>`;}
   else if(v==='job'){const [a,b]=prog.job;pr=`<div class="trnPr"><b>${a}</b> / ${b}</div>`;
     body=`<div class="trnJob">${LVCLS.map(w=>{const L=lvOf(w),dn=L.filter(l=>lvDone(l.id)).length;
-      return `<div class="trnCd"><span class="ar" style="background-image:url(${lvArt(w)})"></span><div class="nm">${WPN[w].t}<small>${dn}/3</small></div><div class="sl">${[0,1,2].map(t=>{const l=L.find(x=>x.t===t);
+      return `<div class="trnCd" data-w="${w}"><span class="ar" style="background-image:url(${lvArt(w)})"></span><div class="nm">${WPN[w].t}<small>${dn}/3</small></div><div class="sl">${[0,1,2].map(t=>{const l=L.find(x=>x.t===t);
         if(!l)return `<button class="lk" disabled><b>${TRLK}${LVTIER[t]}</b>${M?'':'<em>敬請期待</em>'}</button>`;
         const op=lvOpen(l),d=lvDone(l.id);return `<button class="${d?'ok':op?'':'lk'}" data-trp="${l.id}"${op?'':' disabled'}><b>${op?'':TRLK}${LVTIER[t]}${d?'<i>✓</i>':''}</b>${M?'':`<em>${l.n}</em>`}</button>`;}).join('')}</div></div>`;}).join('')}
-      <button class="trnCd tu" data-trp="tu"><span class="ar" style="background-image:url(${copArt(cs[i],i)})"></span><div class="nm">${TRN[0].n}${tuSeen()?'<small>✓</small>':''}</div><div class="tuTx">${M?'基本操作':TRN[0].d}</div></button></div>`;}
+      <button class="trnCd tu" data-trp="tu"><span class="ar" style="background-image:url(${COPART[0]})"></span><div class="nm">${TRN[0].n}${tuSeen()?'<small>✓</small>':''}</div><div class="tuTx">${M?'基本操作':TRN[0].d}</div></button></div>`;}
   else{const S=LVSET[v],[a,b]=prog[v];pr=`<div class="trnPr"><b>${a}</b> / ${b}</div>`;
     body=`<div class="trnSet"><span class="ar" style="background-image:url(${opArtU(S.sk)})"></span><span class="rw">全部過關：${OPC[S.sk].name} 技能</span><div class="g">${S.ls.map((n,k)=>`<button class="lk${k===5?' fin':''}" disabled><u>0${k+1}</u><b>${n}</b><em>${TRLK}敬請期待</em></button>`).join('')}</div></div>`;}
   let pop='';const pk=TRS.pk;
