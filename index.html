@@ -180,6 +180,7 @@ html.gnav #title{padding-bottom:calc(var(--gnH) + 12px)!important}
 #gnav button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:color .1s;font:inherit;cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 9px;font-size:11px;background:none;border:0;color:#8b97a3}
 #gnav svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8}#gnav button:active svg{transform:scale(.88)}
 #gnav button.on{color:#ffcf6b;box-shadow:inset 0 2px 0 #e3aa3e;cursor:default}
+html body #gnav button:hover,html body #gnav button:focus,html body #gnav button:active{border:0;background:none;outline:none;box-shadow:none}html body #gnav button.on:hover,html body #gnav button.on:focus,html body #gnav button.on:active{box-shadow:inset 0 2px 0 #e3aa3e}/* v173: no white hover edge flashing on tap */
 @media (max-height:700px){#tlob .m .lobKD .kb em{font-size:40px}#tlob .m .lobKD .sb em{font-size:24px}#tlob .m .lobSide{gap:5px}#tlob .lobEv i{height:32px}}
 /* ===== desktop: tile board ===== */
 #tlob .d .lobHero{left:8%;bottom:0;height:calc(88% * var(--hs,1));max-width:38%;object-fit:contain;object-position:bottom}
@@ -6064,7 +6065,9 @@ function mkUnit(op,side,i){
 function viewers(side){return G.units.filter(u=>u.alive&&u.side===side&&u.x>=0).map(u=>[u.x,u.y,14]);}
 // like the miniatures on the table, every operator is public except hidden defenders (shown as tokens among decoys)
 // fog of war: an enemy shows only while one of your operators has line of sight to it, or after it was hit (until it moves); a located enemy is only a marker on the map
-function seenBy(side,e){if(G.over)return true;if(smokeAt(e.x,e.y))return false;if(e.side===side)return true;if(!e.alive||e.x<0||G.phase==='setup')return false;if(e.exp&&e.exp[0]===e.x&&e.exp[1]===e.y&&G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&!smokeBlocks(a.x,a.y,e.x,e.y)))return true;return G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&inSight(a,e))||sharedCells(side).has(e.y*G.W+e.x);}
+// v173: 入門 training levels have no fog of war
+const noFog=()=>!!(G&&G.lv&&G.lv.t===0);
+function seenBy(side,e){if(G.over)return true;if(noFog()&&side===G.player&&e.alive&&e.x>=0&&G.phase!=='setup')return true;if(smokeAt(e.x,e.y))return false;if(e.side===side)return true;if(!e.alive||e.x<0||G.phase==='setup')return false;if(e.exp&&e.exp[0]===e.x&&e.exp[1]===e.y&&G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&!smokeBlocks(a.x,a.y,e.x,e.y)))return true;return G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&inSight(a,e))||sharedCells(side).has(e.y*G.W+e.x);}
 function sees(side){if(G.phase==='setup'&&!G.over)return new Set();const s=new Set();for(const e of G.units){if(!e.alive||e.side===side||e.x<0)continue;if(seenBy(side,e))s.add(e.id);}return s;}
 // v89: every operator sees a 120° fan in front of him (10 cells, snipers 14), straight-line distance, nothing behind; seeing an enemy is what lets you shoot him
 const SNIPE=new Set(['glaz','kali']),VR=u=>u.vr||(SNIPE.has(u.op)?14:10),edist=(a,b,c,d)=>Math.round(Math.hypot(a-c,b-d));
@@ -6095,7 +6098,7 @@ function revealCheck(){if(!G||G.phase!=='play'||G.over)return;const atk=alive('A
 function hostFound(){const h=G.hostage;if(!h||h.known)return;h.known=true;if(G.player==='A')bigNote('發現人質',`在 ${coord(h.x,h.y)}`,'a',1500);log('進攻方發現了人質的位置','ka');}
 function hostSeen(){const h=G.hostage;if(!h)return false;if(G.over)return true;if(h.by){const c=G.units.find(a=>a.id===h.by);return !!c&&seenBy(G.player,c);}return G.player==='D'||!!h.known;}
 // lit = every fan of your squad plus what your drones / cameras share; the selected operator's fan is drawn on top (visFx3D)
-function fogVis(){return visCells(G.player);}
+function fogVis(){if(noFog()){const s=new Set();for(let i=0;i<G.W*G.H;i++)s.add(i);return s;}return visCells(G.player);}
 function visCells(side){const s=new Set(sharedCells(side));
   for(const u of G.units)if(u.alive&&u.side===side&&u.x>=0)for(const k of fanCells(u))s.add(k);
   return s;}
@@ -10025,7 +10028,7 @@ function fanTop(pu){const sm=R3.standY;if(R3.fanTopM&&R3.fanTopM.userData.sm===s
   if(!ix.length)return null;const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(v,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));geo.setIndex(ix);
   const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({map:pu.tx,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));m.renderOrder=3;m.frustumCulled=false;m.userData.sm=sm;R3.scene.add(m);return R3.fanTopM=m;}
 function visFx3D(){const play=G.phase==='play'&&!G.over;
-  const fp=visPlane('fogP',.05,2),fu=fp.userData;fp.visible=play;
+  const fp=visPlane('fogP',.05,2),fu=fp.userData;fp.visible=play&&!noFog();
   const mine=play?G.units.filter(u=>u.alive&&u.side===G.player&&u.x>=0):[];
   const sel=G.sel&&G.sel.side===G.player&&G.sel.alive&&G.sel.x>=0&&play?G.sel:null;
   const sh=play?sharedCells(G.player):new Set();
@@ -10447,6 +10450,7 @@ function lvStart(L){const b=$('#banner');if(b)b.hidden=true;{const a=$('#anal');
   if(L.def)L.def.forEach(([op,x,y,fd],i)=>{const u=mkUnit(op,'D',i);u.x=x;u.y=y;u.anchor=[x,y];u.fd=fd.slice();G.units.push(u);});
   else{(L.foes||[]).forEach((op,i)=>G.units.push(mkUnit(op,'D',i)));m.cams.forEach(([x,y])=>G.gadgets.push({type:'cam',x,y,side:'D',alive:true,fixed:true}));autoDefSetup(true);}
   if(L.cluster){const D=G.units.filter(u=>u.side==='D'),a=D[0];D.slice(1).forEach(u=>{const c=adj8(a.x,a.y).find(([x,y])=>{const q=cell(x,y);return q&&q.t==='floor'&&q.indoor&&!q.obst&&!unitAt(x,y)&&!(G.hostage&&G.hostage.x===x&&G.hostage.y===y);});if(c){u.x=c[0];u.y=c[1];u.anchor=[c[0],c[1]];}});}
+  if(L.t===0){G.units.forEach(u=>{if(u.side==='D')u.hidden=false;});G.decoys=[];}
   placeAttackers(L.zone|0);}finally{Math.random=R0;}G.reroll={A:0,D:0};G.phase='play';G.sel=null;
   setTimeout(()=>{try{preloadShots();}catch(e){}},400);
   log(`${WPN[L.cls].t}：${L.n}`,'ks');log(L.brief,'ks');log('過關條件：'+L.goals.join('、'),'ks');log('—— 第 1 輪開始 ——','ks');
@@ -10469,7 +10473,7 @@ function lvFinish(w,why){const L=G.lv,ok=w===G.player;G.over=true;G.busy=false;G
   $('#lvAgain').onclick=()=>{leave();lvStart(L);};
   $('#lvBack').onclick=()=>{leave();goTitle();SCREEN='train';render();lobRender();};
   render();}
-function libHTML(){const M=lobMob(),all=OPBASE,own=all.filter(owned).length,L=all.filter(b=>LIBF==='all'||(LIBF==='own'?owned(b):OPC[b].side===LIBF));
+function libHTML(){const M=lobMob(),all=OPBASE.filter(b=>!/^recruit_/.test(b)),own=all.filter(owned).length,L=all.filter(b=>LIBF==='all'||(LIBF==='own'?owned(b):OPC[b].side===LIBF));
   const got=Object.entries(AS.got||{}).filter(([k])=>ACHM[k]).sort((a,b)=>b[1]-a[1]),last=got[0]&&ACHM[got[0][0]],n=achCount(),pc=Math.round(n/ACH.length*100);
   const tab=(k,l)=>`<button data-libf="${k}" class="${LIBF===k?'on':''}">${l}</button>`;
   return `<div class="lib ${M?'m':'d'}"><div class="libHd">${M?'':'<button class="lobAr" id="t-home" aria-label="返回">‹</button>'}<div><small>INTEL ARCHIVE</small><b>作戰檔案</b></div></div>
