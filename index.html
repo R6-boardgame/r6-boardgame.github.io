@@ -1383,6 +1383,8 @@ html.pg,html.pg body{touch-action:manipulation}html.pg .psbox,html.pg .avgrid{to
 /* v26: big centre notices, bomb countdown chip, low-health vignette */
 #barBtn{position:fixed;left:max(12px,env(safe-area-inset-left));z-index:9;width:62px;height:62px;padding:4px;border:2px solid #e3aa3e;border-radius:4px;background:#0b121a;color:#f2d79a;display:grid;place-items:center;grid-template-rows:1fr auto;gap:0;font:700 11px 'Noto Sans TC',sans-serif;cursor:pointer;box-shadow:0 0 14px rgba(227,170,62,.45);animation:bnIn .3s ease-out}
 #barBtn svg{width:30px;height:30px}
+#escBtn{position:fixed;left:max(12px,env(safe-area-inset-left));z-index:9;width:62px;height:62px;padding:4px;border:2px solid #3fbf6a;border-radius:4px;background:#0a1710;color:#bff5cf;display:grid;place-items:center;grid-template-rows:1fr auto;gap:0;font:700 11px 'Noto Sans TC',sans-serif;cursor:pointer;box-shadow:0 0 14px rgba(63,191,106,.5);animation:bnIn .3s ease-out}
+#escBtn svg{width:30px;height:30px}
 #scanBtn{position:fixed;left:max(12px,env(safe-area-inset-left));z-index:9;width:62px;height:62px;padding:4px;border:2px solid #5ad0ff;border-radius:4px;background:#0b121a;color:#bfeaff;display:grid;place-items:center;grid-template-rows:1fr auto;gap:0;font:700 11px 'Noto Sans TC',sans-serif;cursor:pointer;box-shadow:0 0 14px rgba(90,208,255,.45);animation:bnIn .3s ease-out}
 #scanBtn svg{width:30px;height:30px}
 #scanBtn:disabled{opacity:.5;cursor:default}
@@ -6058,7 +6060,7 @@ function ensureOp(id){
 function mkUnit(op,side,i){
   ensureOp(op);const o=OPS[op],P=PROF[op],hp=P.st;
   const u={id:side+i,op,side,hp,max:hp,speed:5,run:P.run,x:-1,y:-1,alive:true,activated:false,mp:0,ap:0,used:new Set(),ch:o.ch||0,overwatch:false,owd:[0,-1],fd:[0,side==='A'?-1:1],spotted:0,stun:false,hidden:side==='D',anchor:null,gassed:false};
-  if(P.cop!=null)copUnit(u,P.cop);return u;
+  if(P.copU)Object.assign(u,JSON.parse(JSON.stringify(P.copU)));else if(P.cop!=null)copUnit(u,P.cop);return u;
 }
 
 // ---------- visibility ----------
@@ -8546,6 +8548,13 @@ function barBtnUpd(){let b=document.getElementById('barBtn');const u=G&&G.sel;
   if(!b){b=document.createElement('button');b.id='barBtn';b.innerHTML='<svg viewBox="0 0 48 48" fill="none" stroke="#e3aa3e" stroke-width="3" stroke-linecap="round"><rect x="9" y="5" width="30" height="38" rx="2"/><path d="M9 16l30 9M9 30l30-9"/></svg><span>封門</span>';document.body.appendChild(b);}
   const sh=document.getElementById('sheetT'),r0=sh&&sh.getBoundingClientRect(),r=r0&&r0.width?r0:null;b.style.bottom=(r&&r.top>innerHeight*.4?Math.round(innerHeight-r.top+10):Math.round(innerHeight*.3))+'px';
   b.onclick=ev=>{ev.stopPropagation();const v=G.sel;if(!v||!commit(v))return;act(async()=>{const tt=barTargets(v);if(tt.length&&canDo(v,'barr'))await rebar(v,...tt[0]);});};}
+// v179: escorting the hostage works like the barricade button: a green button that only shows up next to the hostage
+function escBtnUpd(){let b=document.getElementById('escBtn');const u=G&&G.sel;
+  const t=u&&G.mission==='hostage'&&!G.tut2&&!G.over&&G.phase==='play'&&!G.busy&&u.side===G.player&&u.alive&&canAct(u)&&(G.active!==u||canDo(u,'obj'))&&escortOK(u);
+  if(!t||document.body.dataset.scr!=='game'){if(b)b.remove();return;}
+  if(!b){b=document.createElement('button');b.id='escBtn';b.innerHTML='<svg viewBox="0 0 48 48" fill="none" stroke="#5fe08a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="10" r="5"/><circle cx="32" cy="13" r="4"/><path d="M17 15v14l-5 13M17 29l6 13M17 20l8 4 7-5M32 17v11l4 13M32 28l-4 13"/></svg><span>'+tt('護送人質')+'</span>';document.body.appendChild(b);}
+  const sh=document.getElementById('sheetT'),r0=sh&&sh.getBoundingClientRect(),r=r0&&r0.width?r0:null;b.style.bottom=(r&&r.top>innerHeight*.4?Math.round(innerHeight-r.top+10):Math.round(innerHeight*.3))+'px';
+  b.onclick=ev=>{ev.stopPropagation();const v=G.sel;if(!v||!escortOK(v)||!commit(v))return;act(()=>escort(v));};}
 // v156: the moving drone's scan button sits where the barricade button does, same size
 function scanBtnUpd(){let b=document.getElementById('scanBtn');const d=dmOf(),u=G&&G.active;
   if(!d||!u||u.side!==G.player||document.body.dataset.scr!=='game'){if(b)b.remove();return;}
@@ -8553,7 +8562,7 @@ function scanBtnUpd(){let b=document.getElementById('scanBtn');const d=dmOf(),u=
   b.disabled=!!G.busy;
   const sh=document.getElementById('sheetT'),r0=sh&&sh.getBoundingClientRect(),r=r0&&r0.width?r0:null;b.style.bottom=(r&&r.top>innerHeight*.4?Math.round(innerHeight-r.top+10):Math.round(innerHeight*.3))+'px';
   b.onclick=ev=>{ev.stopPropagation();const a=G.active;if(!dmOf()||!a||G.busy)return;act(()=>droneFinish(a));};}
-function render(){trackMovement();try{syncElec();}catch(e){}try{const a=G&&G.active;if(a&&G.sel===a&&G.mode==='move'&&!G.busy&&owAuto(a)&&a.ap<=0)G.mode='owdir';}catch(e){}setTimeout(()=>{try{noApTag();}catch(e){}},0);setTimeout(()=>{try{barBtnUpd();}catch(e){}try{scanBtnUpd();}catch(e){}},0);try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{renderTension();}catch(e){}
+function render(){trackMovement();try{syncElec();}catch(e){}try{const a=G&&G.active;if(a&&G.sel===a&&G.mode==='move'&&!G.busy&&owAuto(a)&&a.ap<=0)G.mode='owdir';}catch(e){}setTimeout(()=>{try{noApTag();}catch(e){}},0);setTimeout(()=>{try{barBtnUpd();}catch(e){}try{escBtnUpd();}catch(e){}try{scanBtnUpd();}catch(e){}},0);try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{renderTension();}catch(e){}
   const scr=G?'game':(SCREEN==='setup'?'setup':'title');document.body.dataset.scr=scr;{const wz=$('#wiz');if(wz&&(G||SCREEN!=='setup'))wz.hidden=true;}
   const tt=$('#title');if(tt){const show=scr==='title';if(tt.hidden===show)tt.hidden=!show;if(show&&tt.dataset.s!==SCREEN){tt.dataset.s=SCREEN;renderTitle();}}
   if(R3){heroScene(scr==='title');if(R3.lastScr!==scr){R3.lastScr=scr;R3.sig='';if(scr!=='title')setTimeout(()=>R3&&!R3.camGoal&&setView(G&&G.phase==='setup'?'top':'angle'),0);}}
@@ -8735,7 +8744,7 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
       tac('drone','無人機',G.drones,G.drones>0?droneTargets(u):[]);
       tac('charge','爆破炸藥',G.charges,chargeTargets(u));
       const th=throwTargets(u);tac('frag','破片手榴彈',G.frag,th);tac('flash','閃光彈',G.flash,th);tac('smk','煙霧彈',G.smk,th);tac('clay','闊刀地雷',G.clay,clayTargets(u));
-      if(G.mission==='hostage')L.push(btn('護送人質',sub('obj','相鄰人質'),false,!can('obj')||!escortOK(u),wrap(()=>escort(u)),'primary'));
+      if(G.mission==='hostage'){if(G.tut2)L.push(btn('護送人質',sub('obj','相鄰人質'),false,!can('obj')||!escortOK(u),wrap(()=>escort(u)),'primary'));}
       else L.push(btn('安裝拆彈器',sub('obj','必須站在 A/B 炸彈點'),false,!can('obj')||!plantOK(u),wrap(async()=>{plant(u);await afterAct(u);}),'primary'));
     } else {
       {const mg=mirOpenable(u);if(mg.length)L.push(btn('打開黑鏡',sub('mirror','1 行動 · 洞口變透明'),false,!can('mirror'),wrap(()=>mirOpen(u,mg[0])),'',`<img class="bic" src="${opIcon('mira')}" alt="">`));}
@@ -10653,6 +10662,7 @@ function netStartGame(gp){if(RQ.q)rankLeaveQueue();if(NET.started)return;NET.sta
   const os=NET.side==='A'?'D':'A',my=NET.myPick||{p:cfg.picks[NET.side].slice(),inv:INV_DEF[NET.side]};
   const th=gp&&Array.isArray(gp.p)&&gp.p.length===5&&gp.p.every(k=>OPC[k]&&OPC[k].side===os)?gp:{p:rndPicks(os,false),inv:rndInv(os)};
   const A=NET.side==='A'?my:th,D=NET.side==='D'?my:th;
+  COPNET={...(th.cop||{}),...(my.cop||copSnap(NET.side,my.p))};
   addTeams(A.p,D.p,invOK('A',A.inv),invOK('D',D.inv),true,true);G.dep='D';
   log(`連線對戰開始：房間 ${NET.code}，${MFMIS[G.mission]}任務。防守方先部署，完成後換進攻方選出生位置。`,'ks');
   if(R3){R3.sig='';R3.camPhase='setup';}
@@ -10685,7 +10695,7 @@ function netPush(){
 }
 function netApply(d){
   NET.applying=true;NET.seq=d.seq;const was=G&&G.over;
-  G=netDes(d.state);(G.units||[]).forEach(u=>{try{if(!OPS[u.op])ensureOp(u.op);}catch(e){}});G.player=NET.side;G.busy=false;G.ai=false;G.mode='move';
+  G=netDes(d.state);(G.units||[]).forEach(u=>{try{if(!OPS[u.op])ensureOp(u.op);}catch(e){}});if(G.copNet)try{copApplySnap(G.copNet);}catch(e){}G.player=NET.side;G.busy=false;G.ai=false;G.mode='move';
   if(curSide()===G.player&&!G.over){if(G.sel&&(G.sel.side!==G.player||!G.sel.alive))G.sel=null;}else if(!G.over)G.sel=null;
   if(G.phase==='setup'&&G.dep===G.player&&!G.sel)G.sel=unplaced()[0]||null;
   if(MF&&G.phase==='setup'&&G.dep!==G.player){MF.gotState=true;render();NET.applying=false;return;}
@@ -11318,7 +11328,7 @@ function mkBoard(mk,mis,side,extra){const m=MAPS[mk];cfg.map=mk;
   m.cams.forEach(([x,y])=>G.gadgets.push({type:'cam',x,y,side:'D',alive:true,fixed:true}));
   if(mis==='hostage')placeHostage();else placeBombsSafe();
   if(R3)R3.sig='';return G;}
-function addTeams(ap,dp,invA,invD,atkDeploys,defDeploys){copPrep(false);
+function addTeams(ap,dp,invA,invD,atkDeploys,defDeploys){copPrep(false);if(COPNET){copApplySnap(COPNET);G.copNet=COPNET;COPNET=null;}
   ap.forEach((op,i)=>G.units.push(mkUnit(op,'A',i)));dp.forEach((op,i)=>G.units.push(mkUnit(op,'D',i)));
   if(dp.includes('rook'))alive('D').forEach(u=>{u.max++;u.hp++;});
   Object.assign(G,invFor('A',invA),invFor('D',invD));delete G.warm;
@@ -11400,7 +11410,7 @@ function netPre(opp){if(RQ.q)rankLeaveQueue();clearTimeout(RQ.hostT);const host=
   mkBoard(NET.map,NET.mis,NET.side,{});
   try{if(NET.pun)NET.pun();NET.pun=NET.db.doc('picks/'+code+'_'+(host?'g':'h')).onSnapshot(s=>{const d=s.exists&&s.data();if(d&&d.lock&&(d.ts||0)>t0-120000&&NET&&NET.code===code){NET.oppPick=d;mfOppLock();}},()=>{});}catch(e){}
   mfStart({side:NET.side,mk:NET.map,mis:NET.mis,opp:Object.assign({n:(NET.opp&&NET.opp.name)||'對手'},opp||{}),
-    onLock:pk=>{NET.myPick=pk;netWrite('picks/'+code+'_'+(host?'h':'g'),{...pk,lock:1,ts:Date.now()});},
+    onLock:pk=>{pk.cop=copSnap(NET.side,pk.p);NET.myPick=pk;netWrite('picks/'+code+'_'+(host?'h':'g'),{...pk,lock:1,ts:Date.now()});},
     ready:host?(()=>netStartGame(NET.oppPick)):null,
     // the host waits a few seconds past the clock for the guest's lock, then fills in for them; a guest with no game after that gives up
     tick:left=>{if(host&&left<-8&&MF.lock)mfOppLock();if(!host&&left<-30&&MF.lock&&!MF.gotState)netAbort();}});}
@@ -11408,6 +11418,7 @@ function netAbort(){mfEnd();G=null;try{netLeave();}catch(e){}SCREEN='rank';NETMS
 function rankBotGo(pk){mfEnd();SCREEN='game';const side=G.player,en=side==='A'?'D':'A';
   const bases=new Set(),theirs=[];for(const k of shuffle(OPBASE.filter(k=>OPC[k].side===en&&SCRIPTED.has(k)))){if(theirs.length>=5)break;if(!bases.has(OPC[k].base)){bases.add(OPC[k].base);theirs.push(k);}}
   const ap=side==='A'?pk.p:theirs,dp=side==='D'?pk.p:theirs;
+  COPNET=copSnap(side,pk.p);
   addTeams(ap,dp,side==='A'?pk.inv:INV_DEF.A,side==='D'?pk.inv:INV_DEF.D,side==='A',side==='D');
   log(`線上對戰開始：對手 ${esc(G.bot.name)}，${MFMIS[G.mission]}任務。${side==='A'?'防守方已佈防。點幹員，再點橘框出生格放下他。':'點幹員，再點建築內的空格放下他，也可以放鐵絲網、盾牌與攝影機。'}`,'ks');
   if(R3)R3.sig='';G.sel=alive(side)[0];render();if(R3){R3.camPhase='setup';setTimeout(()=>setView('top'),50);}
@@ -12085,6 +12096,10 @@ function copPrep(on){copAll();for(const s of ['a','d'])['rifle','shotgun'].forEa
   const c=ECO.cop[i],st=copStat(c),sk=copSkOn(c,side);
   PROF[id]={run:st.run,st:st.hp,d:copDice(c).map(b=>b.join('')),dr:c.w==='sg'?'中':'低',dz:c.w==='sg'?2:1,shield:false,card:true,cop:i};
   OPS[id]={...COPDEF[id].O,name:c.nm,role:c.w?WPN[c.w].t:'培養幹員',g:sk?OPS[sk].g:'',gd:sk?OPS[sk].gd:'',ch:sk?OPS[sk].ch:0,...(sk?{}:{passive:'沒有裝備技能',pd:''})};if(classEquipped(c)){OPS[id].g=CSK[c.w].n;OPS[id].gd=CSK[c.w].d;OPS[id].ch=99;}});}
+// v179: online games carry each player's trained operator as a snapshot, so both screens use the same numbers
+let COPNET=null;
+function copSnap(side,picks){const o={};try{copPrep(true);for(const k of picks||[]){const i=copSlot(k);if(i==null||!OPC[k]||OPC[k].side!==side||!PROF[k])continue;const u={side};copUnit(u,i);delete u.side;o[k]={P:{...PROF[k]},O:{...OPS[k]},U:u};}}catch(e){}copPrep(false);return o;}
+function copApplySnap(o){for(const k in o||{}){const v=o[k];if(!v||!v.P||!v.O||!OPC[k])continue;ensureOp(k);PROF[k]={...v.P,cop:null,copU:v.U||null};OPS[k]={...v.O};}}
 function copUnit(u,i){const c=ECO.cop[i],st=copStat(c);u.speed=st.mv;u.fh=st.fov/2;u.cop=i;u.w=c.w;u.clsSkill=classEquipped(c)?c.w:null;if(st.vr>10)u.vr=st.vr;u.nmz=c.nm;const sk=copSkOn(c,u.side);if(sk)u.sk=sk;
   for(const g of c.g)if(g&&!INV[u.side][g]){u.gi=u.gi||{};u.gi[g]=(u.gi[g]|0)+1;}}
 // the other side's gadgets the custom operator carries live on the unit (u.gi); each use borrows the shared counter for that one call
@@ -12111,7 +12126,10 @@ function openAlum(){let el=$('#copAl');if(!el){el=document.createElement('div');
 // the skill button runs the borrowed operator's gadget code
 {const _gt=gTargets;gTargets=function(u){if(!u||!u.sk)return _gt(u);const o=u.op,root=u._op;u._op=root||o;u.op=u.sk;try{return _gt(u);}finally{u.op=o;if(root===undefined)delete u._op;else u._op=root;}};}
 {const _ug=useGadget;useGadget=async function(u,x,y){if(!u||!u.sk)return _ug(u,x,y);const o=u.op,root=u._op;u._op=root||o;u.op=u.sk;try{return await _ug(u,x,y);}finally{u.op=o;if(root===undefined)delete u._op;else u._op=root;}};}
-{const _oa=opArt;opArt=function(id){const i=copSlot(id);return i!=null?copArt(copAll()[i],i):_oa(id);};}
+{const _oa=opArt;opArt=function(id){const i=copSlot(id);if(i==null)return _oa(id);
+  // v179: a training hero shows its class picture; an opponent's trained operator (online snapshot) shows theirs
+  try{if(typeof G!=='undefined'&&G&&G.lv&&G.lv.cls&&id==='recruit_a_rifle')return lvArt(G.lv.cls);const U=PROF[id]&&PROF[id].copU;if(U)return copArt({w:U.w},U.cop|0);}catch(e){}
+  return copArt(copAll()[i],i);};}
 // Glaz: the flip sight swaps the mid and long dice and gives a rifle's view (180°, 10 cells); press again to flip back
 OPS.glaz.g='翻轉瞄具';GDX.glaz=['切換瞄具：中距離和遠距離的骰子互換，視野改成 180°、10 格；再按一次切回狙擊鏡。',99];OPS.glaz.gd=GDX.glaz[0];OPS.glaz.ch=99;
 GT.glaz=()=>'self';

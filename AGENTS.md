@@ -287,3 +287,8 @@
 ## v178 Foley 音效與音樂（使用者桌面 Foley 資料夾）
 - snd/fx：返回 back、點擊對戰 battle（#t-rank/#t-pve/#t-board/#t-lvgo/.trnGo）、部署人員 deploy1-3（setup 放幹員）、狙擊 sniper（w==='sn' 射擊）、盾牌 shield（w 為 sh/hs）、手榴彈 nade_pin/nade_hit、爆炸 boom1/2（SFX.boom 優先用錄音）、燃燒 fire（ignite/goyoBurn）、封門窗 barricade、軟牆 wall（destroyCell 依格子種類）、攝影機 camera（doDestroy 摧毀道具）。
 - snd/mus：MUS 模組用單一 <audio>：大廳 lobby1-5 隨機輪播；SCREEN 為 queue/wait/find 時 queue；MF 選角與 setup 階段 prep；訓練關卡與教學 mission；一般對戰 play 階段仍用合成緊張配樂。音樂開關沿用 SFX.mOn。
+
+## v179
+- 線上對戰帶培養幹員：鎖定陣容時把自己的培養幹員數值打包成 snapshot（copSnap → pick.cop），host 合併雙方後在 addTeams 套用（COPNET → copApplySnap，存在 G.copNet 讓 guest 在 netApply 時也套用）；mkUnit 看到 PROF.copU 就直接套用單位欄位。排隊 30 秒後的電腦對手（rankBotGo）也一樣。
+- 護送人質改成跟封門一樣的浮動按鈕 #escBtn（綠色），只有站在人質旁邊、還能做目標行動時才出現；側欄只在教學（G.tut2）保留。
+- opArt 對 recruit 卡：訓練關卡顯示該職業的圖（lvArt），對手的培養幹員顯示對手職業圖，不再借用自己的培養幹員圖。
