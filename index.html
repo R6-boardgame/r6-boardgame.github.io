@@ -2111,6 +2111,61 @@ html body:has(.panel.open) #actsR{display:none}
 #gHint span{font-size:12px;line-height:1.3;color:#cfd8e0}
 @media (orientation:portrait) and (max-width:700px){#gHint{max-width:calc(100vw - 150px);left:calc(50% - 30px)}}
 .tqueue .qnote{font-size:11.5px;opacity:.7;max-width:280px;text-align:center;line-height:1.4}
+/* v182: ranked queue = night-vision drone feed (dqOpen) */
+#dq{position:fixed;inset:0;z-index:410;overflow:hidden;background:#05080b;color:#e6edf2;font-family:'Noto Sans TC',sans-serif;user-select:none;-webkit-user-select:none}
+#dq *{box-sizing:border-box}
+#dq .dqF{position:absolute;inset:-6%;background:center/cover no-repeat;filter:grayscale(1) contrast(1.3) brightness(.55) sepia(.4) hue-rotate(55deg) saturate(1.7);animation:dqPan 26s ease-in-out infinite alternate;will-change:transform}
+@keyframes dqPan{0%{transform:scale(1.05) translate(-3%,-2%)}50%{transform:scale(1.18) translate(3%,1%)}100%{transform:scale(1.1) translate(-1%,3%)}}
+#dq .dqV{position:absolute;inset:0;background:radial-gradient(circle at 50% 38%,transparent 0 28%,rgba(0,0,0,.78) 88%)}
+#dq .dqL{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 3px);animation:dqFl 3.2s steps(1) infinite}
+@keyframes dqFl{0%,100%{opacity:1}47%{opacity:.75}48%{opacity:1}}
+#dq .dqS{position:absolute;left:0;right:0;top:0;height:90px;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(159,224,168,.12) 80%,rgba(159,224,168,.55) 99%,transparent);animation:dqSw 3.4s linear infinite}
+@keyframes dqSw{from{transform:translateY(-100px)}to{transform:translateY(100vh)}}
+#dq .dqB{position:absolute;width:22px;height:22px;border:2px solid var(--accent)}
+#dq .dqB.tl{left:16px;top:calc(14px + env(safe-area-inset-top));border-right:0;border-bottom:0}#dq .dqB.tr{right:16px;top:calc(14px + env(safe-area-inset-top));border-left:0;border-bottom:0}
+#dq .dqB.bl{left:16px;bottom:var(--dqP);border-right:0;border-top:0}#dq .dqB.br{right:16px;bottom:var(--dqP);border-left:0;border-top:0}
+#dq{--dqP:318px;--g:#9fe0a8}
+#dq .dqH{position:absolute;left:46px;right:46px;top:calc(22px + env(safe-area-inset-top));display:flex;justify-content:space-between;font:600 12px var(--mono);letter-spacing:.18em;color:#fff}
+#dq .dqH i{display:inline-block;width:9px;height:9px;border-radius:50%;background:#ff3b3b;margin-right:7px;box-shadow:0 0 10px #ff3b3b;animation:dqRec 1.2s steps(1) infinite}
+@keyframes dqRec{50%{opacity:0}}
+#dq .dqH em{font-style:normal;color:var(--g)}
+#dq .dqH2{position:absolute;left:46px;right:46px;top:calc(46px + env(safe-area-inset-top));display:flex;justify-content:space-between;font:500 11px var(--mono);letter-spacing:.12em;color:rgba(159,224,168,.8)}
+#dq .dqX{position:absolute;left:50%;top:38%;width:116px;height:116px;margin:-58px 0 0 -58px;transition:left 1.1s cubic-bezier(.5,0,.2,1),top 1.1s cubic-bezier(.5,0,.2,1);pointer-events:none}
+#dq .dqX:before{content:"";position:absolute;inset:0;border-radius:50%;border:1.5px dashed rgba(159,224,168,.75);animation:spin 9s linear infinite}
+#dq .dqX:after{content:"";position:absolute;inset:34px;border-radius:50%;border:1.5px solid rgba(159,224,168,.9);animation:dqPu 1.4s ease-in-out infinite}
+@keyframes dqPu{50%{transform:scale(.8);opacity:.6}}
+#dq .dqX b{position:absolute;background:rgba(159,224,168,.85)}
+#dq .dqX b:nth-child(1){left:57px;top:-22px;width:2px;height:40px}#dq .dqX b:nth-child(2){left:57px;bottom:-22px;width:2px;height:40px}
+#dq .dqX b:nth-child(3){top:57px;left:-22px;height:2px;width:40px}#dq .dqX b:nth-child(4){top:57px;right:-22px;height:2px;width:40px}
+#dq .dqX.lf span{left:auto;right:100%;margin:0 16px 0 0}
+#dq .dqX span{position:absolute;left:100%;top:6px;margin-left:16px;white-space:nowrap;font:600 11px var(--mono);letter-spacing:.12em;color:var(--g);text-shadow:0 1px 3px #000}
+#dq .dqM{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border:2px solid #ff4d4d;transform:rotate(45deg) scale(.2);opacity:0;transition:transform .35s,opacity .35s,border-color .4s;pointer-events:none}
+#dq .dqM.on{transform:rotate(45deg) scale(1);opacity:1;animation:dqBl .5s steps(1) 3}
+#dq .dqM.off{border-color:rgba(200,210,200,.5);opacity:0;transform:rotate(45deg) scale(1.6);transition:transform .9s,opacity .9s,border-color .3s}
+@keyframes dqBl{50%{border-color:transparent}}
+#dq .dqP{position:absolute;left:0;right:0;bottom:0;padding:44px 16px calc(16px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(5,8,11,0),rgba(5,8,11,.94) 16%);display:flex;flex-direction:column;gap:12px}
+#dq .dqP>*{width:100%;max-width:560px;margin:0 auto}
+#dq .dqR{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+#dq .dqR small{display:block;font:600 11px var(--mono);letter-spacing:.28em;color:var(--g)}
+#dq .dqR h2{margin:2px 0 0;font:700 28px/1.1 var(--display);letter-spacing:.06em;color:#fff}
+#dq .dqR #qclock{font:600 40px/1 var(--mono);color:#fff}
+#dq .dqG{display:flex;gap:3px}#dq .dqG i{flex:1;height:6px;background:rgba(159,224,168,.16);transition:background .3s}#dq .dqG i.on{background:var(--g);box-shadow:0 0 6px rgba(159,224,168,.55)}
+#dq .dqN{display:flex;justify-content:space-between;font-size:12px;color:#8fa59a;margin-top:-6px}#dq .dqN #qcount{font:inherit;color:#c9e8cd}
+#dq .dqT{position:relative;min-height:92px;border-left:2px solid var(--g);padding:2px 64px 2px 12px;cursor:pointer;touch-action:pan-y}
+#dq .dqT .h{font:600 11px var(--mono);letter-spacing:.2em;color:rgba(159,224,168,.75)}
+#dq .dqTx{margin-top:4px;font-size:14.5px;line-height:1.6;color:#d9eedc;min-height:46px}
+#dq .dqTx:after{content:"";display:inline-block;width:8px;height:15px;background:var(--g);vertical-align:-2px;margin-left:3px;animation:dqRec .9s steps(1) infinite}
+#dq .dqT nav{position:absolute;right:0;top:0;display:flex;gap:6px}
+#dq .dqT nav button:focus{outline:none;box-shadow:none}
+#dq .dqT nav button{width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;border:1px solid rgba(159,224,168,.4);background:rgba(5,8,11,.6);color:var(--g);font:700 15px/1 var(--mono);cursor:pointer}
+#dq .dqT .dots{position:absolute;left:12px;bottom:-10px;right:64px;height:2px;background:rgba(159,224,168,.12)}
+#dq .dqT .dots i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(159,224,168,.7)}
+#dq .dqT .dots i.run{animation:dqTm var(--dqTip,8s) linear forwards}
+@keyframes dqTm{to{width:100%}}
+#dq .dqC{margin-top:6px;height:50px;display:flex;align-items:center;justify-content:center;padding:0;outline:none;border:1px solid rgba(159,224,168,.35);background:rgba(5,8,11,.7);color:#c7d1da;font:700 15px 'Noto Sans TC',sans-serif;letter-spacing:.2em;cursor:pointer}
+#dq .dqC:active{background:rgba(159,224,168,.12)}
+@media (min-width:900px){#dq .dqH,#dq .dqH2{left:60px;right:60px}#dq .dqX{top:42%}}
+@media (prefers-reduced-motion:reduce){#dq .dqF,#dq .dqS,#dq .dqL,#dq .dqX:before,#dq .dqX:after{animation:none}#dq .dqS{display:none}}
 /* v45 renown / tasks / unlocks / mastery */
 .rni{width:1.15em;height:1.15em;object-fit:contain;vertical-align:-.2em;margin-right:3px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
 .ptag{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#ffd84a}
@@ -10583,6 +10638,7 @@ function renderTitle(){
   const el=$('#tmenu');if(!el)return;if(SCREEN==='rank')SCREEN='title';{const tt=$('#title');if(tt)tt.dataset.s=SCREEN;}const B=(id,label,sub,cls)=>`<button id="${id}" class="tbtn ${cls||''}"><b>${label}</b>${sub?`<span>${sub}</span>`:''}</button>`;
   let h='';if(SCREEN==='task')h=`<button id="t-back" class="tkX" aria-label="關閉">×</button>`+taskHTML();
   const ops=k=>cfg.picks[k].map(x=>`<img src="${opIcon(x)}" alt="${(OPC[x]||OPS[x]).name}" title="${(OPC[x]||OPS[x]).name}">`).join('');
+  if(SCREEN==='queue')dqOpen();else dqClose();
   if(SCREEN==='title')h='';
   else if(SCREEN==='train')h='';
   else if(SCREEN==='board')h=boardHTML()+B('t-back','返回','',' ghost');
@@ -10590,7 +10646,7 @@ function renderTitle(){
   else if(SCREEN==='rank'){if(ME.mode!=='account')h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(null,40)}<div><b>排名戰需要登入帳號</b><br><span>登入後，段位與戰績會存在這個遊戲的共用資料裡。訪客可以玩其他所有模式。</span></div></div></div>`+B('t-login','登入帳號','啟用線上身分','primary')+B('t-back','返回','',' ghost');
     else{fillPicks('A');fillPicks('D');h=`<h2 class="tsec">排名戰</h2><div class="trank"><div class="rk">${rankBadge(ME.rating,44)}<div><span>你的段位</span><br><b>${ME.rating==null?'—':tierName(tierOf(ME.rating))}</b> <span>${ME.rating??''} 分 · ${ME.w} 勝 ${ME.l} 敗</span></div></div>
       <div class="sq"><em>進攻小隊</em>${ops('A')}<button data-edit="A">更換</button></div><div class="sq"><em>防守小隊</em>${ops('D')}<button data-edit="D">更換</button></div><span class="hint">陣營隨機分配，地圖配對後揭曉。勝利 +25 分，落敗 −20 分。</span></div>`+B('t-queue','開始配對','PVP RANK','primary')+B('t-back','返回','',' ghost');}}
-  else if(SCREEN==='queue')h=`<h2 class="tsec">線上對戰</h2><div class="tqueue"><div class="ring"></div><span>搜尋對手中</span><b id="qclock">${fmtClock(Date.now()-RQ.t0)}</b><span>排隊中的玩家 <b id="qcount" style="font-size:14px">1</b></span><span>找到對手後會自動進入對戰。</span><span class="qnote">通常 30 秒內就會配到對手。</span></div>`+B('t-qcancel','取消配對','',' ghost');
+  else if(SCREEN==='queue')h='';
   else if(SCREEN==='pvp')h=`<h2 class="tsec">自訂房間</h2>`+B('t-create','建立房間','你當房主，選陣營；地圖配對後隨機揭曉','primary')+B('t-find','尋找房間','加入其他人開的房間')+B('t-back','返回','',' ghost');
   else if(SCREEN==='create'){const s=cfg.side;fillPicks(s);h=`<h2 class="tsec">建立房間</h2><div class="tpick"><span>你的陣營</span><div class="row">${['A','D'].map(k=>`<button data-cs="${k}" class="${s===k?'on':''}"><b class="${k==='A'?'a':'d'}">${k==='A'?'進攻方':'防守方'}</b></button>`).join('')}</div>
     <span>地圖</span><p class="tnote">隨機抽選，配對成功後揭曉。</p>
@@ -11203,6 +11259,8 @@ I18T.push(["任務簡報 · {0}","Briefing · {0}","ブリーフィング · {0}
 I18T.push(["{0} 的幹員","{0}'s operator","{0} のオペレーター"],["存活 {0} 場 · 擊殺 {1}","Survived {0} · Kills {1}","生存 {0} · キル {1}"]);
 const ORIG=new WeakMap(),LASTSET=new WeakMap();
 Object.assign(I18X,{'朝一個方向衝刺三格，沿路撞爆軟牆、路障、掩護和可部署盾牌。撞到敵人會推著他走，不扣血；把敵人推到牆上或別人身上時，夾擊造成 2 傷並暈眩（軟牆會撞破，硬牆不會）。':['Charge three squares in one direction, smashing soft walls, barricades, cover and deployable shields on the way. An enemy in the way is shoved along with no damage; shove them into a wall or another body to crush them for 2 damage and stun (soft walls break, hard walls hold).',''],'今天還能拿':['Still available today','今日まだ獲得可能'],'今日':['Today','今日'],'版本公告':['Version notes','バージョン情報'],'公告':['News','更新'],'任務':['Missions','ミッション'],'血量（HP）':['Health (HP)','体力（HP）'],'耐力':['Stamina','耐久'],'全部':['All','すべて'],'破牆':['Breach','ブリーチ'],'火力':['Combat','火力'],'支援':['Support','支援'],'控制':['Control','制圧'],'本次更新':['What’s new','今回の更新'],'電子脈衝掃描':['Electronic pulse scan','電子パルススキャン'],'掃射':['Sweep fire','掃射'],'必須站在 A/B 炸彈點':['Stand on the A/B bomb tile','A/B爆弾マスに立つ必要があります']});
+Object.assign(I18X,{"情報": ["Intel", "情報"], "搜尋對手中": ["Searching for opponent", "対戦相手を検索中"], "排隊中的玩家": ["Players in queue", "待機中のプレイヤー"], "30 秒內沒配到會改配 AI 對手": ["No match in 30 s means an AI opponent", "30 秒以内に見つからなければ AI と対戦"], "找到對手，連線中…": ["Opponent found, connecting…", "相手が見つかりました。接続中…"], "改配 AI 對手中…": ["Switching to an AI opponent…", "AI 対戦に切り替え中…"], "分析訊號…": ["Analyzing signal…", "信号を解析中…"], "沒有目標，繼續掃描": ["No contact, scanning", "反応なし、スキャン続行"], "目標鎖定": ["Target locked", "ターゲット捕捉"], "掃描中": ["Scanning", "スキャン中"], "下一則情報": ["Next intel", "次の情報"], "上一則": ["Previous", "前へ"], "下一則": ["Next", "次へ"], "無人機可以穿過窗戶、路障和障礙物，先偵查清楚再決定從哪裡進攻。": ["Drones pass through windows, barricades and obstacles. Scout first, then pick where to attack.", "ドローンは窓・バリケード・障害物を通り抜けられる。まず偵察してから攻め口を決めよう。"], "每名幹員只看得到面前 120°，背後是盲區；「轉向」不花行動點，記得常轉頭。": ["Each operator only sees 120° ahead, and behind is a blind spot. Turning is free, so turn often.", "オペレーターの視界は前方 120° だけ。背後は死角。向きを変えるのは無料なので、こまめに振り向こう。"], "穿過牆洞、軟牆或路障射擊，每一層都會少 2 個命中。": ["Shooting through a wall hole, soft wall or barricade costs 2 hits per layer.", "壁の穴・ソフトウォール・バリケード越しの射撃は、1 枚ごとに命中が 2 減る。"], "隔牆射擊可以打被標記的敵人，但開槍的人也會被對方標記。": ["You can shoot a marked enemy through a wall, but the shooter gets marked too.", "マークされた敵は壁越しに撃てるが、撃った側もマークされる。"], "軟牆第一槍會打出彈孔，之後隔著彈孔就看得到、也打得到。": ["The first shot through a soft wall leaves a bullet hole. After that you can see and shoot through it.", "ソフトウォールは 1 発目で弾痕が開き、以後はその穴越しに見えるし撃てる。"], "同一直線上只能打最近的敵人，斜角不受這個限制。": ["In a straight line you can only hit the nearest enemy. Diagonals are not limited.", "一直線上では一番近い敵しか撃てない。斜めはこの制限なし。"], "目標緊貼牆邊或障礙物時，會多 1 點掩護。": ["A target hugging a wall or obstacle gets 1 extra cover.", "壁や障害物に密着している標的はカバーが 1 増える。"], "拆彈器裝好後，防守方第三個階段結束時就會引爆。": ["Once the defuser is planted, it detonates at the end of the defenders' third phase.", "解除装置を設置すると、防衛側の第 3 フェイズ終了時に起爆する。"], "拆彈要花整整一回合，拆的人倒下就會中斷。": ["Defusing takes a full round, and it stops if the defuser goes down.", "解除には丸 1 ラウンドかかり、解除役が倒れると中断する。"], "進攻方踩到鐵絲網會扣 1 血，並立刻結束這次啟動。": ["An attacker who steps on barbed wire loses 1 health and ends that activation.", "攻撃側が有刺鉄線を踏むと体力 1 を失い、その起動はすぐ終わる。"], "屋外監視器盯著出生點附近，進攻方在鏡頭內移動就會被標記。": ["Outdoor cameras watch the spawn area. Attackers who move in view get marked.", "屋外カメラはスポーン付近を監視していて、映った状態で動いた攻撃側はマークされる。"], "防守方部署時可以把軟牆封成鐵牆，擋住對方的破口路線。": ["During setup, defenders can reinforce soft walls to block breach routes.", "防衛側は配置中にソフトウォールを補強して、突破ルートを塞げる。"]});
+I18T.push(['{0} 秒後改配 AI 對手','AI opponent in {0} s','{0} 秒後に AI と対戦']);
 const I18TC=I18T.map(([k,en,ja])=>{const parts=k.split(/\{\d\}/),ids=(k.match(/\{\d\}/g)||[]).map(x=>+x[1]);
   const esc=x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const lit=parts.reduce((a,b)=>b.length>a.length?b:a,'');
   return {re:new RegExp('^'+parts.map(esc).join('([\\s\\S]*?)')+'$'),ids,en,ja,lit:lit.trim()};});
@@ -11231,7 +11289,7 @@ function trText(o){const k=o.trim();if(!k||!/[㐀-鿿]/.test(k))return null;cons
   const t=trKey(k.replace(/\s+/g,' '),ix,0);if(t==null){I18MISS.add(k);return null;}return o.replace(k,t);}
 // tt: translate a string that is drawn on a canvas or shown in a dialog (outside the page text the observer swaps)
 const tt=s=>ME.lang==='zh'||!s?s:(trText(String(s))??s);
-const I18SKIP='#rbBody,.rulebook .rbBody,script,style,textarea';
+const I18SKIP='#rbBody,.rulebook .rbBody,script,style,textarea,#dqTx';
 function trNode(n){
   if(n.nodeType===3){const p=n.parentElement;if(!p||p.closest(I18SKIP))return;
     if(LASTSET.has(n)&&LASTSET.get(n)!==n.nodeValue){ORIG.delete(n);LASTSET.delete(n);}
@@ -11262,6 +11320,60 @@ function shatter(btn,ev){return new Promise(res=>{
   setTimeout(()=>{flash.remove();btn.style.visibility='';res();},430);});}
 // ---------- ranked: matchmaking through the live room, results in the shared store ----------
 const RQ={q:null,un:null,t:null,t0:0,busy:false,hostT:null};
+// v182: ranked queue screen is a night-vision drone feed; tactical intel auto-rotates (tap / swipe / arrows to switch)
+const DQTIP=['無人機可以穿過窗戶、路障和障礙物，先偵查清楚再決定從哪裡進攻。','每名幹員只看得到面前 120°，背後是盲區；「轉向」不花行動點，記得常轉頭。','穿過牆洞、軟牆或路障射擊，每一層都會少 2 個命中。','隔牆射擊可以打被標記的敵人，但開槍的人也會被對方標記。','軟牆第一槍會打出彈孔，之後隔著彈孔就看得到、也打得到。','同一直線上只能打最近的敵人，斜角不受這個限制。','目標緊貼牆邊或障礙物時，會多 1 點掩護。','拆彈器裝好後，防守方第三個階段結束時就會引爆。','拆彈要花整整一回合，拆的人倒下就會中斷。','進攻方踩到鐵絲網會扣 1 血，並立刻結束這次啟動。','屋外監視器盯著出生點附近，進攻方在鏡頭內移動就會被標記。','防守方部署時可以把軟牆封成鐵牆，擋住對方的破口路線。'];
+const DQ={t:null,tk:null,ty:null,tip:0,mk:0,at:0};
+function dqOpen(){
+  let o=$('#dq');if(o)return;const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mk=ONLINE_MAPS[Math.floor(Math.random()*ONLINE_MAPS.length)],src=mk==='kafe'?'img/map/kafe.webp':`img/map/${mk}_bg.webp`;
+  o=document.createElement('div');o.id='dq';
+  o.innerHTML=`<div class="dqF" style="background-image:url(${src})"></div><div class="dqV"></div><div class="dqS"></div><div class="dqL"></div>
+  <span class="dqB tl"></span><span class="dqB tr"></span><span class="dqB bl"></span><span class="dqB br"></span>
+  <div class="dqH"><span><i></i>DRONE 01 · LIVE</span><em id="dqBat">▮▮▮▮ 100%</em></div>
+  <div class="dqH2"><span id="dqPos">X 000 · Y 000</span><span id="dqAlt">ALT 0.4M</span></div>
+  <div class="dqM"></div><div class="dqM"></div><div class="dqM"></div>
+  <div class="dqX"><b></b><b></b><b></b><b></b><span>掃描中</span></div>
+  <div class="dqP"><div class="dqR"><div><small>SCANNING FOR HOSTILES</small><h2>搜尋對手中</h2></div><b id="qclock">${fmtClock(Date.now()-RQ.t0)}</b></div>
+  <div class="dqG">${'<i></i>'.repeat(30)}</div>
+  <div class="dqN"><span>排隊中的玩家 <b id="qcount">1</b></span><span id="dqAi">30 秒內沒配到會改配 AI 對手</span></div>
+  <div class="dqT" role="button" aria-label="下一則情報"><div class="h" id="dqNo"></div><div class="dqTx" id="dqTx"></div><nav><button data-d="-1" aria-label="上一則">‹</button><button data-d="1" aria-label="下一則">›</button></nav><div class="dots"><i></i></div></div>
+  <button class="dqC" id="dq-x">取消配對</button></div>`;
+  document.body.appendChild(o);
+  $('#dq-x').onclick=()=>{rankCancel();SCREEN='title';renderTitle();};
+  const T=o.querySelector('.dqT');let sx=null;
+  T.addEventListener('click',e=>{const b=e.target.closest('button');dqTip(b?+b.dataset.d:1);});
+  T.addEventListener('pointerdown',e=>{sx=e.clientX;});
+  T.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx;sx=null;if(Math.abs(dx)>40){dqTip(dx<0?1:-1);T._sw=Date.now();}});
+  T.addEventListener('click',e=>{if(T._sw&&Date.now()-T._sw<300)e.stopImmediatePropagation();},true);
+  DQ.tip=Math.floor(Math.random()*DQTIP.length);dqTip(0);
+  DQ.mk=0;DQ.at=0;dqTick();clearInterval(DQ.t);DQ.t=setInterval(dqTick,reduce?1000:250);
+}
+function dqClose(){clearInterval(DQ.t);clearTimeout(DQ.tk);clearInterval(DQ.ty);DQ.t=DQ.tk=DQ.ty=null;const o=$('#dq');if(o)o.remove();}
+function dqTip(d){
+  const n=DQTIP.length;DQ.tip=(DQ.tip+d+n)%n;const no=$('#dqNo'),tx=$('#dqTx');if(!tx)return;
+  no.textContent=`> ${tt('情報')} ${String(DQ.tip+1).padStart(2,'0')}/${String(n).padStart(2,'0')}`;
+  const full=tt(DQTIP[DQ.tip]);clearInterval(DQ.ty);
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)tx.textContent=full;
+  else{let k=0;tx.textContent='';DQ.ty=setInterval(()=>{k+=1;tx.textContent=full.slice(0,k);if(k>=full.length)clearInterval(DQ.ty);},28);}
+  const bar=$('#dq .dqT .dots i');if(bar){bar.classList.remove('run');void bar.offsetWidth;bar.classList.add('run');}
+  clearTimeout(DQ.tk);DQ.tk=setTimeout(()=>dqTip(1),8000);
+}
+function dqTick(){
+  const o=$('#dq');if(!o)return;if(SCREEN!=='queue'){dqClose();return;}
+  const s=(Date.now()-RQ.t0)/1000;
+  o.querySelectorAll('.dqG i').forEach((e,i)=>e.classList.toggle('on',i<Math.min(30,Math.floor(s))));
+  const ai=$('#dqAi');if(ai)ai.textContent=RQ.busy?tt('找到對手，連線中…'):s<30?tt(`${Math.max(1,Math.ceil(30-s))} 秒後改配 AI 對手`):tt('改配 AI 對手中…');
+  const bat=Math.max(5,100-Math.floor(s/3)),bb=$('#dqBat');if(bb)bb.textContent='▮▮▮▮'.slice(0,Math.ceil(bat/25)).padEnd(4,'▯')+' '+bat+'%';
+  if(Date.now()-DQ.at<2400)return;DQ.at=Date.now();
+  // pick a new contact: drop a red marker somewhere in the feed, slide the reticle onto it, then rule it out
+  const fh=innerHeight-318,x=12+Math.random()*76,y=Math.max(90,fh*(.18+Math.random()*.62));
+  const m=o.querySelectorAll('.dqM')[DQ.mk++%3],X=o.querySelector('.dqX'),lb=X.querySelector('span');
+  m.className='dqM';m.style.left=x+'%';m.style.top=y+'px';void m.offsetWidth;m.classList.add('on');
+  X.style.left=x+'%';X.style.top=y+'px';X.classList.toggle('lf',x>50);lb.textContent=tt('分析訊號…');
+  const p=$('#dqPos');if(p)p.textContent=`X ${String(Math.round(x*9.7)).padStart(3,'0')} · Y ${String(Math.round(y)).padStart(3,'0')}`;
+  const al=$('#dqAlt');if(al)al.textContent=`ALT ${(0.3+Math.random()*.4).toFixed(1)}M`;
+  setTimeout(()=>{if(!m.isConnected)return;m.classList.add('off');lb.textContent=tt(RQ.busy?'目標鎖定':'沒有目標，繼續掃描');},1500);
+}
 function fillPicks(side){cfg.picks[side]=cfg.picks[side].filter(owned);const p=cfg.picks[side];const bases=new Set(p.map(k=>OPC[k].base));for(const b of shuffle(OPBASE.filter(k=>OPC[k].side===side&&!bases.has(k)&&opPlayable(k)&&owned(k)))){if(p.length>=5)break;p.push(b);}}
 async function rankQueue(){
   const n=await netInit();if(!n)return;fillPicks('A');fillPicks('D');
