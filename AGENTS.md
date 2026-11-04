@@ -292,3 +292,8 @@
 - 線上對戰帶培養幹員：鎖定陣容時把自己的培養幹員數值打包成 snapshot（copSnap → pick.cop），host 合併雙方後在 addTeams 套用（COPNET → copApplySnap，存在 G.copNet 讓 guest 在 netApply 時也套用）；mkUnit 看到 PROF.copU 就直接套用單位欄位。排隊 30 秒後的電腦對手（rankBotGo）也一樣。
 - 護送人質改成跟封門一樣的浮動按鈕 #escBtn（綠色），只有站在人質旁邊、還能做目標行動時才出現；側欄只在教學（G.tut2）保留。
 - opArt 對 recruit 卡：訓練關卡顯示該職業的圖（lvArt），對手的培養幹員顯示對手職業圖，不再借用自己的培養幹員圖。
+
+## v180
+- 成就面板 #achp z-index 90 → 130，蓋在底部選單上，不再被切掉。
+- 任務頁：返回鍵拿掉，改成右上角 X（.tkX，沿用 id t-back）；手機上面板固定在頂列（頭像、圖示、在線人數）下方、底部選單上方，列距縮小，iPhone 也一頁放得下。
+- 手機大廳左側拿掉「訓練任務」（底部選單已有訓練）；活動方塊改用 img/ui/event.webp，圖上壓「準備中」。
