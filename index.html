@@ -10408,7 +10408,7 @@ function update3D(){
   setInst(R3.reachIM,reach,.065);setInst(R3.reachEdge,reach.map(([x,y])=>[x,y,.38]));setInst(R3.tgtIM,tg);tgtGlow(glow);R3.hl=new Set([...reach,...tg,...glow].map(c=>c[0]+','+c[1]));
   // gadgets, defuser, trail
   const dg=R3.dynG;while(dg.children.length)dg.remove(dg.children[0]);
-  for(const g of G.gadgets){if(!g.alive||g.type==='prisma')continue;if(!G.over&&!gadgetVisibleTo(g,G.player))continue;const gm3=gadget3D(g);if(CAMT.includes(g.type))gm3.userData.cell=[g.x,g.y];dg.add(gm3);}
+  for(const g of G.gadgets){if(!g.alive||g.type==='prisma')continue;if(!G.over&&!gadgetVisibleTo(g,G.player))continue;const gm3=gadget3D(g);if(CAMT.includes(g.type)||g.wall)gm3.userData.cell=[g.x,g.y];dg.add(gm3);}
   if(G.phase==='play'&&!G.over){for(const u of G.units)if(u.alive&&u.x>=0&&u.side!==G.player&&u.spotted>0&&!smokeAt(u.x,u.y)&&!vis.has(u.id))dg.add(pin3D(u.x,u.y));
     if(G.player==='D')for(const k of G.decoys||[])if(k.alive)dg.add(token3D(k.x,k.y,true));
     for(const h of heatPins())dg.add(pin3D(h.x,h.y));}
