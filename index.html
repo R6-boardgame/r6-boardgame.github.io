@@ -10064,6 +10064,7 @@ function tick3D(){
   if(R3.fx2&&R3.fx2.length)R3.fx2=R3.fx2.filter(f=>{let ok=false;try{ok=f(dt);}catch(e){}return ok;});
   for(let i=R3.tracers.length-1;i>=0;i--){const tr=R3.tracers[i];tr.life-=dt;tr.obj.children.forEach(c=>{c.material.opacity=Math.max(0,tr.life/.5);});if(tr.life<=0){R3.fxG.remove(tr.obj);R3.tracers.splice(i,1);}}
   if(R3.hoverCell&&G){const [x,y]=R3.hoverCell;const c=cell(x,y);const h=c&&isWallC(c)?WALLH[R3.wall]+.06:.06;R3.hover.scale.set(.98,h/.06,.98);R3.hover.position.set(cwx(x,y),h/2,cwz(x,y));R3.hover.visible=true;}else R3.hover.visible=false;
+  if(document.body.dataset.scr==='title'&&!R3.intro){const tt=$('#title');if(tt&&!tt.hidden)return;}// v164: the menus cover the 3D view completely, so skip drawing it
   if(R3.comp&&R3.hq)R3.comp.render();else R3.renderer.render(R3.scene,R3.camera);
 }
 // ---------- v118: map effects shared by both players (online they ride in the game state as G.fxq) ----------
@@ -10269,7 +10270,7 @@ function trainHTML(){return `<h2 class="tsec">訓練任務</h2>`+`<button id="t-
 const lobNav=on=>`<nav class="lobNav">${[['home','t-home','home','大廳'],['train','t-train2','flag','訓練'],['cop','t-cop','user','幹員'],['shop','t-shop','shop','商店'],['lib','t-lib','book','作戰檔案']].map(([k,id,ic,l])=>`<button id="${id}"${k===on?' class="on"':''}>${lobIc(ic)}<span>${l}</span></button>`).join('')}</nav>`;
 // v159: 作戰檔案 — roster first, rules and achievements as side cards
 let LIBF='all';
-const libFace=b=>/^recruit_/.test(b)?(OPC[b].side==='A'?'img/av/cop_f.webp':'img/av/cop_m.webp'):'img/face/'+artBase(b)+'.webp';
+const libFace=b=>/^recruit_/.test(b)?(OPC[b].side==='A'?'img/av/cop_f.webp':'img/av/cop_m.webp'):'img/face_s/'+artBase(b)+'.webp';
 // v162 訓練任務：職前訓練（職業情境關）、固若金湯、破門攻堅
 const TRN=[{n:'新手教學',map:'bank',d:'認識回合流程、移動、射擊與獲勝條件。',d2:'從部署到勝負，帶你走完一場完整的對戰。',learn:['回合流程','移動與掩護','射擊與視線','獲勝條件'],done:()=>tuSeen()}];
 const LVCLS=['smg','hs','sh','sg','rf','sn','mg'],LVSH={smg:'衝鋒',hs:'重盾',sh:'機動',sg:'散彈',rf:'步槍',sn:'狙擊',mg:'機槍'};

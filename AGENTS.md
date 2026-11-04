@@ -221,3 +221,7 @@
 ## v163 底部分頁列順暢度
 - 點分頁時先立刻把那顆標成選中，下一個畫面幀才真正切頁（`requestAnimationFrame` + `setTimeout`），手指放開就有反應。按鈕加了 `touch-action:manipulation`。
 - 商店卡片改用 `opArtU(b)`（base64 立繪轉成快取的 blob URL，登入 3 秒後閒置時預先轉好），不再每次重畫都把幾 MB 的 base64 塞進 innerHTML。
+
+## v164 選單頁效能
+- 選單畫面（大廳、訓練、作戰檔案等，`body[data-scr=title]` 且 `#title` 顯示中）被 `.tbg` 完全蓋住，`tick3D` 現在直接跳過 3D 繪製（之前會在背後一直畫 5 個英雄模型，手機很耗效能）。
+- 作戰檔案的頭像改用縮圖 `img/face_s/*.webp`（寬 160，約 12KB；原圖 `img/face/` 寬 360 保留給其他地方）。新增幹員頭像時記得兩個資料夾都放。
