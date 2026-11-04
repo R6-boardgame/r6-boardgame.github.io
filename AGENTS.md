@@ -280,3 +280,6 @@
 ## v176
 - 介面音效換成戰術感的機械聲（保險、卡榫、槍機、皮套、無線電雜訊），來源仍是 Kenney CC0（UI/RPG/Impact/Sci-Fi Audio），疊加合成低頻悶響，細節見 snd/CREDITS.txt。檔名沒變，fetch 加 `?v=176` 避開快取。
 - Kenney 檔案可從 media.githubusercontent.com/media/series-ai/jam-ready-assets/HEAD/kenney-*/audio/Audio/*.ogg 取得（raw 是 LFS 指標）。
+
+## v177
+- 底部選單切換時（gnavGo 的 closeAll）一併移除成就/好友面板 #achp（z-index 90 在 #gnav 下方，原本切頁後成就面板還蓋在畫面上）。

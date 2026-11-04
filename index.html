@@ -10514,7 +10514,7 @@ function lobHTML(){const cs=copAll(),i=LOBI%2,c=cs[i],rk=copScore(c).rk,art=copA
 // v160: phone bottom tabs stay on every menu page (lobby, training, operators, shop, files); pages they sit over get their bottom raised by --gnH
 function gnavState(){const vis=s=>{const e=$(s);return !!e&&!e.hidden;};if(vis('#shop'))return 'shop';if(vis('#cop')||vis('#copAl'))return 'cop';return SCREEN==='train'?'train':SCREEN==='lib'?'lib':SCREEN==='title'?'home':'';}
 let GNSW=false;// v169: while switching tabs, closing the shop or operators page doesn't redraw the lobby underneath first
-function gnavGo(k){const shop=$('#shop'),cop=$('#cop'),al=$('#copAl');let sw=false;const closeAll=keep=>{GNSW=true;try{if(keep!=='shop'&&shop&&!shop.hidden)closeShop();if(keep!=='cop'){if(al&&!al.hidden)al.hidden=true;if(cop&&!cop.hidden){closeCop();sw=true;}}if(keep!=='shop'&&shop&&!shop.hidden)sw=true;}finally{GNSW=false;}};
+function gnavGo(k){const shop=$('#shop'),cop=$('#cop'),al=$('#copAl');let sw=false;const closeAll=keep=>{GNSW=true;try{{const ap=$('#achp');if(ap)ap.remove();}if(keep!=='shop'&&shop&&!shop.hidden)closeShop();if(keep!=='cop'){if(al&&!al.hidden)al.hidden=true;if(cop&&!cop.hidden){closeCop();sw=true;}}if(keep!=='shop'&&shop&&!shop.hidden)sw=true;}finally{GNSW=false;}};
   NETMSG='';if(k==='cop'){closeAll('cop');CP.i=LOBI;openCop();}else if(k==='shop'){closeAll('shop');if(!shop||shop.hidden)openShop();}
   else{closeAll();const s={home:'title',train:'train',lib:'lib'}[k];if(SCREEN!==s||sw){SCREEN=s;renderTitle();}}gnavSync();}
 function gnavSync(){let el=$('#gnav');const show=lobMob()&&preGame()&&document.body.dataset.scr==='title';
