@@ -312,3 +312,7 @@
 
 ## v184
 - 浮動「轉向」只給目前啟動中的幹員、或本回合已經行動過的幹員（u.activated）；還沒動的幹員不能免費轉向。
+
+## v185
+- 底部選單切換（gnavGo closeAll）會一併關掉玩法說明 #manual、規則書 #rbook、幹員圖鑑 #opsel，在規則頁點「大廳」可以回去。
+- 成就面板 .bscroll 加 overflow-x:hidden、touch-action:pan-y，只能上下捲，不會左右晃。
