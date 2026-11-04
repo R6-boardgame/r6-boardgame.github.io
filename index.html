@@ -100,21 +100,21 @@ function makeRoom(name){
 
 // Google sign-in and the cloud save: Firebase, loaded from this site's own copy of the SDK
 const FBC={apiKey:"AIzaSyAXBuiFsa1pCAtuJoCWm00Esl5JBgjgUAk",authDomain:"r6-board-game.firebaseapp.com",projectId:"r6-board-game",storageBucket:"r6-board-game.firebasestorage.app",messagingSenderId:"1067919869716",appId:"1:1067919869716:web:1249505b5c33e10f862401"};
-let fbP=null,fbUser=null,fbReady=false;const fbSubs=new Set();
+let fbP=null,fbUser=null,fbReady=false,fbFail=false;const fbSubs=new Set();
 const fbLoad=()=>fbP||(fbP=new Promise((res,rej)=>{const ls=['fb/app.js','fb/auth.js','fb/firestore.js'];let i=0;
   const next=()=>{if(i>=ls.length){try{if(!firebase.apps.length)firebase.initializeApp(FBC);res(firebase);}catch(e){rej(e);}return;}
     const s=document.createElement('script');s.src=ls[i++];s.onload=next;s.onerror=()=>{fbP=null;rej({code:'network'});};document.head.appendChild(s);};next();}));
 const fbSet=u=>{fbUser=u?{uid:u.uid,name:u.displayName||'',email:u.email||'',photo:u.photoURL||''}:null;
   uid=fbUser?'g'+fbUser.uid:localUid;gName=fbUser?fbUser.name:'';gPhoto=fbUser?fbUser.photo:'';fbReady=true;fbSubs.forEach(fn=>{try{fn(fbUser);}catch(e){}});};
 const fbDoc=async()=>{const fb=await fbLoad();if(!fbUser)throw {code:'unauthenticated'};return fb.firestore().doc('users/'+fbUser.uid);};
-window.R6FB={user:()=>fbUser,
+window.R6FB={user:()=>fbUser,settled:()=>fbReady||fbFail,
   onUser(fn){fbSubs.add(fn);if(fbReady&&fbUser)fn(fbUser);return ()=>fbSubs.delete(fn);},
   async signIn(){const fb=await fbLoad(),a=fb.auth(),p=new fb.auth.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});
     try{await a.signInWithPopup(p);}catch(e){if(/popup-blocked|operation-not-supported|web-storage-unsupported/.test((e&&e.code)||''))return a.signInWithRedirect(p);throw e;}},
   async signOut(){const fb=await fbLoad();await fb.auth().signOut();},
   async load(){const s=await (await fbDoc()).get();return s.exists?s.data():null;},
   async save(d){await (await fbDoc()).set(d);}};
-const fbBoot=()=>fbLoad().then(fb=>{const a=fb.auth();a.getRedirectResult().catch(()=>{});a.onAuthStateChanged(fbSet);}).catch(()=>{});
+const fbBoot=()=>fbLoad().then(fb=>{const a=fb.auth();a.getRedirectResult().catch(()=>{});a.onAuthStateChanged(fbSet);}).catch(()=>{fbFail=true;});
 if(document.readyState==='loading')addEventListener('DOMContentLoaded',fbBoot);else fbBoot();
 let lobby=null;
 const user={async id(){return uid;},async me(){let nick='';try{nick=(JSON.parse(localStorage.getItem('r6bg.profile')||'{}').nick)||'';}catch(e){}return{id:uid,name:nick||gName,avatarUrl:gPhoto};},
@@ -408,23 +408,30 @@ html,body{background:#06090d}
 #boot .lgBtns{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:179px}
 #bootBar{width:100%;height:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);overflow:hidden}
 #bootBar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#b9822a,#e3aa3e);box-shadow:0 0 10px rgba(227,170,62,.6);transition:width .25s linear}
-#bootTx{font-size:13px;color:#a9b6c2;letter-spacing:.08em}
+#bootTx{width:100%;display:flex;justify-content:space-between;gap:12px;font-size:13px;color:#a9b6c2;letter-spacing:.04em}#bootTx b{font-weight:400;transition:opacity .25s}#bootTx em{font-style:normal;font-family:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;color:#e3aa3e}
 @media (orientation:landscape) and (max-height:520px){#boot .lgBox{flex-direction:row;width:min(780px,100%);gap:32px}#boot .lgLogo,#boot .lgBtns{flex:1}}
 </style><div class="lgBg" style="background-image:url(img/ui/lg_bg.webp)"></div><div class="lgBox"><div class="lgLogo"><img class="lgR6" src="img/ui/lg_r6.webp" alt="Tom Clancy's Rainbow Six Siege"><div class="lgLg"><img class="lgSix" src="img/ui/lg_logo.webp" alt="6"><div><small>THE BOARDGAME</small><h1>虹彩六號<br>戰術桌遊</h1></div></div></div>
-<div class="lgBtns"><div id="bootBar"><i></i></div><span id="bootTx">讀取中 0%</span></div></div></div>
+<div class="lgBtns"><div id="bootBar"><i></i></div><span id="bootTx"><b></b><em>0%</em></span></div></div></div>
 <script>
 // v148: loading screen shaped like the login page; it stays until every script, image and font has loaded, then fades into the real login page
 (()=>{const bar=document.querySelector('#bootBar i'),tx=document.getElementById('bootTx'),el=document.getElementById('boot'),t0=Date.now();
-  let p=0,dcl=false,done=false,sc=0;const N=20;
-  const set=v=>{v=Math.max(p,Math.min(1,v));if(v===p)return;p=v;bar.style.width=(p*100).toFixed(1)+'%';tx.textContent='讀取中 '+Math.floor(p*100)+'%';};
+  let p=0,dcl=false,done=false,sc=0,tl=0;const N=20;
+  const pc=tx.querySelector('em'),ln=tx.querySelector('b');
+  // v168: flavour lines instead of "loading"
+  let lg='zh';try{lg=(JSON.parse(localStorage.getItem('r6bg.profile')||'{}').lang)||'zh';}catch(e){}
+  const LN=[['Sledge 正在磨他的錘子','Sledge is sharpening his hammer','Sledgeがハンマーを研いでいる'],['Twitch 正在幫電車充電','Twitch is charging her shock drone','Twitchがドローンを充電中'],['Thermite 正在調配鋁熱劑','Thermite is mixing thermite','Thermiteがテルミットを調合中'],['Mute 正在調干擾器的頻率','Mute is tuning his jammers','Muteがジャマーの周波数を調整中'],['Castle 正在釘防彈板','Castle is nailing up armor panels','Castleが防弾パネルを打ち付けている'],['Smoke 正在檢查毒氣罐（偷偷聞了一下）','Smoke is checking his gas canisters (and sniffing one)','Smokeがガス缶を点検中（ちょっと嗅いだ）'],['Ash 正在裝填破牆彈','Ash is loading breaching rounds','Ashがブリーチング弾を装填中'],['Jäger 正在擦亮他的 ADS','Jäger is polishing his ADS','JägerがADSを磨いている'],['Pulse 正在校準心跳感應器','Pulse is calibrating his heartbeat sensor','Pulseが心拍センサーを調整中'],['Thatcher 又在找他的 EMP','Thatcher is looking for his EMP again','ThatcherがまたEMPを探している'],['Bandit 正在幫電線通電','Bandit is wiring up the batteries','Banditがバッテリーをつないでいる'],['Montagne 正在擦他的盾牌','Montagne is polishing his shield','Montagneが盾を磨いている']],li=lg==='en'?1:lg==='ja'?2:0;
+  let k=Math.floor(Math.random()*LN.length);const say=()=>{ln.textContent=LN[k][li]+'…';k=(k+1)%LN.length;};say();const sayT=setInterval(()=>{ln.style.opacity=0;setTimeout(()=>{say();ln.style.opacity=1;},250);},1700);
+  const set=v=>{v=Math.max(p,Math.min(1,v));if(v===p)return;p=v;bar.style.width=(p*100).toFixed(1)+'%';pc.textContent=Math.floor(p*100)+'%';};
   const mo=new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.tagName==='SCRIPT')sc++;});mo.observe(document.documentElement,{childList:true,subtree:true});
   const tick=()=>{if(done)return;const t=(Date.now()-t0)/1000;
     if(!dcl)set(Math.min(.8,Math.max(.75*(1-Math.exp(-t/5)),.8*Math.min(1,sc/N))));
-    else{const im=[...document.images],ok=im.filter(i=>i.complete).length;set(.8+.17*(im.length?ok/im.length:1));}
+    else if(!tl){const im=[...document.images],ok=im.filter(i=>i.complete).length;set(.8+.1*(im.length?ok/im.length:1));}
+    else set(.9+.09*(1-Math.exp(-(Date.now()-tl)/2500)));
     setTimeout(tick,120);};tick();
   document.addEventListener('DOMContentLoaded',()=>{dcl=true;mo.disconnect();});
-  const fin=()=>{if(done)return;const go=()=>{if(done)return;if(!document.getElementById('login')&&Date.now()-t0<30000)return setTimeout(go,50);done=true;set(1);
-      tx.textContent='讀取完成';setTimeout(()=>{el.classList.add('out');el.setAttribute('aria-busy','false');setTimeout(()=>el.remove(),400);},180);};
+  const fin=()=>{if(done)return;const go=()=>{if(done)return;if(!tl)tl=Date.now();if(!document.getElementById('login')&&Date.now()-t0<30000)return setTimeout(go,50);
+      {const fb=window.R6FB,wait=Date.now()-tl<8000&&fb&&fb.settled&&(!fb.settled()||(fb.user()&&window.GA&&(GA.busy||!GA.u)));if(wait)return setTimeout(go,80);}
+      done=true;set(1);clearInterval(sayT);setTimeout(()=>{el.classList.add('out');el.setAttribute('aria-busy','false');setTimeout(()=>el.remove(),400);},180);};
     (document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,3000))]):Promise.resolve()).then(go);};
   if(document.readyState==='complete')fin();else addEventListener('load',fin);})();
 </script><title>彩六圍攻戰術桌遊</title>
