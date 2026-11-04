@@ -276,3 +276,7 @@
 - 玩家設定面板 `.psettings` z-index 70 → 130，蓋在底部選單 #gnav（125）之上，手機上最下面的設定不再被擋。
 - 音效解鎖：iOS 的觸控 pointerdown/touchstart 不算使用者手勢，AudioContext 一直是 suspended。改成 touchend/pointerup/click 也會呼叫 init()，並在手勢內播一個 1 樣本的靜音 buffer；回到前景時重新 resume（處理 interrupted）。
 - iPhone 靜音開關打開時 Web Audio 本來就不會出聲。
+
+## v176
+- 介面音效換成戰術感的機械聲（保險、卡榫、槍機、皮套、無線電雜訊），來源仍是 Kenney CC0（UI/RPG/Impact/Sci-Fi Audio），疊加合成低頻悶響，細節見 snd/CREDITS.txt。檔名沒變，fetch 加 `?v=176` 避開快取。
+- Kenney 檔案可從 media.githubusercontent.com/media/series-ai/jam-ready-assets/HEAD/kenney-*/audio/Audio/*.ogg 取得（raw 是 LFS 指標）。
