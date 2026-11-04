@@ -6134,7 +6134,7 @@ const SFX=(()=>{
   function unlockTap(){if(!ac)return;try{const b=ac.createBuffer(1,1,22050),s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0);}catch(e){}}
   // v172: recorded interface sounds (Kenney, CC0). Bytes are fetched right away; decoded once audio is allowed
   const SMP={tap:.32,tab:.5,back:.45,ok:.5,buy:.6,err:.45,tick:.35,open:.4},raw={},buf={};
-  Object.keys(SMP).forEach(k=>{raw[k]=fetch('snd/'+k+'.mp3').then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);});
+  Object.keys(SMP).forEach(k=>{raw[k]=fetch('snd/'+k+'.mp3?v=176').then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);});
   function decodeAll(){Object.keys(SMP).forEach(k=>{if(buf[k])return;buf[k]=1;raw[k].then(a=>{if(!a)return delete buf[k];ac.decodeAudioData(a.slice(0),d=>{buf[k]=d;},()=>{delete buf[k];});});});}
   function play(k,vol,jit){if(!ok())return false;const b=buf[k];if(!b||b===1)return false;const s=ac.createBufferSource();s.buffer=b;s.playbackRate.value=1+(jit==null?.04:jit)*(Math.random()*2-1);
     const g=ac.createGain();g.gain.value=(vol==null?1:vol)*SMP[k];s.connect(g);g.connect(fxBus);s.start();return true;}
