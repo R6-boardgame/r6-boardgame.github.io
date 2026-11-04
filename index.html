@@ -2560,6 +2560,23 @@ body.hasClk #tracker .seg{display:none}
 .shKD p.shKDn{margin:0;font-size:12px;color:#8193a3}.shKD .shCta{margin-top:auto}.shKD .shBuy{min-width:140px}
 .shKD .shKDh{display:flex;gap:12px;align-items:center}.shKD .shKDh img{width:64px;height:64px}.shKD h3{margin:2px 0 0;font-family:var(--display);font-size:26px}.shKD small{color:#8193a3}
 .shKD p{color:#c9d3dc;line-height:1.6}
+/* v187: loadout picker, pill tabs, square operator tiles, two-column gear cards */
+html body .mflow .mfTabs{gap:0!important;padding:4px;background:#0b1117;border:1px solid #2b3946;border-radius:999px}
+html body .mflow .mfTabs button{border:0!important;border-radius:999px!important;padding:8px 6px!important;font-size:15px!important;font-weight:800;color:#8fa0ae!important;background:transparent!important;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:none}
+html body .mflow .mfTabs button.on{background:linear-gradient(180deg,#f2b84a,#d99a2b)!important;color:#1a1206!important;box-shadow:0 2px 12px rgba(242,184,74,.4)}
+html body .mflow .mfTabs button em{font-style:normal;font-size:11px;padding:1px 7px;border-radius:999px;background:rgba(255,255,255,.12)}html body .mflow .mfTabs button.on em{background:rgba(0,0,0,.2)}
+html body .mflow .mfOps{flex:none!important;grid-auto-rows:auto!important;gap:6px!important}
+html body .mflow .mfOp{aspect-ratio:1/1.12;height:auto!important;min-height:0!important;border-radius:8px;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:3px!important;padding:4px 2px!important}
+html body .mflow .mfOp img{width:62%!important;height:auto!important;max-height:60%!important;object-fit:contain}html body .mflow .mfOp img.cop{object-fit:cover}
+html body .mflow .mfOp span{font-size:11px!important}
+html body .mflow .mfInvs{display:grid!important;grid-template-columns:1fr 1fr;gap:8px!important;grid-auto-rows:auto!important;align-content:start;flex:none!important;height:auto!important}
+html body .mflow .mfInv{flex:none!important;height:auto!important;min-height:0!important;flex-direction:column!important;align-items:stretch!important;text-align:center;gap:4px!important;padding:10px 8px 8px!important;border-radius:10px;background:linear-gradient(180deg,#18222c,#0f161d)!important;border:1px solid #2b3946!important}
+html body .mflow .mfInv.got{border-color:#f2b84a!important;box-shadow:inset 0 0 0 1px rgba(242,184,74,.35)}
+html body .mflow .mfInv>i{width:100%!important;height:50px!important}html body .mflow .mfInv>i img,html body .mflow .mfInv>i svg{width:50px!important;height:50px!important;max-width:50px!important;max-height:50px!important}
+html body .mflow .mfInv>div:nth-child(2) b{font-size:15px;color:#f4a35a}html body .mflow .mfInv>div:nth-child(2) span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:10.5px!important;min-height:28px}
+html body .mflow .mfCnt{justify-content:center;margin-top:4px;background:#0a0f14;border-radius:999px;padding:3px}html body .mflow .mfCnt button{width:30px!important;height:30px!important;border-radius:999px!important}html body .mflow .mfCnt b{color:#f4a35a}
+html body .mflow .mfNote{grid-column:1/-1}
+@media (min-width:761px){html body .mflow .mfInvs{grid-template-columns:repeat(3,1fr)}}
 </style>
 
 <div class="wrap">
@@ -11543,11 +11560,11 @@ function mfToggle(k){const P=MF.picks,i=P.indexOf(k);if(i>=0)P.splice(i,1);else 
 function mfDraw(){const el=MF.el,side=MF.side,pool=mfPool(side,true),P=MF.picks,inv=MF.inv,used=invSum(inv),cap=INV_CAP[side],L=MF.lock;
   const left=Math.max(0,Math.ceil(MFT-(Date.now()-MF.pick0)/1000));const _rs=scrollSnap(el);
   const ops=pool.map(k=>{const i=P.indexOf(k),lk=i<0&&P.some(p=>mfBase(p)===mfBase(k));return `<button class="mfOp${i>=0?' on':''}${lk?' lk':''}${MF.cur===k?' cur':''}" data-k="${k}"${L?' disabled':''}${lk?' title="另一位培養幹員已在隊上"':''}><img src="${copSlot(k)!=null?(opArt(k)||opIcon(k)):opIcon(k)}" class="${copSlot(k)!=null?'cop':''}" alt=""><span>${esc(copSlot(k)!=null?COPN[copSlot(k)]:OPC[k].name)}</span>${i>=0?`<em>${i+1}</em>`:''}</button>`;}).join('');
-  const invs=Object.entries(INV[side]).map(([k,[n,max,d]])=>`<div class="mfInv"><i>${WZI[k]||''}</i><div><b>${n}</b><span>${d}</span></div><div class="mfCnt"><button data-iv="${k}" data-d="-1"${L||inv[k]<=0?' disabled':''} aria-label="減少${n}">−</button><b>${inv[k]|0}</b><button data-iv="${k}" data-d="1"${L||inv[k]>=max||used>=cap?' disabled':''} aria-label="增加${n}">＋</button></div></div>`).join('');
+  const invs=Object.entries(INV[side]).map(([k,[n,max,d]])=>`<div class="mfInv${inv[k]>0?' got':''}"><i>${WZI[k]||''}</i><div><b>${n}</b><span>${d}</span></div><div class="mfCnt"><button data-iv="${k}" data-d="-1"${L||inv[k]<=0?' disabled':''} aria-label="減少${n}">−</button><b>${inv[k]|0}</b><button data-iv="${k}" data-d="1"${L||inv[k]>=max||used>=cap?' disabled':''} aria-label="增加${n}">＋</button></div></div>`).join('');
   const wait=MF.oppLock?(MF.bot||MF.side==='D'?'雙方已鎖定':'雙方已鎖定，等待防守方部署…'):'已鎖定，等待對手…';
   el.innerHTML=`<div class="mfPick ${side==='A'?'a':'d'}"><header class="mfHd"><img class="mfThumb" src="${mapThumb(MF.mk)}" alt="${MAPS[MF.mk].name}格局圖"><div class="mfMap"><b>${MAPS[MF.mk].name}</b><span>${MFMIS[MF.mis]} · <i>${side==='A'?'進攻方':'防守方'}</i></span></div><div class="mfTm${left<=5&&!L?' hot':''}" id="mfTm">${left}</div></header>
     <div class="mfVsl"><span class="${MF.lock?'ok':''}">${esc(MF.me.n)} ${MF.lock?'已鎖定':'選角中'}</span><span class="${MF.oppLock?'ok':''}">${esc(MF.opp.n)} ${MF.oppLock?'已鎖定':'選角中'}</span></div>
-    <div class="mfTabs"><button data-tab="op" class="${MF.tab==='op'?'on':''}">幹員 ${P.length}/5</button><button data-tab="inv" class="${MF.tab==='inv'?'on':''}">裝備 ${used}/${cap}</button></div>
+    <div class="mfTabs"><button data-tab="op" class="${MF.tab==='op'?'on':''}">幹員<em>${P.length}/5</em></button><button data-tab="inv" class="${MF.tab==='inv'?'on':''}">裝備<em>${used}/${cap}</em></button></div>
     ${MF.tab==='op'?mfDet(MF.cur):''}
     <div class="mfBody">${MF.tab==='op'?`<div class="mfOps" style="--mfc:${pool.length>18?8:pool.length>12?7:6}">${ops}</div>`:`<div class="mfInvs">${invs}<p class="mfNote">${side==='A'?'另有 3 架無人機。':'另有 3 捲鐵絲網與地圖上的攝影機。'}</p></div>`}</div>
     <div class="mfSlots">${[0,1,2,3,4].map(i=>`<div class="mfSl">${P[i]?`<img src="${copSlot(P[i])!=null?(opArt(P[i])||opIcon(P[i])):opIcon(P[i])}" class="${copSlot(P[i])!=null?'cop':''}" alt="${esc(mfName(P[i]))}">`:''}</div>`).join('')}</div>
