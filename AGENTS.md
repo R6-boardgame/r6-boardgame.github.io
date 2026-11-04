@@ -204,3 +204,9 @@
 ## v160：手機底部分頁列常駐
 
 - 手機（`lobMob()`）在選單畫面（`body[data-scr="title"]`，含大廳、訓練、作戰檔案）一直顯示 `#gnav`（`gnavSync` 每 250ms 依 `gnavState()` 亮對應分頁，`gnavGo` 切換：幹員開 `openCop`、商店開 `openShop`，其餘關掉這兩頁再換 `SCREEN`）。`#gnav` z-index 125，蓋在 `#cop`(115)、`#shop`(120) 上；顯示時 `html.gnav` 讓 `#shop`、`#cop`、`#copAl`、`.manual` 的底邊抬高 `--gnH`、`#title` 底部留白，原本的按鈕不會被擋到。幹員圖鑑 `#opsel`（z 200）會蓋過分頁列。
+
+## v161 訓練任務頁（方案 3：任務簡報＋關卡清單）
+- `SCREEN==='train'` 現在跟作戰檔案一樣畫進 `#tlob`（`trnHTML()`），`#tmenu` 隱藏。舊的 `trainHTML()` 已不用。
+- 關卡資料在 `TRN` 陣列（目前只有新手教學，`done` 看 `tuSeen()`），`TRNN=8` 是清單總格數，多的顯示「敬請期待」上鎖。
+- 第二章、第三章、活動關卡分頁先 disabled。
+- 星星評分（提議中，使用者還沒定案）：三個通用條件（過關、無人陣亡、N 回合內完成），每關只填回合上限。新手教學不算星。等第一個正式關卡做好再加星星顯示。
