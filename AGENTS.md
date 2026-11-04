@@ -316,3 +316,6 @@
 ## v185
 - 底部選單切換（gnavGo closeAll）會一併關掉玩法說明 #manual、規則書 #rbook、幹員圖鑑 #opsel，在規則頁點「大廳」可以回去。
 - 成就面板 .bscroll 加 overflow-x:hidden、touch-action:pan-y，只能上下捲，不會左右晃。
+
+## v186
+- 作戰檔案幹員圖鑑：篩選「已擁有」改成「未擁有」（LIBF='not'）；未擁有的頭像灰階（brightness .35 → .7，看得清楚）；全部擁有時顯示「全部幹員都已擁有」。
