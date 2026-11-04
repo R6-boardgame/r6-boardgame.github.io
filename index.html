@@ -8939,9 +8939,13 @@ function setView(kind,snap){
 }
 function introCam(){setView('top');const g=R3.camGoal;if(!g)return;R3.camGoal=null;const off=g.p.clone().sub(g.t),R=off.length(),az1=Math.atan2(off.x,off.z),el1=Math.asin(Math.min(1,off.y/R));
   const wait=document.querySelector('.mapintro')?1900:0;R3.intro={t0:performance.now()+wait,dur:3600,t:g.t.clone(),R,az0:az1-Math.PI*1.25,az1,el0:Math.min(el1,.8),el1};introStep(0);}
-function introStep(k){const I=R3.intro;if(!I)return;const e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2,az=I.az0+(I.az1-I.az0)*e,el=I.el0+(I.el1-I.el0)*Math.pow(e,1.4),r=I.R*(.85+.15*e);// v104: starts high and wide enough that the board is always on screen
-  R3.camera.position.set(I.t.x+r*Math.cos(el)*Math.sin(az),I.t.y+r*Math.sin(el),I.t.z+r*Math.cos(el)*Math.cos(az));R3.controls.target.copy(I.t);if(k>=1)R3.intro=null;}
-function flyTo(p,t,snap){R3.intro=null;const c=R3.controls,cam=R3.camera;if(snap){cam.position.copy(p);c.target.copy(t);c.update();R3.camGoal=null;}else R3.camGoal={p,t};}
+function introStep(k){const I=R3.intro;if(!I)return;const e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2,az=I.az0+(I.az1-I.az0)*e,el=I.el0+(I.el1-I.el0)*Math.pow(e,1.4),r=I.r0!=null?I.r0+(I.R-I.r0)*Math.pow(e,1.6):I.R*(.85+.15*e);// v104: starts high and wide enough that the board is always on screen
+  const T=I.ta?I.ta.clone().lerp(I.t,e):I.t;R3.camera.position.set(T.x+r*Math.cos(el)*Math.sin(az),T.y+r*Math.sin(el),T.z+r*Math.cos(el)*Math.cos(az));R3.controls.target.copy(T);if(k>=1)R3.intro=null;}
+// v174: training levels open on a close-up of the hero, then swing round and up to the top view
+function lvIntroCam(h){if(!R3||!h||h.x<0)return;setView('top');const g=R3.camGoal;if(!g)return;R3.camGoal=null;const off=g.p.clone().sub(g.t),R=off.length(),az1=Math.atan2(off.x,off.z),el1=Math.asin(Math.min(1,off.y/R));
+  const f=h.fd||[0,1],az0=Math.atan2(f[0],f[1]);let d=((az1-az0)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);if(d<Math.PI*.6)d+=2*Math.PI;
+  R3.intro={lock:1,t0:performance.now()+900,dur:3400,t:g.t.clone(),ta:new THREE.Vector3(cwx(h.x,h.y),.85,cwz(h.x,h.y)),R,r0:2.3,az0,az1:az0+d,el0:.16,el1};introStep(0);}
+function flyTo(p,t,snap){if(R3.intro&&R3.intro.lock)return;R3.intro=null;const c=R3.controls,cam=R3.camera;if(snap){cam.position.copy(p);c.target.copy(t);c.update();R3.camGoal=null;}else R3.camGoal={p,t};}
 // after deployment: angled and close, on the unit that acts first (or the first of ours)
 function playCam(){if(!R3||!G)return;const u=(G.active&&G.active.side===G.player&&G.active)||G.sel||G.units.find(u=>u.alive&&u.x>=0&&u.side===G.player);if(!u||u.x<0)return setView('angle');
   R3.followId=u.id;followCam(u,true);}
@@ -10454,7 +10458,7 @@ function lvStart(L){const b=$('#banner');if(b)b.hidden=true;{const a=$('#anal');
   placeAttackers(L.zone|0);}finally{Math.random=R0;}G.reroll={A:0,D:0};G.phase='play';G.sel=null;
   setTimeout(()=>{try{preloadShots();}catch(e){}},400);
   log(`${WPN[L.cls].t}：${L.n}`,'ks');log(L.brief,'ks');log('過關條件：'+L.goals.join('、'),'ks');log('—— 第 1 輪開始 ——','ks');
-  try{if(R3)setView('angle');}catch(e){}startPhase();setTimeout(()=>{if(G&&G.lv===L)bigNote(L.n,L.goals[0],'r',2200);},300);lvGoal();}
+  try{if(R3)lvIntroCam(G.units.find(u=>u.lvHero));}catch(e){try{setView('angle');}catch(x){}}startPhase();setTimeout(()=>{if(G&&G.lv===L)bigNote(L.n,L.goals[0],'r',2200);},300);lvGoal();}
 function lvGoal(){let d=$('#lvGoal');if(!G||!G.lv||G.over){if(d)d.remove();return;}if(!d){d=document.createElement('div');d.id='lvGoal';document.body.appendChild(d);}
   const t=`<b>${G.lv.n}</b><span>${G.lv.goals.join(' · ')}</span>`;if(d.innerHTML!==t)d.innerHTML=t;}
 setInterval(()=>{try{lvGoal();if(!G||!G.lv||G.over)return;const L=G.lv,h=G.units.find(u=>u.lvHero);
