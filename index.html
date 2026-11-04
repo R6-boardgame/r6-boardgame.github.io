@@ -6125,8 +6125,14 @@ const SFX=(()=>{
     try{ac=new AC();}catch(e){ac=null;return;}
     out=ac.createDynamicsCompressor();out.threshold.value=-14;out.ratio.value=4;out.connect(ac.destination);
     fxBus=ac.createGain();fxBus.gain.value=on?.9:0;fxBus.connect(out);muBus=ac.createGain();muBus.gain.value=mOn?.32:0;muBus.connect(out);
-    noiseBuf=ac.createBuffer(1,ac.sampleRate*1.5,ac.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
+    decodeAll();noiseBuf=ac.createBuffer(1,ac.sampleRate*1.5,ac.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
   const ok=()=>ac&&on&&ac.state==='running';
+  // v172: recorded interface sounds (Kenney, CC0). Bytes are fetched right away; decoded once audio is allowed
+  const SMP={tap:.32,tab:.5,back:.45,ok:.5,buy:.6,err:.45,tick:.35,open:.4},raw={},buf={};
+  Object.keys(SMP).forEach(k=>{raw[k]=fetch('snd/'+k+'.mp3').then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);});
+  function decodeAll(){Object.keys(SMP).forEach(k=>{if(buf[k])return;buf[k]=1;raw[k].then(a=>{if(!a)return delete buf[k];ac.decodeAudioData(a.slice(0),d=>{buf[k]=d;},()=>{delete buf[k];});});});}
+  function play(k,vol,jit){if(!ok())return false;const b=buf[k];if(!b||b===1)return false;const s=ac.createBufferSource();s.buffer=b;s.playbackRate.value=1+(jit==null?.04:jit)*(Math.random()*2-1);
+    const g=ac.createGain();g.gain.value=(vol==null?1:vol)*SMP[k];s.connect(g);g.connect(fxBus);s.start();return true;}
   // throttle so a burst of identical events (e.g. a breach destroying several cells) plays once
   const gate=(k,ms)=>{const n=performance.now();if(last[k]&&n-last[k]<ms)return false;last[k]=n;return true;};
   function noise(t,dur,f,q,vol,type,f2){const s=ac.createBufferSource();s.buffer=noiseBuf;const fl=ac.createBiquadFilter();fl.type=type||'bandpass';fl.frequency.setValueAtTime(f,t);if(f2)fl.frequency.exponentialRampToValueAtTime(f2,t+dur);fl.Q.value=q||1;
@@ -6145,7 +6151,11 @@ const SFX=(()=>{
     step(){if(!ok()||!gate('step',90))return;const t=ac.currentTime;noise(t,.06,420+Math.random()*120,2,.22,'bandpass');},
     dice(){if(!ok())return;const t=ac.currentTime;for(let i=0;i<7;i++)noise(t+.05+i*.07+Math.random()*.04,.03,2400+Math.random()*1500,4,.35-i*.03);},
     alert(){if(!ok()||!gate('alert',600))return;const t=ac.currentTime;tone(t,.12,880,0,.18,'square');tone(t+.14,.18,660,0,.18,'square');},
-    ui(){if(!ok()||!gate('ui',40))return;const t=ac.currentTime;tone(t,.04,1200,800,.06,'triangle');},
+    ui(k){if(!ok()||!gate('ui',40))return;if(play(k||'tap'))return;const t=ac.currentTime;tone(t,.04,1200,800,.06,'triangle');},
+    play(k,v,j){return play(k,v,j);},
+    click(){if(!ok()||!gate('click',40))return;if(!play('tick'))tone(ac.currentTime,.04,900,600,.05,'triangle');},
+    buy(){if(!ok())return;play('buy');},
+    err(){if(!ok()||!gate('err',200))return;play('err');},
     round(){if(!ok())return;const t=ac.currentTime;tone(t,.5,110,0,.4,'sawtooth');tone(t,.5,164.8,0,.25,'sawtooth');noise(t,.5,200,.7,.4,'lowpass');},
     siren(){if(!ok())return;const t=ac.currentTime;for(let i=0;i<4;i++){tone(t+i*.42,.38,740,0,.2,'square');tone(t+i*.42+.2,.2,560,0,.2,'square');}tone(t,1.2,60,30,.8,'sine');},
     tick(){if(!ok()||!gate('tick',700))return;const t=ac.currentTime;tone(t,.05,1600,0,.12,'square');},
@@ -6173,7 +6183,13 @@ const SFX=(()=>{
     init};
   // browsers only allow sound after a tap or key press
   ['pointerdown','keydown','touchstart'].forEach(e=>addEventListener(e,()=>init(),{capture:true,passive:true}));
-  addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('button'))S.ui();},{capture:true,passive:true});
+  addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('button,[role=button]');if(!b)return;
+    // pick the sound by what the button does
+    const k=b.matches('#gnav [data-gn],[data-trc],[data-trv]:not(.lobAr),.lobNav button,[data-sb-tab],.trnCh button')?'tab'
+      :b.matches('.lobAr,.trnX,#osX,[aria-label="返回"],[aria-label="關閉"],.back,.lgOut')?'back'
+      :b.matches('.trnGo,.primary,.lgBtn,#cpOk,.cpOk')?'ok'
+      :b.matches('[data-trp]')?'open':'tap';
+    S.ui(k);},{capture:true,passive:true});
   return S;})();
 // music intensity: off outside a game, low while nobody can see an enemy, high once either side has someone in view
 function musicLevel(){if(!G||G.over||G.phase!=='play')return SFX.music(0);
@@ -11703,7 +11719,7 @@ function renderShopDet(){const el=$('#shDet');if(!el)return;const b=SHOP.sel;if(
       ${cta}</div></div>`;
   el.onclick=e=>{if(e.target===el){SHOP.sel=null;renderShopDet();}};$('#shX').onclick=()=>{SHOP.sel=null;renderShopDet();};
   const by=$('#shBuy');if(by)by.onclick=()=>shopBuy(b);}
-function shopBuy(b){if(owned(b)||!opPlayable(b)||ECO.rn<OPPRICE)return;const from=ECO.rn;ECO.rn-=OPPRICE;ECO.own.push(b);ecoSave();
+function shopBuy(b){if(owned(b)||!opPlayable(b)||ECO.rn<OPPRICE)return;const from=ECO.rn;ECO.rn-=OPPRICE;ECO.own.push(b);ecoSave();try{SFX.buy();}catch(e){}
   try{SFX.round&&SFX.round();}catch(e){}
   const box=document.querySelector('.shDBox');if(box){box.classList.add('got');}
   // count the balance down so the cost is felt
@@ -12158,7 +12174,7 @@ function cpSkillPage(){const c=copAll()[CP.i],L=[...(c.w?[classKey(c.w)]:[]),...
     <div class="cpFoot">${sel&&own(sel)?`<button class="cpBtn g" id="cpSkOff" ${c.sk?'':'disabled'}>卸下</button><button class="cpBtn p" id="cpSkEq" ${c.sk===sel||!skFit(c,sel)?'disabled':''}>${!skFit(c,sel)?'職業不符':c.sk===sel?'裝備中':'裝備'}</button>`
       :`<button class="cpBtn g" id="cpSkShop">前往商店</button><button class="cpBtn p" id="cpSkBuy" ${sel&&ECO.rn>=SKPRICE?'':'disabled'}>${sel?(ECO.rn>=SKPRICE?`購買 ${fmtN(SKPRICE)} 聲望`:'聲望不足'):'選一個技能'}</button>`}</div></div>`;}
 function skUse(b,full){if(classOf(b)){const k=classOf(b);return CSK[k].ap+' · '+(k==='hs'?'自由切換':'每回合 1 次');}const n=OPS[b].ch,u=n>50?(full?'次數無限':'無限次'):`${full?'每場 ':''}${n} 次`;return `${u} · 1 行動${full?'點':''}${full&&setupGadget(b)?'（佈防時免費）':''}`;}
-function skBuy(b){if(!b||ECO.sk.includes(b)||ECO.rn<SKPRICE)return false;ECO.rn-=SKPRICE;ECO.sk.push(b);ecoSave();try{SFX.round&&SFX.round();}catch(e){}try{renderPlayer();}catch(e){}return true;}
+function skBuy(b){if(!b||ECO.sk.includes(b)||ECO.rn<SKPRICE)return false;ECO.rn-=SKPRICE;ECO.sk.push(b);ecoSave();try{SFX.buy();}catch(e){}try{renderPlayer();}catch(e){}return true;}
 function cpSave(f){const cs=copAll(),c=cs[CP.i];f(c);f(CP.dr);ecoSave();renderCop();}
 function cpBind(el){const q=s=>el.querySelector(s),on=(s,f)=>{const b=q(s);if(b)b.onclick=f;},d=CP.dr,c=copAll()[CP.i],push=(k,v)=>(CP.st[k]=CP.st[k]||[]).push(cpCopy(v)),left=()=>copLeft(d);
   on('#cpBack',closeCop);on('#cpAlB',openAlum);

@@ -1,0 +1,2 @@
+Interface sounds: "Interface Sounds" by Kenney (www.kenney.nl), CC0 1.0 Universal.
+tap=click_002 tab=select_006 back=back_002 ok=confirmation_001 buy=confirmation_004 err=error_005 tick=drop_002 open=maximize_008 (trailing silence trimmed, mono mp3)
