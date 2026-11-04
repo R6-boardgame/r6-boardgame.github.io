@@ -994,7 +994,7 @@ i.die.bolt{outline:1.5px dashed rgba(255,255,255,.85);outline-offset:-3px}
 .mfDI>button{margin-top:auto;padding:9px;text-align:center;font-size:14px}
 .mfOp.cur{box-shadow:0 0 0 2px #e6edf2}.mfOp.lk img,.mfOp.lk span{opacity:.35;filter:grayscale(1)}.mfOp.lk::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23e6edf2' d='M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V11a1 1 0 0 1 1-1zm2 0h6V7a3 3 0 0 0-6 0z'/%3E%3C/svg%3E")}.mfOp img.cop,.mfSl img.cop{object-fit:cover;object-position:50% 4%}
 .mfInvs{display:flex;flex-direction:column;gap:6px}.mfInv{display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(16,23,30,.8);border:1px solid var(--line)}
-.mfInv>i{width:40px;height:40px;flex:none;display:grid;place-items:center}.mfInv>i svg,.mfInv>i img{width:40px;height:40px;object-fit:contain}
+.mfInv>i{width:40px;height:40px;flex:none;display:grid;place-items:center;overflow:hidden}.mfInv>i svg,.mfInv>i img{width:40px!important;height:40px!important;max-width:40px;max-height:40px;object-fit:contain}
 .mfInv>div:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column}.mfInv>div:nth-child(2) span{font-size:11.5px;color:#9aa7b2;line-height:1.35}
 .mfCnt{display:flex;align-items:center;gap:6px}.mfCnt button{width:34px;height:34px;padding:0;text-align:center}.mfCnt b{min-width:16px;text-align:center}
 .mfNote{font-size:12px;color:#9aa7b2;margin:2px 4px}
@@ -1402,6 +1402,9 @@ html.pg,html.pg body{touch-action:manipulation}html.pg .psbox,html.pg .avgrid{to
 #wfAsk i{display:block;width:34px;height:22px;border-radius:2px}#wfAsk .wfF{background:repeating-linear-gradient(90deg,#3a4653 0 10px,#44515e 10px 11px);transform:perspective(40px) rotateX(35deg)}#wfAsk .wfW{background:repeating-linear-gradient(0deg,#7f8c98 0 6px,#4c5762 6px 7px);border-left:3px solid #4aa8e2}
 @media (min-width:761px) and (min-height:521px){#wfAsk{top:auto;bottom:30px}}
 #noAp b{color:#f2b84a;font-size:18px;letter-spacing:.12em}#noAp span{color:#e8dcc0;font-size:12px}
+#whyTip{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 118px);transform:translateX(-50%);z-index:310;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 18px 6px;max-width:min(86vw,420px);text-align:center;background:rgba(12,14,16,.9);border:2px solid #f2b84a;border-radius:6px;box-shadow:0 0 18px rgba(242,184,74,.35);animation:noApIn .25s ease-out}
+#whyTip b{color:#f2b84a;font-size:17px;letter-spacing:.1em}#whyTip span{color:#e8dcc0;font-size:12px;line-height:1.4}
+html body #acts button.whyD{opacity:.38;cursor:help}html body.actsR #actsR #acts button.whyD{opacity:.42}
 @keyframes noApIn{from{opacity:0;transform:translate(-50%,-6px)}}
 @media (min-width:761px) and (min-height:521px){#noAp{top:auto;bottom:26px;left:calc(50% - 180px)}}
 html body #acts button.primary.owb,html body.actsR #actsR #acts button.primary.owb{background:linear-gradient(180deg,#f2b84a,#d99a2b)!important;color:#140f05!important;border-color:#f2c060!important}
@@ -7448,6 +7451,7 @@ function noApTag(){let el=document.getElementById('noAp');const u=G&&G.active;co
   if(!on){if(el)el.remove();return;}
   if(!el){el=document.createElement('div');el.id='noAp';document.body.appendChild(el);}
   el.innerHTML=`<b>${u.ap<=0?'沒有行動點':'沒有移動點'}</b><span>${u.ap<=0?'點箭頭選監視方向':'點箭頭監視，或繼續用行動'}</span>`;}
+function whyTip(t,s){let el=document.getElementById('whyTip');if(el)el.remove();el=document.createElement('div');el.id='whyTip';el.innerHTML=`<b>${t}</b><span>${s||''}</span>`;document.body.appendChild(el);try{SFX.soft&&SFX.soft();}catch(e){}clearTimeout(whyTip.t);whyTip.t=setTimeout(()=>el.remove(),2400);}
 function canAct(u){
   if(!u||u.side!==G.player||!u.alive||u.defusing||G.busy||G.over||G.phase!=='play'||curSide()!==G.player)return false;
   if(G.active===u)return true;
@@ -8813,15 +8817,21 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
     if(u.hidden&&decoyOf(u))L.push(btn('移動誘餌',`用掉這名幹員的移動點 · 剩 ${isA?u.mp:u.speed}`,G.mode==='decoy',!ok||!decoyReach(u).size,()=>{if(commit(u))setMode('decoy');}));
     const wrap=fn=>()=>{if(commit(u))act(fn);};
     const tmode=(m,list)=>()=>{if(list.length)setMode(m);};
-    L.push(btn('射擊',sub('shoot','1 行動'),G.mode==='shoot',!can('shoot')||!shootables(u).length,tmode('shoot',shootables(u))));
+    {const sht=shootables(u),sb=btn('射擊',sub('shoot',sht.length||!ok?'1 行動':'沒有目標'),G.mode==='shoot',!can('shoot')||!sht.length,tmode('shoot',sht));
+      if(sb.dis&&ok)sb.why=isA&&u.ap<=0?['沒有行動點','這名幹員的 2 個行動點都用完了']:isA&&u.used.has('shoot')?['這次啟動已經射擊過','每次啟動只能射擊一次']:isA&&u.heavyGuard?['重盾架起中','先關閉重盾才能射擊']:!sht.length?['看不到敵人','視線內沒有現身或被標記的敵人，先用無人機或攝影機找人']:null;
+      L.push(sb);}
     L.push(btn('奔跑',u.run?sub('run',`1 行動 · +${u.run} 移動點`):'這名幹員不能奔跑',false,!can('run')||!u.run,wrap(async()=>{if(G.active!==u)return;sprint(u);})));
-    const dt=destroyTargets(u);L.push(btn('破壞',sub('destroy',(PROF[u.op].dz||1)>=2?'路障、軟牆或道具':'路障或道具'),G.mode==='destroy',!can('destroy')||!dt.length,tmode('destroy',dt)));
+    const dt=destroyTargets(u);{const db=btn('破壞',sub('destroy',(PROF[u.op].dz||1)>=2?'路障、軟牆或道具':'路障或道具'),G.mode==='destroy',!can('destroy')||!dt.length,tmode('destroy',dt));
+      if(db.dis&&ok&&!dt.length&&(!isA||canDo(u,'destroy')))db.why=['沒有可破壞的目標','相鄰或視線內沒有路障或看得到的敵方道具'];L.push(db);}
     const o=OPS[u.op];GB=null;
     if(o.g&&(hasClassSkill(u)||!NOBTN.has(u.op))){const t=gTargets(u);const none=t!=='self'&&!t.length;
       GB=btn(GSH[u.op]||o.g,'',G.mode==='gadget',!can('special')||u.ch<=0||none,t==='self'?wrap(()=>useGadget(u)):tmode('gadget',t));GB.self=t==='self';}
     if(hasClassSkill(u)){const K=CSK[u.w],used=u.w!=='hs'&&u.csk===G.round,free=K.ap==='免費',dis=!ok||used||(isA&&!free&&!canDo(u,'cls'))||(u.w==='rf'&&u.aim);
       const md=CSKM[u.w];GB=btn(K.n,u.w==='hs'?(u.heavyGuard?'已啟用 · 點擊關閉':'免費切換'):used?'本回合已用':`${K.ap} · 每回合 1 次`,u.w==='hs'?!!u.heavyGuard:!!md&&G.mode===md,dis||(md==='gl'&&!throwTargets(u).length),md?()=>{if(G.mode===md)return setMode('move');if(commit(u))setMode(md);}:wrap(()=>useCsk(u)),'',`<span class="bic csk">${WPN[u.w].ic}</span>`);GB.self=!md;}
-    const tac=(m,label,n,list)=>n>0&&L.push(btn(label,sub('tactical',`戰術 · 剩 ${n}`),G.mode===m,!can('tactical')||n<=0||!list.length,tmode(m,list),'',eqIc(m)));
+    const TWHY={charge:'要站在軟牆或路障旁邊，干擾器範圍內的牆不行',drone:'附近沒有可以放無人機的格子',clay:'相鄰沒有可以放地雷的空格'};
+    const tac=(m,label,n,list)=>{if(n<=0)return;const tb=btn(label,sub('tactical',`戰術 · 剩 ${n}`),G.mode===m,!can('tactical')||!list.length,tmode(m,list),'',eqIc(m));
+      if(tb.dis&&ok)tb.why=isA&&u.ap<=0?['沒有行動點','這名幹員的 2 個行動點都用完了']:isA&&u.used.has('tactical')?['這次啟動已用過戰術裝備','每次啟動只能用一次戰術裝備']:!list.length?[label+'現在用不了',TWHY[m]||'投擲範圍內沒有可以丟的格子']:null;
+      L.push(tb);};
     if(u.side==='A'){
       if(u.matStuck)L.push(btn('拆掉捕獸夾',sub('unmat','1 行動 · 解除定身'),false,!can('unmat'),wrap(()=>unMat(u))));
       tac('drone','無人機',G.drones,G.drones>0?droneTargets(u):[]);
@@ -8840,7 +8850,10 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
     if(TUG&&ok)L.push(btn('監視',G.mode==='owdir'?'點箭頭選方向':'選方向後結束',G.mode==='owdir',G.busy,()=>{if(G.mode==='owdir')return setMode('move');if(commit(u))setMode('owdir');},'primary owb'));
   }} else {el.remove();return;}
   el.innerHTML='';
-  L.forEach(b=>{if(!b.ic&&GADIC[b.label])b.ic=`<img class="bic gic" src="${GADIC[b.label]}" alt="">`;if(!b.ic&&ACTIC[b.label])b.ic=`<img class="bic act" src="${uiImg('act_'+ACTIC[b.label])}" alt="">`;const e=document.createElement('button');e.innerHTML=`${b.ic?`<span class="bwrap">${b.ic}<span>`:''}${b.label}${b.sub?`<span class="sub">${actSub(b.sub)}</span>`:''}${b.ic?'</span></span>':''}`;if(b.ic)e.classList.add('hasic');if(b.on)e.classList.add('on');if(b.cls)e.classList.add(...b.cls.split(" "));e.disabled=!!b.dis||G.busy;e.onclick=b.fn;el.appendChild(e);});bindGB();
+  L.forEach(b=>{if(!b.ic&&GADIC[b.label])b.ic=`<img class="bic gic" src="${GADIC[b.label]}" alt="">`;if(!b.ic&&ACTIC[b.label])b.ic=`<img class="bic act" src="${uiImg('act_'+ACTIC[b.label])}" alt="">`;const e=document.createElement('button');e.innerHTML=`${b.ic?`<span class="bwrap">${b.ic}<span>`:''}${b.label}${b.sub?`<span class="sub">${actSub(b.sub)}</span>`:''}${b.ic?'</span></span>':''}`;if(b.ic)e.classList.add('hasic');if(b.on)e.classList.add('on');if(b.cls)e.classList.add(...b.cls.split(" "));e.disabled=!!b.dis||G.busy;e.onclick=b.fn;
+    // v186: a greyed button with a reason stays tappable and says why it can't be used
+    if(b.dis&&b.why&&!G.busy){e.disabled=false;e.classList.add('whyD');e.setAttribute('aria-disabled','true');e.onclick=ev=>{ev.stopPropagation();whyTip(...b.why);};}
+    el.appendChild(e);});bindGB();
 }
 function renderMoves(){const el=$('#moves');if(!el||!G)return;
   const rows=G.moves.map((r,i)=>[r,i]).filter(([r])=>G.over||r.side===G.player||r.path.some(p=>p[2])).reverse();
