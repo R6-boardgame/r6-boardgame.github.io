@@ -268,7 +268,6 @@ html.gnav #title{padding-bottom:calc(var(--gnH) + 12px)!important}
 #tlob .trnMeta{display:flex;gap:18px;font-size:12px;color:#8b97a3}#tlob .trnMeta b{display:block;color:#fff;font-size:15px}
 #tlob .trnGo{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#f0b84a,#c98a22);color:#1a1205;font-weight:900;font-size:18px;padding:13px 40px;letter-spacing:.1em;border:0;border-radius:0;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}
 #tlob .trnGo b{color:#1a1205}
-#tlob .trnSt{position:absolute;top:24px;right:24px;z-index:4;border:2px solid #e3aa3e;color:#e3aa3e;font:700 13px var(--mono,monospace);letter-spacing:.2em;padding:4px 10px;transform:rotate(6deg)}
 #tlob .trnCls{display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.08);flex:none;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}#tlob .trnCls::-webkit-scrollbar{display:none}
 #tlob .trnCls button{flex:none;font-size:12px;padding:4px 6px;min-height:0;border:1px solid rgba(255,255,255,.14);background:none;color:#aab4be;border-radius:0}
 #tlob .trnCls button.on{border-color:#e3aa3e;color:#ffcf6b;background:rgba(227,170,62,.14)}#tlob .trnCls button.soon{color:#59636d}
@@ -286,7 +285,6 @@ body:not([data-scr="game"]) #lvGoal{display:none}
 #tlob .trn.m .trnBr p,#tlob .trn.m .trnBr h4,#tlob .trn.m .trnObj,#tlob .trn.m .trnMeta{display:none}
 #tlob .trn.m .trnBr .mob{display:block!important;font-size:12px;color:#b9c3cc;line-height:1.5}
 #tlob .trn.m .trnGo{font-size:15px;padding:10px 24px}#tlob .trn.m .trnBr .op{max-width:48%}
-#tlob .trn.m .trnSt{top:12px;right:12px;font-size:11px}
 #tlob .trn.m .trnBr .op{right:0;height:100%}
 #tlob .trn.m .trnCls{flex-wrap:nowrap;gap:3px;padding:6px 8px}#tlob .trn.m .trnCls button{font-size:11px;padding:4px 5px}#tlob .trn.m .trnCh{padding:8px}#tlob .trn.m .trnCh button{font-size:12px;padding:5px 10px}
 #tlob .trn.m .trnRow{padding:0 12px}#tlob .trn.m .trnRow .n{font-size:18px}#tlob .trn.m .trnRow b{font-size:14px}
@@ -10311,7 +10309,7 @@ function trnHTML(){const M=lobMob(),cs=copAll(),i=LOBI%2;
     br=trnBrief({img:`img/map/${cat==='def'?'consulate':'kafe'}_bg.webp`,art:copArt(cs[i],i),no:cat==='def'?'DEFENSE':'ASSAULT',lab:cat==='def'?'炸彈任務 · 防守方':'炸彈任務 · 進攻方',n:S.n,mob:'關卡製作中，敬請期待。',p:'關卡製作中，敬請期待。全部過關可以得到技能獎勵。',h1:'全部過關獎勵',items:[`${OPC[S.sk].name} 技能`],meta:[],go:'',goId:''});}
   return `<div class="trn ${M?'m':'d'}"><div class="libHd">${M?'':'<button class="lobAr" id="t-home" aria-label="返回">‹</button>'}<div><small>TRAINING</small><b>訓練任務</b></div><div class="trnPr"><span>已完成</span> <b>${dn}</b> / ${tot}</div></div>
     <div class="trnWrap"><div class="trnLs"><div class="trnCh">${tabs}</div>${chips}${rows}</div>${br}</div></div>`;}
-function trnBrief(o){return `<div class="trnBr"><div class="im" style="background-image:url(${o.img})"></div><img class="op" src="${o.art}" alt=""><span class="trnSt">${o.no}</span>
+function trnBrief(o){return `<div class="trnBr"><div class="im" style="background-image:url(${o.img})"></div><img class="op" src="${o.art}" alt="">
   <div class="bd"><div class="no">${o.lab}</div><div class="ttl">${o.n}</div><div class="mob" style="display:none">${o.mob}</div><p>${o.p}</p>
   ${o.h1?`<h4>${o.h1}</h4><div class="trnObj">${o.items.map(x=>`<div><i>◆</i>${x}</div>`).join('')}</div>`:''}
   ${o.meta.length?`<h4>任務資訊</h4><div class="trnMeta">${o.meta.map(([a,b,c])=>`<div>${a}<b${c?` style="color:${c}"`:''}>${b}</b></div>`).join('')}</div>`:''}
