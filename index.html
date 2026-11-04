@@ -12259,8 +12259,10 @@ function cpBind(el){const q=s=>el.querySelector(s),on=(s,f)=>{const b=q(s);if(b)
   on('#cpRtYes',()=>{if(ECO.rn<COP_RT)return;ECO.rn-=COP_RT;const cs=copAll();Object.assign(cs[CP.i],{d:[['Y'],['Y'],['Y']],arm:1,run:0,vis:0,w:null});ecoSave();CP.sheet=null;copDraft();try{renderPlayer();}catch(e){}renderCop();});
   on('#cpPen',()=>{CP.edit=true;renderCop();const i=q('#cpNm');if(i){i.focus();i.select();}});
   {const i=q('#cpNm');if(i){const fit=()=>{let s='';for(const ch of i.value){if(copW(s+ch)>12)break;s+=ch;}if(s!==i.value)i.value=s;const n=q('#cpCnt');if(n)n.textContent=copW(s)+'/12';};
-    const done=()=>{if(!CP.edit)return;CP.edit=false;const v=i.value.trim()||'炮灰';cpSave(o=>o.nm=v);};
-    i.oninput=fit;i.onkeydown=e=>{if(e.key==='Enter')done();if(e.key==='Escape'){e.stopPropagation();CP.edit=false;renderCop();}};i.onblur=done;}}
+    const done=()=>{if(!CP.edit)return;fit();CP.edit=false;const v=i.value.trim()||'炮灰';cpSave(o=>o.nm=v);};
+    // v181: while a Chinese input method is still composing (zhuyin/pinyin), don't count or cut the letters; trim once the word is chosen
+    let ime=false;i.addEventListener('compositionstart',()=>{ime=true;});i.addEventListener('compositionend',()=>{ime=false;fit();});
+    i.oninput=e=>{if(ime||(e&&e.isComposing))return;fit();};i.onkeydown=e=>{if(e.isComposing||e.keyCode===229)return;if(e.key==='Enter'){fit();done();}if(e.key==='Escape'){e.stopPropagation();CP.edit=false;renderCop();}};i.onblur=done;}}
   el.querySelectorAll('[data-gs]').forEach(b=>b.onclick=()=>{CP.sheet={t:'g',i:+b.dataset.gs};renderCop();});
   el.querySelectorAll('[data-gk]').forEach(b=>b.onclick=()=>{const k=b.dataset.gk,i=CP.sheet.i;cpSave(o=>{if(o.g[1-i]===k)o.g[1-i]=o.g[i];o.g[i]=k;});});
   on('#cpGClr',()=>{const i=CP.sheet.i;cpSave(o=>{o.g[i]=null;});});on('#cpGX',()=>{CP.sheet=null;renderCop();});
