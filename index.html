@@ -10492,7 +10492,7 @@ function gnavGo(k){const shop=$('#shop'),cop=$('#cop'),al=$('#copAl');let sw=fal
 function gnavSync(){let el=$('#gnav');const show=lobMob()&&preGame()&&document.body.dataset.scr==='title';
   if(!el){if(!show)return;el=document.createElement('nav');el.id='gnav';el.setAttribute('aria-label','主選單');document.body.appendChild(el);}
   document.documentElement.classList.toggle('gnav',show);if(!show){if(!el.hidden){el.hidden=true;el.innerHTML='';}return;}
-  if(el.hidden||!el.firstChild){el.hidden=false;el.innerHTML=[['home','t-home','home','大廳'],['train','t-train2','flag','訓練'],['cop','t-cop','user','幹員'],['shop','t-shop','shop','商店'],['lib','t-lib','book','作戰檔案']].map(([k,id,ic,l])=>`<button id="${id}" data-gn="${k}">${lobIc(ic)}<span>${l}</span></button>`).join('');
+  if(el.hidden||!el.firstChild){el.hidden=false;el.innerHTML=[['home','t-home','home','大廳'],['train','t-train2','flag','訓練'],['cop','t-cop','user','幹員'],['shop','t-shop','shop','商店'],['lib','t-lib','book','作戰檔案']].map(([k,id,ic,l])=>`<button data-gn="${k}">${lobIc(ic)}<span>${l}</span></button>`).join('');
     el.querySelectorAll('[data-gn]').forEach(b=>b.onclick=()=>{if(b.classList.contains('on')&&b.dataset.gn!=='home')return;el.querySelectorAll('[data-gn]').forEach(x=>x.classList.toggle('on',x===b));requestAnimationFrame(()=>setTimeout(()=>gnavGo(b.dataset.gn),0));});}
   const st=gnavState();el.querySelectorAll('[data-gn]').forEach(b=>b.classList.toggle('on',b.dataset.gn===st));}
 setInterval(gnavSync,250);
@@ -11641,7 +11641,7 @@ function openShop(side){SHOP.side=side||cfg.side||'A';SHOP.pg=0;SHOP.sel=null;le
     addEventListener('resize',()=>{if(!el.hidden)renderShop();});
     addEventListener('keydown',e=>{if(el.hidden||e.key!=='Escape')return;if(SHOP.sel){SHOP.sel=null;renderShopDet();}else closeShop();});}
   el.hidden=false;el.classList.remove('out');renderShop();}
-function closeShop(){const el=$('#shop');if(!el)return;el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');},180);renderPlayer();{const c=$('#cop');if(c&&!c.hidden)renderCop();}if(SCREEN==='title'&&!GNSW)renderTitle();}
+function closeShop(){const el=$('#shop');if(!el)return;if(GNSW){el.hidden=true;el.classList.remove('out');}else{el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');},180);}renderPlayer();{const c=$('#cop');if(c&&!c.hidden)renderCop();}if(SCREEN==='title'&&!GNSW)renderTitle();}
 // v163: shop cards use cached blob URLs instead of re-inserting every base64 portrait on each render
 const OPARTU={};function opArtU(b){const k=artBase(b);if(OPARTU[k])return OPARTU[k];if(!OPART[k])return '';try{const bin=atob(OPART[k]),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);return OPARTU[k]=URL.createObjectURL(new Blob([u8],{type:'image/webp'}));}catch(e){return opArt(b);}}
 // v169: warm every picture while the loading screen is up, so menus open without fetching or decoding
@@ -12085,7 +12085,7 @@ function openCop(){copAll();let el=$('#cop');
   if(!el){el=document.createElement('div');el.id='cop';el.setAttribute('role','dialog');el.setAttribute('aria-label','培養幹員');document.body.appendChild(el);
     addEventListener('keydown',e=>{if(el.hidden||e.key!=='Escape')return;if(CP.sheet){CP.sheet=null;renderCop();}else closeCop();});}
   copDraft();CP.sheet=null;CP.edit=false;el.hidden=false;el.classList.remove('out');renderCop();}
-function closeCop(){const el=$('#cop');if(!el)return;el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');},180);if(SCREEN==='cop')SCREEN='title';if(!GNSW)renderTitle();}
+function closeCop(){const el=$('#cop');if(!el)return;if(GNSW){el.hidden=true;el.classList.remove('out');}else{el.classList.add('out');setTimeout(()=>{el.hidden=true;el.classList.remove('out');},180);}if(SCREEN==='cop')SCREEN='title';if(!GNSW)renderTitle();}
 function cpPenta(sc){const ax=['火力','破壞力','視野','速度','裝甲'],cx=69,cy=70,R=46,pt=(i,r)=>{const a=-Math.PI/2+i*2*Math.PI/5;return [+(cx+r*Math.cos(a)).toFixed(1),+(cy+r*Math.sin(a)).toFixed(1)];};let s='';
   for(const f of [1,.66,.33])s+=`<polygon points="${ax.map((_,i)=>pt(i,R*f).join(',')).join(' ')}" fill="${f===1?'#0e141bcc':'none'}" stroke="#2c3b4a"/>`;
   ax.forEach((_,i)=>{const [x,y]=pt(i,R);s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2c3b4a"/>`;});
