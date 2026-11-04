@@ -6133,8 +6133,11 @@ const SFX=(()=>{
   // v175: iOS only unlocks audio from a real gesture end (touchend/click), and needs a sound started inside it
   function unlockTap(){if(!ac)return;try{const b=ac.createBuffer(1,1,22050),s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0);}catch(e){}}
   // v172: recorded interface sounds (Kenney, CC0). Bytes are fetched right away; decoded once audio is allowed
-  const SMP={tap:.32,tab:.5,back:.45,ok:.5,buy:.6,err:.45,tick:.35,open:.4},raw={},buf={};
-  Object.keys(SMP).forEach(k=>{raw[k]=fetch('snd/'+k+'.mp3?v=176').then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);});
+  const SMP={tap:.32,tab:.5,back:.6,ok:.5,buy:.6,err:.45,tick:.35,open:.4,
+    // v178: the owner's Foley set (snd/fx)
+    battle:.8,deploy1:.5,deploy2:.5,deploy3:.7,sniper:.75,shield:.65,nade_pin:.9,nade_hit:.6,boom1:.7,boom2:.65,fire:.4,barricade:.5,camera:.7,wall:.5},raw={},buf={};
+  const FXK=new Set(['back','battle','deploy1','deploy2','deploy3','sniper','shield','nade_pin','nade_hit','boom1','boom2','fire','barricade','camera','wall']);
+  Object.keys(SMP).forEach(k=>{raw[k]=fetch((FXK.has(k)?'snd/fx/':'snd/')+k+'.mp3?v=178').then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);});
   function decodeAll(){Object.keys(SMP).forEach(k=>{if(buf[k])return;buf[k]=1;raw[k].then(a=>{if(!a)return delete buf[k];ac.decodeAudioData(a.slice(0),d=>{buf[k]=d;},()=>{delete buf[k];});});});}
   function play(k,vol,jit){if(!ok())return false;const b=buf[k];if(!b||b===1)return false;const s=ac.createBufferSource();s.buffer=b;s.playbackRate.value=1+(jit==null?.04:jit)*(Math.random()*2-1);
     const g=ac.createGain();g.gain.value=(vol==null?1:vol)*SMP[k];s.connect(g);g.connect(fxBus);s.start();return true;}
@@ -6149,7 +6152,7 @@ const SFX=(()=>{
     hit(){if(!ok())return;const t=ac.currentTime+.05;tone(t,.22,220,60,.7,'triangle');noise(t,.18,900,1.2,.8);tone(t+.02,.12,1400,700,.15,'square');},
     miss(){if(!ok())return;const t=ac.currentTime+.04;noise(t,.35,5200,6,.5,'bandpass',1400);tone(t+.08,.25,2600,1900,.06,'sine');},
     kill(){if(!ok())return;const t=ac.currentTime+.1;tone(t,.6,90,30,1,'sine');noise(t,.5,300,.8,.6,'lowpass');tone(t+.05,.5,330,110,.18,'sawtooth');},
-    boom(){if(!ok()||!gate('boom',250))return;const t=ac.currentTime;tone(t,.9,70,25,1.1,'sine');noise(t,1.1,600,.6,1,'lowpass',120);noise(t,.25,3000,.8,.5);},
+    boom(){if(!ok()||!gate('boom',250))return;if(play(Math.random()<.5?'boom1':'boom2',1,.06))return;const t=ac.currentTime;tone(t,.9,70,25,1.1,'sine');noise(t,1.1,600,.6,1,'lowpass',120);noise(t,.25,3000,.8,.5);},
     zap(){if(!ok()||!gate('zap',200))return;const t=ac.currentTime;for(let i=0;i<6;i++)noise(t+i*.06,.05,2600+i*400,3,.55,'bandpass');tone(t,.5,110,95,.22,'sawtooth');tone(t,.5,220,180,.08,'square');},
     heal(){if(!ok())return;const t=ac.currentTime;tone(t,.5,520,780,.12,'sine');tone(t+.12,.6,780,1170,.1,'sine');tone(t+.24,.9,1040,1560,.07,'triangle');},
     flash(){if(!ok())return;const t=ac.currentTime;noise(t,.3,4000,.5,.9,'highpass');tone(t+.05,1.6,3800,3600,.09,'sine');},
@@ -6181,6 +6184,10 @@ const SFX=(()=>{
             const k2=ac.createOscillator(),kg2=ac.createGain();k2.frequency.setValueAtTime(56,t+.2);k2.frequency.exponentialRampToValueAtTime(32,t+.36);kg2.gain.setValueAtTime(.24,t+.2);kg2.gain.exponentialRampToValueAtTime(.001,t+.42);k2.connect(kg2);kg2.connect(muBus);k2.start(t+.2);k2.stop(t+.5);
             mus.beat=t+60/96;}},100);}
       if(level!==mus.lvl){mus.lvl=level;mus.g.gain.setTargetAtTime(level?(level>1?1:.8):0,ac.currentTime,.8);}},
+    // v178: weapon shots by class; anything else keeps the synth burst
+    gun(w,n){if(!ok())return;if(w==='sn'&&play('sniper',1,.03))return;if((w==='sh'||w==='hs')&&play('shield',1,.04))return;S.shot(n);},
+    fx(k,v){if(!ok())return false;return play(k,v);},
+    deploy(){if(!ok()||!gate('dep',120))return;play('deploy'+(1+Math.floor(Math.random()*3)));},
     get on(){return on;},
     get mOn(){return mOn;},
     toggle(){on=!on;try{localStorage.setItem('r6snd',on?'1':'0');}catch(e){}init();if(ac)fxBus.gain.value=on?.9:0;return on;},
@@ -6193,14 +6200,32 @@ const SFX=(()=>{
     // pick the sound by what the button does
     const k=b.matches('#gnav [data-gn],[data-trc],[data-trv]:not(.lobAr),.lobNav button,[data-sb-tab],.trnCh button')?'tab'
       :b.matches('.lobAr,.trnX,#osX,[aria-label="返回"],[aria-label="關閉"],.back,.lgOut')?'back'
-      :b.matches('.trnGo,.primary,.lgBtn,#cpOk,.cpOk')?'ok'
+      :b.matches('#t-rank,#t-pve,#t-board,#t-lvgo,.trnGo')?'battle'
+      :b.matches('.primary,.lgBtn,#cpOk,.cpOk')?'ok'
       :b.matches('[data-trp]')?'open':'tap';
     S.ui(k);},{capture:true,passive:true});
   return S;})();
 // music intensity: off outside a game, low while nobody can see an enemy, high once either side has someone in view
-function musicLevel(){if(!G||G.over||G.phase!=='play')return SFX.music(0);
+function musicLevel(){if(!G||G.over||G.phase!=='play'||G.lv||G.tut)return SFX.music(0);
   let hot=false;try{hot=G.units.some(u=>u.alive&&u.x>=0&&u.side!==G.player&&pub(u))||G.units.some(u=>u.alive&&u.side===G.player&&u.spotted>0);}catch(e){}
   SFX.music(hot?2:1);}
+// v178: the owner's music tracks (snd/mus). One <audio> element: lobby tracks shuffle, matchmaking has its
+// own loop, draft + setup use the prep track, training levels and the tutorial use the mission track.
+// Normal battles keep the synth tension bed above.
+const MUS=(()=>{const LOB=['lobby1','lobby2','lobby3','lobby4','lobby5'];let el=null,cur=null,lob=-1,fade=null;
+  function want(){if(!SFX.mOn||document.hidden)return null;
+    if(typeof G!=='undefined'&&G){if(G.over)return null;if(G.phase==='setup')return 'prep';if(G.lv||G.tut)return 'mission';return null;}
+    if(typeof MF!=='undefined'&&MF)return 'prep';
+    if(['queue','wait','find'].includes(SCREEN))return 'queue';return 'lobby';}
+  function src(k){if(k==='lobby'){let n;do{n=Math.floor(Math.random()*LOB.length);}while(n===lob&&LOB.length>1);lob=n;k=LOB[n];}return 'snd/mus/'+k+'.mp3';}
+  function mk(){if(el)return el;el=new Audio();el.preload='auto';el.volume=.5;el.addEventListener('ended',()=>{if(cur==='lobby'){el.src=src('lobby');el.play().catch(()=>{});}else{el.currentTime=0;el.play().catch(()=>{});}});return el;}
+  function tick(){const w=want();if(w===cur){if(w&&el&&el.paused)el.play().catch(()=>{});return;}
+    const a=mk();clearInterval(fade);const go=()=>{cur=w;if(!w){a.pause();return;}a.src=src(w);a.volume=.5;a.play().catch(()=>{cur=null;});};
+    if(cur&&!a.paused){let v=a.volume;fade=setInterval(()=>{v-=.08;if(v<=0){clearInterval(fade);a.volume=0;go();}else a.volume=v;},40);cur=w||null;if(!w)cur=null;}else go();}
+  ['pointerup','click','keydown','touchend'].forEach(e=>addEventListener(e,()=>{try{tick();}catch(x){}},{capture:true,passive:true}));
+  document.addEventListener('visibilitychange',()=>{try{tick();}catch(x){}});
+  setInterval(()=>{try{tick();}catch(x){}},700);
+  return {tick};})();
 
 function renderTension(){
   const on=G&&G.phase==='play'&&!G.over;let c=document.getElementById('defchip');
@@ -6259,7 +6284,7 @@ async function shootUnit(sh,t,ow,moving=false){
   diceHide();
   {const off=hits?0:(Math.random()<.5?-1:1)*.75,dx=t.x-sh.x,dy=t.y-sh.y,L=Math.hypot(dx,dy)||1;
    G.fx={x0:sh.x,y0:sh.y,x1:t.x+(-dy/L)*off,y1:t.y+(dx/L)*off,until:performance.now()+700,c:sh.side==='A'?COL.atk:COL.def};}
-  SFX.shot(Math.min(4,pool.length));setTimeout(()=>hits?SFX.hit():SFX.miss(),170);
+  SFX.gun(sh.w,Math.min(4,pool.length));setTimeout(()=>hits?SFX.hit():SFX.miss(),170);
   if(si)si.fire(hits);render();await shotFX(hits,cine||!!si);if(si)si.kill();
   log(`${nm(sh)}${ow?' 還擊':' 射擊'} ${nm(t)}（${BAND[b]}距離 ${d} 格${sh.stun?'，被閃光彈震暈':''}）${dice} 共 ${sum}${p?`，掩護 −${p}`:''}，造成 ${hits} 傷`,sh.side==='A'?'ka':'kd');
   render(); await sleep(G.ai?320:160);
@@ -6509,7 +6534,7 @@ function chargePlant3D(u,x,y,ms){return new Promise(res=>{if(!R3||!R3.fxG||docum
   const t0=performance.now(),fin=()=>{if(done)return;done=true;R3.fxG.remove(g);pl.geometry.dispose();pl.material.dispose();tex.dispose();res();};setTimeout(fin,ms+120);
   R3.fx2.push(()=>{age=(performance.now()-t0)/1000;pl.scale.setScalar(Math.min(1,.2+age*5));led.visible=Math.sin(age*(10+age*30))>0;if(age*1000>=ms)fin();return !done;});
   try{SFX.tick();setTimeout(()=>SFX.tick(),ms*.45);setTimeout(()=>SFX.alert(),ms*.8);}catch(e){}});}
-function destroyCell(x,y){try{const t0=cell(x,y).t;if(['soft','reinf','bar','hard'].includes(t0)){wallBlast3D(x,y,t0);if(G&&!G.over&&G.phase==='play')setTimeout(()=>{try{fxEv({k:'wall',x,y,side:curSide()});}catch(e){}},0);if(G&&!G.over&&curSide()===G.player)G._wb=(G._wb||0)+1;}}catch(e){}G._wv=(G._wv||0)+1;G.gadgets.forEach(g=>{if(g.type==='mirror'&&g.x===x&&g.y===y)g.alive=false;if(g.type==='cam'&&g.wall&&g.x+g.wall[0]===x&&g.y+g.wall[1]===y)g.alive=false;});SFX.boom();const c=cell(x,y);if(c.t!=='bar')c.breach=true;if(c.t==='bar')c.wasBar=true;c.t='floor';c.rubble=c.breach;c.opened=true;c.elec=false;c.indoor=true;if(c.pair&&!c.breach){const q=cell(c.pair[0],c.pair[1]);if(q&&q.t==='bar')destroyCell(c.pair[0],c.pair[1]);}
+function destroyCell(x,y){try{const t0=cell(x,y).t;if(['soft','reinf','bar','hard'].includes(t0)){wallBlast3D(x,y,t0);if(G&&!G.over&&G.phase==='play')setTimeout(()=>{try{fxEv({k:'wall',x,y,side:curSide()});}catch(e){}},0);if(G&&!G.over&&curSide()===G.player)G._wb=(G._wb||0)+1;}}catch(e){}G._wv=(G._wv||0)+1;G.gadgets.forEach(g=>{if(g.type==='mirror'&&g.x===x&&g.y===y)g.alive=false;if(g.type==='cam'&&g.wall&&g.x+g.wall[0]===x&&g.y+g.wall[1]===y)g.alive=false;});{const t1=cell(x,y).t;if(!(t1==='bar'&&SFX.fx('barricade'))&&!(t1==='soft'&&SFX.fx('wall')))SFX.boom();}const c=cell(x,y);if(c.t!=='bar')c.breach=true;if(c.t==='bar')c.wasBar=true;c.t='floor';c.rubble=c.breach;c.opened=true;c.elec=false;c.indoor=true;if(c.pair&&!c.breach){const q=cell(c.pair[0],c.pair[1]);if(q&&q.t==='bar')destroyCell(c.pair[0],c.pair[1]);}
   const tr=gadgetAt(x,y,'trap'); /* trap stays in doorway */ void tr;}
 
 function shootables(u){
@@ -6568,7 +6593,7 @@ const CAMT=['cam','argus','eye'];
 function camClicks(u){if(!u||u.side!==G.player||!canAct(u)||(G.active===u&&!canDo(u,'destroy')))return [];const dt=destroyTargets(u);
   return G.gadgets.filter(g=>canHitG(u,g)&&dt.some(([a,b])=>a===g.x&&b===g.y)).map(g=>[g.x,g.y]);}
 async function doDestroy(u,x,y){useAct(u,'destroy');const hs=G.gadgets.filter(g=>g.x===x&&g.y===y&&canHitG(u,g));const g=hs.find(g=>g.type==='mat')||hs[0];
-  if(g){g.alive=false;if(g.type==='clay')await clayBoom(g);if(g.volcan)await goyoBurn(g);note(u,'摧毀'+GNAME[g.type]);G.fx={x0:u.x,y0:u.y,x1:x,y1:y,until:performance.now()+400,c:u.side==='A'?COL.atk:COL.def};log(`${nm(u)} 摧毀了${GNAME[g.type]}`,u.side==='A'?'ka':'kd');}
+  if(g){g.alive=false;if(g.type!=='clay'&&!g.volcan)SFX.fx('camera');if(g.type==='clay')await clayBoom(g);if(g.volcan)await goyoBurn(g);note(u,'摧毀'+GNAME[g.type]);G.fx={x0:u.x,y0:u.y,x1:x,y1:y,until:performance.now()+400,c:u.side==='A'?COL.atk:COL.def};log(`${nm(u)} 摧毀了${GNAME[g.type]}`,u.side==='A'?'ka':'kd');}
   else{const c=cell(x,y),wall=c.t==='soft';note(u,wall?'打穿軟牆':'破壞路障');destroyCell(x,y);log(wall?`${nm(u)} 打穿了一面軟牆`:`${nm(u)} 破壞了${c.kind==='window'?'窗戶':'門'}路障`,u.side==='A'?'ka':'kd');}
   render();await sleep(G.ai?150:60);await afterAct(u);}
 const chargeTargets=u=>G.charges>0?adj4(u.x,u.y).filter(([x,y])=>['soft','bar'].includes(cell(x,y).t)&&!jammed(x,y)):[];
@@ -6696,8 +6721,8 @@ async function fragShow(u,a,pool,idx,r,ctr,faces=GRENADE_DIE,label='破片手榴
     const x0=ra.left+ra.width*.62,y0=ra.top+ra.height*.32,x1=rt.left+rt.width*.5,y1=rt.top+rt.height*.62,hy=Math.min(y0,y1)-Math.max(60,innerHeight*.16);
     const g=document.createElement('div');g.className='fgN';g.innerHTML=FGSVG;el.appendChild(g);
     const K=[];for(let i=0;i<=12;i++){const t=i/12,x=x0+(x1-x0)*t,y=(1-t)*(1-t)*y0+2*(1-t)*t*hy+t*t*y1,s=1-.35*t;K.push({transform:`translate(${x}px,${y}px) rotate(${t*720}deg) scale(${s})`});}
-    SFX.step();await new Promise(res=>{const an=g.animate(K,{duration:fast?480:720,easing:'cubic-bezier(.35,.1,.6,1)',fill:'forwards'});an.onfinish=res;setTimeout(res,1200);});
-    g.remove();const b=document.createElement('div');b.className='fgB';b.style.left=x1+'px';b.style.top=y1+'px';el.appendChild(b);SFX.boom();el.classList.add('boom');
+    await new Promise(res=>{const an=g.animate(K,{duration:fast?480:720,easing:'cubic-bezier(.35,.1,.6,1)',fill:'forwards'});an.onfinish=res;setTimeout(res,1200);});
+    g.remove();const b=document.createElement('div');b.className='fgB';b.style.left=x1+'px';b.style.top=y1+'px';el.appendChild(b);SFX.fx('nade_hit');SFX.boom();el.classList.add('boom');
     el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');await sleep(fast?320:480);}
   else SFX.boom();
   const dice=[...pool].map((ch,i)=>`<i class="die" style="background:${DIEC.Y}">${grenadePips(faces[idx[i]])}</i>`).join('');
@@ -6709,9 +6734,9 @@ async function throwGadget(u,kind,x,y){ST(u).gad++;DMGBY=u;aimCam(u,[[x,y]]);
   if(x!==u.x||y!==u.y)u.fd=[Math.sign(x-u.x),Math.sign(y-u.y)];render();try{await fxEv({k:'throw',g:kind,x0:u.x,y0:u.y,x1:x,y1:y,side:u.side,uid:u.id});}catch(e){}
   const area=blastArea(x,y),inA=a=>a.alive&&a.x>=0&&area.some(([i,j])=>i===a.x&&j===a.y);
   const roll=(c,n)=>{let t=0;for(let i=0;i<n;i++)t+=DIE[c][Math.floor(Math.random()*6)];return t;};
-  if(kind==='frag'||kind==='nitro'){const fr=kind==='frag';G[kind]--;note(u,fr?'破片手榴彈':'C4 遙控炸藥');log(`${nm(u)} ${fr?'丟出破片手榴彈':'引爆 C4 遙控炸藥'}`,side);
+  if(kind==='frag'||kind==='nitro'){const fr=kind==='frag';G[kind]--;if(fr){SFX.fx('nade_pin');await sleep(G.ai?250:420);}note(u,fr?'破片手榴彈':'C4 遙控炸藥');log(`${nm(u)} ${fr?'丟出破片手榴彈':'引爆 C4 遙控炸藥'}`,side);
     if(hostHarm(area,u.side,fr?'破片手榴彈':'C4')){SFX.boom();return;}
-    const hit=G.units.filter(inA);if(!fr||!hit.length)SFX.boom();G.scanFx={cells:area,until:performance.now()+900,c:0xff7a2a};if(fr)for(const [i,j] of area)await blastDestroy(i,j,1);
+    const hit=G.units.filter(inA);if(fr&&!hit.length)SFX.fx('nade_hit');if(!fr||!hit.length)SFX.boom();G.scanFx={cells:area,until:performance.now()+900,c:0xff7a2a};if(fr)for(const [i,j] of area)await blastDestroy(i,j,1);
     if(!fr){prismaHit(area,'C4 炸開');droneHit(area,'C4');await volcBlast(area);}
     for(const a of hit){if(!a.alive)continue;const ctr=a.x===x&&a.y===y;let r;if(fr){const idx=[Math.floor(Math.random()*6)];r=GRENADE_DIE[idx[0]];await fragShow(u,a,'Y',idx,r,ctr);}else r=roll('O',ctr?2:1);if(r)await damage(a,r,fr?'破片':'C4');}if(fr&&hit.length){diceHide();shotCamEnd();}}
   else if(kind==='impact'){G.impact--;note(u,'衝擊手榴彈');const c=cell(x,y),w=c.t==='soft'?'軟牆':c.t==='bar'?(c.kind==='window'?'窗戶路障':'門路障'):'道具';await blastDestroy(x,y,2);log(`${nm(u)} 的衝擊手榴彈炸掉了${w}`,side);}
@@ -7391,11 +7416,11 @@ async function onCell(x,y){
     if(depWait())return;
     if(G.player==='A'){const o=unitAt(x,y);if(o&&o.side==='A'){G.sel=o;return render();}
       const zi=G.map.spawns.findIndex(z=>z.cells.some(([a,b])=>a===x&&b===y));
-      if(zi>=0&&u&&u.side==='A'){u.x=x;u.y=y;G.spawn=zi;nextUnplaced();render();}return;}
+      if(zi>=0&&u&&u.side==='A'){u.x=x;u.y=y;G.spawn=zi;SFX.deploy();nextUnplaced();render();}return;}
     const o=unitAt(x,y);
     if((G.mode==='move'||G.mode==='decoy')&&o&&o.side==='D'){G.sel=o;G.mode='move';return render();}
     if(!inT||!u)return;
-    if(G.mode==='move'){const was=u.x<0;u.x=x;u.y=y;u.anchor=[x,y];if(was)nextUnplaced();}
+    if(G.mode==='move'){const was=u.x<0;u.x=x;u.y=y;u.anchor=[x,y];SFX.deploy();if(was)nextUnplaced();}
     else if(G.mode==='gadget'){await useGadget(u,x,y);if(pdirG())G.mode='pdir';else if(u.ch<=0)G.mode='move';}
     else if(G.mode==='wire'||G.mode==='shield'||G.mode==='bpcam'){await deployGadget(u,G.mode,x,y);if(G.mode!=='shdir'&&G.mode!=='bpface'&&!G[G.mode])G.mode='move';}
     else if(G.mode==='decoy'){const k=decoyOf(u);if(k){k.x=x;k.y=y;}G.mode='move';}
@@ -8334,12 +8359,12 @@ function playStartHooks(){if(G._psh)return;G._psh=true;
 // v130: the Volcán canister sits on the shield's inner face: it can only be picked from that side; any explosion sets it off from any side
 const volcSide=(u,g)=>{const D=g.dir||(g.dir=shDef(g.x,g.y));return (u.x-g.x)*D[0]+(u.y-g.y)*D[1]<0;};
 async function volcBlast(area){for(const g of G.gadgets.filter(g=>g.alive&&g.volcan&&area.some(([i,j])=>i===g.x&&j===g.y)))await goyoBurn(g);}
-async function goyoBurn(g){g.alive=false;G.gadgets.push({type:'fire',goyo:true,x:g.x,y:g.y,side:'D',alive:true,life:4});SFX.boom();try{wallBlast3D(g.x,g.y,'floor');}catch(e){}
+async function goyoBurn(g){g.alive=false;G.gadgets.push({type:'fire',goyo:true,x:g.x,y:g.y,side:'D',alive:true,life:4});SFX.boom();setTimeout(()=>SFX.fx('fire'),250);try{wallBlast3D(g.x,g.y,'floor');}catch(e){}
   log('Goyo 的燃燒盾爆燃，周圍九格燒一回合','kd');droneHit(within(g.x,g.y,1),'火焰');if(hostHarm(within(g.x,g.y,1),'D','火焰'))return;
   for(const a of G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,g.x,g.y)<=1)){a.burned=true;await damage(a,1,'火焰');}}
 function goyoOut(f){const hit=G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,f.x,f.y)<=1);if(!hit.length)return;
   log('燃燒盾的火燒完了，還在火圈裡的人再被燒一次','kd');(async()=>{for(const a of hit){if(G.over)break;await damage(a,1,'火焰');}render();})();}
-async function ignite(x,y,by){G.gadgets.push({type:'fire',x,y,side:'D',alive:true,life:2});SFX.boom();log(`${coord(x,y)} 一帶起火了`,'ks');droneHit(within(x,y,1),'火焰');if(hostHarm(within(x,y,1),by||'D','火焰'))return;
+async function ignite(x,y,by){G.gadgets.push({type:'fire',x,y,side:'D',alive:true,life:2});SFX.boom();setTimeout(()=>SFX.fx('fire'),250);log(`${coord(x,y)} 一帶起火了`,'ks');droneHit(within(x,y,1),'火焰');if(hostHarm(within(x,y,1),by||'D','火焰'))return;
   for(const a of G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,x,y)<=1)){a.burned=true;const r=die1('O');if(r)await damage(a,r,'火焰');}}
 var objRoom=(x,y)=>{if(!G._obj||G._obj.wv!==(G._wv||0)){const s=new Set();for(const [i,j] of allCells()){const c=cell(i,j);if(c.site)roomCells(i,j).forEach(k=>s.add(k));}
   if(G.hostage)roomCells(G.hostage.x,G.hostage.y).forEach(k=>s.add(k));G._obj={s,wv:G._wv||0};}return G._obj.s.has(y*G.W+x);};

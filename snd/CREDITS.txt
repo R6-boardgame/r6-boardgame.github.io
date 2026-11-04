@@ -9,3 +9,7 @@ ok   = metalLatch + impactMetal_medium_000 + low thump
 buy  = metalClick + metalLatch + impactPlate_light_000 + low thump
 err  = computerNoise_000 (two short low-passed bursts)
 Mixed to mono mp3; the low thumps are synthesized.
+
+snd/fx and snd/mus (v178): the project owner's own Foley set ("Rainbow six siege-The Board Game/Foley"), converted to mp3.
+fx: back battle deploy1-3 sniper shield nade_pin nade_hit boom1-2 fire barricade camera wall
+mus: lobby1-5 (大聽音樂2-6), queue (線上對戰等待中), prep (對戰前準備), mission (任務模式音樂)
