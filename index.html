@@ -156,7 +156,7 @@ window.claude={use:async name=>{
 #tlob .m .lobGlow{position:absolute;left:50%;top:12%;width:360px;height:50%;transform:translateX(-50%);background:radial-gradient(ellipse at 50% 40%,rgba(120,150,180,.25),rgba(0,0,0,0) 60%)}
 #tlob .m .lobRing{position:absolute;left:50%;bottom:calc(37% + env(safe-area-inset-bottom));width:300px;height:70px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(227,170,62,.35),rgba(227,170,62,0) 65%)}
 #tlob .m .lobRing:after{content:"";position:absolute;inset:16px 34px;border-radius:50%;border:2px solid rgba(227,170,62,.55);box-shadow:0 0 24px rgba(227,170,62,.5)}
-#tlob .m .lobHero{left:50%;transform:translateX(-50%);bottom:calc(38.5% + env(safe-area-inset-bottom));height:min(50%,calc(100% - 38.5% - 70px));max-width:96%;object-fit:contain;object-position:bottom}
+#tlob .m .lobHero{left:50%;transform:translateX(-50%);bottom:calc(38.5% + env(safe-area-inset-bottom));height:calc(min(50%,calc(100% - 38.5% - 70px)) * var(--hs,1));max-width:96%;object-fit:contain;object-position:bottom}
 #tlob .m .lobOp{position:absolute;left:0;right:0;bottom:calc(152px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:center;gap:10px}
 #tlob .m .lobNm{text-align:center;display:flex;flex-direction:column;align-items:center}
 #tlob .m .lobSide{position:absolute;left:8px;top:calc(max(10px,env(safe-area-inset-top)) + 64px);display:flex;flex-direction:column;gap:8px}
@@ -179,7 +179,7 @@ window.claude={use:async name=>{
 #tlob .lobNav button.on{color:var(--lbA2);box-shadow:inset 0 2px 0 var(--lbA);cursor:default}
 @media (max-height:700px){#tlob .m .lobKD .kb em{font-size:40px}#tlob .m .lobKD .sb em{font-size:24px}#tlob .m .lobSide{gap:5px}#tlob .lobEv i{height:32px}}
 /* ===== desktop: tile board ===== */
-#tlob .d .lobHero{left:8%;bottom:0;height:88%;max-width:38%;object-fit:contain;object-position:bottom}
+#tlob .d .lobHero{left:8%;bottom:0;height:calc(88% * var(--hs,1));max-width:38%;object-fit:contain;object-position:bottom}
 #tlob .d .lobLab{position:absolute;left:max(24px,6%);bottom:28px;background:rgba(8,11,14,.82);border:1px solid var(--lbL);border-left:3px solid #c99bff;padding:10px 14px 12px}
 #tlob .d .lobLabT{display:flex;align-items:center;gap:10px}
 #tlob .d .lobLabT b{font-family:var(--display);font-weight:700;font-size:24px;letter-spacing:.06em;display:block;line-height:1.05}
@@ -10184,7 +10184,7 @@ function lobRender(){const t=$('#title');if(!t)return;let el=$('#tlob');if(!el){
   if(SCREEN!=='title'){el.innerHTML='';el.dataset.m='';return;}
   el.dataset.m=lobMob()?'m':'d';el.innerHTML=lobHTML();lbPush();
   el.querySelectorAll('[data-lob]').forEach(b=>b.onclick=e=>{e.stopPropagation();LOBI=(LOBI+2+(+b.dataset.lob))%2;try{localStorage.setItem('r6bg.lobi',LOBI);}catch(x){}lobRender();});
-  const h=$('#lobHero');if(h)h.onclick=()=>{CP.i=LOBI;NETMSG='';openCop();};
+  const h=$('#lobHero');if(h){const HSC={'m_smg':.68},k=(h.getAttribute('src').match(/([a-z_]+)\.\w+$/)||[])[1];if(HSC[k])h.style.setProperty('--hs',HSC[k]);}if(h)h.onclick=()=>{CP.i=LOBI;NETMSG='';openCop();};
   const go=(id,fn)=>{const b=el.querySelector('#'+id);if(b){b.onclick=fn;if(b.tagName!=='BUTTON')b.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')fn();};}};
   go('t-train',()=>{SCREEN='train';NETMSG='';renderTitle();});go('t-train2',()=>{SCREEN='train';NETMSG='';renderTitle();});go('t-board',()=>{SCREEN='board';NETMSG='';lbLoad(true);renderTitle();});
   go('t-pve',()=>{['A','D'].forEach(s=>{cfg.picks[s]=cfg.picks[s].filter(owned);});SCREEN='setup';WZ.step=0;WZ.seen=0;render();});go('t-rank',()=>{NETMSG='';rankQueue();});
