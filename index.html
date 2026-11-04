@@ -1078,7 +1078,7 @@ body[data-scr="setup"] header.top{visibility:hidden}
 .splist{display:flex;flex-direction:column;gap:8px}.splist a,.splist span{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:#121a22;border:1px solid #2a3a48;color:#e6edf2;text-decoration:none;font-size:15px}
 .splist a:hover{border-color:var(--accent)}.splist span{color:#7f8c97}.splist em{font-style:normal;white-space:nowrap;font-size:12px;color:#9aa7b2}
 @media (max-width:760px){.tside{right:12px;top:max(10px,env(safe-area-inset-top));gap:6px}.tsb{width:36px;height:36px}.tsb svg{width:19px;height:19px}}
-.psettings{position:fixed;inset:0;z-index:70;background:rgba(3,5,8,.72);display:grid;place-items:center;padding:16px}.psettings[hidden]{display:none}
+.psettings{position:fixed;inset:0;z-index:130;background:rgba(3,5,8,.72);display:grid;place-items:center;padding:16px}.psettings[hidden]{display:none}
 .psbox{width:min(560px,100%);max-height:calc(100dvh - 32px);overflow-x:hidden;overflow-y:auto;touch-action:pan-y;overscroll-behavior:contain;background:#0e141a;border:1px solid #2c3a47;border-top:3px solid var(--accent);padding:18px 20px;display:flex;flex-direction:column;gap:14px;color:#e6edf2}
 .pshead{display:flex;align-items:center;gap:12px}.pshead .pav{width:58px;height:58px;object-fit:cover;background:#10171e}.pshead div{flex:1;display:flex;flex-direction:column}.pshead b{font-size:20px}.pshead span{font-size:12.5px;color:#9aa7b2}
 .psbox section h4{margin:0 0 8px;font-size:13px;letter-spacing:.12em;color:var(--accent)}
@@ -6124,12 +6124,14 @@ const nm=u=>pub(u)?`<b class="${u.side==='A'?'a':'d'}">${u.nmz||OPS[u.op].name}<
 const SFX=(()=>{
   let ac=null,out=null,fxBus=null,muBus=null,noiseBuf=null,mus=null,last={};
   let on=true,mOn=true;try{on=localStorage.getItem('r6snd')!=='0';mOn=localStorage.getItem('r6mus')!=='0';}catch(e){}
-  function init(){if(ac)return ac.state==='suspended'?ac.resume():null;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+  function init(){if(ac){if(ac.state!=='running'){try{const p=ac.resume();p&&p.catch&&p.catch(()=>{});}catch(e){}unlockTap();}return;}const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
     try{ac=new AC();}catch(e){ac=null;return;}
     out=ac.createDynamicsCompressor();out.threshold.value=-14;out.ratio.value=4;out.connect(ac.destination);
     fxBus=ac.createGain();fxBus.gain.value=on?.9:0;fxBus.connect(out);muBus=ac.createGain();muBus.gain.value=mOn?.32:0;muBus.connect(out);
-    decodeAll();noiseBuf=ac.createBuffer(1,ac.sampleRate*1.5,ac.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
+    unlockTap();decodeAll();noiseBuf=ac.createBuffer(1,ac.sampleRate*1.5,ac.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
   const ok=()=>ac&&on&&ac.state==='running';
+  // v175: iOS only unlocks audio from a real gesture end (touchend/click), and needs a sound started inside it
+  function unlockTap(){if(!ac)return;try{const b=ac.createBuffer(1,1,22050),s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0);}catch(e){}}
   // v172: recorded interface sounds (Kenney, CC0). Bytes are fetched right away; decoded once audio is allowed
   const SMP={tap:.32,tab:.5,back:.45,ok:.5,buy:.6,err:.45,tick:.35,open:.4},raw={},buf={};
   Object.keys(SMP).forEach(k=>{raw[k]=fetch('snd/'+k+'.mp3').then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);});
@@ -6185,7 +6187,8 @@ const SFX=(()=>{
     toggleMusic(){mOn=!mOn;if(!mOn)setTimeout(()=>{try{achGive('quiet');}catch(e){}},0);try{localStorage.setItem('r6mus',mOn?'1':'0');}catch(e){}init();if(ac){muBus.gain.value=mOn?.32:0;if(!mOn&&mus){mus.lvl=0;mus.g.gain.value=0;}}return mOn;},
     init};
   // browsers only allow sound after a tap or key press
-  ['pointerdown','keydown','touchstart'].forEach(e=>addEventListener(e,()=>init(),{capture:true,passive:true}));
+  ['pointerdown','keydown','touchstart','touchend','pointerup','click'].forEach(e=>addEventListener(e,()=>init(),{capture:true,passive:true}));
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ac&&ac.state!=='running'){try{ac.resume().catch(()=>{});}catch(e){}}});
   addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('button,[role=button]');if(!b)return;
     // pick the sound by what the button does
     const k=b.matches('#gnav [data-gn],[data-trc],[data-trv]:not(.lobAr),.lobNav button,[data-sb-tab],.trnCh button')?'tab'
