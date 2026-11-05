@@ -1394,6 +1394,17 @@ html.pg,html.pg body{touch-action:manipulation}html.pg .psbox,html.pg .avgrid{to
 #doneBtn{border-color:#e3aa3e;color:#ffe2a6;box-shadow:0 0 14px rgba(227,170,62,.45)}
 #scanBtn{position:fixed;left:max(12px,env(safe-area-inset-left));z-index:9;width:62px;height:62px;padding:4px;border:2px solid #5ad0ff;border-radius:4px;background:#0b121a;color:#bfeaff;display:grid;place-items:center;grid-template-rows:1fr auto;gap:0;font:700 11px 'Noto Sans TC',sans-serif;cursor:pointer;box-shadow:0 0 14px rgba(90,208,255,.45);animation:bnIn .3s ease-out}
 #scanBtn svg{width:30px;height:30px}
+#evacBtn{position:fixed;left:max(12px,env(safe-area-inset-left));z-index:9;width:62px;height:62px;padding:4px;border:2px solid #a56bff;border-radius:4px;background:#130b1f;color:#e6d4ff;display:grid;place-items:center;grid-template-rows:1fr auto;gap:0;font:700 11px 'Noto Sans TC',sans-serif;cursor:pointer;box-shadow:0 0 14px rgba(165,107,255,.55);animation:bnIn .3s ease-out}
+#evacBtn svg{width:30px;height:30px}
+#opsBar .ob.evac{opacity:.6;filter:saturate(.4);box-shadow:inset 0 0 0 2px #a56bff}
+#copRc{position:fixed;inset:0;z-index:400;display:grid;place-items:center;padding:16px;background:rgba(6,4,10,.72);backdrop-filter:blur(3px)}
+#copRc .crBox{width:min(360px,100%);box-sizing:border-box;display:flex;flex-direction:column;gap:8px;padding:18px 18px 14px;background:#120d1a;border:2px solid #a56bff;border-radius:8px;box-shadow:0 0 28px rgba(165,107,255,.35);color:#e9e2f5;font:500 14px/1.5 'Noto Sans TC',sans-serif;text-align:center}
+#copRc .crBox.dead{border-color:#ff4a3a;box-shadow:0 0 28px rgba(255,74,58,.3)}#copRc .crBox.ok{border-color:#3fbf6a;box-shadow:0 0 28px rgba(63,191,106,.3)}
+#copRc small{color:#b59be0;letter-spacing:.2em;font-size:10px}#copRc b{font-size:19px;color:#fff}
+#copRc .crT{display:flex;flex-direction:column;align-items:center}#copRc .crT em{font:800 34px/1.1 'Oswald','Noto Sans TC',sans-serif;color:#d9c2ff;font-style:normal;font-variant-numeric:tabular-nums}#copRc .crT i{font-style:normal;color:#b8abcc;font-size:12px}
+#copRc .crMsg{min-height:1.2em;color:#ffb3a8;font-size:12px}
+#copRc .crRow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}#copRc button{min-height:42px;padding:0 16px;border-radius:6px;border:1px solid #4a4058;background:#1c1626;color:#cfc6dc;font:700 14px 'Noto Sans TC',sans-serif;cursor:pointer}
+#copRc .crGo,#copRc .crOk{background:#a56bff;border-color:#a56bff;color:#140a22}
 #scanBtn:disabled{opacity:.5;cursor:default}
 #noAp{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 118px);transform:translateX(-50%);z-index:300;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 20px 6px;background:rgba(12,14,16,.86);border:2px solid #f2b84a;border-radius:6px;box-shadow:0 0 18px rgba(242,184,74,.35);animation:noApIn .25s ease-out}
 #wfAsk{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 112px);transform:translateX(-50%);z-index:330;width:max-content;min-width:min(300px,calc(100vw - 32px));box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 14px 10px;background:rgba(12,14,16,.92);border:2px solid #4aa8e2;border-radius:8px;box-shadow:0 0 18px rgba(74,168,226,.35);max-width:calc(100vw - 32px);animation:noApIn .25s ease-out}
@@ -1417,6 +1428,7 @@ html body #acts button.primary.owb.on,html body.actsR #actsR #acts button.primar
 .bignote span{display:block;margin-top:8px;font:500 clamp(14px,1.8vw,22px) 'Noto Sans TC',sans-serif;color:#dfe6ec;letter-spacing:.08em}
 .bignote.a{--bn:#ff9a52;--bnr:255,140,60}.bignote.d{--bn:#62bdf2;--bnr:80,170,240}.bignote.a .bnBand,.bignote.d .bnBand{padding-left:8px;padding-right:8px}.bignote.a b,.bignote.d b{word-break:keep-all}.bignote.r{--bn:#e8eef3}.bignote.r b{font-size:clamp(34px,5.5vw,72px)}
 .bignote.warn{--bn:#ffd23a;--bnr:255,210,60}
+.bignote.ev{--bn:#c99bff;--bnr:165,107,255}
 .bignote.bomb{--bn:#ff4040;--bnr:255,50,50;background:radial-gradient(circle,rgba(255,30,30,.22),transparent 70%);animation:bnFlash .5s 3}
 .bignote.bomb b{font-size:clamp(48px,10vw,130px)}
 .bignote.out{animation:bnOut .4s ease-in forwards}
@@ -6312,6 +6324,7 @@ const SFX=(()=>{
     miss(){if(!ok())return;const t=ac.currentTime+.04;noise(t,.35,5200,6,.5,'bandpass',1400);tone(t+.08,.25,2600,1900,.06,'sine');},
     kill(){if(!ok())return;const t=ac.currentTime+.1;tone(t,.6,90,30,1,'sine');noise(t,.5,300,.8,.6,'lowpass');tone(t+.05,.5,330,110,.18,'sawtooth');},
     boom(){if(!ok()||!gate('boom',250))return;if(play(Math.random()<.5?'boom1':'boom2',1,.06))return;const t=ac.currentTime;tone(t,.9,70,25,1.1,'sine');noise(t,1.1,600,.6,1,'lowpass',120);noise(t,.25,3000,.8,.5);},
+    evac(){if(!ok())return;const t=ac.currentTime;tone(t,2.5,130,1300,.15,'sine');tone(t,2.5,260,2600,.05,'triangle');noise(t,2.5,500,2,.22,'bandpass',5200);tone(t+2.5,.8,1500,2300,.12,'sine');tone(t+2.5,.8,2250,3400,.05,'sine');},
     zap(){if(!ok()||!gate('zap',200))return;const t=ac.currentTime;for(let i=0;i<6;i++)noise(t+i*.06,.05,2600+i*400,3,.55,'bandpass');tone(t,.5,110,95,.22,'sawtooth');tone(t,.5,220,180,.08,'square');},
     heal(){if(!ok())return;const t=ac.currentTime;tone(t,.5,520,780,.12,'sine');tone(t+.12,.6,780,1170,.1,'sine');tone(t+.24,.9,1040,1560,.07,'triangle');},
     flash(){if(!ok())return;const t=ac.currentTime;noise(t,.3,4000,.5,.9,'highpass');tone(t+.05,1.6,3800,3600,.09,'sine');},
@@ -6509,8 +6522,8 @@ async function damage(u,n,src){
 function checkWin(){
   if(G.over||G._boom)return;
   if(G.defuser&&G.defuser.by&&!dfU()){G.units.forEach(x=>{if(!x.alive)x.defusing=false;});G.defuser.by=null;log('拆彈中斷！','ka');if(G.defuser.timer<=0)return bombBoom();}
-  if(!alive('A').length){if(G.defuser&&alive('D').length){if(!G._aDead){G._aDead=1;log('進攻方全員陣亡，但拆彈器還在運作，必須拆除！','ks');bigNote('進攻方全滅','拆彈器還在運作，必須拆除','bomb',2400);}return;}return finish('D','進攻方全員陣亡');}
-  if(!alive('D').length&&!G.tut2)return finish('A','防守方全員陣亡');
+  if(!alive('A').length){if(G.defuser&&alive('D').length){if(!G._aDead){G._aDead=1;log('進攻方全員陣亡，但拆彈器還在運作，必須拆除！','ks');bigNote('進攻方全滅','拆彈器還在運作，必須拆除','bomb',2400);}return;}return finish('D',G.units.some(u=>u.side==='A'&&u.evacd)?'進攻方全員陣亡或撤離':'進攻方全員陣亡');}
+  if(!alive('D').length&&!G.tut2)return finish('A',G.units.some(u=>u.side==='D'&&u.evacd)?'防守方全員陣亡或撤離':'防守方全員陣亡');
 }
 function showAnalysis(w,why){if(!G||!G.over||G.tut)return;let o=$('#anal');if(o)o.remove();o=document.createElement('div');o.id='anal';o.setAttribute('role','dialog');o.setAttribute('aria-label','戰鬥分析');
   const pct=(a,b)=>b?Math.round(a/b*100)+'%':'–',sc=u=>{const s=ST(u);return s.dmg+s.k*3+s.gad;};
@@ -7059,6 +7072,7 @@ function endPhase(){
   {const ow=alive(s).filter(u=>u.x>=0&&!u.overwatch&&!u.defusing);ow.forEach(u=>overwatch(u,true));const sh=ow.filter(u=>pub(u)||s===G.player);if(sh.length&&(s===G.player||G.over))log(`${sh.map(nm).join('、')} 自動進入掩護射擊`,s==='A'?'ka':'kd');}
   G.gadgets.forEach(g=>{if((g.type==='gas'||g.type==='fire')&&g.alive&&--g.life<=0){g.alive=false;if(g.goyo)goyoOut(g);}});
   if(s==='D'&&G.defuser){const du=dfU();if(du){if(--G.defuser.dleft<=0){render();dfDone(du);if(G.over)return;}}else G.defuser.by=null;if(G.defuser&&--G.defuser.timer<=0&&!dfU()){render();return bombBoom();}}
+  evacPhaseEnd(s);if(G.over)return;
   bigNote(`${s==='A'?'進攻方':'防守方'}<wbr>第${'一二'[G.phaseIdx>>1]}階段結束`,'',s==='A'?'a':'d',1100);// v104: say who just finished
   closeMovementPhase();G.phaseIdx++;
   if(G.phaseIdx>=4){
@@ -8233,10 +8247,10 @@ function renderOpsBar(){let b=$('#opsBar');const show=G&&G.phase==='play'&&!G.ov
   const team=G.units.filter(u=>u.side===G.player),foe=G.units.filter(u=>u.side!==G.player),vis=sees(G.player);
   for(const u of foe)if(u.alive&&u.x>=0&&vis.has(u.id))u.seen1=1;
   b.innerHTML=`<div class="obActs ${mine?'':'off'}" title="本階段還能啟動的幹員數">${[0,1,2].map(i=>`<i class="${i<left?'f':''}"></i>`).join('')}</div><div class="obTeam">`+team.map(u=>{
-    const st=(!u.alive?'dead':G.active===u?'act':u.activated?'done':'')+(u.alive&&u.stun?' stun':'');const mp=G.active===u?u.mp:0;
+    const st=(!u.alive?(u.evacd?'evac':'dead'):G.active===u?'act':u.activated?'done':'')+(u.alive&&u.stun?' stun':'');const mp=G.active===u?u.mp:0;
     return `<button data-ob="${u.id}" class="ob ${u.side==='A'?'a':'d'} ${st} ${G.sel===u?'sel':''}" aria-label="${OPS[u.op].name}"><img src="${opIcon(u.op)}" alt=""><span class="obHp">${[...Array(u.max)].map((_,i)=>`<i class="${i<u.hp?'f':''}"></i>`).join('')}</span>${
       G.active===u?`<b class="obMv" title="剩餘移動點">${mp}</b>`:''}${u.activated&&u.alive&&G.active!==u?'<em>✓</em>':''}</button>`;}).join('')
-   +`</div><div class="obMid ${curSide()==='A'?'a':'d'}"><b>∞</b></div><div class="obTeam">`+foe.map(u=>{const k=u.seen1||G.over,st=(!u.alive?' dead':'')+(u.alive&&u.stun&&k?' stun':'');
+   +`</div><div class="obMid ${curSide()==='A'?'a':'d'}"><b>∞</b></div><div class="obTeam">`+foe.map(u=>{const k=u.seen1||G.over,st=(!u.alive?(u.evacd&&k?' evac':' dead'):'')+(u.alive&&u.stun&&k?' stun':'');
     return `<div class="ob foe ${u.side==='A'?'a':'d'}${st}${k?'':' unk'}" aria-label="${k?OPS[u.op].name:'未發現的敵人'}">${k?`<img src="${opIcon(u.op)}" alt="">`:'<b class="obQ">?</b>'}</div>`;}).join('')+'</div>';obClock();}
 function obClock(){const m=document.querySelector('#opsBar .obMid');if(!m||!G)return;const on=clockOn()&&!G.over,s=curSide(),ms=on?G.clock[s]:0,t=on?fmtClock(ms):'∞';
   const b=m.firstChild;if(b.textContent!==t)b.textContent=t;m.className='obMid '+(s==='A'?'a':'d')+(on?(ms<15000?' low':''):' inf');}
@@ -8772,7 +8786,7 @@ function flowBtnUpd(){const scr=document.body.dataset.scr==='game',u=G&&G.sel,a=
   if(!showT){if(t)t.remove();t=null;}else{t=mk('turnBtn','<svg viewBox="0 0 48 48" fill="none" stroke="#8fd3ff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M38 24a14 14 0 1 1-4.1-9.9"/><path d="M35 6v9h-9"/></svg><span>'+tt('轉向')+'</span>');t.classList.toggle('on',G.mode==='face');t.onclick=ev=>{ev.stopPropagation();if(!G.busy)setMode('face');};}
   if(!showD){if(d)d.remove();d=null;}else{d=mk('doneBtn','<svg viewBox="0 0 48 48" fill="none" stroke="#ffd27a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 25l9 9 19-20"/></svg><span>'+tt('完成')+'</span>');d.onclick=ev=>{ev.stopPropagation();const v=G.active;if(v&&!G.busy){G.mode='move';owFinish(v);}};}
   const sh=document.getElementById('sheetT'),r0=sh&&sh.getBoundingClientRect(),r=r0&&r0.width?r0:null;let y=r&&r.top>innerHeight*.4?Math.round(innerHeight-r.top+10):Math.round(innerHeight*.3);
-  if(['barBtn','escBtn','scanBtn'].some(i=>document.getElementById(i)))y+=70;
+  if(['barBtn','escBtn','scanBtn'].some(i=>document.getElementById(i)))y+=70;if(document.getElementById('evacBtn'))y+=70;
   for(const b of [t,d])if(b){b.style.bottom=y+'px';y+=70;}}
 // v156: the moving drone's scan button sits where the barricade button does, same size
 function scanBtnUpd(){let b=document.getElementById('scanBtn');const d=dmOf(),u=G&&G.active;
@@ -8781,7 +8795,7 @@ function scanBtnUpd(){let b=document.getElementById('scanBtn');const d=dmOf(),u=
   b.disabled=!!G.busy;
   const sh=document.getElementById('sheetT'),r0=sh&&sh.getBoundingClientRect(),r=r0&&r0.width?r0:null;b.style.bottom=(r&&r.top>innerHeight*.4?Math.round(innerHeight-r.top+10):Math.round(innerHeight*.3))+'px';
   b.onclick=ev=>{ev.stopPropagation();const a=G.active;if(!dmOf()||!a||G.busy)return;act(()=>droneFinish(a));};}
-function render(){trackMovement();try{syncElec();}catch(e){}try{const a=G&&G.active;if(a&&G.mode==='move'&&!G.busy&&owAuto(a)&&a.ap<=0&&!a.heavyGuard&&!G._owF){G._owF=1;setTimeout(()=>{G._owF=0;if(G.active===a&&G.mode==='move'&&!G.busy&&owAuto(a)&&a.ap<=0)owFinish(a);},200);}}catch(e){}setTimeout(()=>{try{noApTag();}catch(e){}},0);setTimeout(()=>{try{barBtnUpd();}catch(e){}try{escBtnUpd();}catch(e){}try{scanBtnUpd();}catch(e){}try{flowBtnUpd();}catch(e){}},0);try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{renderTension();}catch(e){}
+function render(){trackMovement();try{syncElec();}catch(e){}try{const a=G&&G.active;if(a&&G.mode==='move'&&!G.busy&&owAuto(a)&&a.ap<=0&&!a.heavyGuard&&!G._owF){G._owF=1;setTimeout(()=>{G._owF=0;if(G.active===a&&G.mode==='move'&&!G.busy&&owAuto(a)&&a.ap<=0)owFinish(a);},200);}}catch(e){}setTimeout(()=>{try{noApTag();}catch(e){}},0);setTimeout(()=>{try{barBtnUpd();}catch(e){}try{escBtnUpd();}catch(e){}try{scanBtnUpd();}catch(e){}try{evacBtnUpd();}catch(e){}try{flowBtnUpd();}catch(e){}},0);try{renderClocks();}catch(e){}try{musicLevel();}catch(e){}try{renderTension();}catch(e){}
   const scr=G?'game':(SCREEN==='setup'?'setup':'title');document.body.dataset.scr=scr;{const wz=$('#wiz');if(wz&&(G||SCREEN!=='setup'))wz.hidden=true;}
   const tt=$('#title');if(tt){const show=scr==='title';if(tt.hidden===show)tt.hidden=!show;if(show&&tt.dataset.s!==SCREEN){tt.dataset.s=SCREEN;renderTitle();}}
   if(R3){heroScene(scr==='title');if(R3.lastScr!==scr){R3.lastScr=scr;R3.sig='';if(scr!=='title')setTimeout(()=>R3&&!R3.camGoal&&setView(G&&G.phase==='setup'?'top':'angle'),0);}}
@@ -10430,6 +10444,7 @@ function fxSync(){if(!G||!G.fxq)return;if((G.fxn||0)<FXSEEN)FXSEEN=0;for(const e
 function fxPlay(e){if(!G)return null;const foe=!!e.side&&e.side!==G.player;
   if(e.k==='throw'){if(foe)edgeAlert(e.x1,e.y1);return mapThrow(e);}
   if(e.k==='shot'){if(foe){edgeAlert(e.x0,e.y0);edgeAlert(e.x1,e.y1);}return null;}
+  if(e.k==='evac')return evacBeam(e);
   if(e.k==='wall'){if(foe&&G.units.some(u=>u.alive&&u.side===G.player&&u.x>=0&&inRoomOf(u,e.x,e.y)))edgeAlert(e.x,e.y);return null;}
   return null;}
 // is the wall square (x,y) on the edge of the room u stands in (flood over floor, not through walls, doors, the breach itself)
@@ -11420,7 +11435,7 @@ function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
-const NEWS=[{d: "2026-11-05", v: "v178–v194", i: ["組隊：好友頁可以邀請在線的好友加入小隊，大廳右側會出現小隊圖示；組隊後按「對戰電腦」就是 4v4 合作，兩人各控 2 名幹員，順序是隊長 → 電腦 → 隊員 → 電腦", "好友代碼：好友頁顯示自己的 6 碼代碼，輸入對方代碼就能直接加好友；點好友名字可看他最強的培養幹員、擊殺和存活", "看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
+const NEWS=[{d: "2026-11-05", v: "v178–v195", i: ["培養幹員開打後就不能靠退出逃避陣亡：按「離開」或關掉網頁都算陣亡；斷線的話 3 分鐘內回來可以接著打", "新增「撤離」（紫色按鈕）：培養幹員花 1 行動開始撤離，撐過敵方下一個階段就會被光束接走，這場算存活", "組隊：好友頁可以邀請在線的好友加入小隊，大廳右側會出現小隊圖示；組隊後按「對戰電腦」就是 4v4 合作，兩人各控 2 名幹員，順序是隊長 → 電腦 → 隊員 → 電腦", "好友代碼：好友頁顯示自己的 6 碼代碼，輸入對方代碼就能直接加好友；點好友名字可看他最強的培養幹員、擊殺和存活", "看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
 const newsKey=()=>NEWS[0].d+'#'+NEWS[0].i.length;
 function newsUnread(){try{return localStorage.getItem('newsSeen')!==newsKey();}catch(e){return false;}}
 function newsBadge(){const n=$('#t-news');if(n)n.classList.toggle('unread',newsUnread());}
@@ -12144,6 +12159,143 @@ function ecoBanner(){const b=$('#banner');if(!b||b.hidden||!G||!G._eco||b.queryS
   const d=document.createElement('div');d.className='ecoRes';
   d.innerHTML=`${e.earn?`<b class="ecoE">${RNI}+${fmtN(e.earn)}${(e.bonus||[]).length?`<em class="ecoB">${e.bonus.map(([t,v])=>`${esc(t)} ${v>0?'+':'−'}${Math.abs(v)}`).join('　')}</em>`:''}</b>`:''}${e.lines.map(([t,v])=>`<span>${esc(t)}${v?` <i>+${fmtN(v)}</i>`:''}</span>`).join('')}`;
   const row=b.querySelector('.row');row?b.insertBefore(d,row):b.appendChild(d);}
+// ---------- v195: trained operators can't dodge permadeath by leaving ----------
+Object.assign(I18X,{'離開的話，培養幹員「{0}」也算陣亡（記入學長姐）。確定離開？':['If you leave, trained operator "{0}" dies too (added to the alumni). Leave?',''],
+'這場也會算落敗。':['This match also counts as a loss.',''],'中途離開對戰，沒有在 3 分鐘內回來。':["Left the match and didn't return within 3 minutes.",''],'在斷線前已經倒下。':['Was already down before the connection dropped.',''],
+'知道了':['Got it',''],'對戰中斷':['Match interrupted',''],'培養幹員「{0}」還在戰場上。':['Trained operator "{0}" is still on the field.',''],'內回到對戰，超過就算陣亡':['to get back into the match, or they die',''],
+'放棄（幹員陣亡）':['Give up (operator dies)',''],'回到對戰':['Return to match',''],'連線中…':['Connecting…',''],'回不到原本的對戰，請再試一次。':["Couldn't rejoin the match. Try again.",''],
+'重新連線，回到對戰':['Reconnected to the match',''],'開始撤離':['Evacuating',''],'{0} 要撐過敵方一個階段，期間不能行動':['{0} must survive one enemy phase and cannot act meanwhile',''],
+'撤離成功':['Evacuated',''],'{0} 已安全離開戰場':['{0} left the battlefield safely',''],'撤離':['Evacuate',''],
+'撤離：花 1 行動，之後不能移動、射擊或掩護；撐過敵方下一個階段就安全離開戰場，這場不會陣亡。確定撤離？':["Evacuate: costs 1 action, then you can't move, shoot or overwatch; survive the next enemy phase to leave the field safely and this operator won't die this match. Evacuate?",''],
+'平安歸隊':['made it back',''],'撤離成功，這場算存活。':['Evacuated: counts as a survival.',''],'陣亡':['KIA',''],'中途離開':['Left mid-match',''],
+'進攻方全員陣亡或撤離':['All attackers down or evacuated',''],'防守方全員陣亡或撤離':['All defenders down or evacuated',''],
+'撤離成功，安全離開戰場':['evacuated safely','']});
+I18T.push(["{0} 開始撤離：撐過敵方下一個階段就能安全離開戰場，期間不能移動或射擊","{0} starts evacuating: survive the next enemy phase to leave safely; cannot move or shoot meanwhile",""],["{0} 撤離成功，安全離開戰場","{0} evacuated safely",""]);
+// The match locks the trained operator once fighting starts (ECO.copOut, synced to the cloud). Leaving with 離開, or closing the page and not coming back
+// within 3 minutes, kills them (copDie). A local heartbeat (r6bg.copRc) keeps a snapshot of an offline match / the room of an online one so a dropped
+// connection can resume. The only safe way out is 撤離: 1 action, then survive one enemy phase; a beam lifts the operator off the board.
+const COPRC='r6bg.copRc',COPRC_MS=180e3;
+function myCopU(){if(!G||!G.units)return null;return G.units.find(u=>u.side===G.player&&(!G.coop||u.own===coopRole())&&unitCopSlot(u)!=null)||null;}
+const copLockable=()=>!!G&&!G.tut&&!G.tut2&&!G.lv&&G.phase==='play'&&!G.over;
+function copRcGet(){try{return JSON.parse(localStorage.getItem(COPRC)||'null');}catch(e){return null;}}
+function copRcSet(o){try{if(o)localStorage.setItem(COPRC,JSON.stringify(o));else localStorage.removeItem(COPRC);}catch(e){}}
+function copUnlock(){if(ECO.copOut){delete ECO.copOut;}copRcSet(null);}
+const copGid=()=>G?(G.net&&NET&&NET.code?'n'+NET.code:G._gid||(G._gid=Date.now().toString(36)+Math.random().toString(36).slice(2,7))):null;
+const copLockOn=()=>!!(G&&!G.over&&ECO.copOut&&ECO.copOut.gid===copGid());
+function copLock(u){const i=unitCopSlot(u),gid=copGid();
+  if(ECO.copOut&&ECO.copOut.gid!==gid)copDie(ECO.copOut,'中途離開'); // an older match was never finished
+  const c=copAll()[i];ECO.copOut={i,gen:c.gen|0,nm:c.nm,gid,t0:Date.now(),t:Date.now()};ecoSave();copBeat(true);}
+function copBeat(force){const L=ECO.copOut,u=myCopU();if(!L||!G||copGid()!==L.gid)return;
+  if(u&&u.evacd&&!L.safe){L.safe=1;ecoSave();}const o=copRcGet();const R=o&&o.gid===L.gid?o:{gid:L.gid};R.t=Date.now();
+  if(u&&!u.alive&&!u.evacd)R.dead=1;
+  if(G.net&&NET&&NET.code)R.net={code:NET.code,role:NET.role,side:NET.side,ranked:!!NET.ranked,coop:!!NET.coop,me:NET.me,map:NET.map,mis:NET.mis};
+  else if(!G.busy&&!G.ai&&!G.over&&(force||curSide()===G.player))try{R.snap=netSer();R.net=null;}catch(e){}
+  copRcSet(R);
+  if(Date.now()-(L.t||0)>90e3){L.t=Date.now();ecoSave();}}
+// a fallen trained operator goes to the alumni list and the slot restarts as a new recruit
+function copDie(L,why,k,by){if(!L)return;const c=copAll()[L.i];
+  if(c&&(c.gen|0)===(L.gen|0)){c.k+=k|0;ECO.alum=(Array.isArray(ECO.alum)?ECO.alum:[]).concat([{i:L.i,w:c.w||null,nm:c.nm,rk:copScore(c).rk,k:c.k|0,sv:c.sv|0,by:by||'',q:why||'',ts:Date.now()}]).slice(-100);ECO.cop[L.i]=copNew(c);CP.dr=null;}
+  copUnlock();ecoSave();try{renderPlayer();}catch(e){}try{if(SCREEN==='title')lobRender();}catch(e){}}
+function copLeaveMsg(){const L=ECO.copOut;return tt('離開的話，培養幹員「{0}」也算陣亡（記入學長姐）。確定離開？').replace('{0}',L?L.nm:'');}
+setInterval(()=>{try{
+  if(G&&copLockable()){const u=myCopU();if(u){if(!copLockOn())copLock(u);else copBeat();}}
+  else if(!G&&ECO.copOut)copRecover();}catch(e){console.warn(e);}},2000);
+addEventListener('beforeunload',e=>{try{if(copLockOn()){copBeat(true);e.preventDefault();e.returnValue='';}}catch(x){}});
+addEventListener('pagehide',()=>{try{if(copLockOn())copBeat(true);}catch(x){}});
+// back in the menus with a lock still open: offer to resume within 3 minutes of the last heartbeat, otherwise the operator is dead
+let COPRC_UI=null;
+function copMenusReady(){const lg=document.getElementById('login');return !document.getElementById('boot')&&!(lg&&!lg.hidden&&lg.offsetParent)&&!(window.GA&&GA.busy)&&SCREEN!=='game';}
+function copRecover(){const L=ECO.copOut;if(!L||COPRC_UI||!copMenusReady())return;const R=copRcGet(),mine=R&&R.gid===L.gid;
+  if(L.safe){copSafe(L);return;}
+  if(mine&&R.dead)return copDieDlg(L,'');
+  const hb=mine?R.t:(L.t||L.t0||0),left=COPRC_MS-(Date.now()-hb);
+  if(!mine){if(Date.now()-hb>COPRC_MS+120e3)copDieDlg(L,'中途離開');return;} // another device may still be playing this match
+  if(left<=0||!(R.snap||R.net))return copDieDlg(L,'中途離開');
+  copRcDlg(L,R,hb);}
+// evacuated before the connection dropped: they made it home
+function copSafe(L){const c=copAll()[L.i];if(c&&(c.gen|0)===(L.gen|0))c.sv++;const nm=L.nm;copUnlock();ecoSave();copNotice(`<b>${esc(nm)}　${tt('平安歸隊')}</b><span>${tt('撤離成功，這場算存活。')}</span>`,'ok');}
+function copDieDlg(L,why){const nm=L.nm;copDie(L,why);copNotice(`<b>${esc(nm)}　${tt('陣亡')}</b><span>${tt(why?'中途離開對戰，沒有在 3 分鐘內回來。':'在斷線前已經倒下。')}</span>`);}
+function copNotice(html,k){const el=document.createElement('div');el.id='copRc';el.setAttribute('role','dialog');el.innerHTML=`<div class="crBox ${k||'dead'}">${html}<div class="crRow"><button class="crOk">${tt('知道了')}</button></div></div>`;
+  document.body.appendChild(el);COPRC_UI=el;el.querySelector('.crOk').onclick=()=>{el.remove();COPRC_UI=null;};}
+function copRcDlg(L,R,hb){const el=document.createElement('div');el.id='copRc';el.setAttribute('role','dialog');el.setAttribute('aria-label',tt('對戰中斷'));
+  el.innerHTML=`<div class="crBox"><small>CONNECTION LOST</small><b>${tt('對戰中斷')}</b><span>${tt('培養幹員「{0}」還在戰場上。').replace('{0}',esc(L.nm))}</span>
+    <div class="crT"><em>3:00</em><i>${tt('內回到對戰，超過就算陣亡')}</i></div><div class="crMsg"></div>
+    <div class="crRow"><button class="crQuit">${tt('放棄（幹員陣亡）')}</button><button class="crGo">${tt('回到對戰')}</button></div></div>`;
+  document.body.appendChild(el);COPRC_UI=el;let busy=false;
+  const close=()=>{clearInterval(tk);el.remove();COPRC_UI=null;};
+  const tk=setInterval(()=>{const left=COPRC_MS-(Date.now()-hb);if(left<=0){close();copDieDlg(L,'中途離開');return;}
+    const s=Math.ceil(left/1000);el.querySelector('.crT em').textContent=`${(s/60)|0}:${String(s%60).padStart(2,'0')}`;},250);
+  el.querySelector('.crQuit').onclick=()=>{if(!confirm(copLeaveMsg()))return;close();copDie(L,'中途離開');};
+  el.querySelector('.crGo').onclick=async()=>{if(busy)return;busy=true;const m=el.querySelector('.crMsg');m.textContent=tt('連線中…');
+    let ok=false;try{ok=await copResume(R);}catch(e){console.warn(e);}busy=false;
+    if(ok)close();else m.textContent=tt('回不到原本的對戰，請再試一次。');};}
+async function copResume(R){
+  if(R.net){const n=await netInit();if(!n||n.me!==R.net.me)return false;const q=R.net;
+    Object.assign(n,{code:q.code,role:q.role,side:q.side,ranked:q.ranked,coop:q.coop,map:q.map,mis:q.mis,started:true,pre:true,seq:0});
+    let d=null;try{const s=await n.db.doc('games/'+q.code).get();d=s&&s.exists&&s.data();}catch(e){}
+    if(!d||!d.state){n.code=null;return false;}
+    netApply(d);netSubscribe(q.code);return !!G;}
+  if(!R.snap)return false;
+  const g=netDes(R.snap);g.net=false;g.busy=false;g.ai=false;g.mode='move';G=g;
+  (G.units||[]).forEach(u=>{try{if(!OPS[u.op])ensureOp(u.op);}catch(e){}});try{copPrep(true);}catch(e){}
+  SCREEN='game';$('#banner').hidden=true;if(R3){R3.sig='';setTimeout(()=>{try{playCam();}catch(e){}},50);}
+  log(tt('重新連線，回到對戰'),'ks');render();
+  if(!G.over&&curSide()!==G.player){G.ai=true;render();setTimeout(runAI,600);}
+  return true;}
+// ---------- 撤離 (evacuate) ----------
+function evacOK(u){return !!(u&&G&&copLockable()&&u===myCopU()&&u.alive&&u.x>=0&&!u.defusing&&!u.evac&&!u.matStuck&&!(G.hostage&&G.hostage.by===u.id)&&!dmOf()&&canAct(u)&&(G.active!==u||canDo(u,'obj')));}
+function evacStart(u){useAct(u,'obj');note(u,'撤離');u.evac=1;u.defusing=true;u.overwatch=false;u.ap=0;u.mp=0;u.activated=true;
+  try{SFX.alert();}catch(e){}bigNote(tt('開始撤離'),tt('{0} 要撐過敵方一個階段，期間不能行動').replace('{0}',OPS[u.op].name),'ev',2200);
+  log(`${nm(u)} 開始撤離：撐過敵方下一個階段就能安全離開戰場，期間不能移動或射擊`,u.side==='A'?'ka':'kd');render();}
+// at the end of an enemy phase every evacuating unit that is still standing leaves the board
+function evacPhaseEnd(s){if(!G)return;for(const u of G.units){if(!u.evac||!u.alive||u.side===s||u.evacd)continue;
+  const x=u.x,y=u.y;u.evacd=1;u.evac=0;u.defusing=false;u.alive=false;u.overwatch=false;u.ex=[x,y];u.x=-1;u.y=-1;if(G.sel===u)G.sel=null;
+  log(`${nm(u)} 撤離成功，安全離開戰場`,u.side==='A'?'ka':'kd');
+  try{fxEv({k:'evac',side:u.side,uid:u.id,x,y});}catch(e){}
+  {const n=OPS[u.op].name;setTimeout(()=>bigNote(tt('撤離成功'),tt('{0} 已安全離開戰場').replace('{0}',n),'ev',1800),1500);}}
+  checkWin();}
+function evacBtnUpd(){let b=document.getElementById('evacBtn');const u=G&&G.sel;
+  const t=u&&!G.busy&&!G.over&&u.side===G.player&&myPh()&&evacOK(u);
+  if(!t||document.body.dataset.scr!=='game'){if(b)b.remove();return;}
+  if(!b){b=document.createElement('button');b.id='evacBtn';b.innerHTML='<svg viewBox="0 0 48 48" fill="none" stroke="#c99bff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="24" cy="40" rx="13" ry="4"/><path d="M15 39V9M33 39V9M24 33V6M19 18l5-6 5 6"/></svg><span>'+tt('撤離')+'</span>';document.body.appendChild(b);}
+  const sh=document.getElementById('sheetT'),r0=sh&&sh.getBoundingClientRect(),r=r0&&r0.width?r0:null;let y=r&&r.top>innerHeight*.4?Math.round(innerHeight-r.top+10):Math.round(innerHeight*.3);
+  if(['barBtn','escBtn','scanBtn'].some(i=>document.getElementById(i)))y+=70;b.style.bottom=y+'px';
+  b.onclick=ev=>{ev.stopPropagation();const v=G.sel;if(!v||!evacOK(v))return;
+    if(!confirm(tt('撤離：花 1 行動，之後不能移動、射擊或掩護；撐過敵方下一個階段就安全離開戰場，這場不會陣亡。確定撤離？')))return;
+    if(!commit(v))return;act(async()=>{if(evacOK(v)||G.active===v)evacStart(v);});};}
+// the beam: a violet column climbs out of the floor faster and faster, light streaks race up it and the operator fades away inside
+function evacBeam(e){if(!R3||!R3.scene||!window.THREE)return null;const u=G.units.find(x=>x.id===e.uid);if(!u)return null;
+  if(e.side!==G.player&&!G.over)return null;
+  try{SFX.evac&&SFX.evac();}catch(x){}
+  let f=R3.figs[e.uid];if(f)delete R3.figs[e.uid];else{f=unit3D({...u,id:'ev_'+u.id,x:e.x,y:e.y,alive:true});delete R3.figs['ev_'+u.id];}
+  const px=cwx(e.x,e.y),pz=cwz(e.x,e.y),py=(()=>{try{return standY(e.x,e.y);}catch(x){return 0;}})();
+  f.grp.visible=true;f.grp.position.set(px,py,pz);if(f.badge)f.badge.visible=false;if(f.sel)f.sel.visible=false;if(f.spot)f.spot.visible=false;
+  f.grp.traverse(o=>{if(!o.material||o===f.badge)return;o.material=Array.isArray(o.material)?o.material.map(m=>{const c=m.clone();c._dw0=m.depthWrite;return c;}):(c=>(c._dw0=o.material.depthWrite,c))(o.material.clone());});
+  const T=THREE,grp=new T.Group();grp.position.set(px,py,pz);R3.scene.add(grp);
+  const cv=document.createElement('canvas');cv.width=4;cv.height=256;{const x=cv.getContext('2d'),gr=x.createLinearGradient(0,256,0,0);gr.addColorStop(0,'#fff');gr.addColorStop(.25,'rgba(255,255,255,.8)');gr.addColorStop(.75,'rgba(255,255,255,.35)');gr.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=gr;x.fillRect(0,0,4,256);}
+  const am=new T.CanvasTexture(cv),add={transparent:true,depthWrite:false,side:T.DoubleSide,blending:T.AdditiveBlending};
+  const mk=(geo,col,op,o)=>{const m=new T.Mesh(geo,new T.MeshBasicMaterial({color:col,opacity:op,...add,...(o||{})}));m.renderOrder=7;m.frustumCulled=false;grp.add(m);return m;};
+  const tg=new T.CylinderGeometry(.5,.56,1,40,1,true);tg.translate(0,.5,0);const cg=new T.CylinderGeometry(.17,.2,1,20,1,true);cg.translate(0,.5,0);
+  const tube=mk(tg,0xa86bff,.75,{alphaMap:am}),core=mk(cg,0xf1e4ff,.95,{alphaMap:am});
+  const dc=document.createElement('canvas');dc.width=dc.height=128;{const x=dc.getContext('2d'),gr=x.createRadialGradient(64,64,0,64,64,64);gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.45,'rgba(255,255,255,.55)');gr.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=gr;x.fillRect(0,0,128,128);}
+  const dg=new T.PlaneGeometry(1.9,1.9);dg.rotateX(-Math.PI/2);const disc=mk(dg,0xb57bff,.9,{map:new T.CanvasTexture(dc)});disc.position.y=.03;
+  const rg=new T.RingGeometry(.5,.58,48);rg.rotateX(-Math.PI/2);const ring=mk(rg,0xd9c2ff,.9);ring.position.y=.04;
+  const sg=new T.BoxGeometry(.028,1,.028);sg.translate(0,.5,0);const N=30,st=[];
+  for(let j=0;j<N;j++){const a=Math.random()*Math.PI*2,r=.12+Math.random()*.42,m=mk(sg,j%3?0xc9a2ff:0xffffff,.9);m.position.set(Math.cos(a)*r,0,Math.sin(a)*r);st.push({m,y:-Math.random()*2.2,k:.7+Math.random()*.6});}
+  const T0=2.6,T1=.55,t0=performance.now();let lt=t0,acc=0,done=false;const by=f.body?f.body.position.y:0;
+  const fin=()=>{done=true;R3.scene.remove(grp);grp.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose();}});am.dispose();try{R3.unitG.remove(f.grp);}catch(x){}};
+  (R3.fx2||(R3.fx2=[])).push(()=>{if(done)return false;const nw=performance.now(),dt=Math.min(.1,(nw-lt)/1000);lt=nw;const t=(nw-t0)/1000,q=Math.min(1,t/T0);
+    const h=.25+16*Math.pow(q,2.6),v=1.1+15*q*q;acc+=v*dt;
+    tube.scale.y=h;core.scale.y=h*1.05;tube.material.opacity=.45+.35*q;ring.scale.setScalar(1+.25*Math.sin(t*9)*(1-q)+q*.35);disc.material.opacity=.55+.4*q;
+    for(const s of st){s.y+=v*s.k*dt;const L=.25+v*.11;if(s.y>Math.min(h,9)){s.y=-Math.random()*.4;}s.m.position.y=Math.max(0,s.y);s.m.scale.y=L;s.m.visible=s.y>=0;}
+    const fq=Math.min(1,Math.max(0,(t-.8)/1.5));
+    if(f.body){f.body.position.y=by+.5*fq*fq;f.body.scale.set(1-.8*fq,1+.25*fq,1-.8*fq);}
+    figAlpha(f,Math.round((1-fq)*20)/20);if(fq>=1)f.grp.visible=false;
+    if(t>T0){const k=Math.min(1,(t-T0)/T1);const w=k<.25?1+k*2:1.5*(1-k)/(.75);tube.scale.x=tube.scale.z=Math.max(.01,w);core.scale.x=core.scale.z=Math.max(.01,w*1.4);
+      tube.material.opacity=.8*(1-k);core.material.opacity=.95*(1-k);disc.material.opacity=.95*(1-k);ring.material.opacity=.9*(1-k);st.forEach(s=>s.m.material.opacity=.9*(1-k));if(k>=1){fin();return false;}}
+    return true;});
+  return null;}
+
 {const _fin=finish;finish=function(w,why){G&&(G._why=why);try{ecoGame(w);}catch(e){console.warn(e);}_fin(w,why);try{ecoBanner();}catch(e){}};}
 Object.assign(I18X,{'修正培養幹員以借用技能結束對局時，點數與存活場次未入帳':['Fixed missing trained-operator points and survival counts when a borrowed skill ends the match.','']});
 // unlock dialog: one tap on a locked operator explains, the dialog's button confirms
@@ -12396,7 +12548,12 @@ function hMenu(){let m=$('#hmenu');if(m){m.remove();return;}m=document.createEle
     if(k==='mus'){SFX.toggleMusic();try{musicLevel();}catch(e){}}else if(k==='snd')$('#sndBtn').click();else if(k==='set')openSettings();else if(k==='ach')openAch();else homeGo();};
   setTimeout(()=>addEventListener('pointerdown',function f(e){if(!m.contains(e.target)&&e.target.closest('#homeBtn')==null){m.remove();removeEventListener('pointerdown',f,true);}},true),0);}
 $('#homeBtn').onclick=()=>{if(!G){goTitle();return;}hMenu();};
-function homeGo(){if(!G){goTitle();return;}if(G.over)return goTitle();if(confirm(tt(G.net||G.bot?'離開連線對戰？這場會算落敗。':'離開這場對戰，回到主畫面？'))){if(!G.tut)achGive('retreat');goTitle();}};
+function homeGo(){if(!G){goTitle();return;}if(G.over)return goTitle();
+  // v195: a locked trained operator dies when the player walks out (unless they already evacuated)
+  const lk=copLockOn(),cu=lk?myCopU():null,safe=lk&&(ECO.copOut.safe||cu&&cu.evacd);
+  if(confirm(lk&&!safe?copLeaveMsg()+(G.net||G.bot?'\n'+tt('這場也會算落敗。'):''):tt(G.net||G.bot?'離開連線對戰？這場會算落敗。':'離開這場對戰，回到主畫面？'))){
+    if(lk){try{if(safe){copEnd([]);ecoSave();}else copDie(ECO.copOut,cu&&!cu.alive?'':'中途離開',cu?ST(cu).k:0,cu&&!cu.alive&&cu.kby&&OPC[cu.kby]?OPC[cu.kby].name:'');}catch(e){console.warn(e);}}
+    if(!G.tut)achGive('retreat');goTitle();}};
 $('#manualClose').onclick=closeManual;
 $('#manual').addEventListener('click',e=>{if(e.target.id==='manual')closeManual();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#manual').hidden)closeManual();});
@@ -12580,19 +12737,19 @@ function giBorrow(u,mode,fn){const k=mode==='charge'?'charges':mode;if(!u||!u.gi
   if(r&&typeof r.then==='function')return r.then(v=>{done();return v;},e=>{done();throw e;});done();return r;}
 const giTargets=(u,m)=>m==='charge'?chargeTargets(u):m==='clay'?clayTargets(u):m==='impact'?impactTargets(u):m==='shield'||m==='bpcam'?deployTargets(u):throwTargets(u);
 function copGear(){for(const k of cfg.picks[cfg.side]){const i=copSlot(k);if(i==null)continue;for(const g of ECO.cop[i].g)if(g&&INV[cfg.side][g])G[g]=(G[g]|0)+1;}}
-function copEnd(lines){if(!G||G.tut||G.tut2)return;const u=G.units.find(u=>u.side===G.player&&unitCopSlot(u)!=null);if(!u)return;const i=unitCopSlot(u),c=copAll()[i],k=ST(u).k|0,t0=copTot(c);
+function copEnd(lines){if(!G||G.tut||G.tut2)return;const L0=ECO.copOut;try{copUnlock();}catch(e){}const u=myCopU();if(!u)return;if(L0&&(copAll()[unitCopSlot(u)].gen|0)!==(L0.gen|0))return;const i=unitCopSlot(u),c=copAll()[i],k=ST(u).k|0,t0=copTot(c);
   c.k+=k;c.e=Math.min(COP_CAP-COP_BASE,(c.e|0)+k);const got=copTot(c)-t0;
-  if(!u.alive){const by=u.kby&&OPC[u.kby]?(copSlot(u.kby)!=null?'新進人員':OPC[u.kby].name):'';
+  if(!u.alive&&!u.evacd){const by=u.kby&&OPC[u.kby]?(copSlot(u.kby)!=null?'新進人員':OPC[u.kby].name):'';
     ECO.alum=(Array.isArray(ECO.alum)?ECO.alum:[]).concat([{i,w:c.w||null,nm:c.nm,rk:copScore(c).rk,k:c.k|0,sv:c.sv|0,by,ts:Date.now()}]).slice(-100);
     lines.push([`${c.nm}　陣亡`,0]);ECO.cop[i]=copNew(c);}
-  else{c.sv++;lines.push([`${c.nm}　點數 +${got}`,0]);}
+  else{c.sv++;lines.push([`${c.nm}　${u.evacd?'撤離 · ':''}點數 +${got}`,0]);}
   CP.dr=null;}
 // 學長姐: every trained operator who fell, newest first
 function openAlum(){let el=$('#copAl');if(!el){el=document.createElement('div');el.id='copAl';el.setAttribute('role','dialog');el.setAttribute('aria-label','學長姐');document.body.appendChild(el);}
   const L=(Array.isArray(ECO.alum)?ECO.alum:[]).slice().reverse();el.hidden=false;
   el.innerHTML=`<div class="alBox"><div class="cpTop"><button class="cpBack" id="alBack" aria-label="返回">‹</button><div class="cpTt"><small>FALLEN SENIORS</small><h2>學長姐</h2></div><span class="alN">${L.length?`共 ${L.length} 位`:''}</span></div>
     <div class="alList">${L.length?L.map(a=>`<div class="alRow"><img src="${copArt({w:a.w},a.i)}" alt=""><div class="alI"><div class="alNm"><b>${esc(a.nm)}</b><span class="cpTag${a.w?' w':''}">${a.w&&WPN[a.w]?WPN[a.w].t:'新進人員'}</span><em class="alRk" style="color:${RKC[a.rk]||'#8b9cad'};border-color:${RKC[a.rk]||'#8b9cad'}">${a.rk||'N'}</em></div>
-      <div class="alKd"><span>擊殺 <b>${a.k|0}</b></span><span>存活 <b>${a.sv|0}</b> 場</span></div><div class="alBy">${a.by?`陣亡 · 被 <b>${esc(a.by)}</b> 擊殺`:'陣亡'}</div></div></div>`).join('')
+      <div class="alKd"><span>擊殺 <b>${a.k|0}</b></span><span>存活 <b>${a.sv|0}</b> 場</span></div><div class="alBy">${a.by?`陣亡 · 被 <b>${esc(a.by)}</b> 擊殺`:a.q?`陣亡 · ${esc(a.q)}`:'陣亡'}</div></div></div>`).join('')
       :'<div class="alEmpty"><b>你是第一屆新兵</b><span>還沒有學長姐。好好活下去。</span></div>'}</div></div>`;
   el.querySelector('#alBack').onclick=()=>{el.hidden=true;};}
 // the skill button runs the borrowed operator's gadget code
