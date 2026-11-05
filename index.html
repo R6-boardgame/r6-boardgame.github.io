@@ -2007,6 +2007,57 @@ body:not([data-scr="game"]) #opsBar{display:none}
 .fpOp{display:flex;align-items:center;gap:12px;background:var(--hb2);border:1px solid var(--hl);padding:10px}.fpOp img{width:72px;height:72px;object-fit:cover;border:2px solid #f0b43c;background:#0d141b}
 .fpOp small{display:block;font-size:11px;color:#9fb2c3}.fpOp b{font-size:18px;margin-right:6px}.fpRk{display:inline-block;font:900 12px/1 inherit;font-style:normal;color:#fff;background:var(--rk);padding:3px 6px;vertical-align:3px}
 .fpeek .lobKD{justify-content:center;margin:0}.fpWL{margin:0;font-size:12px;color:#9fb2c3;text-align:center}
+
+/* v194 squad + co-op */
+.sqd{position:fixed;z-index:40;display:flex;flex-direction:column;align-items:center;gap:10px;width:62px;padding:8px 0 9px;background:rgba(10,14,18,.86);border:1px solid rgba(255,255,255,.14);border-top:3px solid #4fd27a;color:#e9edf1}
+.sqd.m{right:12px;top:110px}.sqd.d{left:min(34vw,470px);top:96px}
+.sqd .lb{display:flex;flex-direction:column;align-items:center}.sqd .lb svg{width:18px;height:18px;fill:none;stroke:#4fd27a;stroke-width:2;stroke-linecap:round}.sqd .lb b{font:800 10px/1 'Noto Sans TC',sans-serif;color:#4fd27a;margin-top:2px}
+.sqd .av{position:relative;width:44px;height:44px;border:2px solid #4fd27a;background:#0d141b}.sqd .av img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.sqd .av .cr{position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-size:11px}.sqd .av .st{position:absolute;right:-4px;bottom:-4px;width:12px;height:12px;border-radius:50%;background:#4fd27a;border:2px solid #0a0e12}
+.sqd .av.nr{border-color:#56636f}.sqd .av.nr .st{background:#e3aa3e}
+.sqd .nm{font-size:10px;color:#c9d2da;margin-top:-6px;max-width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sqd .add{width:44px;height:44px;border:2px dashed rgba(255,255,255,.3);background:none;display:grid;place-items:center;color:#f0b43c;font-size:22px;line-height:1;cursor:pointer}
+.sqd .x{font:700 11px/1 'Noto Sans TC',sans-serif;color:#ff9d93;background:none;border:1px solid rgba(255,120,110,.45);padding:5px 6px;cursor:pointer}
+.lobB.ptWait,.lt.ptWait{filter:saturate(.4)}
+.frSt{font-size:11.5px;color:#9fb2c3;white-space:nowrap;display:flex;align-items:center;gap:4px}.fd{width:8px;height:8px;border-radius:50%;background:#56636f;display:inline-block}.fd.on{background:#4fd27a}.fd.gm{background:#ff8a3d}
+.frInv{background:#4fd27a;color:#062;border:0;font:900 12px/1 'Noto Sans TC',sans-serif;padding:7px 10px;cursor:pointer}.frInv:disabled{background:#2a3540;color:#6f8294;cursor:default}.frInv.s:disabled{background:none;border:1px solid #4fd27a;color:#4fd27a}
+.mateT{display:inline-block;margin-left:6px;font-size:10px;color:#7fd1ff;border:1px solid rgba(127,209,255,.4);padding:1px 4px;vertical-align:1px}.mateT.me{color:#f0b43c;border-color:rgba(240,180,60,.5)}
+.inv2{position:fixed;left:10px;right:10px;top:12px;max-width:420px;z-index:300;height:200px;overflow:hidden;color:#e9edf1;border:1px solid rgba(240,180,60,.55);box-shadow:0 18px 40px rgba(0,0,0,.75);clip-path:polygon(0 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%);animation:inv2In .35s ease-out}
+@keyframes inv2In{from{transform:translateY(-30px);opacity:0}to{transform:none;opacity:1}}
+@media (min-width:700px){.inv2{left:auto;right:24px;top:76px;width:420px}}
+.inv2 .ib{position:absolute;inset:0;background:linear-gradient(100deg,#0c1218 0%,#0c1218 46%,rgba(12,18,24,.55) 70%,rgba(12,18,24,.2)),url(img/ui/lg_bg.webp) center/cover}
+.inv2:before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(#f0b43c,#b8761a);z-index:3}
+.inv2:after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.025) 0 2px,transparent 2px 8px);z-index:1;pointer-events:none}
+.inv2 .art{position:absolute;right:-30px;top:-6px;height:270px;z-index:2;filter:drop-shadow(-10px 0 20px rgba(0,0,0,.8));-webkit-mask-image:linear-gradient(180deg,#000 60%,transparent 92%);mask-image:linear-gradient(180deg,#000 60%,transparent 92%)}
+.inv2 .ic2{position:relative;z-index:4;padding:12px 14px 0 18px;display:flex;flex-direction:column;width:68%}
+.inv2 .hd{display:flex;align-items:center;gap:8px}.inv2 .tg{font:700 11px 'Saira Condensed','Noto Sans TC',sans-serif;letter-spacing:.28em;color:#f0b43c}
+.inv2 .ring{position:relative;width:28px;height:28px;margin-left:auto}.inv2 .ring svg{width:28px;height:28px;transform:rotate(-90deg)}.inv2 .ring circle{fill:none;stroke-width:3}.inv2 .ring .t{stroke:rgba(255,255,255,.15)}.inv2 .ring .p{stroke:#f0b43c;stroke-dasharray:94;stroke-dashoffset:0;transition:stroke-dashoffset .25s linear}
+.inv2 .ring em{position:absolute;inset:0;display:grid;place-items:center;font:700 11px sans-serif;font-style:normal}
+.inv2 .nm2{font:900 26px/1.1 'Noto Sans TC',sans-serif;margin-top:4px;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.inv2 .sub{font-size:12px;color:#aebdca}
+.inv2 .opl{margin-top:7px;font-size:11.5px;color:#d8e1e8;display:flex;align-items:center;gap:6px;flex-wrap:wrap}.inv2 .opl i{font-style:normal;color:#8ea2b4;width:100%;font-size:11px;margin-top:-2px}
+.inv2 .rk{font:900 10px/1 sans-serif;color:#1a1206;padding:3px 5px}
+.inv2 .bt{display:flex;gap:8px;margin-top:10px}.inv2 .bt button{font:900 13px/1 'Noto Sans TC',sans-serif;padding:10px 0;text-align:center;cursor:pointer}
+.inv2 .no{width:64px;border:1px solid rgba(255,255,255,.22);color:#c9d2da;background:rgba(0,0,0,.35)}
+.inv2 .ok{flex:1;border:0;background:linear-gradient(180deg,#ffc95a,#e0a22e);color:#1a1206;clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%);letter-spacing:.08em}
+.cpk{position:fixed;inset:0;z-index:250;background:rgba(3,5,8,.82);display:grid;place-items:center;padding:10px}
+#cpk .cpBox{padding:12px!important;box-sizing:border-box}.cpBox{width:min(720px,100%);max-height:calc(100dvh - 20px);display:flex;flex-direction:column;gap:10px;background:#121a22;border:1px solid rgba(255,255,255,.14);border-top:3px solid #f0b43c;padding:12px;color:#e9edf1}
+.cpBox.a{border-top-color:#ff8a3d}.cpBox.d{border-top-color:#4aa3ff}
+.cpBox header{display:flex;align-items:center;gap:10px}.cpBox header img{width:54px;height:40px;object-fit:cover;border:1px solid rgba(255,255,255,.15);background:#0d141b}
+.cpBox header div{flex:1;min-width:0}.cpBox header b{display:block;font-size:16px}.cpBox header span{font-size:12px;color:#9fb2c3}.cpBox.a header i{color:#ff8a3d;font-style:normal}.cpBox.d header i{color:#4aa3ff;font-style:normal}
+.cpBox header .cpT{font:900 24px/1 'Noto Sans TC',sans-serif;color:#f0b43c;min-width:40px;text-align:right}
+.cpHint{margin:0;font-size:12px;color:#9fb2c3;line-height:1.45}
+.cpOps{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));grid-auto-rows:max-content;align-content:start;gap:6px;overflow:auto;min-height:0;flex:0 1 auto;padding:2px}
+.cpOp{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;background:#18222c;border:2px solid transparent;padding:6px 2px 18px;color:#dce8f3;cursor:pointer;font:600 11px/1.1 'Noto Sans TC',sans-serif}
+.cpOp img{width:44px;height:44px;object-fit:contain}.cpOp span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cpOp em{position:absolute;left:-2px;right:-2px;bottom:-2px;font:800 10px/1.4 'Noto Sans TC',sans-serif;font-style:normal;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 3px}
+.cpOp.me{border-color:#f0b43c;background:rgba(240,180,60,.16)}.cpOp.me em{background:#f0b43c;color:#1a1206}
+.cpOp.mt{border-color:#7fd1ff;background:rgba(127,209,255,.1);opacity:1;cursor:not-allowed}.cpOp.mt em{background:#7fd1ff;color:#06202e}.cpOp.mt img{filter:grayscale(.5)}
+.cpOp:disabled:not(.mt):not(.me){opacity:.45}
+.cpSlots{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cpCol h4{margin:0 0 4px;font-size:12px;color:#f0b43c;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cpCol.mt h4{color:#7fd1ff}
+.cpSl{display:flex;align-items:center;gap:6px;background:#0d141b;border:1px solid rgba(255,255,255,.12);padding:4px 6px;margin-bottom:4px;min-height:36px;font-size:12px}
+.cpSl img{width:28px;height:28px;object-fit:contain}.cpSl b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cpSl i{flex:1;font-style:normal;color:#56636f}.cpSl small{display:none}
+.cpBox footer{display:flex;gap:8px}.cpBox footer button{background:#18222c;border:1px solid rgba(255,255,255,.18);color:#dce8f3;font:800 14px/1 'Noto Sans TC',sans-serif;padding:12px 14px;cursor:pointer}
+.cpBox footer .primary{flex:1;background:#f0b43c;border-color:#f0b43c;color:#1a1206}.cpBox footer button:disabled{opacity:.5;cursor:default}
 .frE{color:#9fb2c3;font-size:13px;line-height:1.5;margin:6px 2px}
 .frpg{display:flex;justify-content:center;align-items:center;gap:14px}.frpg button{background:var(--hb2);border:1px solid var(--hl);color:#dce8f3;width:36px;height:30px;cursor:pointer}.frpg button:disabled{opacity:.35}
 .frrec{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.frrec small{color:#8ea2b4;width:100%}.frrec .anFr{margin-left:0}
@@ -6993,16 +7044,16 @@ function beginAct(u){trackMovement();u._actMoved=false;delete u._moveReaction;u.
 function recordAct(){const r=G.cur;G.cur=null;if(!r||(r.path.length<2&&!r.acts.length))return;G.moves.push(r);
   if(r.side===G.player||r.path.some(p=>p[2]))G.hl=G.moves.length-1;}
 function offObst(u){if(!u||!u.alive||u.x<0||!cell(u.x,u.y).obst||cell(u.x,u.y).stand)return;const f=adj8(u.x,u.y).find(([a,b])=>!blocks(cell(a,b))&&(!cell(a,b).obst||cell(a,b).stand)&&!cell(a,b).tall&&!unitAt(a,b)&&!shieldAt(a,b));if(f){u.x=f[0];u.y=f[1];}}
-function endAct(u){if(u&&u.side==='A'&&G.phase==='play'){G._atkActs=(G._atkActs||0)+1;alive('A').forEach(a=>{if(a._mv&&a.x>=0)camCheck(a);});}if(u){const dm=dmOf();if(dm&&dm.by===u.id){const tw=dm.own==='twitch';droneScanNow(u,dm);if(tw)twShock(u,dm.x,dm.y);}if(u.side!==G.player&&u.hidden&&u.alive&&u.mp>0&&!G.net)aiDecoy(u);offObst(u);u.mp=0;if(u.hidden&&u.alive&&!u.overwatch&&!u.defusing)overwatch(u,true);if(!u.overwatch)u.ap=0;}recordAct();G.active=null;G.mode='move';G.tEnd=0;}
+function endAct(u){if(u&&u.side==='A'&&G.phase==='play'){G._atkActs=(G._atkActs||0)+1;alive('A').forEach(a=>{if(a._mv&&a.x>=0)camCheck(a);});}if(u){const dm=dmOf();if(dm&&dm.by===u.id){const tw=dm.own==='twitch';droneScanNow(u,dm);if(tw)twShock(u,dm.x,dm.y);}if(u.side!==G.player&&u.hidden&&u.alive&&u.mp>0&&(!G.net||G.coop))aiDecoy(u);offObst(u);u.mp=0;if(u.hidden&&u.alive&&!u.overwatch&&!u.defusing)overwatch(u,true);if(!u.overwatch)u.ap=0;}recordAct();G.active=null;G.mode='move';G.tEnd=0;}
 function unspent(s){return alive(s).filter(u=>!u.activated&&u.x>=0);}
 function playerAfterAct(){
   endAct(G.active);
-  if(G.acts>=3||!unspent(G.player).length)endPhase(); else render();
+  if(G.acts>=3||!myUnspent().length)endPhase(); else render();
 }
 function endPhase(){
   if(G.over)return;
   if(owqStart(curSide()))return;G.owqDone=false;
-  if(G.net&&curSide()===G.player)G._handoff=true;
+  if(G.net&&(G.coop||curSide()===G.player))G._handoff=true;
   const s=curSide();
   if(G.active)endAct(G.active);
   {const ow=alive(s).filter(u=>u.x>=0&&!u.overwatch&&!u.defusing);ow.forEach(u=>overwatch(u,true));const sh=ow.filter(u=>pub(u)||s===G.player);if(sh.length&&(s===G.player||G.over))log(`${sh.map(nm).join('、')} 自動進入掩護射擊`,s==='A'?'ka':'kd');}
@@ -7022,8 +7073,10 @@ function startPhase(){
   trackMovement();
   G.acts=0;G.sel=null;G.mode='move';
   const s=curSide();if(G.clock&&(G.net||G.bot)){G.clock[s]=PHT;G.clockOut[s]=false;}
-  if(!unspent(s).length||(G.clock&&G.clock[s]<=0)){render();return setTimeout(endPhase,50);}
-  if(G.net&&s!==G.player){G.ai=false;G.busy=false;G.sel=null;render();return;}
+  {const us=G.coop&&s===G.player?unspent(s).filter(u=>u.own===coopOwner()):unspent(s);if(!us.length||(G.clock&&G.clock[s]<=0)){render();return setTimeout(endPhase,50);}}
+  if(G.coop){if(s!==G.player){if(coopRole()==='h'){NET.aiTok=G.round+':'+G.phaseIdx;G.ai=true;render();setTimeout(runAI,350);}else{G.ai=false;G.busy=false;G.sel=null;render();}return;}
+    if(!coopMyTurn()){G.ai=false;G.busy=false;G.sel=null;render();return;}}
+  if(G.net&&!G.coop&&s!==G.player){G.ai=false;G.busy=false;G.sel=null;render();return;}
   if(G.tut2&&s!==G.player)return tuDPhase();if(G.tut&&s!==G.player){log('防守方階段（教學中防守方不行動）','kd');render();return setTimeout(endPhase,400);}
   if(s!==G.player){G.ai=true;render();setTimeout(runAI,350);}
   else{G.ai=false;G.busy=false;G.sel=null;G.mode='move';if(G.tut2)tuAPhase();render();}
@@ -7219,7 +7272,7 @@ async function aiDefender(u){
 async function runAI(){
   if(G.over)return;if(G.bot)return botRunAI();
   G.busy=true;const side=curSide();let n=0;
-  while(n<3&&!G.over){
+  while(n<(G.coop?2:3)&&!G.over){
     const c=unspent(side);if(!c.length)break;
     G._vis=sees(side);
     const score=u=>{const sh=shootables(u).some(t=>t.kind==='unit');
@@ -7421,7 +7474,7 @@ function newGame(){
   G={map:m,grid:parseMap(m,true),W:m.rows[0].length,H:m.rows.length,units:[],gadgets:[],reinf:0,drones:3,wire:3,...invFor('A',cfg.side==='A'?cfg.inv.A:INV_DEF.A),...invFor('D',cfg.side==='D'?cfg.inv.D:INV_DEF.D),decoys:[],mission:cfg.mission||'bomb',hostage:null,round:1,maxRounds:6,phaseIdx:0,phase:'setup',acts:0,active:null,sel:null,mode:'move',defuser:null,over:false,busy:false,ai:false,log:[],moves:[],cur:null,hl:null,player:cfg.side,aiSite:Math.random()<.5?'A':'B',fx:null,spawn:null};try{mapIntro(cfg.map);}catch(e){}
   copPrep(true);copGear();
   const enemy=cfg.side==='A'?'D':'A';
-  const epicks=shuffle(OPBASE.filter(k=>OPC[k].side===enemy&&SCRIPTED.has(k))).slice(0,5);
+  const epicks=shuffle(OPBASE.filter(k=>OPC[k].side===enemy&&SCRIPTED.has(k))).slice(0,COOPNEW?4:5);
   const apicks=cfg.side==='A'?cfg.picks.A:epicks,dpicks=cfg.side==='D'?cfg.picks.D:epicks;
   apicks.forEach((op,i)=>G.units.push(mkUnit(op,'A',i)));
   dpicks.forEach((op,i)=>G.units.push(mkUnit(op,'D',i)));
@@ -7436,13 +7489,13 @@ function newGame(){
 }
 const unplaced=()=>G?alive(G.player).filter(u=>u.x<0):[];
 function nextUnplaced(){const n=unplaced()[0];if(n){G.sel=n;G.mode='move';}}
-function depWait(){return !!(G&&G.net&&G.phase==='setup'&&G.dep&&G.dep!==G.player);}
+function depWait(){return !!(G&&G.net&&G.phase==='setup'&&(G.coop?coopRole()!=='h':G.dep&&G.dep!==G.player));}
 // v117: online, the defender's start button ends their deployment and hands the board to the attacker
 function depDone(){if(unplaced().length)return;if(!(G.decoys||[]).length)seedDecoys();G.dep='A';G.sel=null;G.mode='move';G.bpPend=null;G.rearrCam=null;
   log('防守方部署完成，等待進攻方部署…','kd');G._handoff=true;netPush();render();}
-function startPlay(){if(G&&G.net&&G.phase==='setup'&&G.player==='D'){if(G.dep==='D')depDone();return;}if(G&&!G.reroll)G.reroll={A:0,D:0};try{playStartHooks();}catch(e){console.warn(e);}
+function startPlay(){if(G&&G.coop&&coopRole()!=='h')return;if(G&&G.net&&!G.coop&&G.phase==='setup'&&G.player==='D'){if(G.dep==='D')depDone();return;}if(G&&!G.reroll)G.reroll={A:0,D:0};try{playStartHooks();}catch(e){console.warn(e);}
   if(G.phase==='setup'&&unplaced().length)return;
-  if(!G.net&&G.player==='D'&&!G.decoys.length)seedDecoys();
+  if((!G.net||G.coop)&&G.player==='D'&&!G.decoys.length)seedDecoys();
   G.phase='play';G.sel=null;G.mode='move';clockReset();
   for(const d of alive('D'))if(d.x>=0)d.fd=bestFace(d);
   log(`—— 第 1 輪開始 ——`,'ks');startPhase();
@@ -7489,7 +7542,7 @@ function curTargets(){if(G&&G.wfPend)return G.wfPend;if(G&&G.mode==='cdir'&&cdir
 function owFinish(u){if(!u||!G||G.busy||G.active!==u||!u.alive)return;
   if(u.overwatch||u.defusing||u.heavyGuard||u.x<0){u.ap=0;u.mp=0;G.mode='move';return playerAfterAct();}
   act(async()=>{overwatch(u,false,u.fd||[0,1]);await afterAct(u);});}
-function owAuto(u){return !!(u&&G&&G.active===u&&u.alive&&!u.overwatch&&!u.defusing&&u.mp<=0&&G.phase==='play'&&!G.over&&u.side===G.player&&curSide()===G.player&&!dmOf()&&!(TU&&TU.ph==='game'));}
+function owAuto(u){return !!(u&&G&&G.active===u&&u.alive&&!u.overwatch&&!u.defusing&&u.mp<=0&&G.phase==='play'&&!G.over&&u.side===G.player&&myPh()&&!dmOf()&&!(TU&&TU.ph==='game'));}
 function noApTag(){let el=document.getElementById('noAp');const u=G&&G.active;const on=G&&!G.busy&&G.sel===u&&owAuto(u);
   if(!on){if(el)el.remove();return;}
   if(!el){el=document.createElement('div');el.id='noAp';document.body.appendChild(el);}
@@ -7497,6 +7550,7 @@ function noApTag(){let el=document.getElementById('noAp');const u=G&&G.active;co
 function whyTip(t,s){let el=document.getElementById('whyTip');if(el)el.remove();el=document.createElement('div');el.id='whyTip';el.innerHTML=`<b>${t}</b><span>${s||''}</span>`;document.body.appendChild(el);try{SFX.soft&&SFX.soft();}catch(e){}clearTimeout(whyTip.t);whyTip.t=setTimeout(()=>el.remove(),2400);}
 function canAct(u){
   if(!u||u.side!==G.player||!u.alive||u.defusing||G.busy||G.over||G.phase!=='play'||curSide()!==G.player)return false;
+  if(G.coop&&(u.own!==coopRole()||!coopMyTurn()))return false;
   if(G.active===u)return true;
   return !u.activated&&G.acts<3;
 }
@@ -7510,7 +7564,7 @@ async function act(fn){G.busy=true;render();try{await fn();}finally{G.busy=false
   if(G.over)return render();
   if(cdirG()){G.mode='cdir';return render();}
   if(pdirG()){G.mode='pdir';revealCheck();return render();}
-  if(dmOf()&&curSide()===G.player){G.mode='dronemove';return render();}
+  if(dmOf()&&myPh()){G.mode='dronemove';return render();}
   const u=G.active;
   if(u&&((u.overwatch&&!u.mgOw)||!u.alive))playerAfterAct();
   else if(owAuto(u)&&u.ap<=0&&!u.heavyGuard){G.mode='move';owFinish(u);} // v183: out of actions and movement, overwatch toward the facing direction and end
@@ -8175,7 +8229,7 @@ function drawToken(u,cx,cy,r){
 function renderOpsBar(){let b=$('#opsBar');const show=G&&G.phase==='play'&&!G.over&&SCREEN!=='title';
   if(!show){if(b)b.hidden=true;return;}
   if(!b){b=document.createElement('div');b.id='opsBar';document.body.appendChild(b);b.onclick=e=>{const t=e.target.closest('[data-ob]');if(!t||!G)return;const u=G.units.find(x=>x.id===t.dataset.ob);if(!u)return;if(u.alive&&u.x>=0){onCell(u.x,u.y);setTimeout(()=>{if(R3&&u.alive&&u.x>=0){R3.followId=u.id;R3.followPos=u.x+','+u.y;followCam(u);}},60);}else{G.sel=u;render();}};}
-  b.hidden=false;b.classList.add('hz');const mine=curSide()===G.player,left=Math.max(0,3-(G.acts||0));
+  b.hidden=false;b.classList.add('hz');const mine=myPh(),left=Math.max(0,3-(G.acts||0));
   const team=G.units.filter(u=>u.side===G.player),foe=G.units.filter(u=>u.side!==G.player),vis=sees(G.player);
   for(const u of foe)if(u.alive&&u.x>=0&&vis.has(u.id))u.seen1=1;
   b.innerHTML=`<div class="obActs ${mine?'':'off'}" title="本階段還能啟動的幹員數">${[0,1,2].map(i=>`<i class="${i<left?'f':''}"></i>`).join('')}</div><div class="obTeam">`+team.map(u=>{
@@ -8203,8 +8257,8 @@ function frTap(b){const o=G&&G.net&&NET&&NET.opp;
   if(!b.classList.contains('arm')){b.classList.add('arm');b.querySelector('em').textContent='再點一下加好友';clearTimeout(b._t);b._t=setTimeout(()=>{b.classList.remove('arm');b.querySelector('em').textContent='加好友';},6000);return;}
   frAdd(o);renderPlayer();b.classList.remove('arm');b.classList.add('ok');b.innerHTML=SVG_FR.ok+'<em>已加好友</em>';}
 function anCap(side){const mine=side===G.player,o=G.net&&NET&&NET.opp;
-  const nm=mine?meName():(G.bot?G.bot.name:G.net?(o?o.name:'對手'):'電腦');
-  const fr=mine?'':(o&&isFriend(o.id)?`<button class="anFr ok" aria-label="已是好友">${SVG_FR.ok}<em>已加好友</em></button>`:`<button class="anFr${o?'':' off'}" aria-label="加好友">${SVG_FR.add}<em>加好友</em></button>`);
+  const nm=mine?(G.coop?`${meName()}、${coopMateName()}`:meName()):(G.coop?'電腦':G.bot?G.bot.name:G.net?(o?o.name:'對手'):'電腦');
+  const fr=mine||G.coop?'':(o&&isFriend(o.id)?`<button class="anFr ok" aria-label="已是好友">${SVG_FR.ok}<em>已加好友</em></button>`:`<button class="anFr${o?'':' off'}" aria-label="加好友">${SVG_FR.add}<em>加好友</em></button>`);
   return `<caption><span class="anSide">${side==='A'?'進攻方':'防守方'}</span><b class="anPN">${esc(nm)}</b>${mine?'<i class="me">你</i>':''}${fr}</caption>`;}
 // v193: friend codes + public profile (prof/<CODE>: name and the strongest custom operator), add by code, tap a friend to see their best operator
 const FRC_A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -8213,7 +8267,7 @@ const FRP={code:'',id:'',sig:'',peek:null,cache:{},msg:'',busy:false};
 async function frMyId(){try{if(!window.claude||!claude.use)return null;const u=await claude.use('user');return u?await u.id():null;}catch(e){return null;}}
 function frBest(){const L=copAll().map((c,i)=>({c,i,s:copScore(c)}));L.sort((a,b)=>b.s.sc-a.s.sc||(b.c.k|0)-(a.c.k|0)||(b.c.sv|0)-(a.c.sv|0));const b=L[0];
   return {nm:lobNm(b.c,b.i),i:b.i,w:b.c.w&&WART[b.c.w]?b.c.w:'',k:b.c.k|0,sv:b.c.sv|0,sc:b.s.sc,rk:b.s.rk};}
-async function profPush(){try{const id=await frMyId();if(!id)return;const code=frCode(id);FRP.id=id;if(FRP.code!==code){FRP.code=code;const el=$('#achp');if(el&&ACHV.tab==='fr')renderAch();}
+async function profPush(){try{const id=await frMyId();if(!id)return;const code=frCode(id);FRP.id=id;if(FRP.code!==code){FRP.code=code;setTimeout(invListen,0);const el=$('#achp');if(el&&ACHV.tab==='fr')renderAch();}
   const d={id,n:meName(),best:frBest()},sig=JSON.stringify(d);if(sig===FRP.sig)return;const db=await claude.use('db');if(!db)return;FRP.sig=sig;await db.doc('prof/'+code).set(Object.assign(d,{ts:Date.now()}));}catch(e){}}
 async function profGet(code){try{if(!window.claude||!claude.use)return null;const db=await claude.use('db');if(!db)return null;const s=await db.doc('prof/'+code).get();const d=s.exists&&s.data();return d&&d.id?d:null;}catch(e){return null;}}
 async function frAddCode(raw){const code=String(raw||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(FRP.busy)return;
@@ -8388,7 +8442,7 @@ function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body
     const rec=FR.recent.filter(r=>!isFriend(r.id)).slice(0,3);
     body=`<div class="frMe"><span>我的好友代碼</span><b>${FRP.code||'…'}</b><button class="frCp" ${FRP.code?'':'disabled'}>複製</button></div>
     <form class="frAddC"><input id="frIn" maxlength="8" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="輸入好友代碼"><button type="submit" ${FRP.busy?'disabled':''}>加好友</button></form>${FRP.msg?`<p class="frMsg">${esc(FRP.msg)}</p>`:''}
-    <div class="frl">${L.length?L.slice(ACHV.pg*per,ACHV.pg*per+per).map(f=>`<div class="fri"><button class="frN" data-peek="${f.id}">${esc(f.name)}</button><span>對戰 ${f.w} 勝 ${f.l} 敗</span><button class="frx ${ACHV.sel===f.id?'arm':''}" data-del="${f.id}">${ACHV.sel===f.id?'再點一下移除':'移除'}</button></div>`).join(''):'<p class="frE">還沒有好友。輸入對方的好友代碼，或在連線對戰的戰鬥分析按對手名字旁的加好友圖示。</p>'}</div>
+    <div class="frl">${L.length?L.slice(ACHV.pg*per,ACHV.pg*per+per).map(frRowHTML).join(''):'<p class="frE">還沒有好友。輸入對方的好友代碼，或在連線對戰的戰鬥分析按對手名字旁的加好友圖示。</p>'}</div>
     ${pages>1?`<div class="frpg"><button data-pg="-1" ${ACHV.pg?'':'disabled'}>‹</button><span>${ACHV.pg+1}/${pages}</span><button data-pg="1" ${ACHV.pg<pages-1?'':'disabled'}>›</button></div>`:''}
     ${rec.length?`<div class="frrec"><small>最近對手</small>${rec.map(r=>`<button class="anFr" data-addr="${r.id}">${SVG_FR.add}<em>${esc(r.name)}</em></button>`).join('')}</div>`:''}`;}
   el.innerHTML=`<div class="achBox"><div class="achHead"><div class="seg"><button class="${T==='ach'?'on':''}" data-t="ach">成就 ${achCount()}/${ACH.length}</button><button class="${T==='fr'?'on':''}" data-t="fr">好友 ${FR.list.length}</button></div><button class="achX" aria-label="關閉">✕</button></div>${body}</div>`;
@@ -8400,6 +8454,7 @@ function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body
   const sc=el.querySelector('.bscroll');if(sc){sc.scrollTop=ACHV.st||0;sc.onscroll=()=>{ACHV.st=sc.scrollTop;};}
   const gr=null;if(gr){let x0=null;gr.addEventListener('pointerdown',e=>{x0=e.clientX;});gr.addEventListener('pointerup',e=>{if(x0==null)return;const dx=e.clientX-x0;x0=null;if(Math.abs(dx)>50){const pages=Math.ceil(ACH.length/achPer());const p=Math.max(0,Math.min(pages-1,ACHV.pg+(dx<0?1:-1)));if(p!==ACHV.pg){ACHV.pg=p;ACHV.sel=null;renderAch();}}});}
   el.querySelectorAll('[data-peek]').forEach(b=>b.onclick=()=>frPeek(b.dataset.peek));
+  el.querySelectorAll('[data-invite]').forEach(b=>b.onclick=()=>ptInvite(b.dataset.invite));if(T==='fr')frOnWatch();
   {const bk=el.querySelector('.fpBack');if(bk)bk.onclick=()=>{FRP.peek=null;renderAch();};
    const cp=el.querySelector('.frCp');if(cp)cp.onclick=()=>{try{navigator.clipboard.writeText(FRP.code).then(()=>{cp.textContent='已複製';},()=>{});}catch(e){}};
    const fm=el.querySelector('.frAddC');if(fm)fm.onsubmit=e=>{e.preventDefault();frAddCode(el.querySelector('#frIn').value);};}
@@ -8709,7 +8764,7 @@ function escBtnUpd(){let b=document.getElementById('escBtn');const u=G&&G.sel;
   b.onclick=ev=>{ev.stopPropagation();const v=G.sel;if(!v||!escortOK(v)||!commit(v))return;act(()=>escort(v));};}
 // v183/v184: floating 轉向 (the active unit, or one that already acted this round; not ones still waiting to act) and 完成 (overwatch toward the facing direction, then end) buttons, stacked above the barricade slot
 function flowBtnUpd(){const scr=document.body.dataset.scr==='game',u=G&&G.sel,a=G&&G.active;
-  const base=G&&scr&&G.phase==='play'&&!G.over&&!G.busy&&curSide()===G.player&&!dmOf()&&!(TU&&TU.ph==='game');
+  const base=G&&scr&&G.phase==='play'&&!G.over&&!G.busy&&myPh()&&!dmOf()&&!(TU&&TU.ph==='game');
   const showT=base&&u&&u.side===G.player&&u.alive&&u.x>=0&&!u.defusing&&(u===a||u.activated);
   const showD=base&&a&&a===u&&a.side===G.player&&a.alive;
   const mk=(id,html)=>{let b=document.getElementById(id);if(!b){b=document.createElement('button');b.id=id;b.className='flowBtn';b.innerHTML=html;document.body.appendChild(b);}return b;};
@@ -8842,15 +8897,15 @@ function renderPanel(){{const r=document.getElementById('actsR');if(r)r.replaceC
       `<p class="hint">點下方小隊裡的幹員，再點建築內的空格放下他；放好之後再點一次可以移動。鐵絲網、可部署盾牌、防彈攝影機只能在部署階段放置。Mute、Bandit、Kapkan、Valkyrie 可在此階段把道具放到建築任何位置。</p>`}
       <button class="primary" id="go" ${unplaced().length?'disabled':''}>開始行動<span class="sub">${unplaced().length?`還有 ${unplaced().length} 名幹員沒放`:'進攻方先動'}</span></button></div>`;
   } else {
-    const mine=s===G.player;
-    h+=`<div class="box"><div class="status">${G.over?'對戰結束':mine?`<span class="${s==='A'?'a':'d'}">你的${s==='A'?'進攻':'防守'}階段</span><span class="clock" id="clock"></span>`:`<span class="${s==='A'?'a':'d'}">${s==='A'?'進攻方':'防守方'}行動中…</span>`}</div>
-      <p class="hint">${mine&&!G.over?`本階段還能啟動 ${Math.max(0,3-G.acts)} 名幹員${G.active?'（點其他幹員會結束目前的行動）':'。點選幹員，再點亮起的格子移動。'}`:'等待對手。'}</p>
+    const mine=s===G.player&&(!G.coop||coopMyTurn()),mateT=G.coop&&s===G.player&&!mine;
+    h+=`<div class="box"><div class="status">${G.over?'對戰結束':mine?`<span class="${s==='A'?'a':'d'}">你的${s==='A'?'進攻':'防守'}階段</span><span class="clock" id="clock"></span>`:mateT?`<span class="${s==='A'?'a':'d'}">${esc(coopMateName())} 行動中…</span>`:`<span class="${s==='A'?'a':'d'}">${s==='A'?'進攻方':'防守方'}行動中…</span>`}</div>
+      <p class="hint">${mine&&!G.over?`本階段還能啟動 ${G.coop?Math.min(Math.max(0,3-G.acts),myUnspent().length):Math.max(0,3-G.acts)} 名幹員${G.active?'（點其他幹員會結束目前的行動）':'。點選幹員，再點亮起的格子移動。'}`:mateT?'等隊友動完，接著輪到電腦。':G.coop?'電腦行動中。':'等待對手。'}</p>
       <p class="hint mono">${G.mission==='hostage'?(G.player==='A'?'任務：救出人質，帶到任一出生區':'任務：別讓人質被帶走'):(G.player==='A'?'任務：在 A 或 B 點安裝拆彈器':'任務：守住 A、B 點')}${G.player==='A'?` · 破牆 ${G.charges} · 無人機 ${G.drones} · 破片 ${G.frag} · 閃光 ${G.flash} · 煙霧 ${G.smk}`:` · 加固 ${G.reinf} · 鐵絲網 ${G.wire} · 防彈盾 ${G.shield}`}${G.player==='A'?` · 隱藏標記 ${alive('D').filter(d=>d.hidden).length+(G.decoys||[]).filter(k=>k.alive).length}`:''}</p>
-      ${mine&&!G.over?`<button id="endphase">結束階段<i class="chev">»</i>${(G.acts<3&&unspent(G.player).length)||(G.active&&G.active.alive&&(G.active.ap>0||G.active.mp>0))?'<em class="moreAct">還有幹員可以動作</em>':''}</button>`:''}</div>`;
+      ${mine&&!G.over?`<button id="endphase">結束階段<i class="chev">»</i>${(G.acts<3&&myUnspent().length)||(G.active&&G.active.alive&&(G.active.ap>0||G.active.mp>0))?'<em class="moreAct">還有幹員可以動作</em>':''}</button>`:''}</div>`;
   }
   if(G.sel)h+=`<div class="box">${opCard(G.sel)}<div class="row" id="acts"></div></div>`;
   const team=G.units.filter(u=>u.side===G.player);
-  h+=`<div class="box opt"><h3>我方小隊</h3><div class="roster">${team.map(u=>`<button data-u="${u.id}" class="${u.alive?'':'dead'} ${u===G.sel?'on':''}"><img class="mini ic" src="${opIcon(u.op)}" alt=""><span class="rb"><b class="${u.side==='A'?'a':'d'}">${OPS[u.op].name}</b>${G.phase==='setup'&&u.x<0?'<span class="todo">待部署</span>':hpBar(u)}</span></button>`).join('')}</div></div>`;
+  h+=`<div class="box opt"><h3>我方小隊</h3><div class="roster">${team.map(u=>`<button data-u="${u.id}" class="${u.alive?'':'dead'} ${u===G.sel?'on':''}"><img class="mini ic" src="${opIcon(u.op)}" alt=""><span class="rb"><b class="${u.side==='A'?'a':'d'}">${OPS[u.op].name}</b>${G.coop&&u.own?`<small class="mateT${u.own===coopRole()?' me':''}">${esc(G.coop[u.own]||'')}</small>`:''}${G.phase==='setup'&&u.x<0?'<span class="todo">待部署</span>':hpBar(u)}</span></button>`).join('')}</div></div>`;
   if(G.phase==='play')h+=`<div class="box opt"><h3>移動紀錄</h3><p class="hint">點一筆可在地圖上看路線。座標對照地圖邊緣的字母與數字。</p><div class="moves" id="moves"></div></div>`;
   h+=`<div class="box opt"><h3>戰況紀錄</h3><div class="log" id="log"></div></div>`;
   const st=$('#moves')?$('#moves').scrollTop:0;
@@ -8862,12 +8917,12 @@ function renderPanel(){{const r=document.getElementById('actsR');if(r)r.replaceC
   if($('#zones'))$('#zones').innerHTML='',G.map.spawns.forEach((z,i)=>{const b=document.createElement('button');b.textContent=z.name;if(G.spawn===i)b.className='on';b.onclick=()=>{const z=G.map.spawns[i],free=z.cells.filter(([x,y])=>!unitAt(x,y));unplaced().forEach(u=>{const c=free.shift();if(c){u.x=c[0];u.y=c[1];}});G.spawn=i;nextUnplaced();render();};$('#zones').appendChild(b);});
   if($('#acts'))renderActs();
 }
-function renderDeploy(p){if(depWait()){p.innerHTML=`<div class="box depBox"><div class="depHd"><h2>部署階段</h2><span>${G.dep==='A'?'已完成，等待進攻方選出生位置…':'等待防守方部署…'}</span></div></div>`;return;}
-  if(G.player==='D'&&!G.net&&!(G.decoys||[]).length&&!unplaced().length)seedDecoys();const team=G.units.filter(u=>u.side===G.player),left=unplaced().length,A=G.player==='A';
+function renderDeploy(p){if(depWait()){p.innerHTML=`<div class="box depBox"><div class="depHd"><h2>部署階段</h2><span>${G.coop?`隊長 ${esc(G.coop.h)} 正在部署全隊…`:G.dep==='A'?'已完成，等待進攻方選出生位置…':'等待防守方部署…'}</span></div></div>`;return;}
+  if(G.player==='D'&&(!G.net||G.coop)&&!(G.decoys||[]).length&&!unplaced().length)seedDecoys();const team=G.units.filter(u=>u.side===G.player),left=unplaced().length,A=G.player==='A';
   p.innerHTML=`<div class="box depBox"><div class="depHd"><h2>部署階段</h2><span>${A?'點幹員，再點橘框格子':'點幹員，再點建築內空格'}</span></div>
     <div class="depSq">${team.map(u=>`<button data-u="${u.id}" class="${u===G.sel?'on':''} ${u.x<0?'todo':'ok'}"><img src="${opIcon(u.op)}" alt=""><span>${OPS[u.op].name}</span></button>`).join('')}</div>
     ${A?'<div class="depZ"><small>一次放到</small><div class="row" id="zones"></div></div>':G.sel?'<div class="row" id="acts"></div>':''}
-    <button class="primary" id="go" ${left?'disabled':''}>${G.net&&!A?'部署完成':'開始行動'}<span class="sub">${left?`還有 ${left} 名幹員沒放`:G.net&&!A?'換進攻方選出生位置':'進攻方先動'}</span></button></div>`;
+    <button class="primary" id="go" ${left?'disabled':''}>${G.net&&!G.coop&&!A?'部署完成':'開始行動'}<span class="sub">${left?`還有 ${left} 名幹員沒放`:G.net&&!G.coop&&!A?'換進攻方選出生位置':'進攻方先動'}</span></button></div>`;
   p.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const u=G.units.find(x=>x.id===b.dataset.u);if(u.alive&&u.x>=0)onCell(u.x,u.y);else{G.sel=u;render();}});
   $('#go').onclick=startPlay;
   if($('#zones'))G.map.spawns.forEach((z,i)=>{const b=document.createElement('button');b.textContent=z.name;if(G.spawn===i)b.className='on';b.onclick=()=>{const z=G.map.spawns[i],free=z.cells.filter(([x,y])=>!unitAt(x,y));unplaced().forEach(u=>{const c=free.shift();if(c){u.x=c[0];u.y=c[1];}});G.spawn=i;nextUnplaced();render();};$('#zones').appendChild(b);});
@@ -8923,7 +8978,7 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
     }
     if(u.gi)for(const [k,n] of Object.entries(u.gi)){const m=k==='charges'?'charge':k;tac(m,INV[u.side==='A'?'D':'A'][k][0],n,giBorrow(u,m,()=>giTargets(u,m)));}
     const TUG=!!(TU&&TU.ph==='game');
-    if(TUG&&curSide()===G.player&&!G.busy&&!u.defusing)L.push(btn('轉向',G.mode==='face'?'點箭頭選方向':'免費 · 不花行動',G.mode==='face',false,()=>setMode('face'),'','<span class="bic" style="display:inline-grid;place-items:center;font-size:1.1em">⟳</span>'));
+    if(TUG&&myPh()&&!G.busy&&!u.defusing)L.push(btn('轉向',G.mode==='face'?'點箭頭選方向':'免費 · 不花行動',G.mode==='face',false,()=>setMode('face'),'','<span class="bic" style="display:inline-grid;place-items:center;font-size:1.1em">⟳</span>'));
     if(TUG&&ok)L.push(btn('監視',G.mode==='owdir'?'點箭頭選方向':'選方向後結束',G.mode==='owdir',G.busy,()=>{if(G.mode==='owdir')return setMode('move');if(commit(u))setMode('owdir');},'primary owb'));
   }} else {el.remove();return;}
   el.innerHTML='';
@@ -10540,7 +10595,7 @@ function preGame(){return !(typeof G!=='undefined'&&G);}
   ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,stop,{passive:false}));
   let lt=0;document.addEventListener('touchend',e=>{const n=e.timeStamp;if(preGame()&&e.touches.length===0&&n-lt<320&&!e.target.closest('button,input,select,textarea,a,label,[data-av],canvas')&&e.cancelable)e.preventDefault();lt=n;},{passive:false});
 })();
-function goTitle(){{const a=$('#anal');if(a)a.remove();}if(NET)netLeave();G=null;SCREEN='title';$('#banner').hidden=true;if(R3){R3.sig='';}render();}
+function goTitle(){{const a=$('#anal');if(a)a.remove();}WZ.coop=false;if(PT.pid&&PT.st!=='lobby'){PT.st='lobby';PT.lock=false;PT.picks=[];PT.matePicks=[];PT.launched=0;cpClose();ptSave();}if(NET)netLeave();G=null;SCREEN='title';$('#banner').hidden=true;if(R3){R3.sig='';}render();}
 // ---------- v157: lobby (phone: operator stage, desktop: tile board) + custom-operator leaderboard ----------
 let LOBI=0;try{LOBI=(+localStorage.getItem('r6bg.lobi')|0)%2;}catch(e){}
 const lobMob=()=>matchMedia('(max-width:760px)').matches;
@@ -10744,7 +10799,7 @@ function lobRender(){const t=$('#title');if(!t)return;let el=$('#tlob');if(!el){
   const go=(id,fn)=>{const b=el.querySelector('#'+id);if(b){b.onclick=fn;if(b.tagName!=='BUTTON')b.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')fn();};}};
   go('t-train',()=>{SCREEN='train';NETMSG='';renderTitle();});go('t-train2',()=>{SCREEN='train';NETMSG='';renderTitle();});go('t-board',()=>{SCREEN='board';NETMSG='';lbLoad(true);renderTitle();});
   go('t-pve',()=>{['A','D'].forEach(s=>{cfg.picks[s]=cfg.picks[s].filter(owned);});SCREEN='setup';WZ.step=0;WZ.seen=0;render();});go('t-rank',()=>{NETMSG='';rankQueue();});
-  go('t-tu2',()=>{SCREEN='title';NETMSG='';renderTitle();tuStart();});gnavSync();go('t-lib',()=>{if(SCREEN==='lib')return;SCREEN='lib';NETMSG='';renderTitle();});go('t-home',()=>{if(SCREEN==='title')return;SCREEN='title';NETMSG='';renderTitle();});go('t-man',()=>openManual());go('t-ach',()=>openAch('ach'));go('t-cop',()=>{CP.i=LOBI;NETMSG='';openCop();});go('t-shop',()=>openShop());}
+  go('t-tu2',()=>{SCREEN='title';NETMSG='';renderTitle();tuStart();});gnavSync();go('t-lib',()=>{if(SCREEN==='lib')return;SCREEN='lib';NETMSG='';renderTitle();});go('t-home',()=>{if(SCREEN==='title')return;SCREEN='title';NETMSG='';renderTitle();});go('t-man',()=>openManual());go('t-ach',()=>openAch('ach'));go('t-cop',()=>{CP.i=LOBI;NETMSG='';openCop();});go('t-shop',()=>openShop());ptLobby(el);}
 {let lm=null;addEventListener('resize',()=>{const m=lobMob();if(m!==lm){lm=m;if(SCREEN==='title'||SCREEN==='lib'||SCREEN==='train')lobRender();}});}
 function renderTitle(){
   const el=$('#tmenu');if(!el)return;if(SCREEN==='rank')SCREEN='title';{const tt=$('#title');if(tt)tt.dataset.s=SCREEN;}const B=(id,label,sub,cls)=>`<button id="${id}" class="tbtn ${cls||''}"><b>${label}</b>${sub?`<span>${sub}</span>`:''}</button>`;
@@ -10826,6 +10881,7 @@ function netSubscribe(code){
 }
 function netOnGame(d){
   if(!NET||d.code!==NET.code)return;
+  if(NET.coop){if(d.state&&d.seq>NET.seq&&d.by!==NET.me)netApply(d);return;}
   {const o=NET.role==='host'?{id:d.guest,name:d.guestName}:{id:d.hostId,name:d.hostName};if(o.id)NET.opp={id:o.id,name:o.name||'對手'};}
   if(!d.state){
     if(NET.role==='host'&&d.guest&&!NET.pre&&!NET.started){NET.pre=true;const ks=ONLINE_MAPS;NET.map=ks[Math.floor(Math.random()*ks.length)];NET.mis=Math.random()<.5?'bomb':'hostage';
@@ -10856,13 +10912,14 @@ function netSer(){
   return JSON.stringify(o);
 }
 function netDes(s){
-  const g=JSON.parse(s);g.map=MAPS[g.mapKey];g.units.forEach(u=>u.used=new Set(u.used||[]));const U=i=>g.units.find(u=>u.id===i)||null;
+  const g=JSON.parse(s);delete g._shc;g.map=MAPS[g.mapKey];g.units.forEach(u=>u.used=new Set(u.used||[]));const U=i=>g.units.find(u=>u.id===i)||null;
   g.sel=U(g.sel);g.active=U(g.active);if(g.cur)g.cur.u=U(g.cur.u);g.moves=g.moves.map(m=>({...m,u:U(m.u)}));g.fx=null;g.net=true;return g;
 }
 function netDirty(){
   if(!G||!G.net||!NET||NET.applying)return;
-  if(curSide()!==G.player&&!G._handoff&&!G.over)return;
-  if(G.phase==='setup'&&G.dep&&G.dep!==G.player&&!G._handoff)return;
+  if(G.coop){if(!G._handoff&&!G.over&&!coopIWrite())return;}
+  else{if(curSide()!==G.player&&!G._handoff&&!G.over)return;
+  if(G.phase==='setup'&&G.dep&&G.dep!==G.player&&!G._handoff)return;}
   clearTimeout(NET.t);NET.t=setTimeout(netPush,G._handoff||G.over?60:350);
 }
 function netPush(){
@@ -10873,18 +10930,150 @@ function netPush(){
 function netApply(d){
   NET.applying=true;NET.seq=d.seq;const was=G&&G.over;
   G=netDes(d.state);(G.units||[]).forEach(u=>{try{if(!OPS[u.op])ensureOp(u.op);}catch(e){}});if(G.copNet)try{copApplySnap(G.copNet);}catch(e){}G.player=NET.side;G.busy=false;G.ai=false;G.mode='move';
-  if(curSide()===G.player&&!G.over){if(G.sel&&(G.sel.side!==G.player||!G.sel.alive))G.sel=null;}else if(!G.over)G.sel=null;
+  if(myPh()&&!G.over){if(G.sel&&(G.sel.side!==G.player||!G.sel.alive))G.sel=null;}else if(!G.over)G.sel=null;
   if(G.phase==='setup'&&G.dep===G.player&&!G.sel)G.sel=unplaced()[0]||null;
-  if(MF&&G.phase==='setup'&&G.dep!==G.player){MF.gotState=true;render();NET.applying=false;return;}
+  if(G.coop)cpClose();
+  if(MF&&!G.coop&&G.phase==='setup'&&G.dep!==G.player){MF.gotState=true;render();NET.applying=false;return;}
   if(SCREEN!=='game'||MF){if(RQ.q)rankLeaveQueue();mfEnd();SCREEN='game';if(R3){R3.sig='';setTimeout(()=>G&&G.phase==='setup'?setView('top'):playCam(),50);}}
   if(G.over&&!was){G.over=false;finish(G.win,G.why);}else render();
   NET.applying=false;try{fxSync();}catch(e){}
+  try{coopAfterApply();}catch(e){console.warn(e);}
 }
 function netLeave(){
   if(!NET)return;try{if(NET.unsub)NET.unsub();}catch(e){}NET.unsub=null;try{if(NET.pun)NET.pun();}catch(e){}NET.pun=null;NET.pre=false;NET.myPick=null;NET.oppPick=null;NET.mis=null;
-  if(NET.code&&NET.role==='host'&&!(G&&G.net))netWrite('rooms/'+NET.code,{status:'closed'},true);
-  NET.code=null;NET.role=null;NET.started=false;NET.ranked=false;
+  if(NET.code&&NET.role==='host'&&!NET.coop&&!(G&&G.net))netWrite('rooms/'+NET.code,{status:'closed'},true);
+  NET.code=null;NET.role=null;NET.started=false;NET.ranked=false;NET.coop=false;NET.aiTok=null;
 }
+// ---------- v194: squad (invite a friend) + 4v4 co-op vs the computer ----------
+// pt/<pid>/h is written only by the captain, pt/<pid>/g only by the teammate; inv/<code> carries invites; on/<code> is a presence heartbeat
+const PT={pid:null,role:null,mate:null,st:'lobby',cfg:null,t0:0,picks:[],matePicks:[],lock:false,mateLock:false,un:null,launched:0,invited:{},seen:{}};
+const FRON={},FRONUN={};
+let INVUN=null,INVCODE='',COOPNEW=0;
+const coopRole=()=>G&&G.coop&&NET?(NET.role==='host'?'h':'g'):null;
+function coopOwner(){if(!G||!G.coop)return null;if(G.phase!=='play')return 'h';return curSide()!==G.player?'ai':(G.phaseIdx<2?'h':'g');}
+const coopMyTurn=()=>!!G&&!!G.coop&&coopOwner()===coopRole();
+const coopIWrite=()=>{const o=coopOwner();return (o==='ai'?'h':o)===coopRole();};
+const myPh=()=>!!G&&curSide()===G.player&&(!G.coop||coopMyTurn());
+const myUnspent=()=>unspent(G.player).filter(u=>!G.coop||u.own===coopRole());
+const coopMateName=()=>G&&G.coop?(G.coop[coopRole()==='h'?'g':'h']||'隊友'):'';
+const bestAv=b=>b?`img/av/cop_${b.i?'m':'f'}${b.w?'_'+b.w:''}.webp`:'img/av/cop_f.webp';
+async function ptDb(){try{return window.claude&&claude.use?await claude.use('db'):null;}catch(e){return null;}}
+function ptMe(){return {id:FRP.id,code:FRP.code,name:meName(),best:frBest(),ts:Date.now()};}
+async function onPush(){try{if(!FRP.code)await profPush();if(!FRP.code)return;invListen();const db=await ptDb();if(!db)return;await db.doc('on/'+FRP.code).set({ts:Date.now(),st:G&&G.phase?'game':'lobby'});}catch(e){}}
+setTimeout(onPush,2500);setInterval(()=>{if(!document.hidden)onPush();},25000);
+async function invListen(){if(!FRP.code||INVCODE===FRP.code)return;const db=await ptDb();if(!db)return;if(INVUN)try{INVUN();}catch(e){}INVCODE=FRP.code;
+  INVUN=db.doc('inv/'+FRP.code).onSnapshot(s=>{const d=s.exists&&s.data();if(d)invGot(d);},()=>{});}
+// friends' presence, read while the friends page is open
+function frOnWatch(){ptDb().then(db=>{if(!db)return;for(const f of FR.list){const c=f.code||frCode(f.id);if(FRONUN[c])continue;
+  FRONUN[c]=db.doc('on/'+c).onSnapshot(s=>{const d=s.exists&&s.data();FRON[c]=d||null;clearTimeout(frOnWatch.t);frOnWatch.t=setTimeout(()=>{if($('#achp')&&ACHV.tab==='fr'&&!FRP.peek)renderAch();},150);},()=>{});}});}
+function frOnline(f){const d=FRON[f.code||frCode(f.id)];return d&&Date.now()-(d.ts||0)<70000?d:null;}
+function frRowHTML(f){const on=frOnline(f),inv=PT.invited[f.id]&&Date.now()-PT.invited[f.id]<30000,mate=PT.mate&&PT.mate.id===f.id;
+  const st=mate?'<i class="fd on"></i>小隊中':on?(on.st==='game'?'<i class="fd gm"></i>對戰中':'<i class="fd on"></i>在線'):'<i class="fd"></i>離線';
+  const full=!!PT.mate||PT.role==='g';
+  const btn=mate?'':inv?`<button class="frInv s" disabled>已邀請</button>`:`<button class="frInv" data-invite="${f.id}" ${on&&on.st!=='game'&&!full?'':'disabled'}>邀請</button>`;
+  return `<div class="fri"><button class="frN" data-peek="${f.id}">${esc(f.name)}</button><span class="frSt">${st}</span>${btn}<button class="frx ${ACHV.sel===f.id?'arm':''}" data-del="${f.id}">${ACHV.sel===f.id?'再點一下移除':'移除'}</button></div>`;}
+// ---- party ----
+function ptReset(){if(PT.un)try{PT.un();}catch(e){}Object.assign(PT,{pid:null,role:null,mate:null,st:'lobby',cfg:null,t0:0,picks:[],matePicks:[],lock:false,mateLock:false,un:null,launched:0});cpClose();ptUI();if(SCREEN==='title'&&!G)lobRender();}
+async function ptSave(extra){if(!PT.pid)return;const db=await ptDb();if(!db)return;const base=Object.assign(ptMe(),{picks:PT.picks,lock:PT.lock});
+  try{if(PT.role==='h')await db.doc(`pt/${PT.pid}/h`).set(Object.assign(base,{st:PT.st,cfg:PT.cfg,t0:PT.t0},extra||{}));else await db.doc(`pt/${PT.pid}/g`).set(Object.assign(base,{on:1},extra||{}));}catch(e){}}
+setInterval(()=>{if(PT.pid&&!document.hidden)ptSave();if(PT.mate&&Date.now()-(PT.mate.ts||0)>75000&&!(G&&G.coop)){const n=PT.mate.name;if(PT.role==='g'){ptReset();achToastMsg('小隊已解散',`和 ${esc(n)} 的連線中斷`);}else{PT.mate=null;ptUI();if(SCREEN==='title'&&!G)lobRender();achToastMsg('隊友離線',esc(n));}}},20000);
+async function ptListen(){const db=await ptDb();if(!db)return;if(PT.un)try{PT.un();}catch(e){}const pid=PT.pid,other=PT.role==='h'?'g':'h';
+  PT.un=db.doc(`pt/${pid}/${other}`).onSnapshot(s=>{if(PT.pid!==pid)return;const d=s.exists&&s.data();if(!d)return;ptGot(d);},()=>{});}
+function ptGot(d){
+  if(d.left){const n=(PT.mate&&PT.mate.name)||'隊友';if(PT.role==='g'){ptReset();achToastMsg('小隊已解散',`${esc(n)} 離開了小隊`);}else{const was=!!PT.mate;PT.mate=null;PT.matePicks=[];PT.mateLock=false;ptUI();cpRender();if(SCREEN==='title'&&!G)lobRender();if(was)achToastMsg('隊友離開小隊',esc(n));}return;}
+  if(Date.now()-(d.ts||0)>75000)return;
+  const fresh=!PT.mate;PT.mate={id:d.id,code:d.code,name:d.name||'隊友',best:d.best,ts:d.ts};
+  if(fresh){if(!isFriend(d.id)&&d.id)frAdd({id:d.id,name:d.name});if(PT.role==='h')achToastMsg('隊友已加入',esc(d.name||''));}
+  PT.matePicks=Array.isArray(d.picks)?d.picks.filter(k=>OPC[k]):[];PT.mateLock=!!d.lock;
+  if(PT.role==='g'){
+    if(d.st==='pick'&&d.cfg&&PT.st!=='pick'&&!(G&&G.coop)){PT.st='pick';PT.cfg=d.cfg;PT.t0=d.t0||Date.now();PT.picks=[];PT.lock=false;cpGuestJoin();cpOpen();}
+    else if(d.st==='lobby'&&PT.st==='pick'){PT.st='lobby';cpClose();}
+    if(PT.st==='pick'){const clash=PT.picks.filter(k=>PT.matePicks.some(p=>mfBase(p)===mfBase(k)));if(clash.length){PT.picks=PT.picks.filter(k=>!clash.includes(k));PT.lock=false;whyTip('隊長先選了',clash.map(k=>OPC[k].name).join('、'));ptSave();}}}
+  else if(PT.st==='pick'&&PT.lock&&PT.mateLock)cpLaunch();
+  ptUI();cpRender();if(fresh&&SCREEN==='title'&&!G)lobRender();}
+async function ptInvite(id){const f=FR.list.find(x=>x.id===id);if(!f||PT.mate||PT.role==='g')return;if(!FRP.code)await profPush();if(!FRP.code)return;const db=await ptDb();if(!db)return;
+  if(!PT.pid){PT.pid=FRP.code+Math.random().toString(36).slice(2,6);PT.role='h';PT.st='lobby';await ptSave();ptListen();}
+  PT.invited[id]=Date.now();renderAch();
+  try{await db.doc('inv/'+(f.code||frCode(f.id))).set({pid:PT.pid,from:FRP.id,fromCode:FRP.code,name:meName(),best:frBest(),ts:Date.now()});}catch(e){}
+  ptUI();setTimeout(()=>{if($('#achp')&&ACHV.tab==='fr'&&!FRP.peek)renderAch();},30500);}
+function invGot(d){if(!d||!d.pid||PT.seen[d.pid+':'+d.ts])return;if(Date.now()-(d.ts||0)>30000||PT.pid||(G&&G.phase))return;PT.seen[d.pid+':'+d.ts]=1;invShow(d);}
+function invShow(d){let el=$('#invc');if(el)el.remove();el=document.createElement('div');el.id='invc';el.className='inv2';el.setAttribute('role','dialog');el.setAttribute('aria-label','組隊邀請');
+  const b=d.best||{},art=`img/cop/${b.i?'m':'f'}${b.w?'_'+b.w:''}.webp`;
+  el.innerHTML=`<div class="ib"></div><img class="art" src="${art}" alt="" onerror="this.remove()"><div class="ic2"><div class="hd"><span class="tg">SQUAD INVITE</span><span class="ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" class="t"/><circle cx="18" cy="18" r="15" class="p"/></svg><em>30</em></span></div>
+    <b class="nm2">${esc(d.name||'玩家')}</b><span class="sub">邀請你加入小隊</span>${b.nm?`<div class="opl">${b.rk?`<span class="rk" style="background:${RKC[b.rk]||'#8b9cad'}">${b.rk}</span>`:''}${esc(b.nm)}<i>擊殺 ${b.k|0}　存活 ${b.sv|0}</i></div>`:''}
+    <div class="bt"><button class="no">拒絕</button><button class="ok">加入小隊</button></div></div>`;
+  document.body.appendChild(el);try{SFX.alert();}catch(e){}
+  const end=d.ts+30000,p=el.querySelector('.ring .p'),em=el.querySelector('.ring em');
+  const iv=setInterval(()=>{const left=Math.max(0,end-Date.now());em.textContent=Math.ceil(left/1000);p.style.strokeDashoffset=94*(1-left/30000);if(!left||!el.isConnected){clearInterval(iv);el.remove();}},250);
+  el.querySelector('.no').onclick=()=>{clearInterval(iv);el.remove();};
+  el.querySelector('.ok').onclick=async()=>{clearInterval(iv);el.remove();if(PT.pid||(G&&G.phase))return;
+    Object.assign(PT,{pid:d.pid,role:'g',st:'lobby',mate:{id:d.from,code:d.fromCode,name:d.name||'隊長',best:d.best,ts:Date.now()}});
+    if(d.from&&!isFriend(d.from))frAdd({id:d.from,name:d.name});await ptSave();ptListen();ptUI();if(SCREEN==='title'&&!G)lobRender();achToastMsg('已加入小隊',`隊長：${esc(d.name||'')}`);};}
+async function ptLeave(){if(!PT.pid)return;const db=await ptDb();const me=PT.role,pid=PT.pid;if(db)try{await db.doc(`pt/${pid}/${me}`).set({left:1,ts:Date.now()});}catch(e){}ptReset();}
+// squad strip: a vertical column on the lobby's free right side (desktop: between the operator and the tiles)
+function ptUI(){let el=$('#sqd');const show=!!PT.pid&&SCREEN==='title'&&!G&&!($('#wiz')&&!$('#wiz').hidden)&&!$('#cpk');
+  if(!show){if(el)el.remove();return;}
+  if(!el){el=document.createElement('div');el.id='sqd';document.body.appendChild(el);}
+  el.className='sqd '+(lobMob()?'m':'d');
+  const me={name:meName(),best:frBest()},host=PT.role==='h',H=host?me:PT.mate,M=host?PT.mate:me;
+  const av=(p,cr)=>p?`<div class="av${p===me||Date.now()-(p.ts||0)<45000?'':' nr'}">${cr?'<span class="cr">👑</span>':''}<img src="${bestAv(p.best)}" alt=""><span class="st"></span></div><span class="nm">${esc(p.name||'')}</span>`:'';
+  el.innerHTML=`<div class="lb"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 19c.5-3 2.8-5 6-5s5.5 2 6 5M12 14.6c1-.4 2.5-.6 4-.6 3.2 0 5.5 2 6 5"/></svg><b>小隊</b></div>${av(H,1)}${M?av(M):`<button class="add" aria-label="邀請好友">＋</button>`}<button class="x">離開</button>`;
+  const a=el.querySelector('.add');if(a)a.onclick=()=>openAch('fr');el.querySelector('.x').onclick=()=>{if(confirm(host?'解散小隊？':'離開小隊？'))ptLeave();};}
+setInterval(ptUI,800);
+function ptLobby(el){if(!PT.pid)return;const pve=el.querySelector('#t-pve'),rk=el.querySelector('#t-rank');const sub=(b,t,s)=>{if(!b)return;const x=b.querySelector('b'),y=b.querySelector('small');if(x)x.textContent=t;if(y)y.textContent=s;};
+  if(PT.role==='h'){if(PT.mate)sub(pve,'對戰電腦',`4v4 · 和 ${PT.mate.name} 組隊`);
+    if(pve)pve.onclick=()=>{if(!PT.mate)return whyTip('隊友還沒加入','邀請送出後，等對方按「加入小隊」');['A','D'].forEach(s=>{cfg.picks[s]=cfg.picks[s].filter(owned);});SCREEN='setup';WZ.step=0;WZ.seen=0;WZ.coop=true;ptUI();render();};
+    if(rk)rk.onclick=()=>whyTip('組隊中','按「對戰電腦」和隊友一起打 4v4；要排線上請先解散小隊');}
+  else{sub(rk,'等待隊長',`${PT.mate?PT.mate.name:'隊長'} 選好模式後自動開始`);if(rk){rk.classList.add('ptWait');rk.onclick=()=>whyTip('等待隊長','隊長按「對戰電腦」後，你會一起進入選角');}
+    if(pve)pve.onclick=()=>whyTip('等待隊長','組隊時由隊長選擇模式');}}
+// ---- co-op pick: both pick 2 operators at once; a teammate's pick shows their name and can't be taken ----
+const CPT=60000;
+const cpPool=s=>mfPool(s,true).filter(k=>!/^recruit/.test(k)&&copSlot(k)==null);
+function cpOpen(){let el=$('#cpk');if(!el){el=document.createElement('div');el.id='cpk';el.className='cpk';el.setAttribute('role','dialog');el.setAttribute('aria-label','組隊選角');document.body.appendChild(el);}
+  clearInterval(cpOpen.iv);cpOpen.iv=setInterval(cpTick,250);ptUI();cpRender();}
+function cpClose(){clearInterval(cpOpen.iv);const el=$('#cpk');if(el)el.remove();}
+function cpTick(){if(!$('#cpk')||PT.st!=='pick'){clearInterval(cpOpen.iv);return;}const left=PT.t0+CPT-Date.now(),t=$('#cpk .cpT');if(t)t.textContent=Math.max(0,Math.ceil(left/1000));
+  if(left<=0&&!PT.lock){cpFill();PT.lock=true;ptSave();cpRender();}
+  if(PT.role==='h'&&PT.lock&&(PT.mateLock||left<-8000))cpLaunch();}
+function cpFill(){const s=PT.cfg.side,taken=new Set(PT.matePicks.map(mfBase));for(const k of shuffle(cpPool(s))){if(PT.picks.length>=2)break;if(taken.has(mfBase(k))||PT.picks.some(p=>mfBase(p)===mfBase(k)))continue;PT.picks.push(k);}}
+function cpRender(){const el=$('#cpk');if(!el||!PT.cfg)return;const s=PT.cfg.side,m=MAPS[PT.cfg.map]||MAPS.bank,mn=PT.mate?PT.mate.name:'隊友',me=meName();
+  const mine=new Set(PT.picks.map(mfBase)),theirs=new Set(PT.matePicks.map(mfBase));
+  const pool=cpPool(s);PT.matePicks.forEach(k=>{if(!pool.some(p=>mfBase(p)===mfBase(k)))pool.push(k);});
+  const tile=k=>{const b=mfBase(k),a=mine.has(b),t=theirs.has(b);return `<button class="cpOp${a?' me':''}${t?' mt':''}" data-cp="${k}" ${t||PT.lock?'disabled':''}><img src="${opIcon(k)}" alt=""><span>${esc(OPC[k].name)}</span>${a?`<em>${esc(me)}</em>`:t?`<em>${esc(mn)}</em>`:''}</button>`;};
+  const slot=(k,who,cls)=>`<div class="cpSl ${cls}">${k?`<img src="${opIcon(k)}" alt=""><b>${esc(OPC[k].name)}</b>`:'<i>？</i>'}<small>${esc(who)}</small></div>`;
+  const left=Math.max(0,Math.ceil((PT.t0+CPT-Date.now())/1000));
+  el.innerHTML=`<div class="cpBox ${s==='A'?'a':'d'}"><header><img src="${mapThumb(PT.cfg.map)}" alt=""><div><b>${m.name}</b><span>${PT.cfg.mis==='hostage'?'人質':'炸彈'} · <i>${s==='A'?'進攻方':'防守方'}</i> · 4v4 對電腦</span></div><span class="cpT">${left}</span></header>
+    <p class="cpHint">各選 2 名幹員。隊友選走的會框上他的名字，不能再選。${PT.role==='h'?'戰術裝備用你在「對戰電腦」存的配置，全隊共用。':'戰術裝備由隊長配置，全隊共用。'}</p>
+    <div class="cpOps">${pool.map(tile).join('')}</div>
+    <div class="cpSlots"><div class="cpCol me"><h4>${esc(me)}${PT.lock?' · 已確認':''}</h4>${slot(PT.picks[0],me,'me')}${slot(PT.picks[1],me,'me')}</div><div class="cpCol mt"><h4>${esc(mn)}${PT.mateLock?' · 已確認':''}</h4>${slot(PT.matePicks[0],mn,'mt')}${slot(PT.matePicks[1],mn,'mt')}</div></div>
+    <footer><button id="cpRnd" ${PT.lock?'disabled':''}>隨機</button><button class="primary" id="cpGo" ${PT.lock||PT.picks.length<2?'disabled':''}>${PT.lock?(PT.mateLock?'開始中…':`等待 ${esc(mn)}…`):PT.picks.length<2?`再選 ${2-PT.picks.length} 名`:'確認'}</button></footer></div>`;
+  el.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{if(PT.lock)return;const k=b.dataset.cp,bs=mfBase(k);if(theirs.has(bs))return whyTip(`${OPC[k].name} 已被 ${mn} 選走`,'換一位幹員');
+    const i=PT.picks.findIndex(p=>mfBase(p)===bs);if(i>=0)PT.picks.splice(i,1);else{if(PT.picks.length>=2)return whyTip('已經選了 2 名','先點一位已選的幹員取消');PT.picks.push(k);}try{SFX.ui&&SFX.ui();}catch(e){}ptSave();cpRender();});
+  el.querySelector('#cpRnd').onclick=()=>{PT.picks=[];cpFill();ptSave();cpRender();};
+  el.querySelector('#cpGo').onclick=()=>{if(PT.picks.length<2||PT.lock)return;PT.lock=true;ptSave();cpRender();if(PT.role==='h'&&PT.mateLock)cpLaunch();};}
+// captain finished side / mission / map in the wizard
+function cpHostGo(){WZ.coop=false;PT.cfg={side:cfg.side,mis:cfg.mission||'bomb',map:cfg.map};PT.st='pick';PT.t0=Date.now();PT.picks=[];PT.lock=false;PT.launched=0;ptSave();cpGuestJoin();cpOpen();}
+async function cpGuestJoin(){const n=await netInit();if(!n)return;Object.assign(n,{code:PT.pid,role:PT.role==='h'?'host':'guest',side:PT.cfg.side,seq:0,coop:true,started:false,ranked:false,opp:null});netSubscribe(PT.pid);}
+async function cpLaunch(){if(PT.launched||PT.role!=='h'||!PT.cfg)return;PT.launched=1;const s=PT.cfg.side,used=new Set();
+  const take=a=>{const o=[];for(const k of a){if(o.length>=2)break;if(!OPC[k]||used.has(mfBase(k)))continue;used.add(mfBase(k));o.push(k);}return o;};
+  const fill=o=>{for(const k of shuffle(cpPool(s).concat(mfPool(s,false).filter(k=>!/^recruit/.test(k)&&copSlot(k)==null)))){if(o.length>=2)break;if(used.has(mfBase(k)))continue;used.add(mfBase(k));o.push(k);}return o;};
+  const hp=take(PT.picks),gp=take(PT.matePicks);fill(hp);fill(gp);
+  const n=NET&&NET.coop?NET:await netInit();if(!n){PT.launched=0;return;}if(!n.coop){Object.assign(n,{code:PT.pid,role:'host',side:s,seq:0,coop:true});netSubscribe(PT.pid);}
+  cfg.side=s;cfg.mission=PT.cfg.mis;cfg.map=PT.cfg.map;cfg.picks[s]=hp.concat(gp);
+  cpClose();const wz=$('#wiz');if(wz)wz.hidden=true;SCREEN='setup';COOPNEW=1;
+  try{newGame();}finally{COOPNEW=0;}
+  G.units.filter(u=>u.side===s).forEach((u,i)=>{u.own=i<2?'h':'g';});
+  G.coop={h:meName(),g:PT.mate?PT.mate.name:'隊友'};G.net=true;NET.started=true;
+  log(`組隊 4v4：你和 ${G.coop.g} 各控 2 名幹員。隊長先部署全隊，回合順序是 隊長 → 電腦 → 隊員 → 電腦。`,'ks');
+  PT.st='game';ptSave();
+  netWrite('games/'+PT.pid,{code:PT.pid,seq:0,by:'',state:'',ts:Date.now()},false);NET.seq=0;netPush();render();}
+// after a co-op state lands: the captain runs the computer's phases
+function coopAfterApply(){if(!G||!G.coop||G.over)return;cpClose();const wz=$('#wiz');if(wz)wz.hidden=true;
+  if(G.phase==='play'&&coopOwner()==='ai'&&coopRole()==='h'){const tok=G.round+':'+G.phaseIdx;if(NET.aiTok===tok)return;NET.aiTok=tok;G.ai=true;render();setTimeout(()=>{if(G&&G.coop&&coopOwner()==='ai')runAI();},400);}}
+// when a teammate drops, the clock runs out and nothing arrives: take over their phase
+function coopStall(s,dt){if(!G||!G.coop||G.over||G.phase!=='play'||coopIWrite()||G.clock[s]>0){if(G)G._stall=0;return;}
+  G._stall=(G._stall||0)+dt;if(G._stall<15000)return;G._stall=0;log(`${coopOwner()==='ai'?'隊長':coopMateName()} 沒有回應，跳過這個階段`,'ks');
+  if(coopOwner()==='ai'){G.ai=true;runAI();}else{if(G.active)endAct(G.active);endPhase();}}
 // ---------- title hero shot ----------
 function heroScene(on){
   if(!R3)return;
@@ -11136,9 +11325,9 @@ function scrollSnap(el){if(!el)return()=>{};const key=e=>e.tagName+'.'+String(ty
   return skip=>{walk((e,k)=>{const v=m[k];if(v&&!(skip&&e.closest(skip))){e.scrollTop=v[0];e.scrollLeft=v[1];}});if(window.scrollY!==wy)window.scrollTo(0,wy);};}
 function renderWiz(){let el=$('#wiz');const _rs=WZ.lastStep===WZ.step?scrollSnap(el):null;const keep=[...(el?el.querySelectorAll('.wzBody,.wzOg'):[])].map(e=>e.scrollTop);
   if(!el){el=document.createElement('div');el.id='wiz';el.className='wiz';el.setAttribute('role','dialog');el.setAttribute('aria-label','對戰電腦設定');document.body.appendChild(el);}
-  el.hidden=false;const st=WZ.step;WZ.seen=Math.max(WZ.seen,st);if(st===3||st===4){WZ.lastStep=st;return wzPick(el);}const ok=WZSTEPS[st].ok(),last=st===WZSTEPS.length-1;
+  el.hidden=false;const st=WZ.step;WZ.seen=Math.max(WZ.seen,st);if(WZ.coop&&st>=3){el.hidden=true;return cpHostGo();}if(st===3||st===4){WZ.lastStep=st;return wzPick(el);}const ok=WZSTEPS[st].ok(),last=st===WZSTEPS.length-1;
   const reach=i=>i<=WZ.seen||WZSTEPS.slice(0,i).every(x=>x.ok());
-  el.innerHTML=`<div class="wzTop"><h2>對戰電腦</h2><nav class="wzSteps">${WZSTEPS.map((x,i)=>`<button data-wz-go="${i}" class="${i===st?'cur':i<WZ.seen||(i<st)?'done':''}" ${reach(i)&&WZSTEPS.slice(0,i).every(y=>y.ok())?'':'disabled'}><i>${i<st?'✓':i+1}</i><span>${x.t}</span></button>`).join('')}</nav><span id="wzOnline"></span><button id="wzRules">規則</button></div>
+  el.innerHTML=`<div class="wzTop"><h2>${WZ.coop?'4v4 組隊對戰電腦':'對戰電腦'}</h2><nav class="wzSteps">${WZSTEPS.map((x,i)=>`<button data-wz-go="${i}" class="${i===st?'cur':i<WZ.seen||(i<st)?'done':''}" ${reach(i)&&WZSTEPS.slice(0,i).every(y=>y.ok())?'':'disabled'}><i>${i<st?'✓':i+1}</i><span>${x.t}</span></button>`).join('')}</nav><span id="wzOnline"></span><button id="wzRules">規則</button></div>
     <div class="wzBody">${wzStepHTML()}</div>
     <div class="wzFoot"><button id="wzBack">${st?'‹ 上一步':'‹ 返回主畫面'}</button><span class="msg">${[0,1,2,5].includes(st)?(WZ.arm?'再點一次確定':'點一下看說明，再點一次確定'):ok?`第 ${st+1} 步，共 ${WZSTEPS.length} 步`:WZSTEPS[st].why}</span><button class="primary${last?' start':''}" id="wzNext" ${ok?'':'disabled'} >${last?'開始任務':'下一步 ›'}</button></div>`;
   if(keep.length&&WZ.lastStep===st)el.querySelectorAll('.wzBody,.wzOg').forEach((e,i)=>{if(keep[i]!=null)e.scrollTop=keep[i];});if(_rs)_rs();WZ.lastStep=st;
@@ -11231,7 +11420,7 @@ function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
-const NEWS=[{d: "2026-11-05", v: "v178–v193", i: ["好友代碼：好友頁顯示自己的 6 碼代碼，輸入對方代碼就能直接加好友；點好友名字可看他最強的培養幹員、擊殺和存活", "看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
+const NEWS=[{d: "2026-11-05", v: "v178–v194", i: ["組隊：好友頁可以邀請在線的好友加入小隊，大廳右側會出現小隊圖示；組隊後按「對戰電腦」就是 4v4 合作，兩人各控 2 名幹員，順序是隊長 → 電腦 → 隊員 → 電腦", "好友代碼：好友頁顯示自己的 6 碼代碼，輸入對方代碼就能直接加好友；點好友名字可看他最強的培養幹員、擊殺和存活", "看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
 const newsKey=()=>NEWS[0].d+'#'+NEWS[0].i.length;
 function newsUnread(){try{return localStorage.getItem('newsSeen')!==newsKey();}catch(e){return false;}}
 function newsBadge(){const n=$('#t-news');if(n)n.classList.toggle('unread',newsUnread());}
@@ -11930,12 +12119,13 @@ function ecoAdd(n){ECO.rn=Math.max(0,(ECO.rn|0)+n);}
 // called once per finished match; returns the lines shown on the result banner
 function ecoGame(w){if(!G||G._eco)return G&&G._eco;ecoRoll();const P=G.player,win=w===P,lines=[];let earn=0;
   if(G.tut){if(w==='A'&&!ECO.tut){ECO.tut=1;earn+=2000;lines.push(['完成新手教學',2000]);}}
-  else{const mine=G.units.filter(u=>u.side===P),t={k:0,gad:0};mine.forEach(u=>{const q=ST(u);t.k+=q.k||0;t.gad+=q.gad||0;});
-    const quick=!!G.bot||G.net&&NET&&NET.ranked,custom=G.net&&!quick;
-    if(quick||custom)ECO.streak=win?(ECO.streak|0)+1:0;
+  else{const mine=G.units.filter(u=>u.side===P&&(!G.coop||u.own===coopRole())),t={k:0,gad:0};mine.forEach(u=>{const q=ST(u);t.k+=q.k||0;t.gad+=q.gad||0;});
+    const quick=!G.coop&&(!!G.bot||G.net&&NET&&NET.ranked),custom=G.net&&!G.coop&&!quick;
+    if(G.coop){const v=win?600:400;earn+=v;lines.push([win?'組隊對戰電腦勝利':'組隊對戰電腦',v]);}
+    else if(quick||custom)ECO.streak=win?(ECO.streak|0)+1:0;
     if(quick){const v=win?700:500;earn+=v;lines.push([win?'線上對戰勝利':'線上對戰',v]);}
     else if(custom){const v=win?700:500;earn+=v;lines.push([win?'自訂房間勝利':'自訂房間',v]);}
-    else{const d=dayKey();if(ECO.pveDay!==d){ECO.pveDay=d;ECO.pveEarn=0;}const v=win?500:300;ECO.pveEarn+=v;earn+=v;
+    else if(!G.coop){const d=dayKey();if(ECO.pveDay!==d){ECO.pveDay=d;ECO.pveEarn=0;}const v=win?500:300;ECO.pveEarn+=v;earn+=v;
       lines.push([win?'對戰電腦勝利':'對戰電腦',v]);}
     {const why=G._why||'',bn=[];if(G._pl)bn.push(['安裝拆彈器',50]);if(G._df)bn.push(['解除拆彈器',50]);if(win&&P==='A'&&/人質已安全撤離/.test(why))bn.push(['人質護送成功',100]);
      if(!win&&/害死了人質/.test(why))bn.push(['傷害人質',-50]);G._bonus=bn;bn.forEach(b=>earn+=b[1]);}
@@ -12134,8 +12324,8 @@ function stunFx(t){if(!R3||!R3.figs||!G)return;for(const id in R3.figs){const f=
 // end of your phase: every operator that is not on overwatch yet picks a facing, one by one
 function owqNext(){const u=G.owq&&G.owq[0];if(!u)return;G.sel=u;G.mode='owq';render();
   bigNote(`${OPS[u.op].name} 選監視方向`,`點角色旁的箭頭${G.owq.length>1?`（還有 ${G.owq.length-1} 名）`:''}`,u.side==='A'?'a':'d',1400);}
-function owqStart(s){if(G.over||s!==G.player||G.tut||G.tut2||G.owqDone||(G.clock&&G.clock[s]<=0))return false;if(G.active)endAct(G.active);
-  const q=alive(s).filter(u=>u.x>=0&&!u.overwatch&&(u.activated||u===G.active));if(!q.length)return false;G.owq=q;G.busy=false;owqNext();return true;}
+function owqStart(s){if(G.coop&&!coopMyTurn())return false;if(G.over||s!==G.player||G.tut||G.tut2||G.owqDone||(G.clock&&G.clock[s]<=0))return false;if(G.active)endAct(G.active);
+  const q=alive(s).filter(u=>u.x>=0&&!u.overwatch&&(u.activated||u===G.active)&&(!G.coop||u.own===coopRole()));if(!q.length)return false;G.owq=q;G.busy=false;owqNext();return true;}
 function owqTap(x,y){const u=G.owq&&G.owq[0];if(!u)return;if(!adj8all(u.x,u.y).some(([a,b])=>a===x&&b===y))return render();
   overwatch(u,false,[x-u.x,y-u.y]);G.owq.shift();if(G.owq.length)return owqNext();G.owq=null;G.mode='move';G.sel=null;G.owqDone=true;endPhase();}
 // cameras start hidden from the attackers: an operator who sees one, or a drone rolling into its room, finds it
@@ -12592,11 +12782,12 @@ setInterval(()=>{const now=performance.now(),dt=now-CLK_LAST;CLK_LAST=now;
   const s=curSide(),rolling=document.querySelector('.dicebox:not([hidden])');
   if(!G.cPause&&!rolling&&!document.hidden&&G.clock[s]>0){G.clock[s]-=dt;
     if(G.clock[s]<=0){G.clock[s]=0;
-      if(s===G.player&&!G.busy){log(`${s==='A'?'進攻方':'防守方'}${G.net||G.bot?'這個階段':'本輪'}的時間用完了，${G.net||G.bot?'換對手行動':'不能再啟動幹員'}`,'ks');G.clockOut[s]=true;if(G.active)endAct(G.active);endPhase();}}}
+      coopStall(s,dt);
+      if(s===G.player&&!G.busy&&(!G.coop||coopMyTurn())){log(`${s==='A'?'進攻方':'防守方'}${G.net||G.bot?'這個階段':'本輪'}的時間用完了，${G.net||G.bot?'換對手行動':'不能再啟動幹員'}`,'ks');G.clockOut[s]=true;if(G.active)endAct(G.active);endPhase();}}}
   renderClocks();},200);
 setInterval(()=>{const el=document.getElementById('clock');if(!G||!G.tEnd||!G.active||G.over){if(el)el.textContent='';return;}
   const left=Math.max(0,(G.tEnd-performance.now())/1000);if(el){el.textContent=`⏱ ${Math.ceil(left)}s`;el.classList.toggle('low',left<10);}
-  if(left<=0&&!G.busy&&G.active.side===G.player){log(`${OPS[G.active.op].name} 的啟動時間用完了`,'ks');G.tEnd=0;playerAfterAct();}},250);
+  if(left<=0&&!G.busy&&G.active.side===G.player&&(!G.coop||coopMyTurn())){log(`${OPS[G.active.op].name} 的啟動時間用完了`,'ks');G.tEnd=0;playerAfterAct();}},250);
 try{init3D();}catch(e){console.error(e);R3=null;}
 render();loadPBR();loadModels();loadWallImg();loadC3D();{const r=document.createElement('div');r.id='rotLock';r.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="#e3aa3e" stroke-width="1.8"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18.5h2"/></svg><div>請把手機轉成直式<br><small style="opacity:.7">手機版只支援直式畫面</small></div>';document.body.appendChild(r);try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('portrait').catch(()=>{});}catch(e){}}
 // v162 level hooks (outermost wrappers)

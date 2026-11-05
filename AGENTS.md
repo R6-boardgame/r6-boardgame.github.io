@@ -163,6 +163,7 @@
 - v129：扇形距離數字改成白字加陰影、不要黑底；3、6 的分界弧線在數字兩側斷開留空隙，最遠的數字往內縮 0.45 格不壓在扇形邊緣。
 - v121：線上選角頁，兩位培養幹員只能帶一位：選了一位，另一位的格子變灰並加鎖頭（`.mfOp.lk`），詳情按鈕顯示「已帶另一位」。單機精靈本來就只有一格新兵（用變體切換），不受影響。
 - v193：好友代碼。`frCode(uid)` 由玩家 id 算出 6 碼代碼；`profPush`（跟著 `lbPush` 與開好友頁時執行）把名字與最強培養幹員（`frBest`，依 `copScore` 排）寫到公開文件 `prof/<代碼>`。好友頁上方顯示自己的代碼（可複製）與「輸入好友代碼」欄（`frAddCode`）；點好友名字開 `frPeekHTML`（最強幹員頭像、評級、`lobKD` 擊殺／存活、和你的勝敗）。大廳右上角多一個加好友圖示 `#t-fr` 直接開好友頁。
+- v194：組隊（小隊）與 4v4 合作打電腦。MQTT 文件：`on/<好友代碼>` 在線心跳（`onPush` 每 25 秒）、`inv/<代碼>` 邀請（`invListen`/`invGot`/`invShow`，30 秒失效）、`pt/<pid>/h` 只由隊長寫、`pt/<pid>/g` 只由隊員寫（`ptSave`/`ptListen`/`ptGot`，`PT` 物件）。好友列 `frRowHTML` 顯示在線狀態與「邀請」；大廳右側直式小隊 `#sqd`（`ptUI`）；`ptLobby` 改寫大廳按鈕（隊長：對戰電腦→`WZ.coop` 精靈只走陣營/任務/地圖，之後 `cpHostGo`；隊員：線上對戰變「等待隊長」）。選角 `#cpk`（`cpOpen`/`cpRender`，各選 2 名，隊友選的框上名字、不能選，衝突時隊長優先，60 秒 `CPT`）。`cpLaunch` 由隊長用 `newGame`（`COOPNEW` 讓電腦只帶 4 人）建局，幹員 `u.own='h'|'g'`，`G.coop={h,g}`，再走既有 `games/<pid>` 整盤同步（`NET.coop`）。回合：`ORDER` 原本就是 A,D,A,D，`coopOwner()` 依 `phaseIdx<2` 決定隊長或隊員，電腦階段由隊長那台跑 `runAI`（合作時每階段 2 名）；`coopIWrite()` 決定誰推狀態，`canAct`／`myPh()`／`myUnspent()` 擋掉別人的幹員與階段。隊長負責部署全隊。對方斷線時 `coopStall` 在時間到 15 秒後接手。`netDes` 會刪 `_shc` 快取（JSON 後 Set 會壞）。
 
 
 ## 多語系（v123 起）
