@@ -333,3 +333,9 @@
 
 ## v189
 - 關螢幕或切換 App（visibilitychange hidden / pagehide / freeze）時，背景音樂立刻暫停（不淡出，背景計時器會被節流），AudioContext 也 suspend；回來時再恢復。
+
+## v195 培養幹員不能靠退出逃避陣亡＋撤離
+- 開打（`G.phase==='play'`，非教學、非訓練關卡）時，自己的培養幹員（`myCopU()`，合作時只看自己的）被鎖成出戰中：`ECO.copOut={i,gen,nm,gid,t0,t,safe?}`（跟雲端存檔走，每 90 秒更新 `t`）。`gid` 單機是 `G._gid`、線上是 `'n'+NET.code`（`copGid`）。每 2 秒 `copBeat` 把心跳寫進 localStorage `r6bg.copRc`（`t`、單機在自己回合時的 `netSer()` 快照 `snap`、線上的房間資訊 `net`、幹員倒下 `dead`）。`finish` → `copEnd` 會 `copUnlock()`。
+- 按「離開」（`homeGo`）會提醒「離開的話，培養幹員也算陣亡」，確定就 `copDie`（進學長姐，`q` 記原因，名冊顯示「陣亡 · 中途離開」）。已撤離的幹員離開不會死（`copEnd([])` 算存活）。
+- 關網頁／斷線：回到選單時 `copRecover` 檢查鎖：心跳 3 分鐘內（`COPRC_MS`）跳 `#copRc`「對戰中斷」倒數，可「回到對戰」（`copResume`：單機用快照還原並在電腦回合時接著 `runAI`；線上重新 `netInit`、讀 `games/<code>` 後 `netApply`＋`netSubscribe`），或放棄。逾時、快照沒有、或斷線前已倒下就陣亡（`copDieDlg`）。別台裝置上的鎖沒有本機心跳，雲端 `t` 超過 5 分鐘才判死。開新對戰時若還有舊鎖，舊的直接判死。
+- 撤離（`#evacBtn`，紫色 #a56bff，位置同封門，若封門/護送/掃描在就往上疊一格）：只有自己的培養幹員；花 1 行動（`obj`）開始（`evacStart`：`u.evac`、借用 `u.defusing` 讓他不能動、不自動掩護），撐過敵方下一個階段，在 `endPhase` 裡 `evacPhaseEnd` 把他移出棋盤（`u.evacd`、`alive=false`、`x=-1`），`fxEv({k:'evac'})` 播 `evacBeam`（紫色光柱從地面往上越長越快、光條往上竄、角色變細變透明消失，`SFX.evac`）。`copEnd` 把 `evacd` 當存活。頭像列顯示 `.ob.evac`。測試 stub：`tests/borrowed-skill-progress.cjs`、`tests/defuser-victory.cjs`。

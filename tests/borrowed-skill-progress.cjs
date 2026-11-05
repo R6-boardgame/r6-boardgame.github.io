@@ -8,6 +8,7 @@ const ST=u=>u.st,ecoRoll=()=>{},dayKey=()=> 'test',tkClaimable=()=>0,mxLv=()=>0,
 const ecoAdd=n=>ECO.rn+=n,ecoSave=()=>{saved=JSON.parse(JSON.stringify(ECO));};
 const OPC={recruit_a_rifle:{base:'recruit',name:'Recruit'},recruit_a_shotgun:{base:'recruit',name:'Recruit'},recruit:{name:'Recruit'},zofia:{base:'zofia',name:'Zofia'}};
 const copScore=()=>({rk:'N'});
+const myCopU=()=>G.units.find(u=>u.side===G.player&&unitCopSlot(u)!=null),copUnlock=()=>{delete ECO.copOut;};
 const classOf=k=>typeof k==='string'&&k.startsWith('cls:')?k.slice(4):null;
 `+cut('const copNew=','const copSpent=')+cut('const copSlot=','const copW=')+cut('function copEnd(lines){','// 學長姐:')+cut('function ecoGame(w){','function ecoBanner(){')+`
 let fail=false;

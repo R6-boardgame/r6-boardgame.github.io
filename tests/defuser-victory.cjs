@@ -9,6 +9,7 @@ const setTimeout=fn=>fn(),achGive=()=>awards++,alive=s=>G.units.filter(u=>u.aliv
 const finish=(w,why)=>{wins++;G.over=true;G.win=w;G.why=why;G.active=null;};
 const owqStart=()=>false,curSide=()=> 'D',endAct=()=>{},overwatch=()=>{},pub=()=>false;
 const closeMovementPhase=()=>{},startPhase=()=>starts++;
+const evacPhaseEnd=()=>{};
 `+cut('function dfU(){','function dfTxt(){')+cut('function dfDone(u){','// v113:')+cut('function endPhase(){','function startPhase(){')+`
 for(const player of ['A','D'])for(const attackersAlive of [true,false]){
  const d={id:'d',op:'test',side:'D',alive:true,defusing:true,x:1,y:1};
