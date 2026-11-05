@@ -6292,7 +6292,8 @@ const SFX=(()=>{
     init};
   // browsers only allow sound after a tap or key press
   ['pointerdown','keydown','touchstart','touchend','pointerup','click'].forEach(e=>addEventListener(e,()=>init(),{capture:true,passive:true}));
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ac&&ac.state!=='running'){try{ac.resume().catch(()=>{});}catch(e){}}});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(ac&&ac.state==='running'){try{ac.suspend().catch(()=>{});}catch(e){}}return;}if(ac&&ac.state!=='running'){try{ac.resume().catch(()=>{});}catch(e){}}});
+  addEventListener('pagehide',()=>{if(ac&&ac.state==='running'){try{ac.suspend().catch(()=>{});}catch(e){}}});
   addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('button,[role=button]');if(!b)return;
     // pick the sound by what the button does
     const k=b.matches('#gnav [data-gn],[data-trc],[data-trv]:not(.lobAr),.lobNav button,[data-sb-tab],.trnCh button')?'tab'
@@ -6320,7 +6321,10 @@ const MUS=(()=>{const LOB=['lobby1','lobby2','lobby3','lobby4','lobby5'];let el=
     const a=mk();clearInterval(fade);const go=()=>{cur=w;if(!w){a.pause();return;}a.src=src(w);a.volume=.5;a.play().catch(()=>{cur=null;});};
     if(cur&&!a.paused){let v=a.volume;fade=setInterval(()=>{v-=.08;if(v<=0){clearInterval(fade);a.volume=0;go();}else a.volume=v;},40);cur=w||null;if(!w)cur=null;}else go();}
   ['pointerup','click','keydown','touchend'].forEach(e=>addEventListener(e,()=>{try{tick();}catch(x){}},{capture:true,passive:true}));
-  document.addEventListener('visibilitychange',()=>{try{tick();}catch(x){}});
+  // v189: screen off or app switch cuts the music right away (no fade: background timers are throttled)
+  const cut=()=>{clearInterval(fade);if(el){try{el.pause();}catch(x){}el.volume=.5;}cur=null;};
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)return cut();try{tick();}catch(x){}});
+  addEventListener('pagehide',cut);document.addEventListener('freeze',cut);
   setInterval(()=>{try{tick();}catch(x){}},700);
   return {tick};})();
 
