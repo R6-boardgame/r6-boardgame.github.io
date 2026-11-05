@@ -47,6 +47,8 @@
 
 ## 怎麼修改與發佈
 
+- 版本公告：`index.html` 的 `NEWS` 陣列（新的在最前面），每天一筆 `{d:'YYYY-MM-DD',v:'版本範圍',i:[條目]}`，同一天的更新加進當天那筆。玩家沒讀過最新一筆時，大廳大聲公按鈕會出現紅點（`newsBadge`，localStorage `newsSeen`）。
+
 1. 直接改 `index.html`（從現在起它就是唯一原始碼）。
 2. 本機測試：`python3 -m http.server` 後開 `http://localhost:8000/`。至少測兩種尺寸：**手機直式 390×844** 與 **桌機 1400×900**。
 3. 自動化測試建議用 Playwright：開頁 → `#t-pve` 進入對戰電腦 → 可在 `page.evaluate` 裡直接呼叫全域函式（例如 `WZ.step=2;renderWiz()` 跳到選地圖），截圖確認並收集 `pageerror`，必須沒有錯誤。
