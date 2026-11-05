@@ -6642,6 +6642,8 @@ function shootables(u){
   const o=[];LOSW=u.op==='warden';LOSD=u.side==='D';try{return shootables0(u,o);}finally{LOSW=false;LOSD=false;}}
 function shootables0(u,o){
   for(const e of G.units)if(e.alive&&e.side!==u.side&&e.x>=0&&(!e.hidden||e.spotted>0)&&((G.tut2?los(u.x,u.y,e.x,e.y):inSight(u,e))||(e.spotted>0&&e.op!=='vigil'&&(G.tut2||inFan(u,e.x,e.y))&&los(u.x,u.y,e.x,e.y,true))))o.push({kind:'unit',t:e,x:e.x,y:e.y});
+  // v192: an enemy the team can see, in this operator's line of sight but outside the way he faces, can still be shot: he turns to face it first (turning is free)
+  if(!G.tut2)for(const e of G.units)if(e.alive&&e.side!==u.side&&e.x>=0&&!o.some(a=>a.t===e)&&(!e.hidden||e.spotted>0)&&!smokeAt(e.x,e.y)&&seenBy(u.side,e)&&Math.hypot(e.x-u.x,e.y-u.y)<=VR(u)+.01&&los(u.x,u.y,e.x,e.y))o.push({kind:'unit',t:e,x:e.x,y:e.y,turn:true});
   if(u.side==='A')for(const g of G.gadgets)if(g.alive&&g.type==='prisma'&&(G.tut2?los(u.x,u.y,g.x,g.y):inSight(u,g)))o.push({kind:'unit',t:projU(g),x:g.x,y:g.y});
   {const k=o.filter(a=>!o.some(b=>b!==a&&sameRay(u,a,b)&&cheb(u.x,u.y,b.x,b.y)<cheb(u.x,u.y,a.x,a.y)));o.length=0;o.push(...k);}
   return o;
@@ -6650,6 +6652,7 @@ function sameRay(u,a,b){return (a.x===u.x&&b.x===u.x&&Math.sign(a.y-u.y)===Math.
 function rayBlk(sh,t){const d=cheb(sh.x,sh.y,t.x,t.y);return G.units.some(f=>f!==t&&f.alive&&f.side===t.side&&f.x>=0&&(!f.hidden||f.spotted>0)&&sameRay(sh,t,f)&&cheb(sh.x,sh.y,f.x,f.y)<d&&losAs(sh,()=>inSight(sh,f)));
 }
 async function doShoot(u,tg){
+  if(tg&&tg.turn&&(tg.x!==u.x||tg.y!==u.y)){u.fd=[tg.x-u.x,tg.y-u.y];if(u.overwatch)u.owd=dir8(u.fd);}
   if(G.tut&&tg.kind==='unit')G.tutShot=true;
   const s2=u.used.has('shoot');useAct(u,'shoot');if(s2)u._s2=1;note(u,`${s2?'第二槍':'射擊'} ${OPS[tg.t.op].name}`);
   u._half=s2;try{await shootUnit(u,tg.t);}finally{u._half=false;u.aim=0;}await afterAct(u);
@@ -8847,7 +8850,7 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
     const wrap=fn=>()=>{if(commit(u))act(fn);};
     const tmode=(m,list)=>()=>{if(list.length)setMode(m);};
     {const sht=shootables(u),sb=btn('射擊',sub('shoot',sht.length||!ok?'1 行動':'沒有目標'),G.mode==='shoot',!can('shoot')||!sht.length,tmode('shoot',sht));
-      if(sb.dis&&ok)sb.why=isA&&u.ap<=0?['沒有行動點','這名幹員的 2 個行動點都用完了']:isA&&u.used.has('shoot')?['這次啟動已經射擊過','每次啟動只能射擊一次']:isA&&u.heavyGuard?['重盾架起中','先關閉重盾才能射擊']:!sht.length?['看不到敵人','視線內沒有現身或被標記的敵人，先用無人機或攝影機找人']:null;
+      if(sb.dis&&ok)sb.why=isA&&u.ap<=0?['沒有行動點','這名幹員的 2 個行動點都用完了']:isA&&u.used.has('shoot')?['這次啟動已經射擊過','每次啟動只能射擊一次']:isA&&u.heavyGuard?['重盾架起中','先關閉重盾才能射擊']:!sht.length?(G.units.some(e=>e.alive&&e.side!==u.side&&e.x>=0&&(!e.hidden||e.spotted>0)&&seenBy(u.side,e)&&Math.hypot(e.x-u.x,e.y-u.y)<=VR(u)+.01)?['被擋住了','看得到敵人是靠隊友或攝影機，但這名幹員和他之間有牆或煙擋住']:['看不到敵人','視線內沒有現身或被標記的敵人，先用無人機或攝影機找人']):null;
       L.push(sb);}
     L.push(btn('奔跑',u.run?sub('run',`1 行動 · +${u.run} 移動點`):'這名幹員不能奔跑',false,!can('run')||!u.run,wrap(async()=>{if(G.active!==u)return;sprint(u);})));
     const dt=destroyTargets(u);{const db=btn('破壞',sub('destroy',(PROF[u.op].dz||1)>=2?'路障、軟牆或道具':'路障或道具'),G.mode==='destroy',!can('destroy')||!dt.length,tmode('destroy',dt));
@@ -11183,7 +11186,7 @@ function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
-const NEWS=[{d: "2026-11-05", v: "v178–v190", i: ["對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
+const NEWS=[{d: "2026-11-05", v: "v178–v192", i: ["看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
 const newsKey=()=>NEWS[0].d+'#'+NEWS[0].i.length;
 function newsUnread(){try{return localStorage.getItem('newsSeen')!==newsKey();}catch(e){return false;}}
 function newsBadge(){const n=$('#t-news');if(n)n.classList.toggle('unread',newsUnread());}
