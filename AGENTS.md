@@ -328,3 +328,6 @@
 ## v188
 - 底部選單（手機 #gnav、桌機 .lobNav）「幹員」改名「培養」。
 - 新手教學結尾（TU_POST）拿掉作戰檔案/規則：改成點「培養」→ 介紹培養幹員 → 說明依培養方向可轉職成職業兵種（桌機在這步按下一步會關掉 #cop）→ 點「訓練」→「自主訓練」結束教學。
+
+## v189
+- 關螢幕或切換 App（visibilitychange hidden / pagehide / freeze）時，背景音樂立刻暫停（不淡出，背景計時器會被節流），AudioContext 也 suspend；回來時再恢復。
