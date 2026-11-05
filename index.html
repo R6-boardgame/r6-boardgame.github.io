@@ -2577,6 +2577,12 @@ html body .mflow .mfInv>div:nth-child(2) b{font-size:15px;color:#f4a35a}html bod
 html body .mflow .mfCnt{justify-content:center;margin-top:4px;background:#0a0f14;border-radius:999px;padding:3px}html body .mflow .mfCnt button{width:30px!important;height:30px!important;border-radius:999px!important}html body .mflow .mfCnt b{color:#f4a35a}
 html body .mflow .mfNote{grid-column:1/-1}
 html body .mflow .mfInvs.c3{grid-template-columns:repeat(3,1fr)}html body .mflow .mfInvs.c3 .mfInv>div:nth-child(2) b{font-size:13.5px}html body .mflow .mfInvs.c3 .mfCnt button{width:26px!important;height:26px!important}html body .mflow .mfInvs.c3 .mfCnt{gap:4px!important}
+html body .mflow .pvVs{flex:none;font-size:13px;font-weight:800;color:#e8eef3;padding:5px 12px;border:1px solid #2b3946;border-radius:999px;background:#0b1117;letter-spacing:.04em}
+html body .mflow .pvDots{display:flex;justify-content:center;flex-wrap:wrap;gap:2px 4px}html body .mflow .pvDots button{display:flex;align-items:center;gap:4px;padding:2px 5px!important;border:0!important;background:none!important;font-size:11.5px!important;color:#6f7e8b!important;box-shadow:none;min-height:0}
+html body .mflow .pvDots button i{width:7px;height:7px;border-radius:50%;background:#3a4a58}html body .mflow .pvDots button.d{color:#a9b6c1!important}html body .mflow .pvDots button.d i{background:#62c46a}html body .mflow .pvDots button.c{color:#f2b84a!important;font-weight:800}html body .mflow .pvDots button.c i{background:#f2b84a}html body .mflow .pvDots button:disabled{opacity:.6}
+html body .mflow .mfFt.pv #wzBack{flex:none;width:96px;padding:12px 8px;font-size:15px;text-align:center}html body .mflow .mfFt.pv #mfRnd{width:auto!important;padding:12px 14px}html body .mflow .mfFt.pv #wzNext{flex:1;padding:12px;font-size:15px;text-align:center}
+html body .mflow .mfOp.lk{opacity:.45}html body .mflow .mfOp{position:relative}html body .mflow .mfOp .pvLk{position:absolute;left:3px;top:2px;font-size:10px}
+#whyTip{z-index:520!important}
 @media (min-width:761px){html body .mflow .mfInvs{grid-template-columns:repeat(3,1fr)}}
 </style>
 
@@ -11042,6 +11048,34 @@ function wzStepHTML(){const s=cfg.side,st=WZ.step;
       row('幹員',p.map(k=>`<img src="${opIcon(k)}" alt="">${OPC[k].name}`).join(' '),3)+
       row('戰術裝備',Object.entries(INV[s]).filter(([k])=>inv[k]).map(([k,v])=>`${v[0]} ×${inv[k]}`).join('、')||'無',4)+row('計時',T[cfg.timer||0],5)}</dl>`;}
   }}
+// v190: vs-computer squad and gear share one screen, laid out like the online pick (map card on top, VS 電腦 instead of the clock)
+function wzPick(el){const s=cfg.side,P=cfg.picks[s],inv=cfg.inv[s],used=invUsed(s),cap=INV_CAP[s],tab=WZ.step===4?'inv':'op',pool=mfPool(s,false);
+  if(!WZ.cur||!OPC[WZ.cur]||OPC[WZ.cur].side!==s||!pool.some(k=>mfBase(k)===mfBase(WZ.cur)))WZ.cur=P[0]||pool[0];
+  const _rs=scrollSnap(el),full=P.length===5&&P.every(owned);
+  const at=k=>{let i=P.indexOf(k);if(i<0&&copSlot(k)==null)i=P.findIndex(p=>mfBase(p)===mfBase(k)&&copSlot(p)==null);return i;};
+  const ops=pool.map(k=>{const i=at(k),sh=i>=0?P[i]:k,lk=!owned(k)||(i<0&&P.some(p=>mfBase(p)===mfBase(k)));
+    return `<button class="mfOp${i>=0?' on':''}${lk?' lk':''}${WZ.cur===sh||WZ.cur===k?' cur':''}" data-k="${sh}"${lk?` title="${owned(k)?'另一位培養幹員已在隊上':'尚未解鎖'}"`:''}><img src="${copSlot(sh)!=null?(opArt(sh)||opIcon(sh)):opIcon(sh)}" class="${copSlot(sh)!=null?'cop':''}" alt=""><span>${esc(copSlot(sh)!=null?COPN[copSlot(sh)]:OPC[sh].name)}</span>${i>=0?`<em>${i+1}</em>`:''}${owned(k)?'':'<b class="pvLk">🔒</b>'}</button>`;}).join('');
+  const invs=Object.entries(INV[s]).map(([k,[n,max,d]])=>`<div class="mfInv${inv[k]>0?' got':''}"><i>${WZI[k]||''}</i><div><b>${n}</b><span>${d}</span></div><div class="mfCnt"><button data-iv="${k}" data-d="-1"${inv[k]<=0?' disabled':''} aria-label="減少${n}">−</button><b>${inv[k]|0}</b><button data-iv="${k}" data-d="1"${inv[k]>=max||used>=cap?' disabled':''} aria-label="增加${n}">＋</button></div></div>`).join('');
+  const dots=[[0,'陣營'],[1,'任務'],[2,'地圖'],[3,'選角'],[5,'計時'],[6,'確認']].map(([g,t])=>{const cur=g===3,can=g<3||cur||(full&&WZ.seen>=g);return `<button class="${g<3||(g>3&&WZ.seen>=g&&full)?'d':''}${cur?' c':''}" ${cur?'':`data-wz-go="${g}"`}${can?'':' disabled'}><i></i>${t}</button>`;}).join('');
+  el.innerHTML=`<div class="mflow pvMode"><div class="mfPick ${s==='A'?'a':'d'}"><header class="mfHd"><img class="mfThumb" src="${mapThumb(cfg.map)}" alt="${MAPS[cfg.map].name}格局圖"><div class="mfMap"><b>${MAPS[cfg.map].name}</b><span>${cfg.mission==='hostage'?'人質':'炸彈'} · <i>${s==='A'?'進攻方':'防守方'}</i></span></div><div class="pvVs">VS 電腦</div></header>
+    <nav class="pvDots">${dots}</nav>
+    <div class="mfTabs"><button data-tab="op" class="${tab==='op'?'on':''}">幹員<em>${P.length}/5</em></button><button data-tab="inv" class="${tab==='inv'?'on':''}">裝備<em>${used}/${cap}</em></button></div>
+    ${tab==='op'?mfDet(WZ.cur,P,false):''}
+    <div class="mfBody">${tab==='op'?`<div class="mfOps">${ops}</div>`:`<div class="mfInvs">${invs}<p class="mfNote">${s==='A'?'另有 3 架無人機。':'另有 3 捲鐵絲網與地圖上的攝影機。'}</p></div>`}</div>
+    <div class="mfSlots">${[0,1,2,3,4].map(i=>`<div class="mfSl">${P[i]&&OPC[P[i]]?`<img src="${copSlot(P[i])!=null?(opArt(P[i])||opIcon(P[i])):opIcon(P[i])}" class="${copSlot(P[i])!=null?'cop':''}" alt="${esc(mfName(P[i]))}">`:''}</div>`).join('')}</div>
+    <footer class="mfFt pv"><button id="wzBack">‹ 上一步</button><button id="mfRnd">隨機</button><button class="primary" id="wzNext"${full?'':' disabled'}>${full?'下一步 ›':P.length===5?'有幹員未解鎖':`再選 ${5-P.length} 名`}</button></footer></div></div>`;
+  _rs();mfFit(el);
+  const re=()=>renderWiz(),say=(t,d)=>{try{whyTip(t,d);}catch(e){}};
+  const ad=el.querySelector('#mfAdd');if(ad&&WZ.cur&&!owned(WZ.cur)&&!P.includes(WZ.cur)){ad.disabled=false;ad.textContent='未解鎖';ad.classList.remove('primary');}
+  const toggle=k=>{const i=at(k);if(i>=0){P.splice(i,1);}else{if(!owned(k))return say(`${OPC[k].name} 尚未解鎖`,'可到首頁「商店」購買');if(P.some(p=>mfBase(p)===mfBase(k)))return say('已帶另一位培養幹員','先把隊上那位移出');if(P.length>=5)return say('小隊已滿 5 人','先點一位已選的幹員移出');P.push(k);}try{SFX.ui&&SFX.ui();}catch(e){}re();};
+  el.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{WZ.step=b.dataset.tab==='inv'?4:3;re();});
+  el.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(WZ.cur===k)return toggle(k);WZ.cur=k;try{SFX.ui&&SFX.ui();}catch(e){}re();});
+  if(ad)ad.onclick=()=>{if(WZ.cur)toggle(WZ.cur);};
+  el.querySelectorAll('[data-iv]').forEach(b=>b.onclick=()=>{const k=b.dataset.iv,v=(inv[k]|0)+(+b.dataset.d);if(v<0||v>INV[s][k][1]||(+b.dataset.d>0&&invUsed(s)>=cap))return;inv[k]=v;re();});
+  el.querySelector('#mfRnd').onclick=()=>{if(tab==='op'){cfg.picks[s]=rndPicks(s,true);WZ.cur=cfg.picks[s][0];}else cfg.inv[s]=rndInv(s);re();};
+  el.querySelector('#wzBack').onclick=()=>{WZ.ret=null;WZ.step=2;WZ.arm=null;re();};
+  el.querySelector('#wzNext').onclick=()=>{if(!full)return;const r=WZ.ret;WZ.ret=null;WZ.step=r!=null?r:5;WZ.arm=null;re();};
+  el.querySelectorAll('[data-wz-go]').forEach(b=>b.onclick=()=>{WZ.ret=null;WZ.step=+b.dataset.wzGo;WZ.arm=null;re();});}
 // v116: re-rendering a screen with innerHTML must not throw its scroll areas back to the top (avatar list, operator pick…)
 function scrollSnap(el){if(!el)return()=>{};const key=e=>e.tagName+'.'+String(typeof e.className==='string'?e.className:'').trim().split(/\s+/)[0];
   const walk=f=>{const c={};[el,...el.querySelectorAll('*')].forEach(e=>{const k=key(e);c[k]=(c[k]||0)+1;f(e,k+'#'+c[k]);});};
@@ -11049,7 +11083,7 @@ function scrollSnap(el){if(!el)return()=>{};const key=e=>e.tagName+'.'+String(ty
   return skip=>{walk((e,k)=>{const v=m[k];if(v&&!(skip&&e.closest(skip))){e.scrollTop=v[0];e.scrollLeft=v[1];}});if(window.scrollY!==wy)window.scrollTo(0,wy);};}
 function renderWiz(){let el=$('#wiz');const _rs=WZ.lastStep===WZ.step?scrollSnap(el):null;const keep=[...(el?el.querySelectorAll('.wzBody,.wzOg'):[])].map(e=>e.scrollTop);
   if(!el){el=document.createElement('div');el.id='wiz';el.className='wiz';el.setAttribute('role','dialog');el.setAttribute('aria-label','對戰電腦設定');document.body.appendChild(el);}
-  el.hidden=false;const st=WZ.step;WZ.seen=Math.max(WZ.seen,st);const ok=WZSTEPS[st].ok(),last=st===WZSTEPS.length-1;
+  el.hidden=false;const st=WZ.step;WZ.seen=Math.max(WZ.seen,st);if(st===3||st===4){WZ.lastStep=st;return wzPick(el);}const ok=WZSTEPS[st].ok(),last=st===WZSTEPS.length-1;
   const reach=i=>i<=WZ.seen||WZSTEPS.slice(0,i).every(x=>x.ok());
   el.innerHTML=`<div class="wzTop"><h2>對戰電腦</h2><nav class="wzSteps">${WZSTEPS.map((x,i)=>`<button data-wz-go="${i}" class="${i===st?'cur':i<WZ.seen||(i<st)?'done':''}" ${reach(i)&&WZSTEPS.slice(0,i).every(y=>y.ok())?'':'disabled'}><i>${i<st?'✓':i+1}</i><span>${x.t}</span></button>`).join('')}</nav><span id="wzOnline"></span><button id="wzRules">規則</button></div>
     <div class="wzBody">${wzStepHTML()}</div>
@@ -11547,23 +11581,26 @@ function mfPick(){MF.st='pick';MF.pick0=Date.now();mfDraw();
   let beep=-1;MF.iv=setInterval(()=>{if(!MF)return;const left=MFT-(Date.now()-MF.pick0)/1000,s=Math.max(0,Math.ceil(left)),t=$('#mfTm');
     if(t){t.textContent=s;t.classList.toggle('hot',s<=5&&!MF.lock);}
     if(s<=5&&s>0&&s!==beep&&!MF.lock){beep=s;try{SFX.soft&&SFX.soft();}catch(e){}}
-    if(left<=0&&!MF.lock){MF.picks=rndPicks(MF.side,true);MF.inv=rndInv(MF.side);mfLock();}
+    if(left<=0&&!MF.lock){mfFill();mfLock();}
     if(MF.tick)MF.tick(left);},200);}
 // tap an operator to see their card; tap the one on show again (or the button) to add or remove them
-function mfDet(k){if(!k||!OPC[k])return '';const c=OPC[k],i=MF.picks.indexOf(k),clash=i<0&&MF.picks.some(p=>mfBase(p)===mfBase(k)),gx=typeof GDX!=='undefined'&&GDX[k]?GDX[k][0]:cardText(c);
+function mfDet(k,PK,LK){if(!k||!OPC[k])return '';PK=PK||MF.picks;LK=LK===undefined?MF.lock:LK;const c=OPC[k],i=PK.indexOf(k),clash=i<0&&PK.some(p=>mfBase(p)===mfBase(k)),gx=typeof GDX!=='undefined'&&GDX[k]?GDX[k][0]:cardText(c);
   // v115: one compact strip: small portrait, name + add button on one line, gadget in two lines, dice and stats on one line each
   return `<div class="mfDet"><img class="mfDA" src="${opArt(k)||opIcon(k)}" alt="" onerror="this.style.visibility='hidden'"><div class="mfDI">
-    <div class="mfDN"><div><b>${esc(mfName(k))}</b><small>${c.zh.role||''}</small></div><button class="${i>=0?'':'primary'}" id="mfAdd"${MF.lock||(i<0&&(MF.picks.length>=5||clash))?' disabled':''}>${i>=0?'移出':clash?(copSlot(k)!=null?'已帶另一位':'已帶同名'):MF.picks.length>=5?'已滿':'加入'}</button></div>
+    <div class="mfDN"><div><b>${esc(mfName(k))}</b><small>${c.zh.role||''}</small></div><button class="${i>=0?'':'primary'}" id="mfAdd"${LK||(i<0&&(PK.length>=5||clash))?' disabled':''}>${i>=0?'移出':clash?(copSlot(k)!=null?'已帶另一位':'已帶同名'):PK.length>=5?'已滿':'加入'}</button></div>
     <div class="mfDG"><b>${c.zh.g||'沒有專屬道具'}${c.g&&c.g.charges?`<i>×${c.g.charges}</i>`:''}</b><p>${gx||''}</p></div>
     <div class="mfDW">${['近','中','遠'].map((r,n)=>`<span>${r}<em>${hexDice(c.w[n]||[])}</em></span>`).join('')}</div>
     <div class="mfDS"><span>耐力 <b>${c.st??'—'}</b></span><span>${c.run?`奔跑 <b>+${c.run}</b>`:'不能奔跑'}</span><span>破壞 <b>${DZN[c.dz]||'—'}</b></span></div></div></div>`;}
 // v189: pick the column count that gives the biggest operator tiles that still fit the space left on screen
-function mfFit(){const el=MF&&MF.el;if(!el)return;const sl=el.querySelector('.mfSlots'),room=x=>sl?Math.floor(sl.getBoundingClientRect().top-x.getBoundingClientRect().top-6):x.clientHeight;
+function mfFit(root){const el=root||(MF&&MF.el);if(!el)return;const sl=el.querySelector('.mfSlots'),room=x=>sl?Math.floor(sl.getBoundingClientRect().top-x.getBoundingClientRect().top-6):x.clientHeight;
   const iv=el.querySelector('.mfInvs');if(iv){iv.classList.remove('c3');iv.style.maxHeight=room(iv)+'px';if(iv.scrollHeight>iv.clientHeight+1)iv.classList.add('c3');return;}
   const g=el.querySelector('.mfOps'),b=g&&g.parentElement;if(!g||!b)return;const n=g.children.length,W=b.clientWidth,H=room(g),gap=6;if(!n||!W||H<=0)return;
   let best=null;for(let c=4;c<=9;c++){const r=Math.ceil(n/c),w=(W-gap*(c-1))/c,h=Math.min(w*1.15,(H-gap*(r-1))/r),sz=Math.min(w,h);if(!best||sz>best.sz+.5)best={c,w,h,sz};}
   g.style.setProperty('grid-template-columns',`repeat(${best.c},minmax(0,1fr))`,'important');g.style.setProperty('grid-auto-rows',Math.floor(best.h)+'px','important');g.style.setProperty('--mfT',Math.floor(best.sz)+'px');}
-addEventListener('resize',()=>{try{if(MF&&MF.st==='pick')mfFit();}catch(e){}});
+addEventListener('resize',()=>{try{if(MF&&MF.st==='pick')mfFit();else if(SCREEN==='setup'&&(WZ.step===3||WZ.step===4))mfFit($('#wiz'));}catch(e){}});
+// v190: when the clock runs out, keep the operators the player already picked and only fill the empty slots (it used to throw the whole squad away)
+function mfFill(){const P=MF.picks.filter(k=>OPC[k]&&owned(k));for(const k of shuffle(mfPool(MF.side,true))){if(P.length>=5)break;if(!P.some(p=>mfBase(p)===mfBase(k)))P.push(k);}MF.picks=P;
+  if(!invSum(MF.inv))MF.inv=rndInv(MF.side);}
 function mfToggle(k){const P=MF.picks,i=P.indexOf(k);if(i>=0)P.splice(i,1);else if(P.length<5&&!P.some(p=>mfBase(p)===mfBase(k)))P.push(k);try{SFX.ui&&SFX.ui();}catch(e){}}
 function mfDraw(){const el=MF.el,side=MF.side,pool=mfPool(side,true),P=MF.picks,inv=MF.inv,used=invSum(inv),cap=INV_CAP[side],L=MF.lock;
   const left=Math.max(0,Math.ceil(MFT-(Date.now()-MF.pick0)/1000));const _rs=scrollSnap(el);
