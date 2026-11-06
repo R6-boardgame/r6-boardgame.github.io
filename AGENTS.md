@@ -385,3 +385,7 @@
 ## v211 移除 Flores 與 Thunderbird
 - 使用者要求把這兩名幹員拿掉：`OPCARDS`、`data/skills.csv`、技能說明、`GT`/`GA`/AI/3D 外觀、`SCRIPTED`/`NOBTN`/`SETUPOPS`、`GSH` 都刪了；`PAIDCORE` 改成空集合。`opsAll` 門檻 `OPSN` 自動少 2。
 - 圖片檔（`img/*/flores.webp`、`thunderbird.webp`）和 `OPICONS`/`AIMM`/`FACEM`/`I18X` 裡的舊鍵保留，避免玩家舊頭像失效；不影響遊戲。
+## v212 成就徽章圖片
+- 73 張金屬徽章（使用者給的 `achievement-icons-metal-v1.zip`，1254px PNG）去邊、縮成 256px webp 放 `img/ach/<id>.webp`（共約 1.1 MB）。`ACHIMG` 列出有圖的 id；**沒有圖的成就會從 `ACH` 移除**（使用者指定）。新增成就時要一起放圖並加進 `ACHIMG`。
+- `achIc(a,px)` 回傳圖片（沒圖才用 emoji）：任務結束頁「成就達成」、解鎖提示、成就頁詳情都用它；成就頁的徽章 `achBadge` 有圖時直接用圖（未解鎖沿用 `.bdS` 灰階）。
+- `data/achievements.csv` 的「圖示」欄寫 `<id>.png` 只是對照用；`achApply` 遇到檔名會略過，不會把檔名當文字顯示。
