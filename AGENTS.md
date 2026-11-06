@@ -368,3 +368,7 @@
 - 幹員道具／職業技能／職業特性的名稱與說明可以用表格改：`data/skills.csv`（欄位看表頭 `id`、`技能名稱`、`技能說明`；空白格＝用程式內建文字）。若 `SKILL_SHEET` 填了 Google 試算表「發布到網路」的 CSV 網址，就優先讀它，讀不到才讀 repo 的 CSV。
 - 開頁時先套用 localStorage `r6skills` 的上一份表格，再非同步抓最新的（`skApply`）。寫入目標：`GDX[id][0]`／`OPS.gd`（已實作）、`OPC.zh.x`（未實作，會自動加【尚未實作】）、`OPS.pd`（Rook、Tachanka 被動）、`CSK[k].n/d`、`WPN[k].fx`（id 寫成 `trait_k`）。只改和內建不同的格子；表格移除某列時會還原內建。
 - 改程式內的技能文字後，記得同步更新 `data/skills.csv`，不然表格會把它蓋回去。
+
+## v207 成就表格
+- 成就的圖示、名稱、條件文字也可以用表格改：`data/achievements.csv`（表頭 `id`、`分類`、`圖示`、`成就名稱`、`達成條件`；`分類` 只是給人看的），或填 `ACH_SHEET`（Google 試算表發布 CSV）。`achApply` 直接改 `ACHM[id]` 的 `ic/n/d`；達成門檻 `goal` 和判定不在表格裡。localStorage 鍵 `r6ach`。載入共用 `tblLoad(key,urls,apply)`。
+- 英日文翻譯（`I18X`）是用中文原文當鍵，表格改過的中文在英日文介面會顯示中文。新增或改程式內成就文字時同步更新 CSV。
