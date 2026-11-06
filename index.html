@@ -2828,7 +2828,7 @@ html body .mflow .mfOp.lk{opacity:.45}html body .mflow .mfOp{position:relative}h
         <div class="rqShow"><span class="rqFan big"><svg viewBox="0 0 40 30" aria-hidden="true"><path d="M20 28 L3.4 6.5 A21 21 0 0 1 36.6 6.5 Z" fill="rgba(255,196,80,.35)" stroke="#ffc450" stroke-width="1.5"/><circle cx="20" cy="27" r="3" fill="#ef7f3e"/></svg></span><p>每名幹員提供<b>面前 120° 的扇形視野</b>，背後看不到。一般幹員最遠看見 <b>10 格</b>；狙擊兵 Glaz、Kali 最遠看見 <b>14 格</b>。</p></div>
         <ul class="rqList"><li><img class="rqImg" data-eq="drone" alt="">無人機</li><li><img class="rqImg" data-eq="cam" alt="">監視器</li><li><span class="rqFan"><svg viewBox="0 0 40 30" aria-hidden="true"><path d="M20 28 L3.4 6.5 A21 21 0 0 1 36.6 6.5 Z" fill="rgba(255,196,80,.35)" stroke="#ffc450" stroke-width="1.5"/><circle cx="20" cy="27" r="3" fill="#ef7f3e"/></svg></span>隊友</li></ul>
         <p class="rqP">隊友、無人機或監視器看見的區域也會亮起。</p>
-        <p class="rqNote"><b>只要我方有來源提供視野，就能對射程內的敵人射擊，不必由射擊的幹員親眼看見，也不必先轉向目標。</b>不過射擊的幹員和敵人之間的直線不能被牆或煙霧擋住。</p>
+        <p class="rqNote"><b>只要我方有來源提供視野，就能對射程內的敵人射擊，不必由射擊的幹員親眼看見，也不必先轉向目標。</b>靠隊友視野射擊時可以隔著軟牆或路障開槍（承重牆與加固牆仍會擋住），穿過的牆照樣算掩護。</p>
         <h4 class="rqH">按下射擊，選擇目標</h4>
         <div class="rqShow"><img class="rqBig" data-ua="shoot" alt=""><p>按右側「射擊」，再點選地圖上有<span class="rqSw r"></span><b>紅框</b>的敵人。再按一次「射擊」可取消。</p></div>
         <p class="rqP">如果同一條橫線或直線上有兩名敵人，你只能射擊較近的那一名；斜線方向不受這項限制。</p>
@@ -2846,7 +2846,7 @@ html body .mflow .mfOp.lk{opacity:.45}html body .mflow .mfOp{position:relative}h
           <div><b>紅骰</b><span data-die="R" data-f="1,1,2,2,3,3"></span><small>1、1、2、2、3、3（平均 2）</small></div>
           <div><b>橙骰</b><span data-die="O" data-f="0,1,1,2,2,3"></span><small>0、1、1、2、2、3（平均 1.5）</small></div>
           <div><b>黃骰</b><span data-die="Y" data-f="0,0,1,1,2,2"></span><small>0、0、1、1、2、2（平均 1）</small></div>
-          <div><b>手榴彈骰</b><span data-die="Y" data-g="1" data-f="1,1,1,2,2,2"></span><small>破片手榴彈：1、1、1、2、2、2</small></div></div>
+          <div><b>手榴彈骰</b><span data-die="Y" data-g="1" data-f="0,1,1,2,2,3"></span><small>破片手榴彈與 Fuze 集束炸彈：0、1、1、2、2、3</small></div></div>
         <h4 class="rqH">掩護會減少命中數</h4>
         <table class="rqTbl"><tr><th>射擊路徑或目標狀態</th><th>命中數</th></tr><tr><td>每穿過一面完整的軟牆</td><td>−2</td></tr><tr><td>目標緊貼障礙物，如桌子、書櫃、牆邊</td><td>−1</td></tr><tr><td><img class="rqImg" data-eq="shield" alt="">從可部署盾牌正面射擊</td><td>−2</td></tr></table>
         <p class="rqNote"><b>不同掩護可以相加。</b>例如，隔著一面完整的軟牆射擊躲在桌旁的敵人，共減少 3 點命中數。可部署盾牌只有正面提供掩護，側面與背後沒有。</p></section>
@@ -2870,7 +2870,7 @@ html body .mflow .mfOp.lk{opacity:.45}html body .mflow .mfOp{position:relative}h
           <div class="rqCard"><h4>手機</h4><p><b>單指拖曳</b>：平移地圖</p><p><b>雙指轉動</b>：旋轉視角</p><p><b>雙指捏合</b>：縮放</p></div></div>
         <p class="rqP">左上角可以切換斜角、俯視，以及將牆面降低，方便查看室內。「聚焦幹員」會將鏡頭移到選取的幹員身邊；「環繞」會讓鏡頭自動繞場；「＋／－」可調整縮放。</p>
         <h4 class="rqH">查看移動紀錄</h4>
-        <p class="rqP">幹員結束行動後，會留下輪次、起點 → 終點、移動格數與執行過的行動。點選紀錄，就能在地圖上查看路線。地圖上緣的字母與左緣的數字是座標（範圍依地圖大小而定）。</p>
+        <p class="rqP">幹員結束行動後，會留下輪次、起點 → 終點、移動格數與執行過的行動。點選紀錄，就能在地圖上查看路線。</p>
         <p class="rqNote">敵人的紀錄只顯示被我方看見的部分，未知位置會以「？」表示。</p></section>
     </div>
   </div>
@@ -6876,7 +6876,7 @@ function shootables(u){
 function shootables0(u,o){
   for(const e of G.units)if(e.alive&&e.side!==u.side&&e.x>=0&&(!e.hidden||e.spotted>0)&&((G.tut2?los(u.x,u.y,e.x,e.y):inSight(u,e))||(e.spotted>0&&e.op!=='vigil'&&(G.tut2||inFan(u,e.x,e.y))&&los(u.x,u.y,e.x,e.y,true))))o.push({kind:'unit',t:e,x:e.x,y:e.y});
   // v192: an enemy the team can see, in this operator's line of sight but outside the way he faces, can still be shot: he turns to face it first (turning is free)
-  if(!G.tut2)for(const e of G.units)if(e.alive&&e.side!==u.side&&e.x>=0&&!o.some(a=>a.t===e)&&(!e.hidden||e.spotted>0)&&!smokeAt(e.x,e.y)&&seenBy(u.side,e)&&Math.hypot(e.x-u.x,e.y-u.y)<=VR(u)+.01&&los(u.x,u.y,e.x,e.y))o.push({kind:'unit',t:e,x:e.x,y:e.y,turn:true});
+  if(!G.tut2)for(const e of G.units)if(e.alive&&e.side!==u.side&&e.x>=0&&!o.some(a=>a.t===e)&&(!e.hidden||e.spotted>0)&&!smokeAt(e.x,e.y)&&seenBy(u.side,e)&&Math.hypot(e.x-u.x,e.y-u.y)<=VR(u)+.01&&los(u.x,u.y,e.x,e.y,true))o.push({kind:'unit',t:e,x:e.x,y:e.y,turn:true});
   if(u.side==='A')for(const g of G.gadgets)if(g.alive&&g.type==='prisma'&&(G.tut2?los(u.x,u.y,g.x,g.y):inSight(u,g)))o.push({kind:'unit',t:projU(g),x:g.x,y:g.y});
   {const k=o.filter(a=>!o.some(b=>b!==a&&sameRay(u,a,b)&&cheb(u.x,u.y,b.x,b.y)<cheb(u.x,u.y,a.x,a.y)));o.length=0;o.push(...k);}
   return o;
@@ -7047,7 +7047,7 @@ const throwTargets=u=>within(u.x,u.y,6).filter(([x,y])=>!blocks(cell(x,y))&&los(
 const impactTargets=u=>within(u.x,u.y,6).filter(([x,y])=>{const c=cell(x,y);return c.t!=='hard'&&c.t!=='reinf'&&!(x===u.x&&y===u.y)&&los(u.x,u.y,x,y,false,true)&&(['soft','bar'].includes(c.t)||G.gadgets.some(g=>g.alive&&g.side!==u.side&&g.x===x&&g.y===y&&GSTR[g.type]));});
 // one victim of a frag: thrower's card bottom-left, victim's card top-right, the grenade arcs across and bursts, then the yellow dice
 const FGSVG='<svg viewBox="0 0 40 40"><rect x="17" y="3" width="9" height="7" rx="1.5" fill="#9aa3a8"/><path d="M25 6c6 0 9 4 9 9" stroke="#c9d0d4" stroke-width="2.6" fill="none" stroke-linecap="round"/><circle cx="33" cy="8" r="3" fill="none" stroke="#c9d0d4" stroke-width="2"/><ellipse cx="21" cy="24" rx="12" ry="13" fill="#4d5a3a"/><path d="M10 20h22M9.5 26h23M14 13v22M21 11v26M28 13v22" stroke="#2f3824" stroke-width="1.6"/><ellipse cx="17" cy="19" rx="4" ry="5" fill="#fff" opacity=".18"/></svg>';
-const GRENADE_DIE=[1,1,1,2,2,2],FUZE_DIE=[0,1,1,2,2,3];
+const GRENADE_DIE=[0,1,1,2,2,3],FUZE_DIE=[0,1,1,2,2,3];
 const grenadePips=n=>Array.from({length:n},()=>FGSVG.replace('<svg ','<svg style="width:18px;height:22px;display:inline-block;vertical-align:middle" ')).join('')||'—';
 async function fragShow(u,a,pool,idx,r,ctr,faces=GRENADE_DIE,label='破片手榴彈'){
   if(!CINE.on||document.hidden||a===u||!u.alive){const dice=[...pool].map((ch,i)=>`<i class="die" style="background:${DIEC.Y}">${grenadePips(faces[idx[i]])}</i>`).join('');
@@ -11476,7 +11476,7 @@ const LEGEND_EXTRA=[
 $('#legend').innerHTML=LEGEND.map(([s,t])=>`<span>${s}${t}</span>`).join('');
 $('#lgfull').innerHTML=[...LEGEND,...LEGEND_EXTRA].map(([s,t])=>`<div>${s}<span>${t}</span></div>`).join('');
 let manualReturn=null;
-function openManual(sec){try{document.querySelectorAll('#manual img[data-eq]').forEach(m=>{if(!m.getAttribute('src')){const r=/src="([^"]+)"/.exec(eqIc(m.dataset.eq)||'');if(r)m.src=r[1];else if(m.dataset.eq==='drone')m.src=GADIC['無人機'];}});document.querySelectorAll('#manual img[data-ua]').forEach(m=>{if(!m.src)m.src=uiImg('act_'+m.dataset.ua);});document.querySelectorAll('#manual [data-die]').forEach(m=>{if(m.childElementCount)return;const L=m.dataset.die,g=!!m.dataset.g;m.innerHTML=m.dataset.f.split(',').map(v=>`<img alt="${v}" src="${dieFace(DIEC[L],+v,false,g).toDataURL('image/webp',.8)}">`).join('');});{const el=document.getElementById('rqOpCard');if(el&&!el.innerHTML){const g0=G;try{if(!G)G={player:'A',phase:'setup',units:[]};const u=mkUnit('ash','A',0);u.ch=OPS.ash.ch||2;const h=opCard(u),i=h.indexOf('<div class=\x22oc '),j=h.indexOf('<div class=\x22nm\x22>');el.innerHTML=h.slice(i,j);}finally{G=g0;}}}}catch(e){}try{achGive('reader');}catch(e){}manualReturn=document.activeElement;$('#manual').hidden=false;if(sec)$('#'+sec).scrollIntoView({block:'start'});$('#manualClose').focus();}
+function openManual(sec){try{document.querySelectorAll('#manual img[data-eq]').forEach(m=>{if(!m.getAttribute('src')){const r=/src="([^"]+)"/.exec(eqIc(m.dataset.eq)||'');if(r)m.src=r[1];else if(m.dataset.eq==='drone')m.src=GADIC['無人機'];else if(m.dataset.eq==='reinf'&&typeof WALLIMG_SRC!=='undefined')m.src=WALLIMG_SRC.reinf;}});document.querySelectorAll('#manual img[data-ua]').forEach(m=>{if(!m.src)m.src=uiImg('act_'+m.dataset.ua);});document.querySelectorAll('#manual [data-die]').forEach(m=>{if(m.childElementCount)return;const L=m.dataset.die,g=!!m.dataset.g;m.innerHTML=m.dataset.f.split(',').map(v=>`<img alt="${v}" src="${dieFace(DIEC[L],+v,false,g).toDataURL('image/webp',.8)}">`).join('');});{const el=document.getElementById('rqOpCard');if(el&&!el.innerHTML){const g0=G;try{if(!G)G={player:'A',phase:'setup',units:[]};const u=mkUnit('ash','A',0);u.ch=OPS.ash.ch||2;const h=opCard(u),i=h.indexOf('<div class=\x22oc '),j=h.indexOf('<div class=\x22nm\x22>');el.innerHTML=h.slice(i,j);}finally{G=g0;}}}}catch(e){}try{achGive('reader');}catch(e){}manualReturn=document.activeElement;$('#manual').hidden=false;if(sec)$('#'+sec).scrollIntoView({block:'start'});$('#manualClose').focus();}
 function closeManual(){$('#manual').hidden=true;if(manualReturn&&manualReturn.focus)manualReturn.focus();}
 // ---------- original rulebook viewer (Traditional Chinese translation), from the lobby and in game ----------
 const RB={books:[{id:'core',title:'核心規則',src:'rulesmd'}],cur:'core',q:'',html:{}};
