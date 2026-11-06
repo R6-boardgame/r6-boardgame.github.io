@@ -8718,7 +8718,7 @@ var GDX={
  jager:['〔佈防〕主動防禦系統：裝在牆上（跟防彈攝影機一樣選牆）；進攻方把投擲道具丟到它 3 格內時自動攔截，道具作廢，每台可攔 2 次。',2],
  buck:['〔行動〕萬能鑰匙：打穿 4 格內看得到的一面軟牆或路障。',3],
  blackbeard:['〔反應〕步槍護盾：被射中時自動擋下最多 2 傷。',2],
- capitao:['〔行動〕戰術十字弩：在 6 格內射出燃燒彈，3×3 範圍起火兩個階段，裡面的幹員立刻受一顆橙骰傷害，之後走進火裡的也會。',3],
+ capitao:['〔行動〕戰術十字弩：在 6 格內射出燃燒彈，3×3 範圍起火兩回合，裡面的幹員立刻受一顆橙骰傷害，之後走進火裡的也會。',3],
  hibana:['〔行動〕X-KAIROS：在 6 格內炸開一面軟牆、路障或加固牆（通電或被干擾時不行）。',2],
  frost:['〔佈防／行動〕捕獸夾：佈防時放在室內，對戰中放在相鄰格，可以和鐵絲網疊在同一格。進攻方看不到。踩到的人血量減半（無條件捨去），被夾在那一格不能移動，要花 1 個行動點拆掉才能走；上面有鐵絲網也一樣會觸發。',2],
  caveira:['〔被動〕審訊：Caveira 擊殺敵人時，其他進攻方全被標記。〔行動〕無聲步：隔牆射擊 3 格內一名被標記的進攻方（算輕型掩護）。',99],
@@ -8812,7 +8812,7 @@ async function goyoBurn(g){g.alive=false;G.gadgets.push({type:'fire',goyo:true,x
   for(const a of G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,g.x,g.y)<=1)){a.burned=true;await damage(a,1,'火焰');}}
 function goyoOut(f){const hit=G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,f.x,f.y)<=1);if(!hit.length)return;
   log('燃燒盾的火燒完了，還在火圈裡的人再被燒一次','kd');(async()=>{for(const a of hit){if(G.over)break;await damage(a,1,'火焰');}render();})();}
-async function ignite(x,y,by){G.gadgets.push({type:'fire',x,y,side:'D',alive:true,life:2});SFX.boom();setTimeout(()=>SFX.fx('fire'),250);log(`${coord(x,y)} 一帶起火了`,'ks');droneHit(within(x,y,1),'火焰');if(hostHarm(within(x,y,1),by||'D','火焰'))return;
+async function ignite(x,y,by,life=2){G.gadgets.push({type:'fire',x,y,side:'D',alive:true,life});SFX.boom();setTimeout(()=>SFX.fx('fire'),250);log(`${coord(x,y)} 一帶起火了`,'ks');droneHit(within(x,y,1),'火焰');if(hostHarm(within(x,y,1),by||'D','火焰'))return;
   for(const a of G.units.filter(a=>a.alive&&a.x>=0&&cheb(a.x,a.y,x,y)<=1)){a.burned=true;const r=die1('O');if(r)await damage(a,r,'火焰');}}
 var objRoom=(x,y)=>{if(!G._obj||G._obj.wv!==(G._wv||0)){const s=new Set();for(const [i,j] of allCells()){const c=cell(i,j);if(c.site)roomCells(i,j).forEach(k=>s.add(k));}
   if(G.hostage)roomCells(G.hostage.x,G.hostage.y).forEach(k=>s.add(k));G._obj={s,wv:G._wv||0};}return G._obj.s.has(y*G.W+x);};
@@ -8920,7 +8920,7 @@ var UG={
  ace:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;destroyCell(x,y);await blastDestroy(x,y,3);log(`${nm(u)} 的 S.E.L.M.A. 炸開了牆面`,s);},
  maverick:async(u,x,y,s)=>{destroyCell(x,y);log(`${nm(u)} 用噴槍燒穿了一面牆`,s);},
  oryx:async(u,x,y,s)=>{u.rnd=G.round;destroyCell(x,y);u.x=x;u.y=y;u.mp=(u.mp|0)+2;log(`${nm(u)} 撞穿牆面衝了進來，額外獲得 2 格移動`,s);await clayCheck(u);},
- capitao:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;log(`${nm(u)} 射出燃燒箭`,s);await ignite(x,y,'A');},
+ capitao:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;log(`${nm(u)} 射出燃燒箭`,s);await ignite(x,y,'A',8);},
  gridlock:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;G.gadgets.push({type:'trax',x,y,side:'A',alive:true});log(`${nm(u)} 在 ${coord(x,y)} 撒下 Trax 尖刺`,s);},
  zero:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;G.gadgets.push({type:'argus',x,y,side:'A',alive:true});log(`${nm(u)} 射出 Argus 攝影機`,s);},
  kali:async(u,x,y,s)=>{if(catchThrow(u,x,y))return;SFX.boom();const R=new Set([...roomCells(x,y)].filter(k=>cheb(k%G.W,(k/G.W)|0,x,y)<=3));let n=0;
@@ -12930,7 +12930,7 @@ function renderOpSelect(anim){
   const abEn=cur.g.ab.map(a=>`${a.k==='PASSIVE'?'':a.k+(a.t?' → '+a.t:'')+' — '}${a.x}`).join('<br>');
   const det=`<div class="osD" ${anim?'':'style="animation:none"'}>${opArt(cur.id)?`<img class="osArt" src="${opArt(cur.id)}" alt="">`:''}<button class="osX" id="osX">‹ 返回</button>
     <div class="osInfo"><div class="osName"><b>${cur.name}</b><img src="${opIcon(cur.id)}" alt=""></div>${osEco(cur)}<div class="osOrg">${cur.org||''}${cur.real?' · '+cur.real:''}</div>
-    <div class="osSide">${sideIc}<span>${cur.side==='A'?'攻擊方':'防守方'}</span>${cur.zh.role?`<span class="hint">· ${cur.zh.role}</span>`:''}<span class="osBatch">${cur.batchZh}</span></div>
+    <div class="osSide">${sideIc}<span>${cur.side==='A'?'攻擊方':'防守方'}</span>${cur.zh.role?`<span class="hint">· ${cur.zh.role}</span>`:''}</div>
     ${vars.length>1?`<div class="osVar">${vars.map((v,i)=>`<button data-ov="${v.id}" class="${v.id===cur.id?'on':''}">${copSlot(v.id)!=null?COPN[i]:'卡片版本 '+(i+1)}</button>`).join('')}</div>`:''}
     <div class="osG"><div class="gi"><img src="${opIcon(cur.id)}" alt=""></div><div class="gt"><b>${cur.zh.g||'（無特殊裝置）'}</b>${SCRIPTED.has(cur.id)?(()=>{let d='';try{d=skGet(cur.id).d||'';}catch(e){}return d?`<p class="osGd">${d}</p>`:'';})():cur.g.ab&&cur.g.ab.some(a=>a.k!=='PASSIVE')?'<span class="osImp">尚未實作，目前只有卡片數值</span>':''}</div></div>
     <div class="osSec"><h4>武器命中骰</h4><div class="osW">${['1-3','4-6','7+'].map((r,i)=>`<div><span>RANGE ${r}<small>${['近','中','遠'][i]}</small></span>${hexDice(cur.w[i])}</div>`).join('')}</div></div>
