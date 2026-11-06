@@ -11489,7 +11489,7 @@ function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
-const NEWS=[{d: "2026-11-06", v: "v196", i: ["大廳右上的好友按鈕改成「申請好友」和「好友名單」兩頁，成就移回 🏆 按鈕；輸入好友代碼改成送出申請，對方在「申請好友」按同意後才會成為好友，等待同意的申請也列在那裡"]},{d: "2026-11-05", v: "v178–v195", i: ["培養幹員開打後就不能靠退出逃避陣亡：按「離開」或關掉網頁都算陣亡；斷線的話 3 分鐘內回來可以接著打", "新增「撤離」（紫色按鈕）：培養幹員花 1 行動開始撤離，撐過敵方下一個階段就會被光束接走，這場算存活", "組隊：好友頁可以邀請在線的好友加入小隊，大廳右側會出現小隊圖示；組隊後按「對戰電腦」就是 4v4 合作，兩人各控 2 名幹員，順序是隊長 → 電腦 → 隊員 → 電腦", "好友代碼：好友頁顯示自己的 6 碼代碼，輸入對方代碼就能直接加好友；點好友名字可看他最強的培養幹員、擊殺和存活", "看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
+const NEWS=[{d: "2026-11-06", v: "v196–v197", i: ["每個 Google 帳號都是各自獨立的遊戲帳號：換另一個 Google 帳號登入會是全新的進度，不會再沿用上一個帳號的聲望、幹員和成就", "登出 Google 後，這台裝置會回到全新的訪客", "大廳右上的好友按鈕改成「申請好友」和「好友名單」兩頁，成就移回 🏆 按鈕；輸入好友代碼改成送出申請，對方在「申請好友」按同意後才會成為好友，等待同意的申請也列在那裡"]},{d: "2026-11-05", v: "v178–v195", i: ["培養幹員開打後就不能靠退出逃避陣亡：按「離開」或關掉網頁都算陣亡；斷線的話 3 分鐘內回來可以接著打", "新增「撤離」（紫色按鈕）：培養幹員花 1 行動開始撤離，撐過敵方下一個階段就會被光束接走，這場算存活", "組隊：好友頁可以邀請在線的好友加入小隊，大廳右側會出現小隊圖示；組隊後按「對戰電腦」就是 4v4 合作，兩人各控 2 名幹員，順序是隊長 → 電腦 → 隊員 → 電腦", "好友代碼：好友頁顯示自己的 6 碼代碼，輸入對方代碼就能直接加好友；點好友名字可看他最強的培養幹員、擊殺和存活", "看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
 const newsKey=()=>NEWS[0].d+'#'+NEWS[0].i.length;
 function newsUnread(){try{return localStorage.getItem('newsSeen')!==newsKey();}catch(e){return false;}}
 function newsBadge(){const n=$('#t-news');if(n)n.classList.toggle('unread',newsUnread());}
@@ -11983,12 +11983,22 @@ function gaMerge(d,first){let e=d.eco||{};if(d.ecoJ)try{e=JSON.parse(d.ecoJ)||{}
   (d.fr||[]).forEach(f=>{if(f&&f.id&&!FR.list.some(x=>x.id===f.id))FR.list.push(f);});
   const p=d.prof||{};if(!ME.nick&&p.nick)ME.nick=p.nick;if(newer&&p.avatar){ME.avatar=p.avatar;ME.usePhoto=!!p.usePhoto;}
   try{localStorage.setItem(EKEY,JSON.stringify(ECO));localStorage.setItem(AKEY,JSON.stringify(AS));localStorage.setItem(FKEY,JSON.stringify(FR));}catch(x){}}
-async function gaOn(u){GA.u=u;GA.ok=false;GA.err='';
+// v197: each Google account is its own game account. The progress kept in this browser belongs to the account in r6bg.glink;
+// signing out, or signing in with a different account, wipes it and reloads so nothing carries over to the next account.
+const GA_KEYS=['r6bg.eco','r6bg.ach','r6bg.social','r6bg.copRc','r6bg.glink'];
+function gaWipe(){clearTimeout(gaT);try{GA_KEYS.forEach(k=>localStorage.removeItem(k));
+  localStorage.setItem(PKEY,JSON.stringify({mode:'guest',guest:ME.guest,nick:'',avatar:'recruit_a_rifle',usePhoto:false,lang:ME.lang}));}catch(x){}}
+const gaOwner=u=>String((u&&u.email)||'').toLowerCase()==='aesopfilmedit@gmail.com';
+async function gaOn(u){const prev=GA.u;GA.u=u;GA.ok=false;GA.err='';
   const re=()=>{renderPlayer();renderSettings();lgState();};
-  if(!u){GA.busy=false;re();if(ME.mode==='account')acctLoad().then(re);return;}
+  if(!u){GA.busy=false;if(prev){gaWipe();location.reload();return;}re();if(ME.mode==='account')acctLoad().then(re);return;}
+  let link=null;try{link=localStorage.getItem('r6bg.glink');}catch(x){}
+  if(link&&link!==u.uid){gaWipe();location.reload();return;}
   GA.busy=true;renderSettings();
-  try{const d=await R6FB.load();let first=true;try{first=localStorage.getItem('r6bg.glink')!==u.uid;}catch(x){}
-    if(d)gaMerge(d,first);if(String(u.email||'').toLowerCase()==='aesopfilmedit@gmail.com'&&!ECO.g58){ECO.g58=1;ECO.rn=(ECO.rn|0)+999999;ecoSave();}GA.ok=true;try{localStorage.setItem('r6bg.glink',u.uid);}catch(x){}
+  try{let d=await R6FB.load();const first=link!==u.uid;
+    // clean up accounts that already received another account's progress before v197 (the owner-only renown gift is the tell)
+    if(d&&!gaOwner(u)){let e={};try{e=d.ecoJ?JSON.parse(d.ecoJ)||{}:(d.eco||{});}catch(x){}if(e.g58){if(ECO.g58){gaWipe();location.reload();return;}d=null;}}
+    if(d)gaMerge(d,first);if(gaOwner(u)&&!ECO.g58){ECO.g58=1;ECO.rn=(ECO.rn|0)+999999;ecoSave();}GA.ok=true;try{localStorage.setItem('r6bg.glink',u.uid);}catch(x){}
     ME.mode='account';saveMe();gaPush(true);acctLoad().then(re);}
   catch(e){const c=(e&&e.code)||'';GA.err=/permission/.test(c)?'雲端存檔被拒絕：資料庫規則還沒設定好。':'讀不到雲端存檔，請檢查網路後重新登入。';}
   GA.busy=false;renderPlayer();renderSettings();if(SCREEN==='title'||SCREEN==='task')renderTitle();lgState();}
@@ -12030,10 +12040,11 @@ function lgGoogle(){const fb=window.R6FB;if(!fb)return;if(fb.user&&fb.user())ret
     lgErr(/popup-closed|cancelled-popup/.test(c)?'':/unauthorized-domain/.test(c)?'這個網址還沒加進 Firebase 的授權網域。':/network/.test(c)?'網路連不上 Google，請稍後再試。':'登入失敗（'+(c||'未知錯誤')+'）');lgState();});}
 if(window.R6FB)R6FB.onUser(u=>{lgState();if(LG.want&&u)loginDone('google');});
 function loginDone(how){LG.want=false;const el=$('#login');if(!el||el.classList.contains('out'))return;
-  if(how==='guest'&&window.R6FB&&R6FB.user&&R6FB.user()){clearTimeout(gaT);(GA.ok?R6FB.save(gaPack()).catch(()=>{}):Promise.resolve()).then(()=>R6FB.signOut()).catch(()=>{});}
+  if(how==='guest'&&window.R6FB&&R6FB.user&&R6FB.user()){clearTimeout(gaT);try{sessionStorage.setItem('r6bg.asGuest','1');}catch(x){}(GA.ok?R6FB.save(gaPack()).catch(()=>{}):Promise.resolve()).then(()=>R6FB.signOut()).catch(()=>{});}
   el.classList.add('out');setTimeout(()=>el.remove(),450);
   if(!tuSeen())setTimeout(tuStart,380);}
-setTimeout(loginShow,0);
+(()=>{let g=null;try{g=sessionStorage.getItem('r6bg.asGuest');sessionStorage.removeItem('r6bg.asGuest');}catch(x){}
+  if(g)setTimeout(()=>{if(!tuSeen())tuStart();},380);else setTimeout(loginShow,0);})();
 
 let TU=null;
 const tuU=k=>G&&G.units.find(u=>u.tu===k);
