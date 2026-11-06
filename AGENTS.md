@@ -345,3 +345,7 @@
 - `games/<code>` 的 merge 寫入改用訂閱快取 `NET.doc` 合併後 `set`，不再先讀 retained（省 ≥250ms）。`netDirty` 延遲 350→150ms（交棒/結束 40ms）。
 - 線上計時：`startPhase` 寫 `G.clkEnd=Date.now()+PHT`、`G.clkBy=NET.me`；每 200ms 以 `clkNow(G.clkBy)` 算剩餘，`NET.off`（對方時鐘−自己，取 `d.ts-Date.now()` 的最大值）校正。切頁/背景不再暫停、擲骰也不停。回到前景（dt>3s）先等 2.5s（`NET.hold`）讓新狀態進來。
 - `netStall`：對方階段時間到又 8 秒沒動靜，等待方替他 `endPhase`（PvP）；合作仍走 `coopStall`（也改成 8 秒）。
+
+## v201 新舊版相容
+- `NETV=2`：只有雙方都宣告 ≥2 才壓縮（`NET.zip`）。合作看隊伍文件 `ptMe().nv`（`PT.mate.nv`，舊版會跳提醒），PvP 看 `games/` 的 `hostNv`/`guestNv`。改連線格式時要升 `NETV`，並保留舊格式的收發。
+- 合作的 `games/<pid>` 會跨場重用：`NET.since=PT.t0`（隊長時鐘），`netRecv` 丟掉 `ts` 比它早的文件。
