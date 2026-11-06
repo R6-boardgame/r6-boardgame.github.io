@@ -10299,6 +10299,14 @@ function shotCamEnd(){if(!R3||!R3.cineSave)return;const s=R3.cineSave;R3.cineSav
 
 // ---------- 3D dice: thrown straight onto the board view, physics decides how they tumble ----------
 const DICE={};
+// one bullet standing up, centred on x,y, turned by a; dark like the board game's hit icons, with a die-coloured seam and shine
+function dieBullet(g,x,y,a,w,h,col){g.save();g.translate(x,y);g.rotate(a);const hw=w/2,top=-h/2,bot=h/2,neck=top+h*.40,rim=bot-h*.08;
+  g.fillStyle='#121314';
+  g.beginPath();g.moveTo(-hw*.86,neck);g.bezierCurveTo(-hw*.86,top+h*.16,-hw*.30,top,0,top);g.bezierCurveTo(hw*.30,top,hw*.86,top+h*.16,hw*.86,neck);g.closePath();g.fill();
+  g.fillRect(-hw,neck,w,rim-neck);g.fillRect(-hw*1.08,rim+h*.025,w*1.08,bot-rim-h*.025);g.fillRect(-hw*.82,rim,w*.82,h*.03);
+  g.fillStyle=col;g.fillRect(-hw,neck,w,h*.035);g.fillRect(-hw,rim-h*.035,w,h*.03);
+  g.globalAlpha=.28;g.fillStyle='#fff';g.fillRect(-hw*.55,neck+h*.07,w*.16,rim-neck-h*.14);
+  g.beginPath();g.ellipse(-hw*.32,top+h*.22,w*.07,h*.08,0,0,7);g.fill();g.restore();}
 function dieFace(col,v,bolt,grenade=false){
   const N=256,c=document.createElement('canvas');c.width=c.height=N;const g=c.getContext('2d');
   const gr=g.createRadialGradient(N*.35,N*.3,N*.1,N/2,N/2,N*.75);gr.addColorStop(0,shade(col,12));gr.addColorStop(1,shade(col,-30));g.fillStyle=gr;g.fillRect(0,0,N,N);
@@ -10306,8 +10314,10 @@ function dieFace(col,v,bolt,grenade=false){
   g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=6;g.strokeRect(14,14,N-28,N-28);
   if(bolt){g.save();g.setLineDash([14,10]);g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=4;g.strokeRect(24,24,N-48,N-48);g.restore();
     g.fillStyle='#fff';g.beginPath();[[44,30],[30,66],[46,66],[36,96],[66,52],[50,52],[60,30]].forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fill();}
-  // hit marks: a crosshair per hit, like the board game's hit icons
-  const pos={1:[[128,128]],2:[[84,172],[172,84]],3:[[76,180],[128,128],[180,76]]}[v]||[];
+  // hit marks: bullets (v208) - 1 = one bullet lying diagonally, 2 and 3 = bullets standing side by side
+  if(!grenade&&v){const B=v===1?[[128,128,Math.PI/4,64,176]]:v===2?[[100,128,0,46,150],[156,128,0,46,150]]:[[84,128,0,36,140],[128,128,0,36,140],[172,128,0,36,140]];
+    for(const [x,y,a,w,h] of B)dieBullet(g,x,y,a,w,h,col);}
+  const pos=grenade?({1:[[128,128]],2:[[84,172],[172,84]],3:[[76,180],[128,128],[180,76]]}[v]||[]):[];
   for(const [x,y] of pos){g.save();g.translate(x,y);g.fillStyle='#121314';g.strokeStyle='#121314';g.lineWidth=9;
     if(grenade){g.beginPath();g.ellipse(0,6,23,29,0,0,Math.PI*2);g.fill();g.fillRect(-9,-32,18,12);g.lineWidth=5;g.beginPath();g.moveTo(6,-29);g.lineTo(22,-26);g.lineTo(31,-8);g.stroke();g.beginPath();g.arc(24,-31,8,0,Math.PI*2);g.stroke();g.strokeStyle=col;g.lineWidth=2;for(const yy of [-6,6,18]){g.beginPath();g.moveTo(-19,yy);g.lineTo(19,yy);g.stroke();}g.beginPath();g.moveTo(0,-17);g.lineTo(0,31);g.stroke();g.restore();continue;}
     g.beginPath();g.arc(0,0,30,0,7);g.stroke();g.lineWidth=7;for(const a of [0,1,2,3]){g.save();g.rotate(a*Math.PI/2);g.beginPath();g.moveTo(0,-44);g.lineTo(0,-18);g.stroke();g.restore();}
