@@ -349,3 +349,7 @@
 ## v201 新舊版相容
 - `NETV=2`：只有雙方都宣告 ≥2 才壓縮（`NET.zip`）。合作看隊伍文件 `ptMe().nv`（`PT.mate.nv`，舊版會跳提醒），PvP 看 `games/` 的 `hostNv`/`guestNv`。改連線格式時要升 `NETV`，並保留舊格式的收發。
 - 合作的 `games/<pid>` 會跨場重用：`NET.since=PT.t0`（隊長時鐘），`netRecv` 丟掉 `ts` 比它早的文件。
+
+## v202 WebRTC 直連
+- `netSubscribe` 會呼叫 `rtcStart(code)`：host 建 DataChannel、等 ICE 收完（最多 2.5s）把完整 SDP 寫到 `rtc/<code>/o`（`sid`），guest 訂閱後回答到 `rtc/<code>/a`。看到新的 `sid` guest 會整個重建。STUN 用 Google／Cloudflare，沒有 TURN。
+- `netPush` 有 `NET.dc` 就先從直連送 `{code,seq,by,state,ts}`，同時照寫 `games/<code>`（備援、斷線回復用）；收端都走 `netRecv`，重複的靠 `seq` 擋掉。直連時 `netDirty` 延遲 40ms（交棒 10ms）。`netLeave` 會 `rtcClose()`。
