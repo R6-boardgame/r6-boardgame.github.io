@@ -13009,6 +13009,40 @@ function openAlum(){let el=$('#copAl');if(!el){el=document.createElement('div');
   return copArt(copAll()[i],i);};}
 // Glaz: the flip sight swaps the mid and long dice and gives a rifle's view (180°, 10 cells); press again to flip back
 OPS.glaz.g='翻轉瞄具';GDX.glaz=['切換瞄具：中距離和遠距離的骰子互換，視野改成 180°、10 格；再按一次切回狙擊鏡。',99];OPS.glaz.gd=GDX.glaz[0];OPS.glaz.ch=99;
+// v206: skill names and texts can be edited in a table: data/skills.csv in this repo, or a Google Sheet published as CSV (SKILL_SHEET).
+// Columns by header: id, 技能名稱, 技能說明. An empty cell keeps the built-in text; the last table read is cached for the next start.
+var SKILL_SHEET='';
+var SKT={def:{},on:new Set()};
+function skCsv(t){const R=[];let r=[],f='',q=false;t=t.replace(/^﻿/,'');
+  for(let i=0;i<t.length;i++){const ch=t[i];
+    if(q){if(ch==='"'){if(t[i+1]==='"'){f+='"';i++;}else q=false;}else f+=ch;}
+    else if(ch==='"')q=true;else if(ch===','){r.push(f);f='';}
+    else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&t[i+1]==='\n')i++;r.push(f);R.push(r);r=[];f='';}else f+=ch;}
+  if(f||r.length){r.push(f);R.push(r);}return R;}
+function skGet(id){
+  if(id.startsWith('trait_')){const w=WPN[id.slice(6)];return w?{g:'',d:w.fx||''}:null;}
+  if(CSK[id])return {g:CSK[id].n,d:CSK[id].d};
+  const c=OPC[id];if(!c||id.startsWith('recruit'))return null;ensureOp(id);const o=OPS[id]||{};
+  return {g:o.g||o.passive||c.zh.g||'',d:GDX[id]?GDX[id][0]:SCRIPTED.has(id)?(o.gd||o.pd||''):(c.zh.x||'')};}
+function skPut(id,g,d){
+  if(id.startsWith('trait_')){WPN[id.slice(6)].fx=d;return;}
+  if(CSK[id]){CSK[id].n=g;CSK[id].d=d;return;}
+  const c=OPC[id],o=OPS[id],cur=skGet(id);
+  if(g!==cur.g){c.zh.g=g;if(o){if(o.passive&&!o.g)o.passive=g;else o.g=g;}}
+  if(d!==cur.d){if(GDX[id]){GDX[id][0]=d;if(o)o.gd=d;}
+    else if(SCRIPTED.has(id)){if(o){if(o.pd&&!o.gd)o.pd=d;else o.gd=d;}}
+    else{c.zh.x=d;if(o)o.gd=(c.g.ab&&c.g.ab.some(a=>a.k!=='PASSIVE')?'【尚未實作】':'')+d;}}}
+function skApply(t){const R=skCsv(t);if(!R.length)return false;const h=R[0].map(s=>s.trim()),iI=h.indexOf('id'),iG=h.indexOf('技能名稱'),iD=h.indexOf('技能說明');
+  if(iI<0||(iG<0&&iD<0))return false;const seen=new Set();
+  for(const r of R.slice(1)){const id=(r[iI]||'').trim();if(!id)continue;let cur;try{cur=skGet(id);}catch(e){cur=null;}if(!cur)continue;
+    if(!SKT.def[id])SKT.def[id]=cur;const df=SKT.def[id],g=iG>=0&&(r[iG]||'').trim()?r[iG].trim():df.g,d=iD>=0&&(r[iD]||'').trim()?r[iD].trim():df.d;
+    seen.add(id);try{skPut(id,g,d);}catch(e){}}
+  for(const id of SKT.on)if(!seen.has(id)){try{skPut(id,SKT.def[id].g,SKT.def[id].d);}catch(e){}}
+  SKT.on=seen;return true;}
+(function(){const KEY='r6skills';try{const t=localStorage.getItem(KEY);if(t)skApply(t);}catch(e){}
+  (async()=>{for(const u of [SKILL_SHEET,'data/skills.csv'].filter(Boolean)){
+    try{const r=await fetch(u+(u.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});if(!r.ok)continue;const t=await r.text();
+      if(skApply(t)){try{localStorage.setItem(KEY,t);}catch(e){}return;}}catch(e){}}})();})();
 GT.glaz=()=>'self';
 UG.glaz=async(u,x,y,s)=>{const d=u.pd||PROF[u._op||u.op].d;u.pd=[d[0],d[2],d[1]];
   if(!u.flip){u._fv=[u.fh,u.vr];u.fh=90;u.vr=10;u.flip=1;log(`${nm(u)} 翻開瞄具：中、遠距離的骰子互換，視野 180°`,s);}
