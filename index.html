@@ -13039,10 +13039,22 @@ function skApply(t){const R=skCsv(t);if(!R.length)return false;const h=R[0].map(
     seen.add(id);try{skPut(id,g,d);}catch(e){}}
   for(const id of SKT.on)if(!seen.has(id)){try{skPut(id,SKT.def[id].g,SKT.def[id].d);}catch(e){}}
   SKT.on=seen;return true;}
-(function(){const KEY='r6skills';try{const t=localStorage.getItem(KEY);if(t)skApply(t);}catch(e){}
-  (async()=>{for(const u of [SKILL_SHEET,'data/skills.csv'].filter(Boolean)){
+// v207: achievements use the same kind of table: data/achievements.csv (or ACH_SHEET), columns id, 圖示, 成就名稱, 達成條件
+var ACH_SHEET='';
+var ACHT={def:{},on:new Set()};
+function achApply(t){const R=skCsv(t);if(!R.length)return false;const h=R[0].map(s=>s.trim()),iI=h.indexOf('id'),F=[['ic',h.indexOf('圖示')],['n',h.indexOf('成就名稱')],['d',h.indexOf('達成條件')]];
+  if(iI<0||F.every(f=>f[1]<0))return false;const seen=new Set();
+  for(const r of R.slice(1)){const id=(r[iI]||'').trim(),a=ACHM[id];if(!a)continue;
+    if(!ACHT.def[id])ACHT.def[id]={ic:a.ic,n:a.n,d:a.d};seen.add(id);
+    for(const [k,i] of F){const v=i>=0?(r[i]||'').trim():'';a[k]=v||ACHT.def[id][k];}}
+  for(const id of ACHT.on)if(!seen.has(id))Object.assign(ACHM[id],ACHT.def[id]);
+  ACHT.on=seen;return true;}
+function tblLoad(key,urls,apply){try{const t=localStorage.getItem(key);if(t)apply(t);}catch(e){}
+  (async()=>{for(const u of urls.filter(Boolean)){
     try{const r=await fetch(u+(u.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});if(!r.ok)continue;const t=await r.text();
-      if(skApply(t)){try{localStorage.setItem(KEY,t);}catch(e){}return;}}catch(e){}}})();})();
+      if(apply(t)){try{localStorage.setItem(key,t);}catch(e){}return;}}catch(e){}}})();}
+tblLoad('r6skills',[SKILL_SHEET,'data/skills.csv'],skApply);
+tblLoad('r6ach',[ACH_SHEET,'data/achievements.csv'],achApply);
 GT.glaz=()=>'self';
 UG.glaz=async(u,x,y,s)=>{const d=u.pd||PROF[u._op||u.op].d;u.pd=[d[0],d[2],d[1]];
   if(!u.flip){u._fv=[u.fh,u.vr];u.fh=90;u.vr=10;u.flip=1;log(`${nm(u)} 翻開瞄具：中、遠距離的骰子互換，視野 180°`,s);}
