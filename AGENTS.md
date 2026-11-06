@@ -389,3 +389,6 @@
 - 73 張金屬徽章（使用者給的 `achievement-icons-metal-v1.zip`，1254px PNG）去邊、縮成 256px webp 放 `img/ach/<id>.webp`（共約 1.1 MB）。`ACHIMG` 列出有圖的 id；**沒有圖的成就會從 `ACH` 移除**（使用者指定）。新增成就時要一起放圖並加進 `ACHIMG`。
 - `achIc(a,px)` 回傳圖片（沒圖才用 emoji）：任務結束頁「成就達成」、解鎖提示、成就頁詳情都用它；成就頁的徽章 `achBadge` 有圖時直接用圖（未解鎖沿用 `.bdS` 灰階）。
 - `data/achievements.csv` 的「圖示」欄寫 `<id>.png` 只是對照用；`achApply` 遇到檔名會略過，不會把檔名當文字顯示。
+
+## v213 移除閃電骰
+- 使用者要求閃電骰完全移除：卡片骰組的 `*` 不再轉小寫（`ensureOp`），`PROF` 內建骰組全部轉大寫，`shotPool` 一律 `toUpperCase()`，有掩護時不再拿掉任何骰子（只扣掩護點數）。幹員卡 `hexDice` 不畫閃電、詳情頁拿掉閃電骰說明、新手教學 Ash 射擊說明（中英日）改掉閃電敘述。原版規則全文（`rulesmd`）沒動。
