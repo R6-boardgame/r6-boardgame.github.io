@@ -203,7 +203,7 @@ html body #gnav button:hover,html body #gnav button:focus,html body #gnav button
 #tlob .lt.pvp{grid-column:1/4;border-color:rgba(227,170,62,.7)}
 #tlob .lt.pvp>b{font-size:44px;color:var(--lbA2)}
 #tlob .lt.pvp .go{position:absolute;right:16px;bottom:14px;background:var(--lbA);color:#1a1405;font-family:var(--display);font-weight:700;font-size:22px;padding:6px 22px;clip-path:polygon(8% 0,100% 0,92% 100%,0 100%)}
-#tlob .lt.pve{grid-column:1/3}#tlob .lt.trn{grid-column:3/5}
+#tlob .lt.pve{grid-column:1/3}#tlob .lt.ltrn{grid-column:3/5}
 #tlob .tl{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}#tlob .tl span{font-size:12px;padding:4px 10px;border:1px solid var(--lbL);background:rgba(8,11,14,.7);color:#8b97a3}
 #tlob .tl span.on{border-color:rgba(227,170,62,.6);color:var(--lbA2)}
 #tlob .lt.sm svg{position:absolute;top:12px;right:12px;width:30px;height:30px;fill:none;stroke:rgba(255,255,255,.35);stroke-width:1.6}
@@ -212,7 +212,8 @@ html body #gnav button:hover,html body #gnav button:focus,html body #gnav button
 #tlob .lt.ev>b{color:#d9c2ff}#tlob .lt.ev>small{color:#a98fd6}#tlob .lt.ev svg{stroke:rgba(200,170,255,.6)}
 #tlob .lt.lbB{grid-column:4/5;justify-content:flex-start;cursor:pointer;border-color:rgba(227,170,62,.55);background:linear-gradient(180deg,rgba(40,30,10,.88),rgba(12,17,22,.88));padding:12px 14px}
 #tlob .lbh{display:flex;align-items:center;gap:8px;margin-bottom:6px;width:100%}#tlob .lbh svg{width:22px;height:22px;fill:none;stroke:var(--lbA2);stroke-width:1.7}
-#tlob .lbh b{font-family:var(--display);font-size:22px;font-weight:700;color:var(--lbA2)}#tlob .lbh small{margin-left:auto;font-size:11px;color:#9aa6b2}
+#tlob .lbh b{font-family:var(--display);font-size:22px;font-weight:700;color:var(--lbA2);white-space:nowrap}#tlob .lbh small{margin-left:auto;font-size:11px;color:#9aa6b2;white-space:nowrap}
+@media (max-width:1400px){#tlob .lbh small{display:none}}
 #tlob .lbl,.tboard .lbl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;width:100%}
 #tlob .lbl li,.tboard .lbl li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid rgba(255,255,255,.12)}
 #tlob .lbl em,.tboard .lbl em{font-style:normal;font-family:var(--display);font-weight:700;font-size:24px;line-height:1;color:#ffcf6b;min-width:18px}
@@ -10784,7 +10785,7 @@ function lobHTML(){const cs=copAll(),i=LOBI%2,c=cs[i],rk=copScore(c).rk,art=copA
       <button class="lt pvp" id="t-rank"><i class="im" style="background-image:url(img/ui/sides.webp)"></i><i class="sh"></i><b>線上對戰</b><small>PVP · 排名戰${ME.rating!=null&&ME.mode==='account'?' · '+tierName(tierOf(ME.rating)):''}</small><span class="go">開始</span></button>
       <div class="lt lbB" id="t-board" role="button" tabindex="0"><div class="lbh">${lobIc('trophy')}<b>排行榜</b><small>培養幹員</small></div><ol class="lbl">${L.length?L.map((r,n)=>lbRowHTML(r,n+1)).join(''):`<li class="none">${LB.list==null?'讀取中…':'還沒有人上榜'}</li>`}</ol>${lbMeHTML()}</div>
       <button class="lt pve" id="t-pve"><i class="im" style="background-image:url(img/map/bank.webp)"></i><i class="sh"></i><b>對戰電腦</b><small>PVE · 選陣營、地圖與幹員</small></button>
-      <button class="lt trn" id="t-train"><i class="im" style="background-image:url(img/map/kafe.webp)"></i><i class="sh"></i><b>訓練任務</b><span class="tl"><span class="on">新手教學 · 可重溫</span><span>更多關卡 · 敬請期待</span></span></button>
+      <button class="lt ltrn" id="t-train"><i class="im" style="background-image:url(img/map/kafe.webp)"></i><i class="sh"></i><b>訓練任務</b><span class="tl"><span class="on">新手教學 · 可重溫</span><span>更多關卡 · 敬請期待</span></span></button>
       <button class="lt sm" id="t-cop">${lobIc('user')}<b>培養幹員</b><small>養成你的專屬幹員</small></button>
       <button class="lt sm" id="t-shop">${lobIc('shop')}<b>商店</b><small>解鎖幹員、技能</small></button>
       <button class="lt sm" id="t-lib">${lobIc('book')}<b>作戰檔案</b><small>規則 · 圖鑑 · 成就</small></button>
