@@ -339,3 +339,9 @@
 - 按「離開」（`homeGo`）會提醒「離開的話，培養幹員也算陣亡」，確定就 `copDie`（進學長姐，`q` 記原因，名冊顯示「陣亡 · 中途離開」）。已撤離的幹員離開不會死（`copEnd([])` 算存活）。
 - 關網頁／斷線：回到選單時 `copRecover` 檢查鎖：心跳 3 分鐘內（`COPRC_MS`）跳 `#copRc`「對戰中斷」倒數，可「回到對戰」（`copResume`：單機用快照還原並在電腦回合時接著 `runAI`；線上重新 `netInit`、讀 `games/<code>` 後 `netApply`＋`netSubscribe`），或放棄。逾時、快照沒有、或斷線前已倒下就陣亡（`copDieDlg`）。別台裝置上的鎖沒有本機心跳，雲端 `t` 超過 5 分鐘才判死。開新對戰時若還有舊鎖，舊的直接判死。
 - 撤離（`#evacBtn`，紫色 #a56bff，位置同封門，若封門/護送/掃描在就往上疊一格）：只有自己的培養幹員；花 1 行動（`obj`）開始（`evacStart`：`u.evac`、借用 `u.defusing` 讓他不能動、不自動掩護），撐過敵方下一個階段，在 `endPhase` 裡 `evacPhaseEnd` 把他移出棋盤（`u.evacd`、`alive=false`、`x=-1`），`fxEv({k:'evac'})` 播 `evacBeam`（紫色光柱從地面往上越長越快、光條往上竄、角色變細變透明消失，`SFX.evac`）。`copEnd` 把 `evacd` 當存活。頭像列顯示 `.ob.evac`。測試 stub：`tests/borrowed-skill-progress.cjs`、`tests/defuser-victory.cjs`。
+
+## v200 線上同步加速＋共用計時
+- `netPush` 把 `netSer()` 用 `CompressionStream('gzip')`＋base64 壓成 `'z1:'…`（`netZip`，約 150KB→3KB），走 `NET.zq` 依序寫；收端 `netRecv` 先 `netUnzip` 再交給 `netOnGame`（`NET.rq` 依序、解完再比 `seq`）。沒有 `z1:` 前綴的照舊收。`copResume` 讀檔也要先 `netUnzip`。
+- `games/<code>` 的 merge 寫入改用訂閱快取 `NET.doc` 合併後 `set`，不再先讀 retained（省 ≥250ms）。`netDirty` 延遲 350→150ms（交棒/結束 40ms）。
+- 線上計時：`startPhase` 寫 `G.clkEnd=Date.now()+PHT`、`G.clkBy=NET.me`；每 200ms 以 `clkNow(G.clkBy)` 算剩餘，`NET.off`（對方時鐘−自己，取 `d.ts-Date.now()` 的最大值）校正。切頁/背景不再暫停、擲骰也不停。回到前景（dt>3s）先等 2.5s（`NET.hold`）讓新狀態進來。
+- `netStall`：對方階段時間到又 8 秒沒動靜，等待方替他 `endPhase`（PvP）；合作仍走 `coopStall`（也改成 8 秒）。
