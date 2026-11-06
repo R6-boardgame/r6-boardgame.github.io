@@ -8783,11 +8783,11 @@ function catchThrow(u,x,y){if(u.side!=='A')return false;
   return false;}
 function dmgMod(u,n){if(n>0&&G.gadgets.some(g=>g.alive&&g.type==='kona'&&inRoomOf(g,u.x,u.y,3))){log(`Kóna 治療站讓 ${nm(u)} 少受 1 傷`,'ks');n--;}return n;}
 function onKill(u){const by=DMGBY;if(by&&by.op==='caveira'&&u.side==='A'){alive('A').filter(a=>a!==u).forEach(locU);log('Caveira 審訊完畢，所有進攻方的位置都被標記','kd');}}
-// v214: Iana's Gemini clone walks up to 5 squares (no walls), reveals enemies in its 120° / 10-square view without marking them, and vanishes if an enemy on overwatch fires at it or when it stops
+// v214: Iana's Gemini clone walks up to 5 squares (no walls), reveals and marks enemies in its 120° / 10-square view, and vanishes if an enemy on overwatch fires at it or when it stops
 async function ianaClone(u,x,y,s){const f={...u,mp:5,matStuck:false},m=reach(f),p=pathFrom(m,x,y);if(!p.length)return;
   const k={type:'drone',own:'iana',x:u.x,y:u.y,side:'A',alive:true};G.gadgets.push(k);log(`${nm(u)} 放出 Gemini 分身`,s);let px=u.x,py=u.y,shot=null;
   try{for(const [a,b] of p){const fd=[Math.sign(a-px)||0,Math.sign(b-py)||0];k.x=a;k.y=b;px=a;py=b;const fake={...u,x:a,y:b,fd,hidden:false,spotted:0,id:'ianaClone'};render();await sleep(220);
-    for(const e of G.units)if(e.alive&&e.side!==u.side&&e.x>=0&&inFan(fake,e.x,e.y,10,60)&&los(a,b,e.x,e.y)){if(e.hidden)reveal(e,'被 Iana 的分身看見，');}
+    for(const e of G.units)if(e.alive&&e.side!==u.side&&e.x>=0&&inFan(fake,e.x,e.y,10,60)&&los(a,b,e.x,e.y)){if(e.hidden)reveal(e,'被 Iana 的分身看見，');if(!NOLOC.has(e.op)&&!(e.spotted>0)){e.spotted=1;log(`Iana 的分身標記了 ${nm(e)}`,s);}}
     shot=G.units.find(e=>e.alive&&e.side!==u.side&&e.overwatch&&e.x>=0&&!e.owShot&&!e.stun&&(e.mgOw||(a-e.x)*e.owd[0]+(b-e.y)*e.owd[1]>0)&&losAs(e,()=>inSight(e,fake)));
     if(shot){shot.owShot=1;G.fx={x0:shot.x,y0:shot.y,x1:a,y1:b,until:performance.now()+400,c:COL.def};SFX.shot&&SFX.shot();log(`${nm(shot)} 對 Iana 的分身開火，分身消失了`,'kd');break;}}
   }finally{k.alive=false;G.gadgets=G.gadgets.filter(g=>g!==k);}
