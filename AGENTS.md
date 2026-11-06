@@ -353,3 +353,7 @@
 ## v202 WebRTC 直連
 - `netSubscribe` 會呼叫 `rtcStart(code)`：host 建 DataChannel、等 ICE 收完（最多 2.5s）把完整 SDP 寫到 `rtc/<code>/o`（`sid`），guest 訂閱後回答到 `rtc/<code>/a`。看到新的 `sid` guest 會整個重建。STUN 用 Google／Cloudflare，沒有 TURN。
 - `netPush` 有 `NET.dc` 就先從直連送 `{code,seq,by,state,ts}`，同時照寫 `games/<code>`（備援、斷線回復用）；收端都走 `netRecv`，重複的靠 `seq` 擋掉。直連時 `netDirty` 延遲 40ms（交棒 10ms）。`netLeave` 會 `rtcClose()`。
+
+## v203 爆炸卡頓
+- 場景裡固定有一盞 `R3.fxL` 點光源（平常亮度 0）。爆炸特效用 `fxLight(色,距離,衰減,x,y,z)` 借用它，**不要再 `new PointLight` 加進場景**：光源數一變，three.js 會把地圖上所有材質重新編譯（約 28 個 shader），破牆／手榴彈時手機會卡一兩秒。
+- `floorCanvas` 的地板花紋（`buildTex` + PBR 圖樣）以格子大小快取在 `FTEX`，之後每次破牆重建地圖從 ~180ms 降到 ~30ms；它也會還原 2D 用的 `TEX/TEXKEY`。
