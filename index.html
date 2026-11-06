@@ -10314,7 +10314,7 @@ function dieFace(col,v,bolt,grenade=false){
   g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=6;g.strokeRect(14,14,N-28,N-28);
   if(bolt){g.save();g.setLineDash([14,10]);g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=4;g.strokeRect(24,24,N-48,N-48);g.restore();
     g.fillStyle='#fff';g.beginPath();[[44,30],[30,66],[46,66],[36,96],[66,52],[50,52],[60,30]].forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fill();}
-  // hit marks: bullets (v208) - 1 = one bullet lying diagonally, 2 and 3 = bullets standing side by side
+  // hit marks: bullets (v209) - 1 = one bullet lying diagonally, 2 and 3 = bullets standing side by side
   if(!grenade&&v){const B=v===1?[[128,128,Math.PI/4,64,176]]:v===2?[[100,128,0,46,150],[156,128,0,46,150]]:[[84,128,0,36,140],[128,128,0,36,140],[172,128,0,36,140]];
     for(const [x,y,a,w,h] of B)dieBullet(g,x,y,a,w,h,col);}
   const pos=grenade?({1:[[128,128]],2:[[84,172],[172,84]],3:[[76,180],[128,128],[180,76]]}[v]||[]):[];
