@@ -363,3 +363,8 @@
 - 裝備：`PT.gear`／`PT.mateGear`（每人 2 個，存在 pt 文件的 `gear`）。開局時 `G.cinv={h,g}`，`G[k]` 是全隊合計。玩家這邊的裝備數量和消耗一律用 `gq(u,k)`／`gdec(u,k)`（電腦方的單位和非合作模式會回到 `G[k]`）。
 - 炸彈點：隊長按下開始選角時，`preSites(map)` 先抽好房間存進 `PT.cfg.sites`；`cpLaunch` 用 `FORCESITES` 讓 `randSites` 選同一組。防守方在選角畫面看得到（`cpSites`），進攻方顯示「目標未知」。
 - 部署輪流進行：`G.depBy` 依序是 'h'→'g'→'go'。`coopOwner()` 在部署階段回傳 `depBy`，`unplaced()` 只算輪到的人的幹員，`coopDepNext` 負責交棒；輪到 'go' 時由隊長執行 `startPlay`（`coopAfterApply`）。部署時不能選隊友的幹員。
+
+## v206 技能說明表格
+- 幹員道具／職業技能／職業特性的名稱與說明可以用表格改：`data/skills.csv`（欄位看表頭 `id`、`技能名稱`、`技能說明`；空白格＝用程式內建文字）。若 `SKILL_SHEET` 填了 Google 試算表「發布到網路」的 CSV 網址，就優先讀它，讀不到才讀 repo 的 CSV。
+- 開頁時先套用 localStorage `r6skills` 的上一份表格，再非同步抓最新的（`skApply`）。寫入目標：`GDX[id][0]`／`OPS.gd`（已實作）、`OPC.zh.x`（未實作，會自動加【尚未實作】）、`OPS.pd`（Rook、Tachanka 被動）、`CSK[k].n/d`、`WPN[k].fx`（id 寫成 `trait_k`）。只改和內建不同的格子；表格移除某列時會還原內建。
+- 改程式內的技能文字後，記得同步更新 `data/skills.csv`，不然表格會把它蓋回去。
