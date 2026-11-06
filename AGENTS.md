@@ -381,3 +381,7 @@
 - 新追蹤：`G._rl` 我方對敵射擊的擲骰總和與是否擊殺（`shootUnit`）、`G._fd` 我方傷到隊友、`G._gt` 我方用過的道具種類。用在 sharp、storm、zero、zen、spray、ff3、retreat、gad20、ff。
 - 救出人質的判定看 `G.why` 是否「人質已安全撤離」；任務結算（tourist）看「人質已安全撤離／拆彈器／炸彈已被拆除」；thenwhat＝防守方以「拆彈器已被破壞」獲勝且進攻方仍有人活著。中途離開不再給 retreat。lose5 要在累計 5 敗後贏一場。
 - 圖示：使用者要改成圖片（表裡寫 `<id>.png`），圖片還沒給，暫時仍用 emoji。
+
+## v211 移除 Flores 與 Thunderbird
+- 使用者要求把這兩名幹員拿掉：`OPCARDS`、`data/skills.csv`、技能說明、`GT`/`GA`/AI/3D 外觀、`SCRIPTED`/`NOBTN`/`SETUPOPS`、`GSH` 都刪了；`PAIDCORE` 改成空集合。`opsAll` 門檻 `OPSN` 自動少 2。
+- 圖片檔（`img/*/flores.webp`、`thunderbird.webp`）和 `OPICONS`/`AIMM`/`FACEM`/`I18X` 裡的舊鍵保留，避免玩家舊頭像失效；不影響遊戲。
