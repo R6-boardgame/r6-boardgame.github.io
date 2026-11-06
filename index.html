@@ -2061,6 +2061,62 @@ body:not([data-scr="game"]) #opsBar{display:none}
 .inv2 .bt{display:flex;gap:8px;margin-top:10px}.inv2 .bt button{font:900 13px/1 'Noto Sans TC',sans-serif;padding:10px 0;text-align:center;cursor:pointer}
 .inv2 .no{width:64px;border:1px solid rgba(255,255,255,.22);color:#c9d2da;background:rgba(0,0,0,.35)}
 .inv2 .ok{flex:1;border:0;background:linear-gradient(180deg,#ffc95a,#e0a22e);color:#1a1206;clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%);letter-spacing:.08em}
+/* v204: co-op pick (desktop: squad | picks | map + operator; phone: stacked) */
+#cpk.cq{position:fixed;inset:0;z-index:250;background:radial-gradient(ellipse at 50% 0,#1d2a36,#0b1016 72%);color:#dfe6ec;display:grid;grid-template-columns:270px minmax(0,1fr) minmax(320px,420px);grid-template-rows:auto auto minmax(0,1fr) auto;grid-template-areas:"top top top" "L C M" "L C I" "B B B";gap:12px 16px;padding:14px max(20px,env(safe-area-inset-right,0px)) max(14px,env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));font-family:'Noto Sans TC',sans-serif;box-sizing:border-box}
+#cpk.cq *{box-sizing:border-box}
+.cq .cqTop{grid-area:top;display:flex;align-items:center;gap:12px;padding:8px 14px;background:linear-gradient(90deg,#2a2018,#141b22);border:1px solid #3a2f22}
+.cq .cqTop b{font-size:18px;color:#f08a3c}.cq .cqTop small{color:#9aa6b0}.cq.a .cqTop i{color:#f08a3c;font-style:normal}.cq.d .cqTop i{color:#5ab8ff;font-style:normal}
+.cq .chip{margin-left:auto;padding:4px 12px;border-radius:20px;background:#0d1319;border:1px solid #2c3a47;font-weight:700;font-size:13px;white-space:nowrap}
+.cq .cqT{font:700 26px/1 'IBM Plex Mono',monospace;color:#e3aa3e;min-width:42px;text-align:right}
+.cq .cqL{grid-area:L;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto}
+.cq .cqP{background:rgba(14,20,27,.92);border:1px solid #26323d;padding:12px;display:flex;flex-direction:column;gap:8px}.cq .cqP.me{border-top:3px solid #e3aa3e}.cq .cqP.mt{border-top:3px solid #5ab8ff}
+.cq .cqP header{display:flex;align-items:center;gap:8px}.cq .av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:900;background:#e3aa3e;color:#111;font-size:13px;flex:none}.cq .mt .av{background:#5ab8ff}
+.cq .cqP header b{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.cq .cqP header small{color:#8995a0;font-size:12px;white-space:nowrap}.cq .cqP header span{margin-left:auto;font-size:12px;font-weight:700;color:#e3aa3e;white-space:nowrap}.cq .cqP header span.ok{color:#6fd08c}
+.cq .cqSls{display:grid;grid-template-columns:1fr 1fr;gap:6px}.cq .cqSls .sep{display:none}
+.cq .cqSl{height:46px;display:flex;align-items:center;gap:8px;padding:0 8px;background:#18222c;border:1px solid #2b3946;font-size:13px;min-width:0}.cq .cqSl b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cq .cqSl img,.cq .cqSl .gi{width:28px;height:28px;flex:none}.cq .gi{display:grid;place-items:center;overflow:hidden}.cq .gi img,.cq .gi svg{max-width:100%;max-height:100%;object-fit:contain}
+.cq .me .cqSl:not(.e){border-color:rgba(227,170,62,.45)}.cq .mt .cqSl:not(.e){border-color:rgba(90,184,255,.45)}.cq .cqSl.e{border-style:dashed;color:#5d6a76;background:none;justify-content:center}
+.cq .cqC{grid-area:C;display:flex;flex-direction:column;gap:10px;min-height:0;min-width:0}
+.cq .cqTabs{display:flex;background:#0d1319;border:1px solid #26323d;border-radius:24px;padding:4px;flex:none}.cq .cqTabs button{flex:1;padding:8px;border:0;border-radius:20px;background:none;color:#dfe6ec;font:700 15px 'Noto Sans TC',sans-serif;cursor:pointer}
+.cq .cqTabs button.on{background:linear-gradient(#f2b84a,#d99a2a);color:#1a1205}.cq .cqTabs em{font-style:normal;font-size:12px;margin-left:6px;padding:1px 7px;border-radius:9px;background:rgba(0,0,0,.25)}
+.cq .cqGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));grid-auto-rows:max-content;gap:8px;overflow:auto;min-height:0;align-content:start;padding:3px}
+.cq .cqOp{position:relative;height:92px;background:#151e27;border:1px solid #2a3743;color:#dfe6ec;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font:600 13px 'Noto Sans TC',sans-serif;cursor:pointer;padding:0 0 14px}
+.cq .cqOp img{width:40px;height:40px}.cq .cqOp.me{border:2px solid #e3aa3e;background:#2a2314}.cq .cqOp.mt{border:2px solid #5ab8ff;background:#0f1a24}.cq .cqOp.mt img,.cq .cqOp.mt span{opacity:.45}
+.cq .cqOp.cur{outline:2px solid #fff;outline-offset:2px}.cq .cqOp em{position:absolute;left:0;right:0;bottom:0;font-style:normal;font-size:11px;font-weight:800;padding:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cq .cqOp.me em{background:#e3aa3e;color:#1a1205}.cq .cqOp.mt em{background:#5ab8ff;color:#06121c}.cq .cqOp:focus-visible,.cq button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.cq .cqGrid.gear{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.cq .cqG{display:flex;gap:10px;align-items:center;padding:10px;background:#141c24;border:1px solid #2b3946}.cq .cqG.on{border-color:#e3aa3e}.cq .cqG .gi{width:52px;height:52px;flex:none}
+.cq .cqG .tx{min-width:0;flex:1}.cq .cqG b{color:#f08a3c;font-size:14px}.cq .cqG p{font-size:11.5px;color:#9aa6b0;margin:2px 0 0;line-height:1.45}
+.cq .who em{font-style:normal;font-size:11px;font-weight:800;padding:0 6px;margin-left:5px}.cq .who .me{background:#e3aa3e;color:#111}.cq .who .mt{background:#5ab8ff;color:#06121c}
+.cq .cnt{display:flex;flex-direction:column;align-items:center;gap:2px}.cq .cnt button{width:28px;height:28px;border-radius:50%;border:1px solid #445;background:none;color:#dfe6ec;cursor:pointer}.cq .cnt button:disabled{opacity:.3}.cq .cnt i{font-style:normal;color:#e3aa3e;font-weight:800}
+.cq .cqHint{margin:0;font-size:12.5px;color:#9aa6b0}.cq .cqHint b{color:#e3aa3e}
+.cq .cqM{grid-area:M;background:rgba(14,20,27,.92);border:1px solid #26323d;border-bottom:0;padding:12px 12px 0;display:flex;flex-direction:column;gap:8px}
+.cq .mp{position:relative;cursor:zoom-in;border:1px solid #3a4652;line-height:0}.cq .mp img{width:100%;height:auto;display:block}.cq .zm{position:absolute;right:6px;bottom:6px;background:rgba(11,16,22,.8);border:1px solid #445;padding:2px 7px;font-size:12px;line-height:1.4}
+.cq .pin,.cqZoom .pin{position:absolute;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;background:#e8473c;color:#fff;font:800 12px/22px sans-serif;text-align:center;font-style:normal;box-shadow:0 0 0 3px rgba(232,71,60,.35)}
+.cq .mi{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.cq .mi b{display:none}.cq .mi small{color:#9aa6b0;font-size:12.5px}.cq .mi .tg{color:#e3aa3e;font-weight:700}
+.cq .cqI{grid-area:I;background:rgba(14,20,27,.92);border:1px solid #26323d;border-top:1px solid #26323d;padding:10px 12px;overflow:auto;min-height:0;display:flex;flex-direction:column;gap:8px}
+.cq .cqDet .art,.cq .cqDet .osVar,.cq .cqDet .osImp{display:none}.cq .cqDet .nm{display:flex;align-items:center;gap:8px}.cq .cqDet .nm img{width:36px;height:36px}.cq .cqDet .nm b{font-size:18px;color:#f08a3c}
+.cq .cqDet .hint{font-size:12px;color:#9aa6b0}.cq .cqDet .g b{color:#e3aa3e;font-size:14px}.cq .cqDet p{font-size:12.5px;color:#b8c2ca;line-height:1.55;margin:4px 0}.cq .cqDet .osW{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:#9aa6b0}
+.cq .cqDet .osW div{display:flex;align-items:center;gap:4px}.cq .cqDet .st{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:#9aa6b0;margin-top:4px}.cq .cqDet .st b{color:#dfe6ec}
+.cq .cqAdd button{width:100%;height:40px;border:0;font:800 14px 'Noto Sans TC',sans-serif;cursor:pointer;background:#2b3946;color:#9aa6b0}.cq .cqAdd .add{background:#e3aa3e;color:#1a1205}.cq .cqAdd .rm{background:#3a2a1a;color:#e3aa3e;border:1px solid #e3aa3e}.cq .cqAdd button:disabled{cursor:default;opacity:.6}
+.cq .cqB{grid-area:B;display:flex;gap:10px;height:52px}.cq .cqB button{border:1px solid #33414e;background:#141c24;color:#dfe6ec;font:700 15px 'Noto Sans TC',sans-serif;padding:0 20px;cursor:pointer}
+.cq .cqB .go{flex:1;background:linear-gradient(#f2b84a,#d99a2a);color:#1a1205;border:0;font-size:17px}.cq .cqB .go:disabled{background:#5c4a22;color:rgba(26,18,5,.75);cursor:default}
+.cqZoom{position:absolute;inset:0;z-index:5;background:rgba(3,5,8,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;cursor:zoom-out}
+.cqZoom img{max-width:100%;max-height:calc(100% - 30px);object-fit:contain}.cqZoom{line-height:0}.cqZoom small{line-height:1.4;color:#9aa6b0}
+.cqZoom>img{display:block}.cqZoom{position:fixed}
+@media (max-width:860px){
+ .cq>*{flex:none!important;min-height:auto!important}
+ #cpk.cq{display:flex;flex-direction:column;gap:8px;overflow:auto;padding:max(8px,env(safe-area-inset-top,0px)) 12px calc(76px + env(safe-area-inset-bottom,0px))}
+ .cq .cqTop{order:0;padding:6px 10px;flex-wrap:wrap}.cq .cqTop .chip{display:none}.cq .cqTop b{font-size:16px}.cq .cqT{margin-left:auto;font-size:20px}
+ .cq .cqM{order:1;flex-direction:row;align-items:center;border:0;background:none;padding:0;gap:12px}.cq .mp{width:150px;flex:none}.cq .mi{flex-direction:column;gap:3px}.cq .mi b{display:block;color:#f08a3c;font-size:16px}
+ .cq .pin{width:16px;height:16px;font-size:10px;line-height:16px}
+ .cq .cqI{order:2;max-height:none;overflow:visible;border:1px solid #2b3946;background:#141c24}.cq .cqDet .wzOdIn{display:flex!important;flex-direction:column;gap:6px}.cq .cqDet .odL,.cq .cqDet .odR{width:auto!important;max-width:none!important;flex:none!important}.cq .cqDet .odR{display:flex;flex-wrap:wrap;gap:4px 12px}.cq .cqDet p{font-size:12px}
+ .cq .cqL{order:3;overflow:visible;gap:6px}.cq .cqP{flex-direction:row;align-items:center;padding:6px 8px;gap:8px}.cq .cqP header{flex-direction:column;align-items:flex-start;gap:0;width:62px;flex:none}.cq .cqP header .av,.cq .cqP header small{display:none}.cq .cqP header b{font-size:13px;max-width:62px}
+ .cq .cqP header span{margin:0;font-size:11px}.cq .cqSls{display:flex;gap:5px;flex:1}.cq .cqSls .sep{display:block;width:1px;background:#2b3946;margin:4px 1px}.cq .cqSl{width:38px;height:38px;padding:0;justify-content:center}.cq .cqSl b{display:none}.cq .cqSl.e b{display:block;font-size:0}.cq .cqSl.e b::after{content:'＋';font-size:15px}
+ .cq .cqC{order:4;min-height:auto}.cq .cqGrid{overflow:visible;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.cq .cqOp{height:76px;font-size:11.5px}.cq .cqOp img{width:30px;height:30px}.cq .cqGrid.gear{grid-template-columns:1fr}
+ .cq .cqB{order:5;position:fixed;left:0;right:0;bottom:0;height:auto;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));background:#0b1016;border-top:1px solid #26323d}.cq .cqB button{height:48px;font-size:14px;padding:0 12px}.cq .cqB .go{font-size:15px}
+}
+
 .cpk{position:fixed;inset:0;z-index:250;background:rgba(3,5,8,.82);display:grid;place-items:center;padding:10px}
 #cpk .cpBox{padding:12px!important;box-sizing:border-box}.cpBox{width:min(720px,100%);max-height:calc(100dvh - 20px);display:flex;flex-direction:column;gap:10px;background:#121a22;border:1px solid rgba(255,255,255,.14);border-top:3px solid #f0b43c;padding:12px;color:#e9edf1}
 .cpBox.a{border-top-color:#ff8a3d}.cpBox.d{border-top-color:#4aa3ff}
@@ -6210,6 +6266,9 @@ function parseMap(m,rnd){
   linkDoors(g,m);assignMats(g,m);markObst(g,m);if(rnd)randSites(g,m);return g;
 }
 // v99: a new pair of bomb rooms every match: two rooms from m.sitePool that share a wall, a 2x2 site in each; the hostage is held in site A
+// v204: co-op rolls the bomb rooms at the pick (defenders see them there); FORCESITES makes the match use that pair
+let FORCESITES=null;
+function preSites(k){const m=MAPS[k];if(!m||!m.sitePool)return null;m._lastSites=null;try{parseMap(m,true);}catch(e){return null;}return m._lastSites||null;}
 function randSites(g,m){if(!m.sitePool)return;const H=g.length,W=g[0].length,rid=new Int16Array(W*H).fill(-1),rooms=[];
   g.forEach(row=>row.forEach(c=>{c.site=null;}));
   m.labels.forEach(([n,lx,ly],i)=>{const sx=Math.floor(lx),sy=Math.floor(ly),s=g[sy]&&g[sy][sx];if(!s||s.t!=='floor'||rid[sy*W+sx]>=0)return;const cs=[],q=[[sx,sy]];rid[sy*W+sx]=i;
@@ -6218,7 +6277,9 @@ function randSites(g,m){if(!m.sitePool)return;const H=g.length,W=g[0].length,rid
   const ok=i=>i>=0&&rooms[i]&&m.sitePool.includes(rooms[i].n),pairs=new Set();
   for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){if(g[y][x].t==='floor'||g[y][x].t==='out')continue;
     for(const [a,b] of [[[x-1,y],[x+1,y]],[[x,y-1],[x,y+1]]]){const i=rid[a[1]*W+a[0]],j=rid[b[1]*W+b[0]];if(i!==j&&ok(i)&&ok(j))pairs.add(Math.min(i,j)+','+Math.max(i,j));}}
-  const P=[...pairs];if(!P.length)return;const pr=P[Math.floor(Math.random()*P.length)].split(',').map(Number);if(Math.random()<.5)pr.reverse();
+  const P=[...pairs];if(!P.length)return;let pr=P[Math.floor(Math.random()*P.length)].split(',').map(Number);if(Math.random()<.5)pr.reverse();
+  if(FORCESITES){const f=P.map(q=>q.split(',').map(Number)).find(([i,j])=>[rooms[i].n,rooms[j].n].sort().join('|')===[...FORCESITES].sort().join('|'));if(f)pr=rooms[f[0]].n===FORCESITES[0]?f:[f[1],f[0]];}
+  m._lastSites=[rooms[pr[0]].n,rooms[pr[1]].n];
   pr.forEach((i,k)=>{const L=rooms[i].cs,inR=new Set(L.map(([x,y])=>y*W+x)),free=(x,y)=>inR.has(y*W+x)&&!g[y][x].obst;
     const mx=L.reduce((a,c)=>a+c[0],0)/L.length,my=L.reduce((a,c)=>a+c[1],0)/L.length;let best=null,bd=1e9;
     for(const [x,y] of L)if(free(x,y)&&free(x+1,y)&&free(x,y+1)&&free(x+1,y+1)){const d=Math.hypot(x+1-mx,y+1-my);if(d<bd){bd=d;best=[[x,y],[x+1,y],[x,y+1],[x+1,y+1]];}}
@@ -6806,7 +6867,7 @@ async function doDestroy(u,x,y){useAct(u,'destroy');const hs=G.gadgets.filter(g=
   if(g){g.alive=false;if(g.type!=='clay'&&!g.volcan)SFX.fx('camera');if(g.type==='clay')await clayBoom(g);if(g.volcan)await goyoBurn(g);note(u,'摧毀'+GNAME[g.type]);G.fx={x0:u.x,y0:u.y,x1:x,y1:y,until:performance.now()+400,c:u.side==='A'?COL.atk:COL.def};log(`${nm(u)} 摧毀了${GNAME[g.type]}`,u.side==='A'?'ka':'kd');}
   else{const c=cell(x,y),wall=c.t==='soft';note(u,wall?'打穿軟牆':'破壞路障');destroyCell(x,y);log(wall?`${nm(u)} 打穿了一面軟牆`:`${nm(u)} 破壞了${c.kind==='window'?'窗戶':'門'}路障`,u.side==='A'?'ka':'kd');}
   render();await sleep(G.ai?150:60);await afterAct(u);}
-const chargeTargets=u=>G.charges>0?adj4(u.x,u.y).filter(([x,y])=>['soft','bar'].includes(cell(x,y).t)&&!jammed(x,y)):[];
+const chargeTargets=u=>gq(u,'charges')>0?adj4(u.x,u.y).filter(([x,y])=>['soft','bar'].includes(cell(x,y).t)&&!jammed(x,y)):[];
 const reinfTargets=u=>G.reinf>0?(G.phase==='setup'?allCells():adj4(u.x,u.y)).filter(([x,y])=>cell(x,y).t==='soft'):[];
 function defuseOK(u){return G.defuser&&!dfU()&&man(u.x,u.y,G.defuser.x,G.defuser.y)<=1;}
 // v112: the defuser can go down anywhere in a bomb site's room, not only on the 2×2 marked cells
@@ -6944,27 +7005,27 @@ async function throwGadget(u,kind,x,y){ST(u).gad++;DMGBY=u;aimCam(u,[[x,y]]);
   if(x!==u.x||y!==u.y)u.fd=[Math.sign(x-u.x),Math.sign(y-u.y)];render();try{await fxEv({k:'throw',g:kind,x0:u.x,y0:u.y,x1:x,y1:y,side:u.side,uid:u.id});}catch(e){}
   const area=blastArea(x,y),inA=a=>a.alive&&a.x>=0&&area.some(([i,j])=>i===a.x&&j===a.y);
   const roll=(c,n)=>{let t=0;for(let i=0;i<n;i++)t+=DIE[c][Math.floor(Math.random()*6)];return t;};
-  if(kind==='frag'||kind==='nitro'){const fr=kind==='frag';G[kind]--;if(fr){SFX.fx('nade_pin');await sleep(G.ai?250:420);}note(u,fr?'破片手榴彈':'C4 遙控炸藥');log(`${nm(u)} ${fr?'丟出破片手榴彈':'引爆 C4 遙控炸藥'}`,side);
+  if(kind==='frag'||kind==='nitro'){const fr=kind==='frag';gdec(u,kind);if(fr){SFX.fx('nade_pin');await sleep(G.ai?250:420);}note(u,fr?'破片手榴彈':'C4 遙控炸藥');log(`${nm(u)} ${fr?'丟出破片手榴彈':'引爆 C4 遙控炸藥'}`,side);
     if(hostHarm(area,u.side,fr?'破片手榴彈':'C4')){SFX.boom();return;}
     const hit=G.units.filter(inA);if(fr&&!hit.length)SFX.fx('nade_hit');if(!fr||!hit.length)SFX.boom();G.scanFx={cells:area,until:performance.now()+900,c:0xff7a2a};if(fr)for(const [i,j] of area)await blastDestroy(i,j,1);
     if(!fr){prismaHit(area,'C4 炸開');droneHit(area,'C4');await volcBlast(area);}
     for(const a of hit){if(!a.alive)continue;const ctr=a.x===x&&a.y===y;let r;if(fr){const idx=[Math.floor(Math.random()*6)];r=GRENADE_DIE[idx[0]];await fragShow(u,a,'Y',idx,r,ctr);}else r=roll('O',ctr?2:1);if(r)await damage(a,r,fr?'破片':'C4');}if(fr&&hit.length){diceHide();shotCamEnd();}}
-  else if(kind==='impact'){G.impact--;note(u,'衝擊手榴彈');const c=cell(x,y),w=c.t==='soft'?'軟牆':c.t==='bar'?(c.kind==='window'?'窗戶路障':'門路障'):'道具';await blastDestroy(x,y,2);log(`${nm(u)} 的衝擊手榴彈炸掉了${w}`,side);}
-  else if(kind==='flash'){SFX.flash();G.flash--;note(u,'閃光彈');let n=0;for(const a of G.units)if(inA(a)){stunU(a);if(a.hidden)reveal(a,'被閃光彈');n++;}
+  else if(kind==='impact'){gdec(u,'impact');note(u,'衝擊手榴彈');const c=cell(x,y),w=c.t==='soft'?'軟牆':c.t==='bar'?(c.kind==='window'?'窗戶路障':'門路障'):'道具';await blastDestroy(x,y,2);log(`${nm(u)} 的衝擊手榴彈炸掉了${w}`,side);}
+  else if(kind==='flash'){SFX.flash();gdec(u,'flash');note(u,'閃光彈');let n=0;for(const a of G.units)if(inA(a)){stunU(a);if(a.hidden)reveal(a,'被閃光彈');n++;}
     log(`${nm(u)} 丟出閃光彈，${n} 名幹員被震暈（射擊只擲兩顆黃骰，到回合結束）`,side);}
-  else if(kind==='smk'){G.smk--;note(u,'煙霧彈');G.gadgets.push({type:'smk',x:Math.min(x,G.W-2),y:Math.min(y,G.H-2),side:u.side,alive:true});log(`${nm(u)} 丟出煙霧彈，煙霧擋住視線到回合結束`,side);}
+  else if(kind==='smk'){gdec(u,'smk');note(u,'煙霧彈');G.gadgets.push({type:'smk',x:Math.min(x,G.W-2),y:Math.min(y,G.H-2),side:u.side,alive:true});log(`${nm(u)} 丟出煙霧彈，煙霧擋住視線到回合結束`,side);}
   G.fx={x0:u.x,y0:u.y,x1:x,y1:y,until:performance.now()+400,c:COL.accent};render();await sleep(150);await afterAct(u);
 }
-const clayTargets=u=>G.clay>0?adj4(u.x,u.y).filter(([x,y])=>{const c=cell(x,y);return !blocks(c)&&!gadgetAt(x,y)&&!unitAt(x,y);}):[];
-function deployClay(u,x,y){useAct(u,'tactical');G.clay--;note(u,'闊刀地雷');const g={type:'clay',x,y,dx:x-u.x,dy:y-u.y,side:u.side,alive:true,cid:'cl'+(G.clN=(G.clN||0)+1)};G.gadgets.push(g);log(`${nm(u)} 在 ${coord(x,y)} 佈下闊刀地雷`,'ka');
+const clayTargets=u=>gq(u,'clay')>0?adj4(u.x,u.y).filter(([x,y])=>{const c=cell(x,y);return !blocks(c)&&!gadgetAt(x,y)&&!unitAt(x,y);}):[];
+function deployClay(u,x,y){useAct(u,'tactical');gdec(u,'clay');note(u,'闊刀地雷');const g={type:'clay',x,y,dx:x-u.x,dy:y-u.y,side:u.side,alive:true,cid:'cl'+(G.clN=(G.clN||0)+1)};G.gadgets.push(g);log(`${nm(u)} 在 ${coord(x,y)} 佈下闊刀地雷`,'ka');
   if(u.side===G.player&&!G.ai){G.cdir=g.cid;bigNote('選闊劍地雷的面向','點地雷旁邊的箭頭','a',1400);render();return;}
   render();return afterAct(u);}
 const deployTargets=(u,k)=>[[u.x,u.y],...adj8(u.x,u.y)].filter(([x,y])=>{const c=cell(x,y);return c.t==='floor'&&c.indoor&&stackOK(x,y,k||'shield')&&!(unitAt(x,y)&&!(x===u.x&&y===u.y));}).filter(([x,y])=>!(x===u.x&&y===u.y));
 async function deployGadget(u,kind,x,y,w){
   if(G.phase!=='setup')useAct(u,'tactical');
   if(kind==='wire'){G.wire--;G.gadgets.push({type:'wire',x,y,side:'D',alive:true});if(pub(u)||G.player==='D')log(`${nm(u)} 拉起鐵絲網`,'kd');}
-  else if(kind==='bpcam'){if(!w){const cs=bpCands(x,y);if(cs.length>1&&G.player==='D'&&!G.ai){G.bpPend=cs;G.mode='bpface';bigNote('選一面牆','點發光的牆，攝影機會貼在那一面','d',1600);return;}if(cs[0]){x=cs[0].x;y=cs[0].y;w=cs[0].w;}}G.bpcam--;G.gadgets.push({type:'cam',bp:true,x,y,side:u.side,alive:true,wall:w?[w[0]-x,w[1]-y]:null});if(G.player==='D')log(`${nm(u)} 裝上防彈攝影機`,'kd');}
-  else{G.shield--;const sg={type:'shield',x,y,side:u.side,alive:true};sg.dir=shDef(x,y);G.gadgets.push(sg);if(pub(u)||G.player==='D')log(`${nm(u)} 架設防彈盾`,'kd');
+  else if(kind==='bpcam'){if(!w){const cs=bpCands(x,y);if(cs.length>1&&G.player==='D'&&!G.ai){G.bpPend=cs;G.mode='bpface';bigNote('選一面牆','點發光的牆，攝影機會貼在那一面','d',1600);return;}if(cs[0]){x=cs[0].x;y=cs[0].y;w=cs[0].w;}}gdec(u,'bpcam');G.gadgets.push({type:'cam',bp:true,x,y,side:u.side,alive:true,wall:w?[w[0]-x,w[1]-y]:null});if(G.player==='D')log(`${nm(u)} 裝上防彈攝影機`,'kd');}
+  else{gdec(u,'shield');const sg={type:'shield',x,y,side:u.side,alive:true};sg.dir=shDef(x,y);G.gadgets.push(sg);if(pub(u)||G.player==='D')log(`${nm(u)} 架設防彈盾`,'kd');
     if(u.side===G.player&&!G.ai){G.shdir=sg;G.mode='shdir';bigNote('選擇盾牌正面','點盾牌旁邊的格子，只擋那一側的半圓','d',1600);}}
   render();if(G.phase==='play')await afterAct(u);
 }
@@ -7532,9 +7593,12 @@ function newGame(){
   log(cfg.side==='A'?'部署階段：點幹員，再點橘框出生格放下他。全員就位後開始行動。':'部署階段：點幹員，再點建築內的空格放下他，也可以放鐵絲網、盾牌與攝影機。全員就位後開始。','ks');
   render();
 }
-const unplaced=()=>G?alive(G.player).filter(u=>u.x<0):[];
+const unplaced=()=>G?alive(G.player).filter(u=>u.x<0&&!(G.coop&&G.phase==='setup'&&u.own!==(G.depBy||'h'))):[];
 function nextUnplaced(){const n=unplaced()[0];if(n){G.sel=n;G.mode='move';}}
-function depWait(){return !!(G&&G.net&&G.phase==='setup'&&(G.coop?coopRole()!=='h':G.dep&&G.dep!==G.player));}
+function depWait(){return !!(G&&G.net&&G.phase==='setup'&&(G.coop?coopRole()!==(G.depBy||'h'):G.dep&&G.dep!==G.player));}
+// v204: co-op deploys in turn — the captain places their 2, then the teammate places theirs and starts the match
+function coopDepNext(){if(!G||!G.coop||G.phase!=='setup'||depWait()||unplaced().length)return;const nx=G.depBy==='g'?'go':'g';G.depBy=nx;G.sel=null;G.mode='move';G.bpPend=null;G.rearrCam=null;
+  log(nx==='g'?`${G.coop.h} 部署完成，換 ${G.coop.g} 部署`:`${G.coop.g} 部署完成，開始對戰`,'ks');G._handoff=true;render();if(nx==='go'&&coopRole()==='h')startPlay();}
 // v117: online, the defender's start button ends their deployment and hands the board to the attacker
 function depDone(){if(unplaced().length)return;if(!(G.decoys||[]).length)seedDecoys();G.dep='A';G.sel=null;G.mode='move';G.bpPend=null;G.rearrCam=null;
   log('防守方部署完成，等待進攻方部署…','kd');G._handoff=true;netPush();render();}
@@ -7629,19 +7693,19 @@ async function onCell(x,y){
   if(G.mode==='face'){const f=G.sel;G.mode='move';if(f&&adj8all(f.x,f.y).some(([a,b])=>a===x&&b===y)){f.fd=[x-f.x,y-f.y];if(f.overwatch){f.owd=dir8(f.fd);f.fd=f.owd.slice();}if(R3&&R3.figs&&R3.figs[f.id])R3.figs[f.id].face=Math.atan2(f.fd[0],f.fd[1]);revealCheck();camDiscover();}return render();}
   const u=G.sel,c=cell(x,y),k=`${x},${y}`;
   if(G.phase==='setup'&&G.mode==='bpface'&&G.bpEye){const h=(G.bpPend||[]).find(p=>p.w[0]===x&&p.w[1]===y),e=G.bpEye;G.bpPend=null;G.bpEye=null;G.mode='move';if(h){G._eyeW=h;try{await useGadget(e,h.x,h.y);}finally{G._eyeW=null;}}if(e.ch>0){G.sel=e;G.mode='gadget';}return render();}
-  if(G.phase==='setup'&&G.mode==='bpface'){const h=(G.bpPend||[]).find(p=>p.w[0]===x&&p.w[1]===y);G.bpPend=null;G.mode='bpcam';if(h){await deployGadget(u,'bpcam',h.x,h.y,h.w);if(!G.bpcam)G.mode='move';return render();}}
+  if(G.phase==='setup'&&G.mode==='bpface'){const h=(G.bpPend||[]).find(p=>p.w[0]===x&&p.w[1]===y);G.bpPend=null;G.mode='bpcam';if(h){await deployGadget(u,'bpcam',h.x,h.y,h.w);if(!gq(u,'bpcam'))G.mode='move';return render();}}
   const inT=curTargets().some(([a,b])=>a===x&&b===y);
   if(G.phase==='setup'){
     if(depWait())return;
-    if(G.player==='A'){const o=unitAt(x,y);if(o&&o.side==='A'){G.sel=o;return render();}
+    if(G.player==='A'){const o=unitAt(x,y);if(o&&o.side==='A'){if(G.coop&&o.own!==coopRole())return;G.sel=o;return render();}
       const zi=G.map.spawns.findIndex(z=>z.cells.some(([a,b])=>a===x&&b===y));
       if(zi>=0&&u&&u.side==='A'){u.x=x;u.y=y;G.spawn=zi;SFX.deploy();nextUnplaced();render();}return;}
     const o=unitAt(x,y);
-    if((G.mode==='move'||G.mode==='decoy')&&o&&o.side==='D'){G.sel=o;G.mode='move';return render();}
+    if((G.mode==='move'||G.mode==='decoy')&&o&&o.side==='D'){if(G.coop&&o.own!==coopRole())return;G.sel=o;G.mode='move';return render();}
     if(!inT||!u)return;
     if(G.mode==='move'){const was=u.x<0;u.x=x;u.y=y;u.anchor=[x,y];SFX.deploy();if(was)nextUnplaced();}
     else if(G.mode==='gadget'){await useGadget(u,x,y);if(pdirG())G.mode='pdir';else if(u.ch<=0)G.mode='move';}
-    else if(G.mode==='wire'||G.mode==='shield'||G.mode==='bpcam'){await deployGadget(u,G.mode,x,y);if(G.mode!=='shdir'&&G.mode!=='bpface'&&!G[G.mode])G.mode='move';}
+    else if(G.mode==='wire'||G.mode==='shield'||G.mode==='bpcam'){await deployGadget(u,G.mode,x,y);if(G.mode!=='shdir'&&G.mode!=='bpface'&&!gq(u,G.mode))G.mode='move';}
     else if(G.mode==='decoy'){const k=decoyOf(u);if(k){k.x=x;k.y=y;}G.mode='move';}
     else if(G.mode==='rearr'){G.rearr=G.rearr??5;const cg=G.gadgets.find(g=>g.alive&&g.type==='cam'&&g.fixed&&g.x===x&&g.y===y);
       if(G.rearrCam){if(!G.rearrCam.moved){G.rearr--;G.rearrCam.moved=1;}G.rearrCam.x=x;G.rearrCam.y=y;G.rearrCam=null;log('攝影機換了位置','kd');}
@@ -7703,7 +7767,7 @@ async function onCell(x,y){
   G.mode='move';render();
 }
 function setMode(m){G.mode=G.mode===m?'move':m;render();}
-async function doCharge(u,x,y){useAct(u,'tactical');note(u,'爆破炸藥');G.charges--;render();await chargePlant3D(u,x,y,G.ai?650:950);destroyCell(x,y);log(`${nm(u)} 引爆爆破炸藥`,'ka');render();await sleep(G.ai?150:60);await afterAct(u);}
+async function doCharge(u,x,y){useAct(u,'tactical');note(u,'爆破炸藥');gdec(u,'charges');render();await chargePlant3D(u,x,y,G.ai?650:950);destroyCell(x,y);log(`${nm(u)} 引爆爆破炸藥`,'ka');render();await sleep(G.ai?150:60);await afterAct(u);}
 
 // ---------- rendering ----------
 const cv=$('#board');let ctx=cv.getContext('2d');let S=30,M=20,OFF=false;
@@ -9008,14 +9072,14 @@ function renderPanel(){{const r=document.getElementById('actsR');if(r)r.replaceC
   if($('#zones'))$('#zones').innerHTML='',G.map.spawns.forEach((z,i)=>{const b=document.createElement('button');b.textContent=z.name;if(G.spawn===i)b.className='on';b.onclick=()=>{const z=G.map.spawns[i],free=z.cells.filter(([x,y])=>!unitAt(x,y));unplaced().forEach(u=>{const c=free.shift();if(c){u.x=c[0];u.y=c[1];}});G.spawn=i;nextUnplaced();render();};$('#zones').appendChild(b);});
   if($('#acts'))renderActs();
 }
-function renderDeploy(p){if(depWait()){p.innerHTML=`<div class="box depBox"><div class="depHd"><h2>部署階段</h2><span>${G.coop?`隊長 ${esc(G.coop.h)} 正在部署全隊…`:G.dep==='A'?'已完成，等待進攻方選出生位置…':'等待防守方部署…'}</span></div></div>`;return;}
-  if(G.player==='D'&&(!G.net||G.coop)&&!(G.decoys||[]).length&&!unplaced().length)seedDecoys();const team=G.units.filter(u=>u.side===G.player),left=unplaced().length,A=G.player==='A';
+function renderDeploy(p){if(depWait()){p.innerHTML=`<div class="box depBox"><div class="depHd"><h2>部署階段</h2><span>${G.coop?`${G.depBy==='g'?'隊員 '+esc(G.coop.g):G.depBy==='go'?'開始中':'隊長 '+esc(G.coop.h)} ${G.depBy==='go'?'…':'正在部署自己的幹員，部署好就換你'}`:G.dep==='A'?'已完成，等待進攻方選出生位置…':'等待防守方部署…'}</span></div></div>`;return;}
+  if(G.player==='D'&&!G.net&&!(G.decoys||[]).length&&!unplaced().length)seedDecoys();const team=G.units.filter(u=>u.side===G.player&&!(G.coop&&u.own!==coopRole())),left=unplaced().length,A=G.player==='A',cpN=G.coop&&G.depBy!=='g';
   p.innerHTML=`<div class="box depBox"><div class="depHd"><h2>部署階段</h2><span>${A?'點幹員，再點橘框格子':'點幹員，再點建築內空格'}</span></div>
     <div class="depSq">${team.map(u=>`<button data-u="${u.id}" class="${u===G.sel?'on':''} ${u.x<0?'todo':'ok'}"><img src="${opIcon(u.op)}" alt=""><span>${OPS[u.op].name}</span></button>`).join('')}</div>
     ${A?'<div class="depZ"><small>一次放到</small><div class="row" id="zones"></div></div>':G.sel?'<div class="row" id="acts"></div>':''}
-    <button class="primary" id="go" ${left?'disabled':''}>${G.net&&!G.coop&&!A?'部署完成':'開始行動'}<span class="sub">${left?`還有 ${left} 名幹員沒放`:G.net&&!G.coop&&!A?'換進攻方選出生位置':'進攻方先動'}</span></button></div>`;
+    <button class="primary" id="go" ${left?'disabled':''}>${cpN||(G.net&&!G.coop&&!A)?'部署完成':'開始行動'}<span class="sub">${left?`還有 ${left} 名幹員沒放`:cpN?`換 ${esc(G.coop.g)} 部署`:G.net&&!G.coop&&!A?'換進攻方選出生位置':'進攻方先動'}</span></button></div>`;
   p.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const u=G.units.find(x=>x.id===b.dataset.u);if(u.alive&&u.x>=0)onCell(u.x,u.y);else{G.sel=u;render();}});
-  $('#go').onclick=startPlay;
+  $('#go').onclick=G.coop?coopDepNext:startPlay;
   if($('#zones'))G.map.spawns.forEach((z,i)=>{const b=document.createElement('button');b.textContent=z.name;if(G.spawn===i)b.className='on';b.onclick=()=>{const z=G.map.spawns[i],free=z.cells.filter(([x,y])=>!unitAt(x,y));unplaced().forEach(u=>{const c=free.shift();if(c){u.x=c[0];u.y=c[1];}});G.spawn=i;nextUnplaced();render();};$('#zones').appendChild(b);});
   if($('#acts'))renderActs();portActs();}
 function actSub(t){return matchMedia('(max-width:760px),(max-height:520px) and (orientation:landscape)').matches?t.replace(/^(戰術|專屬) · /,'').replace(' · +',' +'):t;}
@@ -9031,8 +9095,8 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
     if(u.side!=='D'||G.player!=='D'){el.remove();return;}
     L.push(btn('移動幹員','點建築內空格',G.mode==='move',false,()=>setMode('move')));
     L.push(btn('調整場景',`攝影機、門窗、鐵牆 · 剩 ${G.rearr??5} 次`,G.mode==='rearr',(G.rearr??5)<=0&&!G.rearrCam,()=>{G.rearrCam=null;setMode('rearr');}));
-    for(const d of alive('D').filter(d=>setupGadget(d.sk||d.op)))L.push(btn(GSH[d.op]||OPS[d.op].g,`${OPS[d.op].name} · 剩 ${d.ch}`,G.mode==='gadget'&&u===d,d.ch<=0,()=>{if(G.mode==='gadget'&&G.sel===d)return setMode('move');G.sel=d;setMode('gadget');},'',d.op==='valkyrie'?eqIc('valk'):`<img class="bic" src="${opIcon(d.op)}" alt="">`));
-    L.push(btn('鐵絲網',`剩 ${G.wire}`,G.mode==='wire',G.wire<=0,()=>setMode('wire'),'',eqIc('wire')));L.push(btn('可部署盾牌',`剩 ${G.shield}`,G.mode==='shield',G.shield<=0,()=>setMode('shield'),'',eqIc('shield')));L.push(btn('防彈攝影機',`剩 ${G.bpcam}`,G.mode==='bpcam'||G.mode==='bpface',G.bpcam<=0,()=>{G.bpPend=null;if(G.mode==='bpface')G.mode='bpcam';setMode('bpcam');},'',eqIc('bpcam')));
+    for(const d of alive('D').filter(d=>setupGadget(d.sk||d.op)&&!(G.coop&&d.own!==coopRole())))L.push(btn(GSH[d.op]||OPS[d.op].g,`${OPS[d.op].name} · 剩 ${d.ch}`,G.mode==='gadget'&&u===d,d.ch<=0,()=>{if(G.mode==='gadget'&&G.sel===d)return setMode('move');G.sel=d;setMode('gadget');},'',d.op==='valkyrie'?eqIc('valk'):`<img class="bic" src="${opIcon(d.op)}" alt="">`));
+    L.push(btn('鐵絲網',`剩 ${G.wire}`,G.mode==='wire',G.wire<=0,()=>setMode('wire'),'',eqIc('wire')));L.push(btn('可部署盾牌',`剩 ${gq(u,'shield')}`,G.mode==='shield',gq(u,'shield')<=0,()=>setMode('shield'),'',eqIc('shield')));L.push(btn('防彈攝影機',`剩 ${gq(u,'bpcam')}`,G.mode==='bpcam'||G.mode==='bpface',gq(u,'bpcam')<=0,()=>{G.bpPend=null;if(G.mode==='bpface')G.mode='bpcam';setMode('bpcam');},'',eqIc('bpcam')));
   } else if(u.side===G.player&&u.alive){
     const ok=canAct(u),isA=G.active===u,can=k=>ok&&(!isA||canDo(u,k)),sub=(k,t)=>isA&&k!=='destroy'&&u.used.has(k)?'已用過':t;
     const dmv=dmOf();if(dmv&&isA){L.push(btn('無人機移動中',`剩 ${dmv.mp} 移動點 · 按左下「掃描」停下`,false,true,()=>{},'','',eqIc('drone')));}else{
@@ -9056,13 +9120,13 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
     if(u.side==='A'){
       if(u.matStuck)L.push(btn('拆掉捕獸夾',sub('unmat','1 行動 · 解除定身'),false,!can('unmat'),wrap(()=>unMat(u))));
       tac('drone','無人機',G.drones,G.drones>0?droneTargets(u):[]);
-      tac('charge','爆破炸藥',G.charges,chargeTargets(u));
-      const th=throwTargets(u);tac('frag','破片手榴彈',G.frag,th);tac('flash','閃光彈',G.flash,th);tac('smk','煙霧彈',G.smk,th);tac('clay','闊刀地雷',G.clay,clayTargets(u));
+      tac('charge','爆破炸藥',gq(u,'charges'),chargeTargets(u));
+      const th=throwTargets(u);tac('frag','破片手榴彈',gq(u,'frag'),th);tac('flash','閃光彈',gq(u,'flash'),th);tac('smk','煙霧彈',gq(u,'smk'),th);tac('clay','闊刀地雷',gq(u,'clay'),clayTargets(u));
       if(G.mission==='hostage'){if(G.tut2)L.push(btn('護送人質',sub('obj','相鄰人質'),false,!can('obj')||!escortOK(u),wrap(()=>escort(u)),'primary'));}
       else L.push(btn('安裝拆彈器',sub('obj','必須站在 A/B 炸彈點'),false,!can('obj')||!plantOK(u),wrap(async()=>{plant(u);await afterAct(u);}),'primary'));
     } else {
       {const mg=mirOpenable(u);if(mg.length)L.push(btn('打開黑鏡',sub('mirror','1 行動 · 洞口變透明'),false,!can('mirror'),wrap(()=>mirOpen(u,mg[0])),'',`<img class="bic" src="${opIcon('mira')}" alt="">`));}
-      tac('impact','衝擊手榴彈',G.impact,impactTargets(u));tac('nitro','C4 遙控炸藥',G.nitro,throwTargets(u));
+      tac('impact','衝擊手榴彈',gq(u,'impact'),impactTargets(u));tac('nitro','C4 遙控炸藥',gq(u,'nitro'),throwTargets(u));
       if(G.mission!=='hostage'&&G.defuser)L.push(btn('解除拆彈器',sub('obj','站上或相鄰'),false,!can('obj')||!defuseOK(u),wrap(async()=>{defuse(u);await afterAct(u);}),'primary'));
     }
     if(u.gi)for(const [k,n] of Object.entries(u.gi)){const m=k==='charges'?'charge':k;tac(m,INV[u.side==='A'?'D':'A'][k][0],n,giBorrow(u,m,()=>giTargets(u,m)));}
@@ -11078,7 +11142,11 @@ const PT={pid:null,role:null,mate:null,st:'lobby',cfg:null,t0:0,picks:[],matePic
 const FRON={},FRONUN={};
 let INVUN=null,INVCODE='',COOPNEW=0;
 const coopRole=()=>G&&G.coop&&NET?(NET.role==='host'?'h':'g'):null;
-function coopOwner(){if(!G||!G.coop)return null;if(G.phase!=='play')return 'h';return curSide()!==G.player?'ai':(G.phaseIdx<2?'h':'g');}
+// v204: in co-op each player carries their own 2 pieces of gear (G.cinv[h|g]); G[k] stays the team total
+const gOwn=u=>{if(!G||!G.coop||!G.cinv)return null;if(u&&u.side!==G.player)return null;return (u&&u.own)||coopRole();};
+function gq(u,k){const o=gOwn(u);return o&&INV[G.player]&&INV[G.player][k]?((G.cinv[o]||{})[k]|0):(G[k]|0);}
+function gdec(u,k){G[k]=Math.max(0,(G[k]|0)-1);const o=gOwn(u);if(o&&G.cinv[o]&&G.cinv[o][k]>0)G.cinv[o][k]--;}
+function coopOwner(){if(!G||!G.coop)return null;if(G.phase!=='play')return G.depBy||'h';return curSide()!==G.player?'ai':(G.phaseIdx<2?'h':'g');}
 const coopMyTurn=()=>!!G&&!!G.coop&&coopOwner()===coopRole();
 const coopIWrite=()=>{const o=coopOwner();return (o==='ai'?'h':o)===coopRole();};
 const myPh=()=>!!G&&curSide()===G.player&&(!G.coop||coopMyTurn());
@@ -11101,8 +11169,8 @@ function frRowHTML(f){const on=frOnline(f),inv=PT.invited[f.id]&&Date.now()-PT.i
   const btn=mate?'':inv?`<button class="frInv s" disabled>已邀請</button>`:`<button class="frInv" data-invite="${f.id}" ${on&&on.st!=='game'&&!full?'':'disabled'}>邀請</button>`;
   return `<div class="fri"><button class="frN" data-peek="${f.id}">${esc(f.name)}</button><span class="frSt">${st}</span>${btn}<button class="frx ${ACHV.sel===f.id?'arm':''}" data-del="${f.id}">${ACHV.sel===f.id?'再點一下移除':'移除'}</button></div>`;}
 // ---- party ----
-function ptReset(){if(PT.un)try{PT.un();}catch(e){}Object.assign(PT,{pid:null,role:null,mate:null,st:'lobby',cfg:null,t0:0,picks:[],matePicks:[],lock:false,mateLock:false,un:null,launched:0});cpClose();ptUI();if(SCREEN==='title'&&!G)lobRender();}
-async function ptSave(extra){if(!PT.pid)return;const db=await ptDb();if(!db)return;const base=Object.assign(ptMe(),{picks:PT.picks,lock:PT.lock});
+function ptReset(){if(PT.un)try{PT.un();}catch(e){}Object.assign(PT,{pid:null,role:null,mate:null,st:'lobby',cfg:null,t0:0,picks:[],matePicks:[],gear:{},mateGear:{},cur:null,tab:'op',lock:false,mateLock:false,un:null,launched:0});cpClose();ptUI();if(SCREEN==='title'&&!G)lobRender();}
+async function ptSave(extra){if(!PT.pid)return;const db=await ptDb();if(!db)return;const base=Object.assign(ptMe(),{picks:PT.picks,gear:PT.gear||{},lock:PT.lock});
   try{if(PT.role==='h')await db.doc(`pt/${PT.pid}/h`).set(Object.assign(base,{st:PT.st,cfg:PT.cfg,t0:PT.t0},extra||{}));else await db.doc(`pt/${PT.pid}/g`).set(Object.assign(base,{on:1},extra||{}));}catch(e){}}
 setInterval(()=>{if(PT.pid&&!document.hidden)ptSave();if(PT.mate&&Date.now()-(PT.mate.ts||0)>75000&&!(G&&G.coop)){const n=PT.mate.name;if(PT.role==='g'){ptReset();achToastMsg('小隊已解散',`和 ${esc(n)} 的連線中斷`);}else{PT.mate=null;ptUI();if(SCREEN==='title'&&!G)lobRender();achToastMsg('隊友離線',esc(n));}}},20000);
 async function ptListen(){const db=await ptDb();if(!db)return;if(PT.un)try{PT.un();}catch(e){}const pid=PT.pid,other=PT.role==='h'?'g':'h';
@@ -11112,9 +11180,9 @@ function ptGot(d){
   if(Date.now()-(d.ts||0)>75000)return;
   const fresh=!PT.mate;PT.mate={id:d.id,code:d.code,name:d.name||'隊友',best:d.best,ts:d.ts,nv:d.nv||1};if(PT.mate.nv<NETV&&PT.oldW!==d.id){PT.oldW=d.id;achToastMsg('隊友的遊戲是舊版','請對方重新整理頁面，不然可能會卡住');}
   if(fresh){if(!isFriend(d.id)&&d.id)frAdd({id:d.id,name:d.name});if(PT.role==='h')achToastMsg('隊友已加入',esc(d.name||''));}
-  PT.matePicks=Array.isArray(d.picks)?d.picks.filter(k=>OPC[k]):[];PT.mateLock=!!d.lock;
+  PT.matePicks=Array.isArray(d.picks)?d.picks.filter(k=>OPC[k]):[];PT.mateGear=d.gear&&typeof d.gear==='object'?d.gear:{};PT.mateLock=!!d.lock;
   if(PT.role==='g'){
-    if(d.st==='pick'&&d.cfg&&PT.st!=='pick'&&!(G&&G.coop)){PT.st='pick';PT.cfg=d.cfg;PT.t0=d.t0||Date.now();PT.picks=[];PT.lock=false;cpGuestJoin();cpOpen();}
+    if(d.st==='pick'&&d.cfg&&PT.st!=='pick'&&!(G&&G.coop)){PT.st='pick';PT.cfg=d.cfg;PT.t0=d.t0||Date.now();PT.picks=[];PT.gear={};PT.cur=null;PT.tab='op';PT.lock=false;cpGuestJoin();cpOpen();}
     else if(d.st==='lobby'&&PT.st==='pick'){PT.st='lobby';cpClose();}
     if(PT.st==='pick'){const clash=PT.picks.filter(k=>PT.matePicks.some(p=>mfBase(p)===mfBase(k)));if(clash.length){PT.picks=PT.picks.filter(k=>!clash.includes(k));PT.lock=false;whyTip('隊長先選了',clash.map(k=>OPC[k].name).join('、'));ptSave();}}}
   else if(PT.st==='pick'&&PT.lock&&PT.mateLock)cpLaunch();
@@ -11160,27 +11228,56 @@ const cpPool=s=>mfPool(s,true).filter(k=>!/^recruit/.test(k)&&copSlot(k)==null);
 function cpOpen(){let el=$('#cpk');if(!el){el=document.createElement('div');el.id='cpk';el.className='cpk';el.setAttribute('role','dialog');el.setAttribute('aria-label','組隊選角');document.body.appendChild(el);}
   clearInterval(cpOpen.iv);cpOpen.iv=setInterval(cpTick,250);ptUI();cpRender();}
 function cpClose(){clearInterval(cpOpen.iv);const el=$('#cpk');if(el)el.remove();}
-function cpTick(){if(!$('#cpk')||PT.st!=='pick'){clearInterval(cpOpen.iv);return;}const left=PT.t0+CPT-Date.now(),t=$('#cpk .cpT');if(t)t.textContent=Math.max(0,Math.ceil(left/1000));
+function cpTick(){if(!$('#cpk')||PT.st!=='pick'){clearInterval(cpOpen.iv);return;}const left=PT.t0+CPT-Date.now(),t=$('#cpk .cqT');if(t)t.textContent=Math.max(0,Math.ceil(left/1000));
   if(left<=0&&!PT.lock){cpFill();PT.lock=true;ptSave();cpRender();}
   if(PT.role==='h'&&PT.lock&&(PT.mateLock||left<-8000))cpLaunch();}
-function cpFill(){const s=PT.cfg.side,taken=new Set(PT.matePicks.map(mfBase));for(const k of shuffle(cpPool(s))){if(PT.picks.length>=2)break;if(taken.has(mfBase(k))||PT.picks.some(p=>mfBase(p)===mfBase(k)))continue;PT.picks.push(k);}}
+function cpFill(){const s=PT.cfg.side,taken=new Set(PT.matePicks.map(mfBase));for(const k of shuffle(cpPool(s))){if(PT.picks.length>=2)break;if(taken.has(mfBase(k))||PT.picks.some(p=>mfBase(p)===mfBase(k)))continue;PT.picks.push(k);}
+  PT.gear=PT.gear||{};for(let i=0;i<20&&cpGearN(PT.gear)<2;i++){const k=shuffle(Object.keys(INV[s]))[0];if((PT.gear[k]|0)<INV[s][k][1])PT.gear[k]=(PT.gear[k]|0)+1;}}
+// v204: co-op pick, laid out like the mockup — squad on the left, picks in the middle, map + operator card on the right (stacked on phones)
+function cpSites(){const c=PT.cfg;if(!c||c.side!=='D')return null;const m=MAPS[c.map];if(!m)return null;const H=m.rows.length,W=m.rows[0].length,out=[];
+  if(c.sites&&m.labels){c.sites.forEach((n,i)=>{const l=m.labels.find(L=>L[0]===n);if(l)out.push({L:'AB'[i],n,x:l[1]/W*100,y:l[2]/H*100});});return out;}
+  for(const L of ['A','B']){const pts=[];m.rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch===L)pts.push([x,y]);}));if(pts.length)out.push({L,n:L+' 點',x:(pts.reduce((a,p)=>a+p[0],0)/pts.length+.5)/W*100,y:(pts.reduce((a,p)=>a+p[1],0)/pts.length+.5)/H*100});}return out;}
+const cpGearN=g=>Object.values(g||{}).reduce((a,b)=>a+(b|0),0);
 function cpRender(){const el=$('#cpk');if(!el||!PT.cfg)return;const s=PT.cfg.side,m=MAPS[PT.cfg.map]||MAPS.bank,mn=PT.mate?PT.mate.name:'隊友',me=meName();
+  const g0=el.querySelector('.cqGrid'),keep=[g0?g0.scrollTop:0,el.scrollTop];
+  el.className='cq '+(s==='A'?'a':'d');
   const mine=new Set(PT.picks.map(mfBase)),theirs=new Set(PT.matePicks.map(mfBase));
   const pool=cpPool(s);PT.matePicks.forEach(k=>{if(!pool.some(p=>mfBase(p)===mfBase(k)))pool.push(k);});
-  const tile=k=>{const b=mfBase(k),a=mine.has(b),t=theirs.has(b);return `<button class="cpOp${a?' me':''}${t?' mt':''}" data-cp="${k}" ${t||PT.lock?'disabled':''}><img src="${opIcon(k)}" alt=""><span>${esc(OPC[k].name)}</span>${a?`<em>${esc(me)}</em>`:t?`<em>${esc(mn)}</em>`:''}</button>`;};
-  const slot=(k,who,cls)=>`<div class="cpSl ${cls}">${k?`<img src="${opIcon(k)}" alt=""><b>${esc(OPC[k].name)}</b>`:'<i>？</i>'}<small>${esc(who)}</small></div>`;
+  if(!PT.cur||!OPC[PT.cur]||!pool.includes(PT.cur))PT.cur=PT.picks[0]||pool.find(k=>!theirs.has(mfBase(k)))||pool[0];
+  const tab=PT.tab==='inv'?'inv':'op',gN=cpGearN(PT.gear),mgN=cpGearN(PT.mateGear),sites=cpSites(),ready=PT.picks.length===2&&gN===2;
+  const tile=k=>{const b=mfBase(k),a=mine.has(b),t=theirs.has(b);return `<button class="cqOp${a?' me':''}${t?' mt':''}${PT.cur===k?' cur':''}" data-cp="${k}"><img src="${opIcon(k)}" alt=""><span>${esc(OPC[k].name)}</span>${a?`<em>你</em>`:t?`<em>${esc(mn)}</em>`:''}</button>`;};
+  const opSl=k=>k?`<div class="cqSl"><img src="${opIcon(k)}" alt=""><b>${esc(OPC[k].name)}</b></div>`:`<div class="cqSl e"><b>＋ 幹員</b></div>`;
+  const gList=g=>{const o=[];for(const k in INV[s])for(let i=0;i<(g&&g[k]|0);i++)o.push(k);return o;};
+  const gSl=k=>k?`<div class="cqSl"><i class="gi">${WZI[k]||''}</i><b>${INV[s][k][0]}</b></div>`:`<div class="cqSl e"><b>＋ 裝備</b></div>`;
+  const card=(who,nm,role,ops,gear,lock)=>{const gl=gList(gear);return `<div class="cqP ${who}"><header><i class="av">${esc((nm||'?')[0])}</i><b>${esc(nm)}</b><small>${role}</small><span class="${lock?'ok':''}">${lock?'✓ 已確認':'選擇中…'}</span></header>
+    <div class="cqSls">${opSl(ops[0])}${opSl(ops[1])}<i class="sep"></i>${gSl(gl[0])}${gSl(gl[1])}</div></div>`;};
   const left=Math.max(0,Math.ceil((PT.t0+CPT-Date.now())/1000));
-  el.innerHTML=`<div class="cpBox ${s==='A'?'a':'d'}"><header><img src="${mapThumb(PT.cfg.map)}" alt=""><div><b>${m.name}</b><span>${PT.cfg.mis==='hostage'?'人質':'炸彈'} · <i>${s==='A'?'進攻方':'防守方'}</i> · 4v4 對電腦</span></div><span class="cpT">${left}</span></header>
-    <p class="cpHint">各選 2 名幹員。隊友選走的會框上他的名字，不能再選。${PT.role==='h'?'戰術裝備用你在「對戰電腦」存的配置，全隊共用。':'戰術裝備由隊長配置，全隊共用。'}</p>
-    <div class="cpOps">${pool.map(tile).join('')}</div>
-    <div class="cpSlots"><div class="cpCol me"><h4>${esc(me)}${PT.lock?' · 已確認':''}</h4>${slot(PT.picks[0],me,'me')}${slot(PT.picks[1],me,'me')}</div><div class="cpCol mt"><h4>${esc(mn)}${PT.mateLock?' · 已確認':''}</h4>${slot(PT.matePicks[0],mn,'mt')}${slot(PT.matePicks[1],mn,'mt')}</div></div>
-    <footer><button id="cpRnd" ${PT.lock?'disabled':''}>隨機</button><button class="primary" id="cpGo" ${PT.lock||PT.picks.length<2?'disabled':''}>${PT.lock?(PT.mateLock?'開始中…':`等待 ${esc(mn)}…`):PT.picks.length<2?`再選 ${2-PT.picks.length} 名`:'確認'}</button></footer></div>`;
-  el.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{if(PT.lock)return;const k=b.dataset.cp,bs=mfBase(k);if(theirs.has(bs))return whyTip(`${OPC[k].name} 已被 ${mn} 選走`,'換一位幹員');
-    const i=PT.picks.findIndex(p=>mfBase(p)===bs);if(i>=0)PT.picks.splice(i,1);else{if(PT.picks.length>=2)return whyTip('已經選了 2 名','先點一位已選的幹員取消');PT.picks.push(k);}try{SFX.ui&&SFX.ui();}catch(e){}ptSave();cpRender();});
-  el.querySelector('#cpRnd').onclick=()=>{PT.picks=[];cpFill();ptSave();cpRender();};
-  el.querySelector('#cpGo').onclick=()=>{if(PT.picks.length<2||PT.lock)return;PT.lock=true;ptSave();cpRender();if(PT.role==='h'&&PT.mateLock)cpLaunch();};}
+  const cur=PT.cur,cb=cur&&mfBase(cur),cMine=cb&&mine.has(cb),cTheirs=cb&&theirs.has(cb);
+  let det='';try{if(cur){try{ensureOp(cur);}catch(e){}det=wzOpDetail(OPC[cur]);}}catch(e){det=`<b>${cur?esc(OPC[cur].name):''}</b>`;}
+  const addB=cur?(cTheirs?`<button disabled>${esc(mn)} 已選</button>`:cMine?`<button class="rm" data-cq-add>移出我的小隊</button>`:`<button class="add" data-cq-add ${PT.lock||PT.picks.length>=2?'disabled':''}>${PT.picks.length>=2?'已選滿 2 名':'加入我的小隊'}</button>`):'';
+  const gcard=k=>{const [n,max,d]=INV[s][k],my=PT.gear[k]|0,mt=PT.mateGear[k]|0;return `<div class="cqG${my?' on':''}"><i class="gi">${WZI[k]||''}</i><div class="tx"><b>${n}</b><span class="who">${my?`<em class="me">你 ×${my}</em>`:''}${mt?`<em class="mt">${esc(mn)} ×${mt}</em>`:''}</span><p>${d}</p></div>
+    <div class="cnt"><button data-cg="${k}" data-dv="-1" ${PT.lock||my<=0?'disabled':''} aria-label="減少${n}">−</button><i>${my}</i><button data-cg="${k}" data-dv="1" ${PT.lock||gN>=2||my>=max?'disabled':''} aria-label="增加${n}">＋</button></div></div>`;};
+  const goTxt=PT.lock?(PT.mateLock?'開始中…':`✓ 已確認 · 等待 ${esc(mn)}…`):ready?'確認出戰':`還差${PT.picks.length<2?` ${2-PT.picks.length} 名幹員`:''}${PT.picks.length<2&&gN<2?'、':''}${gN<2?` ${2-gN} 個裝備`:''}`;
+  el.innerHTML=`<div class="cqTop"><b>${m.name}</b><small>${PT.cfg.mis==='hostage'?'人質':'炸彈'} · <i>${s==='A'?'進攻方':'防守方'}</i></small><span class="chip">4v4 合作 · 你＋${esc(mn)} VS 電腦</span><span class="cqT">${left}</span></div>
+    <div class="cqL">${card('me',me,PT.role==='h'?'你 · 隊長':'你 · 隊員',PT.picks,PT.gear,PT.lock)}${card('mt',mn,PT.role==='h'?'隊員':'隊長',PT.matePicks,PT.mateGear,PT.mateLock)}</div>
+    <div class="cqM"><div class="mp" data-cq-zoom><img src="${mapPlan(PT.cfg.map)}" alt="${m.name} 平面圖">${(sites||[]).map(p=>`<i class="pin" style="left:${p.x}%;top:${p.y}%">${p.L}</i>`).join('')}<span class="zm">⤢</span></div>
+      <div class="mi"><b>${m.name}</b><small>${PT.cfg.mis==='hostage'?'人質':'炸彈'} · ${s==='A'?'進攻方':'防守方'}</small><small class="tg">${sites?(PT.cfg.mis==='hostage'?'人質在 ':'炸彈點 ')+sites.map(p=>(PT.cfg.mis==='hostage'&&p.L==='B')?'':p.L+'：'+esc(p.n)).filter(Boolean).join(' · '):'目標未知'}</small></div></div>
+    <div class="cqI">${cur?`<div class="cqDet">${det}</div><div class="cqAdd">${addB}</div>`:''}</div>
+    <div class="cqC"><div class="cqTabs"><button data-cq-tab="op" class="${tab==='op'?'on':''}">幹員 <em>${PT.picks.length}/2</em></button><button data-cq-tab="inv" class="${tab==='inv'?'on':''}">裝備 <em>${gN}/2</em></button></div>
+      ${tab==='op'?`<div class="cqGrid">${pool.map(tile).join('')}</div>`:`<p class="cqHint">每人帶 <b>2 個</b>裝備，對戰時只有自己的幹員能用自己帶的。</p><div class="cqGrid gear">${Object.keys(INV[s]).map(gcard).join('')}</div>`}</div>
+    <div class="cqB"><button id="cpRnd" ${PT.lock?'disabled':''}>隨機補滿</button><button class="go" id="cpGo" ${PT.lock||!ready?'disabled':''}>${goTxt}</button></div>`;
+  el.scrollTop=keep[1];const gr=el.querySelector('.cqGrid');if(gr&&g0&&PT._tab===tab)gr.scrollTop=keep[0];PT._tab=tab;
+  el.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{PT.cur=b.dataset.cp;try{SFX.ui&&SFX.ui();}catch(e){}cpRender();});
+  el.querySelectorAll('[data-cq-tab]').forEach(b=>b.onclick=()=>{PT.tab=b.dataset.cqTab;cpRender();});
+  const ab=el.querySelector('[data-cq-add]');if(ab)ab.onclick=()=>{if(PT.lock)return;const k=PT.cur,bs=mfBase(k);if(theirs.has(bs))return whyTip(`${OPC[k].name} 已被 ${mn} 選走`,'換一位幹員');
+    const i=PT.picks.findIndex(p=>mfBase(p)===bs);if(i>=0)PT.picks.splice(i,1);else{if(PT.picks.length>=2)return whyTip('已經選了 2 名','先把一位移出小隊');PT.picks.push(k);}try{SFX.ui&&SFX.ui();}catch(e){}ptSave();cpRender();};
+  el.querySelectorAll('[data-cg]').forEach(b=>b.onclick=()=>{if(PT.lock)return;const k=b.dataset.cg,dv=+b.dataset.dv,v=(PT.gear[k]|0)+dv;if(v<0||v>INV[s][k][1]||(dv>0&&cpGearN(PT.gear)>=2))return;PT.gear[k]=v;if(!v)delete PT.gear[k];ptSave();cpRender();});
+  const z=el.querySelector('[data-cq-zoom]');if(z)z.onclick=()=>{const o=document.createElement('div');o.className='cqZoom';o.innerHTML=z.innerHTML.replace('<span class="zm">⤢</span>','')+'<small>點一下關閉</small>';o.onclick=()=>o.remove();el.appendChild(o);};
+  el.querySelector('#cpRnd').onclick=()=>{cpFill();ptSave();cpRender();};
+  el.querySelector('#cpGo').onclick=()=>{if(!ready||PT.lock)return;PT.lock=true;ptSave();cpRender();if(PT.role==='h'&&PT.mateLock)cpLaunch();};}
+
 // captain finished side / mission / map in the wizard
-function cpHostGo(){WZ.coop=false;PT.cfg={side:cfg.side,mis:cfg.mission||'bomb',map:cfg.map};PT.st='pick';PT.t0=Date.now();PT.picks=[];PT.lock=false;PT.launched=0;ptSave();cpGuestJoin();cpOpen();}
+function cpHostGo(){WZ.coop=false;PT.cfg={side:cfg.side,mis:cfg.mission||'bomb',map:cfg.map,sites:preSites(cfg.map)};PT.st='pick';PT.t0=Date.now();PT.picks=[];PT.gear={};PT.cur=null;PT.tab='op';PT.lock=false;PT.launched=0;ptSave();cpGuestJoin();cpOpen();}
 async function cpGuestJoin(){const n=await netInit();if(!n)return;Object.assign(n,{since:PT.t0||0,zip:!!(PT.mate&&PT.mate.nv>=2),code:PT.pid,role:PT.role==='h'?'host':'guest',side:PT.cfg.side,seq:0,coop:true,started:false,ranked:false,opp:null});netSubscribe(PT.pid);}
 async function cpLaunch(){if(PT.launched||PT.role!=='h'||!PT.cfg)return;PT.launched=1;const s=PT.cfg.side,used=new Set();
   const take=a=>{const o=[];for(const k of a){if(o.length>=2)break;if(!OPC[k]||used.has(mfBase(k)))continue;used.add(mfBase(k));o.push(k);}return o;};
@@ -11189,14 +11286,16 @@ async function cpLaunch(){if(PT.launched||PT.role!=='h'||!PT.cfg)return;PT.launc
   const n=NET&&NET.coop?NET:await netInit();if(!n){PT.launched=0;return;}if(!n.coop){Object.assign(n,{since:PT.t0||0,code:PT.pid,role:'host',side:s,seq:0,coop:true});netSubscribe(PT.pid);}n.zip=!!(PT.mate&&PT.mate.nv>=2);
   cfg.side=s;cfg.mission=PT.cfg.mis;cfg.map=PT.cfg.map;cfg.picks[s]=hp.concat(gp);
   cpClose();const wz=$('#wiz');if(wz)wz.hidden=true;SCREEN='setup';COOPNEW=1;
-  try{newGame();}finally{COOPNEW=0;}
+  FORCESITES=PT.cfg.sites||null;try{newGame();}finally{COOPNEW=0;FORCESITES=null;}
   G.units.filter(u=>u.side===s).forEach((u,i)=>{u.own=i<2?'h':'g';});
+  {const hg=invFor(s,PT.gear),gg=invFor(s,PT.mateGear);G.cinv={h:hg,g:gg};for(const k in INV[s])G[k]=(hg[k]|0)+(gg[k]|0);G.depBy='h';}
   G.coop={h:meName(),g:PT.mate?PT.mate.name:'隊友'};G.net=true;NET.started=true;
-  log(`組隊 4v4：你和 ${G.coop.g} 各控 2 名幹員。隊長先部署全隊，回合順序是 隊長 → 電腦 → 隊員 → 電腦。`,'ks');
+  log(`組隊 4v4：你和 ${G.coop.g} 各控 2 名幹員、各帶 2 個裝備。隊長先部署自己的幹員，再換隊員；回合順序是 隊長 → 電腦 → 隊員 → 電腦。`,'ks');
   PT.st='game';ptSave();
   netWrite('games/'+PT.pid,{code:PT.pid,seq:0,by:'',state:'',ts:Date.now()},false);NET.seq=0;netPush();render();}
 // after a co-op state lands: the captain runs the computer's phases
 function coopAfterApply(){if(!G||!G.coop||G.over)return;cpClose();const wz=$('#wiz');if(wz)wz.hidden=true;
+  if(G.phase==='setup'){if(G.depBy==='go'&&coopRole()==='h'){setTimeout(()=>{if(G&&G.coop&&G.phase==='setup'&&G.depBy==='go')startPlay();},50);return;}if(!depWait()&&!G.sel){G.sel=unplaced()[0]||null;G.mode='move';render();}return;}
   if(G.phase==='play'&&coopOwner()==='ai'&&coopRole()==='h'){const tok=G.round+':'+G.phaseIdx;if(NET.aiTok===tok)return;NET.aiTok=tok;G.ai=true;render();setTimeout(()=>{if(G&&G.coop&&coopOwner()==='ai')runAI();},400);}}
 // v200: shared phase clock — the deadline is in the clock of whoever started the phase; NET.off is the other device's clock minus ours
 function clkNow(by){return Date.now()+(NET&&by&&by!==NET.me?(NET.off||0):0);}
@@ -11370,6 +11469,14 @@ const mapThumb=(()=>{const c={};return k=>{if(c[k])return c[k];const m=MAPS[k],H
   g.font='bold 22px sans-serif';g.textAlign='center';g.textBaseline='middle';
   if(!m.sitePool)for(const L of ['A','B']){const pts=[];m.rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch===L)pts.push([x,y]);}));if(pts.length){const cx=pts.reduce((a,p)=>a+p[0],0)/pts.length,cy=pts.reduce((a,p)=>a+p[1],0)/pts.length;g.fillStyle='#e3aa3e';g.fillText(L,cx*s+s/2,cy*s+s/2);}}
   return c[k]=cv.toDataURL();};})();
+// v204: a readable floor plan for the co-op pick: walls, doors, windows and room names (no bomb sites)
+const mapPlan=(()=>{const c={};return k=>{if(c[k])return c[k];const m=MAPS[k],H=m.rows.length,W=m.rows[0].length,s=18,cv=document.createElement('canvas');cv.width=W*s;cv.height=H*s;const g=cv.getContext('2d');
+  const col={'~':'#1f2b22','#':'#0d1218','=':'#6d5a47','D':'#b07a43','W':'#6fa3c8','A':'#3c4651','B':'#3c4651','.':'#3c4651'};
+  g.fillStyle='#17202a';g.fillRect(0,0,cv.width,cv.height);
+  m.rows.forEach((r,y)=>[...r].forEach((ch,x)=>{g.fillStyle=col[ch]||'#3c4651';g.fillRect(x*s,y*s,s,s);if(ch==='#'||ch==='='){g.fillStyle='rgba(255,255,255,.06)';g.fillRect(x*s,y*s,s,2);}}));
+  g.font='600 15px "Noto Sans TC",sans-serif';g.textAlign='center';g.textBaseline='middle';
+  (m.labels||[]).forEach(([n,lx,ly])=>{const w=g.measureText(n).width+10;g.fillStyle='rgba(10,14,18,.72)';g.fillRect(lx*s-w/2,ly*s-10,w,20);g.fillStyle='#e6edf2';g.fillText(n,lx*s,ly*s+1);});
+  return c[k]=cv.toDataURL('image/png');};})();
 // v148: build and decode every map plan (and the big map art) up front, so picking a map shows its plan at once
 const MAPWARM=[];setTimeout(()=>{for(const k in MAPS){try{for(const u of [mapThumb(k),mapBig(k)]){if(!u)continue;const i=new Image();i.src=u;MAPWARM.push(i);if(i.decode)i.decode().catch(()=>{});}}catch(e){}}},0);
 const WZSTEPS=[
@@ -11554,7 +11661,7 @@ function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
-const NEWS=[{d: "2026-11-06", v: "v196–v203", i: ["破牆、手榴彈爆炸時不再卡一下：爆炸的閃光不再讓整張地圖重新編譯材質，破牆後重建地圖也快很多（手機、電腦都有感）", "線上對戰改成兩台裝置直接連線（WebRTC），不再繞國外伺服器，動作幾乎即時同步；打不通的網路會自動退回原本的方式", "合作模式修正：隊友還開著舊版網頁時不會再卡在「開始中」（會提醒對方重新整理）；也不會讀到上一場留下來的對戰", "線上對戰同步更快：每次傳的資料縮小到原本的幾十分之一，也不用先讀再寫", "線上對戰的計時改成兩邊共用同一個時間：切到別的頁面或 App 時間照走，對方不會卡住；對手超過時間又沒有回應，8 秒後自動跳過他的階段", "培養幹員頁下方的能力條、可用點數和按鈕變扁，上面的幹員和能力雷達圖有更多空間", "培養幹員頁在手機上不再擠成一團：名字、擊殺／存活和能力雷達圖會依螢幕高度自動縮放，不再互相重疊", "拿掉防守方的誘餌標記和「移動誘餌」按鈕","每個 Google 帳號都是各自獨立的遊戲帳號：換另一個 Google 帳號登入會是全新的進度，不會再沿用上一個帳號的聲望、幹員和成就", "登出 Google 後，這台裝置會回到全新的訪客", "大廳右上的好友按鈕改成「申請好友」和「好友名單」兩頁，成就移回 🏆 按鈕；輸入好友代碼改成送出申請，對方在「申請好友」按同意後才會成為好友，等待同意的申請也列在那裡"]},{d: "2026-11-05", v: "v178–v195", i: ["培養幹員開打後就不能靠退出逃避陣亡：按「離開」或關掉網頁都算陣亡；斷線的話 3 分鐘內回來可以接著打", "新增「撤離」（紫色按鈕）：培養幹員花 1 行動開始撤離，撐過敵方下一個階段就會被光束接走，這場算存活", "組隊：好友頁可以邀請在線的好友加入小隊，大廳右側會出現小隊圖示；組隊後按「對戰電腦」就是 4v4 合作，兩人各控 2 名幹員，順序是隊長 → 電腦 → 隊員 → 電腦", "好友代碼：好友頁顯示自己的 6 碼代碼，輸入對方代碼就能直接加好友；點好友名字可看他最強的培養幹員、擊殺和存活", "看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
+const NEWS=[{d: "2026-11-06", v: "v196–v204", i: ["4v4 合作選角改版：左邊是兩人的隊伍、中間選幹員和裝備、右邊是地圖平面圖和幹員資訊；手機版改成直排", "4v4 合作每人各帶 2 個裝備，對戰時只有自己的幹員能用自己帶的", "4v4 合作改成各自部署：隊長先放自己的 2 名，再換隊員放；防守方選角時就看得到炸彈點，進攻方顯示「目標未知」", "破牆、手榴彈爆炸時不再卡一下：爆炸的閃光不再讓整張地圖重新編譯材質，破牆後重建地圖也快很多（手機、電腦都有感）", "線上對戰改成兩台裝置直接連線（WebRTC），不再繞國外伺服器，動作幾乎即時同步；打不通的網路會自動退回原本的方式", "合作模式修正：隊友還開著舊版網頁時不會再卡在「開始中」（會提醒對方重新整理）；也不會讀到上一場留下來的對戰", "線上對戰同步更快：每次傳的資料縮小到原本的幾十分之一，也不用先讀再寫", "線上對戰的計時改成兩邊共用同一個時間：切到別的頁面或 App 時間照走，對方不會卡住；對手超過時間又沒有回應，8 秒後自動跳過他的階段", "培養幹員頁下方的能力條、可用點數和按鈕變扁，上面的幹員和能力雷達圖有更多空間", "培養幹員頁在手機上不再擠成一團：名字、擊殺／存活和能力雷達圖會依螢幕高度自動縮放，不再互相重疊", "拿掉防守方的誘餌標記和「移動誘餌」按鈕","每個 Google 帳號都是各自獨立的遊戲帳號：換另一個 Google 帳號登入會是全新的進度，不會再沿用上一個帳號的聲望、幹員和成就", "登出 Google 後，這台裝置會回到全新的訪客", "大廳右上的好友按鈕改成「申請好友」和「好友名單」兩頁，成就移回 🏆 按鈕；輸入好友代碼改成送出申請，對方在「申請好友」按同意後才會成為好友，等待同意的申請也列在那裡"]},{d: "2026-11-05", v: "v178–v195", i: ["培養幹員開打後就不能靠退出逃避陣亡：按「離開」或關掉網頁都算陣亡；斷線的話 3 分鐘內回來可以接著打", "新增「撤離」（紫色按鈕）：培養幹員花 1 行動開始撤離，撐過敵方下一個階段就會被光束接走，這場算存活", "組隊：好友頁可以邀請在線的好友加入小隊，大廳右側會出現小隊圖示；組隊後按「對戰電腦」就是 4v4 合作，兩人各控 2 名幹員，順序是隊長 → 電腦 → 隊員 → 電腦", "好友代碼：好友頁顯示自己的 6 碼代碼，輸入對方代碼就能直接加好友；點好友名字可看他最強的培養幹員、擊殺和存活", "看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
 const newsKey=()=>NEWS[0].d+'#'+NEWS[0].i.length;
 function newsUnread(){try{return localStorage.getItem('newsSeen')!==newsKey();}catch(e){return false;}}
 function newsBadge(){const n=$('#t-news');if(n)n.classList.toggle('unread',newsUnread());}
