@@ -7112,7 +7112,7 @@ function endPhase(){
 function startPhase(){
   trackMovement();
   G.acts=0;G.sel=null;G.mode='move';
-  const s=curSide();if(G.clock&&(G.net||G.bot)){G.clock[s]=PHT;G.clockOut[s]=false;}
+  const s=curSide();if(G.clock&&(G.net||G.bot)){G.clock[s]=PHT;G.clockOut[s]=false;if(G.net&&NET){G.clkEnd=Date.now()+PHT;G.clkBy=NET.me;}}
   {const us=G.coop&&s===G.player?unspent(s).filter(u=>u.own===coopOwner()):unspent(s);if(!us.length||(G.clock&&G.clock[s]<=0)){render();return setTimeout(endPhase,50);}}
   if(G.coop){if(s!==G.player){if(coopRole()==='h'){NET.aiTok=G.round+':'+G.phaseIdx;G.ai=true;render();setTimeout(runAI,350);}else{G.ai=false;G.busy=false;G.sel=null;render();}return;}
     if(!coopMyTurn()){G.ai=false;G.busy=false;G.sel=null;render();return;}}
@@ -10933,7 +10933,9 @@ async function netInit(){
   NETMSG='';NET={db,user,me,seq:0,q:Promise.resolve()};return NET;
 }
 const randCode=()=>{const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<4;i++)s+=A[(Math.random()*A.length)|0];return s;};
-function netWrite(path,data,merge){NET.q=NET.q.then(()=>merge?NET.db.doc(path).update(data):NET.db.doc(path).set(data)).catch(e=>{console.warn('net',e);if(e&&e.code==='quota_exceeded'||e&&e.code==='revoked'){NETMSG=NETFAIL;renderTitle();}});return NET.q;}
+// v200: the game doc is cached from its own subscription, so a merge write is a plain set (no read round-trip first)
+function netWrite(path,data,merge){const gp=NET.code&&path==='games/'+NET.code;if(merge&&gp&&NET.doc){NET.doc=Object.assign({},NET.doc,data);const full=NET.doc;NET.q=NET.q.then(()=>NET.db.doc(path).set(full)).catch(e=>console.warn('net',e));return NET.q;}
+  NET.q=NET.q.then(()=>merge?NET.db.doc(path).update(data):NET.db.doc(path).set(data)).catch(e=>{console.warn('net',e);if(e&&e.code==='quota_exceeded'||e&&e.code==='revoked'){NETMSG=NETFAIL;renderTitle();}});return NET.q;}
 async function netCreate(){
   const n=await netInit();if(!n)return;fillPicks(cfg.side);
   const code=randCode();Object.assign(n,{code,role:'host',side:cfg.side,map:null,seq:0,started:false});
@@ -10962,8 +10964,16 @@ async function netJoin(code,ranked){
 }
 function netSubscribe(code){
   if(NET.unsub)NET.unsub();
-  NET.unsub=NET.db.doc('games/'+code).onSnapshot(s=>{const d=s.exists&&s.data();if(d)setTimeout(()=>netOnGame(d),0);},e=>{NETMSG='連線中斷，請回到主畫面重新加入。';renderTitle();});
+  NET.doc=null;NET.off=null;NET.unsub=NET.db.doc('games/'+code).onSnapshot(s=>{const d=s.exists&&s.data();if(d){if(NET.code===code)NET.doc=d;setTimeout(()=>netRecv(d),0);}},e=>{NETMSG='連線中斷，請回到主畫面重新加入。';renderTitle();});
 }
+// v200: board states travel gzip'd (about 150 KB of JSON becomes 2–3 KB)
+const b64=u=>{let s='';for(let i=0;i<u.length;i+=32768)s+=String.fromCharCode.apply(null,u.subarray(i,i+32768));return btoa(s);};
+async function netZip(s){try{if(!window.CompressionStream)return s;const buf=await new Response(new Blob([s]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer();return 'z1:'+b64(new Uint8Array(buf));}catch(e){return s;}}
+async function netUnzip(s){if(typeof s!=='string'||!s.startsWith('z1:'))return s;const bin=atob(s.slice(3)),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  return await new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'))).text();}
+function netRecv(d){if(d&&NET&&d.by&&d.by!==NET.me&&d.ts&&d.seq>NET.seq){const o=d.ts-Date.now();NET.off=NET.off==null?o:Math.max(NET.off,o);}
+  if(!d||typeof d.state!=='string'||!d.state.startsWith('z1:'))return netOnGame(d);if(!NET||d.by===NET.me||!(d.seq>NET.seq))return;
+  NET.rq=(NET.rq||Promise.resolve()).then(()=>netUnzip(d.state)).then(st=>{if(NET&&d.seq>NET.seq)netOnGame(Object.assign({},d,{state:st}));}).catch(e=>console.warn('unzip',e));}
 function netOnGame(d){
   if(!NET||d.code!==NET.code)return;
   if(NET.coop){if(d.state&&d.seq>NET.seq&&d.by!==NET.me)netApply(d);return;}
@@ -11005,12 +11015,12 @@ function netDirty(){
   if(G.coop){if(!G._handoff&&!G.over&&!coopIWrite())return;}
   else{if(curSide()!==G.player&&!G._handoff&&!G.over)return;
   if(G.phase==='setup'&&G.dep&&G.dep!==G.player&&!G._handoff)return;}
-  clearTimeout(NET.t);NET.t=setTimeout(netPush,G._handoff||G.over?60:350);
+  clearTimeout(NET.t);NET.t=setTimeout(netPush,G._handoff||G.over?40:150);
 }
 function netPush(){
   if(!G||!G.net||!NET)return;const st=netSer();NET.seq++;G._handoff=false;
-  netWrite('games/'+NET.code,{seq:NET.seq,by:NET.me,state:st,ts:Date.now()},true);
-  if(G.over)netWrite('rooms/'+NET.code,{status:'done'},true);
+  const sq=NET.seq,cd=NET.code,ov=G.over;NET.zq=(NET.zq||Promise.resolve()).then(()=>netZip(st)).then(z=>{if(!NET||NET.code!==cd)return;
+    netWrite('games/'+cd,{seq:sq,by:NET.me,state:z,ts:Date.now()},true);if(ov)netWrite('rooms/'+cd,{status:'done'},true);}).catch(e=>console.warn('zip',e));
 }
 function netApply(d){
   NET.applying=true;NET.seq=d.seq;const was=G&&G.over;
@@ -11155,9 +11165,15 @@ async function cpLaunch(){if(PT.launched||PT.role!=='h'||!PT.cfg)return;PT.launc
 // after a co-op state lands: the captain runs the computer's phases
 function coopAfterApply(){if(!G||!G.coop||G.over)return;cpClose();const wz=$('#wiz');if(wz)wz.hidden=true;
   if(G.phase==='play'&&coopOwner()==='ai'&&coopRole()==='h'){const tok=G.round+':'+G.phaseIdx;if(NET.aiTok===tok)return;NET.aiTok=tok;G.ai=true;render();setTimeout(()=>{if(G&&G.coop&&coopOwner()==='ai')runAI();},400);}}
+// v200: shared phase clock — the deadline is in the clock of whoever started the phase; NET.off is the other device's clock minus ours
+function clkNow(by){return Date.now()+(NET&&by&&by!==NET.me?(NET.off||0):0);}
+// the other player's phase ran out and nothing has arrived for a while (app in the background, dropped): end it for them
+function netStall(s,dt){if(!G||!G.net||G.over||G.phase!=='play')return;if(G.coop)return coopStall(s,dt);
+  if(s===G.player){G._stall=0;return;}G._stall=(G._stall||0)+dt;if(G._stall<8000)return;G._stall=0;
+  log('對手沒有回應，跳過這個階段','ks');if(G.active)endAct(G.active);G._handoff=true;endPhase();}
 // when a teammate drops, the clock runs out and nothing arrives: take over their phase
 function coopStall(s,dt){if(!G||!G.coop||G.over||G.phase!=='play'||coopIWrite()||G.clock[s]>0){if(G)G._stall=0;return;}
-  G._stall=(G._stall||0)+dt;if(G._stall<15000)return;G._stall=0;log(`${coopOwner()==='ai'?'隊長':coopMateName()} 沒有回應，跳過這個階段`,'ks');
+  G._stall=(G._stall||0)+dt;if(G._stall<8000)return;G._stall=0;log(`${coopOwner()==='ai'?'隊長':coopMateName()} 沒有回應，跳過這個階段`,'ks');
   if(coopOwner()==='ai'){G.ai=true;runAI();}else{if(G.active)endAct(G.active);endPhase();}}
 // ---------- title hero shot ----------
 function heroScene(on){
@@ -11505,7 +11521,7 @@ function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
-const NEWS=[{d: "2026-11-06", v: "v196–v199", i: ["培養幹員頁下方的能力條、可用點數和按鈕變扁，上面的幹員和能力雷達圖有更多空間", "培養幹員頁在手機上不再擠成一團：名字、擊殺／存活和能力雷達圖會依螢幕高度自動縮放，不再互相重疊", "拿掉防守方的誘餌標記和「移動誘餌」按鈕","每個 Google 帳號都是各自獨立的遊戲帳號：換另一個 Google 帳號登入會是全新的進度，不會再沿用上一個帳號的聲望、幹員和成就", "登出 Google 後，這台裝置會回到全新的訪客", "大廳右上的好友按鈕改成「申請好友」和「好友名單」兩頁，成就移回 🏆 按鈕；輸入好友代碼改成送出申請，對方在「申請好友」按同意後才會成為好友，等待同意的申請也列在那裡"]},{d: "2026-11-05", v: "v178–v195", i: ["培養幹員開打後就不能靠退出逃避陣亡：按「離開」或關掉網頁都算陣亡；斷線的話 3 分鐘內回來可以接著打", "新增「撤離」（紫色按鈕）：培養幹員花 1 行動開始撤離，撐過敵方下一個階段就會被光束接走，這場算存活", "組隊：好友頁可以邀請在線的好友加入小隊，大廳右側會出現小隊圖示；組隊後按「對戰電腦」就是 4v4 合作，兩人各控 2 名幹員，順序是隊長 → 電腦 → 隊員 → 電腦", "好友代碼：好友頁顯示自己的 6 碼代碼，輸入對方代碼就能直接加好友；點好友名字可看他最強的培養幹員、擊殺和存活", "看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
+const NEWS=[{d: "2026-11-06", v: "v196–v200", i: ["線上對戰同步更快：每次傳的資料縮小到原本的幾十分之一，也不用先讀再寫", "線上對戰的計時改成兩邊共用同一個時間：切到別的頁面或 App 時間照走，對方不會卡住；對手超過時間又沒有回應，8 秒後自動跳過他的階段", "培養幹員頁下方的能力條、可用點數和按鈕變扁，上面的幹員和能力雷達圖有更多空間", "培養幹員頁在手機上不再擠成一團：名字、擊殺／存活和能力雷達圖會依螢幕高度自動縮放，不再互相重疊", "拿掉防守方的誘餌標記和「移動誘餌」按鈕","每個 Google 帳號都是各自獨立的遊戲帳號：換另一個 Google 帳號登入會是全新的進度，不會再沿用上一個帳號的聲望、幹員和成就", "登出 Google 後，這台裝置會回到全新的訪客", "大廳右上的好友按鈕改成「申請好友」和「好友名單」兩頁，成就移回 🏆 按鈕；輸入好友代碼改成送出申請，對方在「申請好友」按同意後才會成為好友，等待同意的申請也列在那裡"]},{d: "2026-11-05", v: "v178–v195", i: ["培養幹員開打後就不能靠退出逃避陣亡：按「離開」或關掉網頁都算陣亡；斷線的話 3 分鐘內回來可以接著打", "新增「撤離」（紫色按鈕）：培養幹員花 1 行動開始撤離，撐過敵方下一個階段就會被光束接走，這場算存活", "組隊：好友頁可以邀請在線的好友加入小隊，大廳右側會出現小隊圖示；組隊後按「對戰電腦」就是 4v4 合作，兩人各控 2 名幹員，順序是隊長 → 電腦 → 隊員 → 電腦", "好友代碼：好友頁顯示自己的 6 碼代碼，輸入對方代碼就能直接加好友；點好友名字可看他最強的培養幹員、擊殺和存活", "看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
 const newsKey=()=>NEWS[0].d+'#'+NEWS[0].i.length;
 function newsUnread(){try{return localStorage.getItem('newsSeen')!==newsKey();}catch(e){return false;}}
 function newsBadge(){const n=$('#t-news');if(n)n.classList.toggle('unread',newsUnread());}
@@ -12315,6 +12331,7 @@ async function copResume(R){
     Object.assign(n,{code:q.code,role:q.role,side:q.side,ranked:q.ranked,coop:q.coop,map:q.map,mis:q.mis,started:true,pre:true,seq:0});
     let d=null;try{const s=await n.db.doc('games/'+q.code).get();d=s&&s.exists&&s.data();}catch(e){}
     if(!d||!d.state){n.code=null;return false;}
+    try{d=Object.assign({},d,{state:await netUnzip(d.state)});}catch(e){n.code=null;return false;}
     netApply(d);netSubscribe(q.code);return !!G;}
   if(!R.snap)return false;
   const g=netDes(R.snap);g.net=false;g.busy=false;g.ai=false;g.mode='move';G=g;
@@ -13018,6 +13035,11 @@ let CLK_LAST=performance.now();
 setInterval(()=>{const now=performance.now(),dt=now-CLK_LAST;CLK_LAST=now;
   if(!clockOn()||G.over){renderClocks();return;}
   const s=curSide(),rolling=document.querySelector('.dicebox:not([hidden])');
+  // v200: online games share one wall-clock deadline per phase, so it keeps running when a tab is hidden and both screens agree
+  if(G.net&&G.clkEnd&&NET){if(dt>3000)NET.hold=now+2500;const left=Math.max(0,G.clkEnd-clkNow(G.clkBy));G.clock[s]=left;
+    if(left<=0&&!(NET.hold>now)){netStall(s,dt);
+      if(!G.clockOut[s]&&s===G.player&&!G.busy&&(!G.coop||coopMyTurn())){log(`${s==='A'?'進攻方':'防守方'}這個階段的時間用完了，換對手行動`,'ks');G.clockOut[s]=true;if(G.active)endAct(G.active);endPhase();}}
+    renderClocks();return;}
   if(!G.cPause&&!rolling&&!document.hidden&&G.clock[s]>0){G.clock[s]-=dt;
     if(G.clock[s]<=0){G.clock[s]=0;
       coopStall(s,dt);
