@@ -381,3 +381,8 @@
 - 新追蹤：`G._rl` 我方對敵射擊的擲骰總和與是否擊殺（`shootUnit`）、`G._fd` 我方傷到隊友、`G._gt` 我方用過的道具種類。用在 sharp、storm、zero、zen、spray、ff3、retreat、gad20、ff。
 - 救出人質的判定看 `G.why` 是否「人質已安全撤離」；任務結算（tourist）看「人質已安全撤離／拆彈器／炸彈已被拆除」；thenwhat＝防守方以「拆彈器已被破壞」獲勝且進攻方仍有人活著。中途離開不再給 retreat。lose5 要在累計 5 敗後贏一場。
 - 圖示：使用者要改成圖片（表裡寫 `<id>.png`），圖片還沒給，暫時仍用 emoji。
+
+## v211 成就徽章圖片
+- 73 張金屬徽章（使用者給的 `achievement-icons-metal-v1.zip`，1254px PNG）去邊、縮成 256px webp 放 `img/ach/<id>.webp`（共約 1.1 MB）。`ACHIMG` 列出有圖的 id；**沒有圖的成就會從 `ACH` 移除**（使用者指定）。新增成就時要一起放圖並加進 `ACHIMG`。
+- `achIc(a,px)` 回傳圖片（沒圖才用 emoji）：任務結束頁「成就達成」、解鎖提示、成就頁詳情都用它；成就頁的徽章 `achBadge` 有圖時直接用圖（未解鎖沿用 `.bdS` 灰階）。
+- `data/achievements.csv` 的「圖示」欄寫 `<id>.png` 只是對照用；`achApply` 遇到檔名會略過，不會把檔名當文字顯示。
