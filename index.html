@@ -11947,7 +11947,7 @@ function trKey(k,ix,d){const e=I18X[k]||I18N[k];if(e&&e[ix])return e[ix];
     const out=tk.map(x=>{const y=x.trim();if(!y||!/[㐀-鿿]/.test(y))return x;const t=trKey(y,ix,d+1);if(t==null)ok=false;return x.replace(y,t);});
     if(ok)return out.join(ix?sep:({'：':': ','；':'; ','，':', ','、':', ','・':' · '}[sep]||sep));break;}
   return best;}
-Object.assign(I18X,{'攻擊':['Attack',''],'防守':['Defense',''],'全部類型':['All roles',''],'骰數仍受每段最多 4 顆、三段合計最多 10 顆限制。':['Maximum 4 dice per range and 10 dice across all three ranges.',''],'幹員圖鑑改為上下捲動，新增攻擊／防守篩選':['Operator codex now scrolls vertically, with Attack / Defense filters.',''],'培養幹員每個距離區段最多 4 顆骰子':['Trained operators can have at most 4 dice per range.','']});
+Object.assign(I18X,{'攻擊':['Attack',''],'防守':['Defense',''],'全部類型':['All roles',''],'骰數仍受每段最多 4 顆、三段合計最多 10 顆限制。':['Maximum 4 dice per range and 10 dice across all three ranges.',''],'三段各多 1 顆免費黃骰，不算在每段 4 顆、合計 10 顆的上限內。':['One free yellow die at each range, on top of the 4-per-range and 10-total caps.',''],'幹員圖鑑改為上下捲動，新增攻擊／防守篩選':['Operator codex now scrolls vertically, with Attack / Defense filters.',''],'培養幹員每個距離區段最多 4 顆骰子':['Trained operators can have at most 4 dice per range.','']});
 Object.assign(I18X,{'投擲 6 格：目標格與相鄰格每人擲 1 顆手榴彈骰（三面 1、三面 2），並破壞路障':['Throw up to 6 spaces: each affected operator rolls one grenade die (three 1 faces, three 2 faces). Destroys barricades.',''],'拆彈器已被破壞':['The defuser has been destroyed.',''],'拆彈器遭防守方破壞後，立即結束對局，防守方勝利':['Destroying the defuser immediately ends the match in a defender victory.','']});
 Object.assign(I18X,{'重盾':['Heavy shield',''],'機動盾':['Mobile shield',''],'重盾兵':['Heavy shield soldier',''],'機動盾兵':['Mobile shield soldier',''],'機槍兵':['Gunner',''],'散彈兵':['Breacher',''],'狙擊兵':['Marksman',''],'衝鋒兵':['Rusher',''],'此路不通':['You shall not pass',''],'鎮壓暴徒':['Riot suppression',''],'解除重盾防禦':['Lower heavy shield',''],'免費切換':['Free toggle',''],'切換模式':['Toggle mode',''],'已啟用 · 點擊關閉':['Active · Tap to disable',''],'點擊切換模式：免疫正面 120° 的武器攻擊；仍可被道具鎖定及範圍攻擊波及。啟用時可以移動、轉向，但不能攻擊或使用道具；關閉後恢復。':['Toggle immunity to weapon attacks from the front 120°. Gadgets and area attacks can still affect you. You may move and turn, but cannot attack or use gadgets while active.',''],'受到的傷害固定 −2。不能奔跑。此路不通可切換正面防禦模式。':['Incoming damage −2. Cannot sprint. Toggle frontal defense with You shall not pass.',''],'受到的傷害固定 −1。可以奔跑；裝備鎮壓暴徒技能後可向前衝刺撞擊。':['Incoming damage −2. Can sprint. Riot suppression charges forward and strikes.','']});
 Object.assign(I18X,{'盾兵職業更新':['Shield class update',''],'新增重盾兵與機動盾兵，接入男女角色圖與護盾特效':['Added heavy and mobile shield classes, male/female artwork and shield effects.',''],'煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷':['Smoke blocks sight and hides operators inside it. Smoke tiles remain throwable targets; smoke grants no damage reduction.',''],'〔被動〕智慧眼鏡：永遠不會被震暈，煙霧仍會遮擋視線。':['[Passive] Smart glasses: immune to stun. Smoke still blocks vision.','']});
@@ -12969,7 +12969,7 @@ const WSVG=p=>`<svg viewBox="0 0 48 48" fill="none" stroke="#e3aa3e" stroke-widt
 const nOR=L=>L.filter(d=>d==='O'||d==='R').length,nR=L=>L.filter(d=>d==='R').length;
 const WPN={
   mg:{n:'機槍',t:'機槍兵',en:'GUNNER',ic:WSVG('<circle cx="24" cy="24" r="16"/><circle cx="24" cy="15" r="3.2"/><circle cx="32.6" cy="21.2" r="3.2"/><circle cx="29.3" cy="31.3" r="3.2"/><circle cx="18.7" cy="31.3" r="3.2"/><circle cx="15.4" cy="21.2" r="3.2"/>'),
-    trig:c=>c.arm>=3&&[0,1,2].every(b=>c.d[b].length>=3&&nOR(c.d[b])>=1),fx:'骰數仍受每段最多 4 顆、三段合計最多 10 顆限制。'},
+    trig:c=>c.arm>=3&&[0,1,2].every(b=>c.d[b].length>=3&&nOR(c.d[b])>=1),fx:'三段各多 1 顆免費黃骰，不算在每段 4 顆、合計 10 顆的上限內。'},
   hs:{n:'重盾',t:'重盾兵',en:'HEAVY SHIELD',ic:WSVG('<path d="M10 5h28v29L24 44 10 34z"/><path d="M17 15h14M17 23h14"/>'),
     trig:c=>c.arm===3&&c.d[1].length>=4&&nOR(c.d[1])>=1&&c.d[0].length>=3,fx:'受到的傷害固定 −2。不能奔跑。此路不通可切換正面防禦模式。',lim:{2:{max:2,noR:1}}},
   sh:{n:'機動盾',t:'機動盾兵',en:'MOBILE SHIELD',ic:WSVG('<path d="M24 5l15 6v11c0 10-6.5 17-15 21C15.5 39 9 32 9 22V11z"/><path d="M17 20h14"/>'),
@@ -13028,7 +13028,8 @@ const dTot=c=>10;
 const runCap=c=>c.w==='hs'?0:COPARM[c.arm].run;
 /* v152: adding armor auto-trims run to the new cap; those refunded run points count toward the 2-point armor cost */
 const armFree=c=>c.arm>=3?0:Math.max(0,c.run-(c.w==='hs'?0:COPARM[c.arm+1].run));
-const copDice=c=>c.d;
+// v217: the gunner's free yellow die per range is rolled too (it was only drawn on the training page before); it sits outside the 4-per-range / 10-total caps
+const copDice=c=>c.w==='mg'?c.d.map(L=>L.concat('Y')):c.d;
 const copArt=(c,i)=>c.w&&WART[c.w]?`img/cop/${i?'m':'f'}_${c.w}.webp`:COPART[i];
 function wApply(c,w){const n=JSON.parse(JSON.stringify(c));n.w=w;if(!n.sk||classOf(n.sk))n.sk=classKey(w);
   for(let b=0;b<3;b++){let L=n.d[b].slice().sort((x,y)=>RANKD[y]-RANKD[x]).slice(0,bMax(n,b));if(bNoR(n,b))L=L.map(x=>x==='R'?'O':x);n.d[b]=L.length?L:['Y'];}
