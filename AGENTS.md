@@ -357,3 +357,9 @@
 ## v203 爆炸卡頓
 - 場景裡固定有一盞 `R3.fxL` 點光源（平常亮度 0）。爆炸特效用 `fxLight(色,距離,衰減,x,y,z)` 借用它，**不要再 `new PointLight` 加進場景**：光源數一變，three.js 會把地圖上所有材質重新編譯（約 28 個 shader），破牆／手榴彈時手機會卡一兩秒。
 - `floorCanvas` 的地板花紋（`buildTex` + PBR 圖樣）以格子大小快取在 `FTEX`，之後每次破牆重建地圖從 ~180ms 降到 ~30ms；它也會還原 2D 用的 `TEX/TEXKEY`。
+
+## v204 4v4 合作選角改版
+- `cpRender` 改成 `#cpk.cq`：grid areas `top / L(兩人隊伍) C(幹員/裝備分頁) M(地圖) I(幹員資訊 wzOpDetail) / B`；≤860px 改成直排（`order`），底部按鈕固定。點幹員格只會切換資訊，按資訊卡的「加入我的小隊」才會選。地圖用 `mapPlan(k)`（平面圖＋房間名稱，不畫炸彈點）。
+- 裝備：`PT.gear`／`PT.mateGear`（每人 2 個，存在 pt 文件的 `gear`）。開局時 `G.cinv={h,g}`，`G[k]` 是全隊合計。玩家這邊的裝備數量和消耗一律用 `gq(u,k)`／`gdec(u,k)`（電腦方的單位和非合作模式會回到 `G[k]`）。
+- 炸彈點：隊長按下開始選角時，`preSites(map)` 先抽好房間存進 `PT.cfg.sites`；`cpLaunch` 用 `FORCESITES` 讓 `randSites` 選同一組。防守方在選角畫面看得到（`cpSites`），進攻方顯示「目標未知」。
+- 部署輪流進行：`G.depBy` 依序是 'h'→'g'→'go'。`coopOwner()` 在部署階段回傳 `depBy`，`unplaced()` 只算輪到的人的幹員，`coopDepNext` 負責交棒；輪到 'go' 時由隊長執行 `startPlay`（`coopAfterApply`）。部署時不能選隊友的幹員。
