@@ -2014,6 +2014,13 @@ body:not([data-scr="game"]) #opsBar{display:none}
 .frAddC{display:flex;gap:6px}.frAddC input{flex:1;min-width:0;background:#0d141b;border:1px solid var(--hl);color:#fff;padding:9px 10px;font:700 15px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:2px;text-transform:uppercase}.frAddC input::placeholder{letter-spacing:0;font-family:inherit;font-weight:400;text-transform:none;color:#6f8294}
 .frAddC button{background:#f0b43c;border:0;color:#1a1206;padding:0 14px;font:800 13px/1 inherit;cursor:pointer}.frAddC button:disabled{opacity:.5}
 .frMsg{margin:-4px 2px 0;font-size:12px;color:#ffcf7a}
+.achT{flex:1;font:800 15px/1 inherit;color:#f0b43c;letter-spacing:.04em}.achT em{font-style:normal;color:#e6edf2;margin-left:4px}
+.frDot{font-style:normal;display:inline-block;min-width:16px;height:16px;border-radius:8px;background:#e5483b;color:#fff;font:800 10px/16px var(--mono,monospace);padding:0 4px;margin-left:4px;vertical-align:1px}
+.frScr{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:8px}
+.frSec{display:flex;align-items:center;gap:8px;margin:4px 2px 0;font-size:12px;color:#8ea2b4;font-weight:700}.frSec em{font-style:normal;color:#f0b43c}
+.fri .frCd{font:700 12px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:1px;color:#8ea2b4}.fri .frWt{color:#ffcf7a}
+.frOk{background:#4fd27a;color:#062;border:0;font:900 12px/1 inherit;padding:6px 11px;cursor:pointer}
+#t-fr{position:relative;overflow:visible}#t-fr em{position:absolute;top:2px;right:2px;min-width:15px;height:15px;border-radius:8px;background:#e5483b;color:#fff;font:800 10px/15px var(--mono);font-style:normal;text-align:center;padding:0 3px}
 .frN::after{content:' ›';color:#f0b43c}.frN{flex:1;min-width:0;background:none;border:0;padding:0;color:#e6edf2;text-align:left;font:800 14px/1.2 inherit;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:underline dotted rgba(240,180,60,.6);text-underline-offset:3px}
 .fpeek{display:flex;flex-direction:column;gap:10px}.fpTop{display:flex;align-items:center;gap:10px}.fpTop b{flex:1;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fpBack{background:var(--hb2);border:1px solid var(--hl);color:#dce8f3;width:34px;height:32px;font-size:20px;cursor:pointer}.fpCode{font:700 13px/1 ui-monospace,Menlo,Consolas,monospace;color:#9fb2c3;letter-spacing:2px}
@@ -8259,9 +8266,10 @@ const SVG_FR={add:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy
   ok:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20c.6-3.8 3.2-5.8 6.5-5.8s5.9 2 6.5 5.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M15.5 10.5l2.2 2.2 4-4.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'};
 // ---- friends: kept in this browser, mirrored to the player's private store when signed in ----
 const FKEY='r6bg.social';
-const FR=(()=>{let p=null;try{p=JSON.parse(localStorage.getItem(FKEY)||'null');}catch(e){}return Object.assign({list:[],recent:[]},p||{});})();
+const FR=(()=>{let p=null;try{p=JSON.parse(localStorage.getItem(FKEY)||'null');}catch(e){}return Object.assign({list:[],recent:[],out:[]},p||{});})();
 function frSave(){try{localStorage.setItem(FKEY,JSON.stringify(FR));}catch(e){}socialPush();}
 const isFriend=id=>FR.list.some(f=>f.id===id);
+const frOut=id=>(FR.out||[]).some(o=>o.id===id);
 function frAdd(o){if(!o||!o.id||isFriend(o.id))return;FR.list.push({id:o.id,name:o.name||'對手',ts:Date.now(),w:0,l:0});frSave();achGive('friend');if(FR.list.length>=5)achGive('friend5');}
 function frDel(id){FR.list=FR.list.filter(f=>f.id!==id);frSave();}
 function frRecord(o,win){if(!o||!o.id)return;FR.recent=[{id:o.id,name:o.name||'對手',ts:Date.now(),win}].concat(FR.recent.filter(r=>r.id!==o.id)).slice(0,6);
@@ -8269,11 +8277,12 @@ function frRecord(o,win){if(!o||!o.id)return;FR.recent=[{id:o.id,name:o.name||'�
 function frTap(b){const o=G&&G.net&&NET&&NET.opp;
   if(!o){achToastMsg('對手是電腦','只有連線對戰的真人玩家可以加好友');return;}
   if(isFriend(o.id)){achToastMsg('已經是好友',esc(o.name));return;}
-  if(!b.classList.contains('arm')){b.classList.add('arm');b.querySelector('em').textContent='再點一下加好友';clearTimeout(b._t);b._t=setTimeout(()=>{b.classList.remove('arm');b.querySelector('em').textContent='加好友';},6000);return;}
-  frAdd(o);renderPlayer();b.classList.remove('arm');b.classList.add('ok');b.innerHTML=SVG_FR.ok+'<em>已加好友</em>';}
+  if(frOut(o.id)){achToastMsg('已送出好友申請',`等待 ${esc(o.name)} 同意`);return;}
+  if(!b.classList.contains('arm')){b.classList.add('arm');b.querySelector('em').textContent='再點一下申請好友';clearTimeout(b._t);b._t=setTimeout(()=>{b.classList.remove('arm');b.querySelector('em').textContent='加好友';},6000);return;}
+  b.classList.remove('arm');b.classList.add('ok');b.innerHTML=SVG_FR.ok+'<em>已申請</em>';frReqSend({id:o.id,code:frCode(o.id),n:o.name},m=>achToastMsg('好友申請',esc(m)));}
 function anCap(side){const mine=side===G.player,o=G.net&&NET&&NET.opp;
   const nm=mine?(G.coop?`${meName()}、${coopMateName()}`:meName()):(G.coop?'電腦':G.bot?G.bot.name:G.net?(o?o.name:'對手'):'電腦');
-  const fr=mine||G.coop?'':(o&&isFriend(o.id)?`<button class="anFr ok" aria-label="已是好友">${SVG_FR.ok}<em>已加好友</em></button>`:`<button class="anFr${o?'':' off'}" aria-label="加好友">${SVG_FR.add}<em>加好友</em></button>`);
+  const fr=mine||G.coop?'':(o&&isFriend(o.id)?`<button class="anFr ok" aria-label="已是好友">${SVG_FR.ok}<em>已加好友</em></button>`:o&&frOut(o.id)?`<button class="anFr ok" aria-label="已送出好友申請">${SVG_FR.ok}<em>已申請</em></button>`:`<button class="anFr${o?'':' off'}" aria-label="加好友">${SVG_FR.add}<em>加好友</em></button>`);
   return `<caption><span class="anSide">${side==='A'?'進攻方':'防守方'}</span><b class="anPN">${esc(nm)}</b>${mine?'<i class="me">你</i>':''}${fr}</caption>`;}
 // v193: friend codes + public profile (prof/<CODE>: name and the strongest custom operator), add by code, tap a friend to see their best operator
 const FRC_A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -8282,7 +8291,7 @@ const FRP={code:'',id:'',sig:'',peek:null,cache:{},msg:'',busy:false};
 async function frMyId(){try{if(!window.claude||!claude.use)return null;const u=await claude.use('user');return u?await u.id():null;}catch(e){return null;}}
 function frBest(){const L=copAll().map((c,i)=>({c,i,s:copScore(c)}));L.sort((a,b)=>b.s.sc-a.s.sc||(b.c.k|0)-(a.c.k|0)||(b.c.sv|0)-(a.c.sv|0));const b=L[0];
   return {nm:lobNm(b.c,b.i),i:b.i,w:b.c.w&&WART[b.c.w]?b.c.w:'',k:b.c.k|0,sv:b.c.sv|0,sc:b.s.sc,rk:b.s.rk};}
-async function profPush(){try{const id=await frMyId();if(!id)return;const code=frCode(id);FRP.id=id;if(FRP.code!==code){FRP.code=code;setTimeout(invListen,0);const el=$('#achp');if(el&&ACHV.tab==='fr')renderAch();}
+async function profPush(){try{const id=await frMyId();if(!id)return;const code=frCode(id);FRP.id=id;if(FRP.code!==code){FRP.code=code;setTimeout(invListen,0);setTimeout(frReqListen,0);const el=$('#achp');if(el&&ACHV.tab!=='ach')renderAch();}
   const d={id,n:meName(),best:frBest()},sig=JSON.stringify(d);if(sig===FRP.sig)return;const db=await claude.use('db');if(!db)return;FRP.sig=sig;await db.doc('prof/'+code).set(Object.assign(d,{ts:Date.now()}));}catch(e){}}
 async function profGet(code){try{if(!window.claude||!claude.use)return null;const db=await claude.use('db');if(!db)return null;const s=await db.doc('prof/'+code).get();const d=s.exists&&s.data();return d&&d.id?d:null;}catch(e){return null;}}
 async function frAddCode(raw){const code=String(raw||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(FRP.busy)return;
@@ -8294,7 +8303,8 @@ async function frAddCode(raw){const code=String(raw||'').toUpperCase().replace(/
   if(d.id===FRP.id)return say('這是你自己的代碼');
   FRP.cache[d.id]=d;
   if(isFriend(d.id)){const f=FR.list.find(x=>x.id===d.id);if(f&&d.n){f.name=d.n;frSave();}return say(`${d.n||'對方'} 已經是你的好友`);}
-  frAdd({id:d.id,name:d.n||'玩家'});const f=FR.list.find(x=>x.id===d.id);if(f){f.code=code;frSave();}FRP.msg='';FRP.peek=d.id;renderAch();}
+  if(frOut(d.id))return say(`已經申請過了，等待 ${d.n||'對方'} 同意`);
+  FRP.busy=true;await frReqSend({id:d.id,code,n:d.n||'玩家'},m=>{FRP.msg=m;});FRP.busy=false;const i=$('#frIn');if(i)i.value='';renderAch();}
 function frPeek(id){FRP.peek=id;renderAch();const f=FR.list.find(x=>x.id===id),code=(f&&f.code)||frCode(id);
   profGet(code).then(d=>{if(d){FRP.cache[id]=d;if(f&&d.n&&f.name!==d.n){f.name=d.n;frSave();}}else if(!FRP.cache[id])FRP.cache[id]={none:1};if(FRP.peek===id)renderAch();});}
 function frPeekHTML(){const id=FRP.peek,f=FR.list.find(x=>x.id===id)||{name:'玩家',w:0,l:0},d=FRP.cache[id],b=d&&d.best,code=(f.code)||frCode(id);
@@ -8302,6 +8312,50 @@ function frPeekHTML(){const id=FRP.peek,f=FR.list.find(x=>x.id===id)||{name:'玩
   else{const img=`img/av/cop_${b.i?'m':'f'}${b.w?'_'+b.w:''}.webp`;
     main=`<div class="fpOp"><img src="${img}" alt=""><div><small>最強培養幹員</small><b>${esc(b.nm)}</b>${b.rk?`<i class="fpRk" style="--rk:${RKC[b.rk]||'#8b9cad'}">${b.rk}</i>`:''}</div></div>${lobKD(b.sv,b.k)}`;}
   return `<div class="fpeek"><div class="fpTop"><button class="fpBack" aria-label="返回">‹</button><b>${esc((d&&d.n)||f.name)}</b><span class="fpCode">${code}</span></div>${main}<p class="fpWL">和你對戰 ${f.w|0} 勝 ${f.l|0} 敗</p></div>`;}
+// v196: friend requests. Sending a code asks the other player; they accept or decline under 申請好友.
+// freq/<their code>/<my code> is a request waiting for them; fans/<my code>/<their code> is their answer to mine.
+const FRQ={inc:{},code:'',un:null,aun:null};
+const frIncN=()=>Object.keys(FRQ.inc).length;
+function frBadge(){const f=$('#t-fr');if(!f)return;const n=frIncN();let e=f.querySelector('em');if(n){if(!e){e=document.createElement('em');f.appendChild(e);}e.textContent=n;}else if(e)e.remove();}
+function frReqRedraw(){frBadge();clearTimeout(frReqRedraw.t);frReqRedraw.t=setTimeout(()=>{if($('#achp')&&ACHV.tab!=='ach'&&!FRP.peek)renderAch();},120);}
+async function frReqListen(){if(!FRP.code||FRQ.code===FRP.code)return;const db=await ptDb();if(!db||FRQ.code===FRP.code)return;FRQ.code=FRP.code;
+  try{if(FRQ.un)FRQ.un();if(FRQ.aun)FRQ.aun();}catch(e){}FRQ.inc={};
+  const pull=async()=>{try{const r=await db.collection('freq/'+FRQ.code).get(),o={};r.docs.forEach(x=>{const d=x.data();if(d&&d.id&&d.code)o[d.code]=d;});FRQ.inc=o;frReqCheck();}catch(e){}};
+  FRQ.un=db.doc('freq/'+FRQ.code+'/+').onSnapshot(s=>{const d=s.exists&&s.data();if(d&&d.id&&d.code){FRQ.inc[d.code]=d;frReqCheck();}else pull();},()=>{});
+  FRQ.aun=db.doc('fans/'+FRQ.code+'/+').onSnapshot(s=>{const d=s.exists&&s.data();if(d&&d.code&&d.id)frAnswer(d,db);},()=>{});}
+// someone who is already a friend, or whom I asked too, is accepted straight away
+function frReqCheck(){for(const c in FRQ.inc){const d=FRQ.inc[c];if(d.id===FRP.id){delete FRQ.inc[c];continue;}if(isFriend(d.id)||frOut(d.id))frAccept(c,1);}frReqRedraw();}
+async function frAnswer(d,db){const o=(FR.out||[]).find(x=>x.id===d.id||x.code===d.code);
+  try{await db.doc('fans/'+FRQ.code+'/'+d.code).delete();}catch(e){}
+  if(d.ok){const was=isFriend(d.id);if(!was)frAdd({id:d.id,name:d.n||(o&&o.name)||'玩家'});const f=FR.list.find(x=>x.id===d.id);if(f){f.code=d.code;if(d.n)f.name=d.n;}
+    if(!was)achToastMsg('新好友',`${esc(d.n||(o&&o.name)||'對方')} 同意了你的好友申請`);}
+  else if(o)achToastMsg('好友申請未通過',`${esc(d.n||o.name)} 沒有接受你的申請`);
+  if(o)FR.out=FR.out.filter(x=>x!==o);frSave();renderPlayer();frReqRedraw();}
+async function frReqSend(p,say){say=say||(()=>{});if(!p||!p.id)return;if(!p.code)p.code=frCode(p.id);
+  if(!FRP.code)await profPush();if(!FRP.code)return say('還在連線，請稍後再試');
+  if(p.id===FRP.id)return say('這是你自己');
+  if(isFriend(p.id))return say(`${p.n||'對方'} 已經是你的好友`);
+  if(FRQ.inc[p.code]){await frAccept(p.code);return say(`${p.n||'對方'} 也申請加你，已經成為好友`);}
+  const db=await ptDb();if(!db)return say('連線中斷，請稍後再試');
+  try{await db.doc('freq/'+p.code+'/'+FRP.code).set({id:FRP.id,code:FRP.code,n:meName(),best:frBest(),ts:Date.now()});}catch(e){return say('送出失敗，請稍後再試');}
+  FR.out=[{id:p.id,code:p.code,name:p.n||'玩家',ts:Date.now()}].concat((FR.out||[]).filter(o=>o.id!==p.id)).slice(0,30);frSave();
+  say(`已送出申請，等待 ${p.n||'對方'} 同意`);frReqRedraw();}
+async function frAccept(code,quiet){const d=FRQ.inc[code];if(!d)return;delete FRQ.inc[code];
+  if(!isFriend(d.id))frAdd({id:d.id,name:d.n||'玩家'});const f=FR.list.find(x=>x.id===d.id);if(f){f.code=d.code;if(d.n)f.name=d.n;}
+  FR.out=(FR.out||[]).filter(o=>o.id!==d.id);frSave();FRP.cache[d.id]=Object.assign({},FRP.cache[d.id]||{},{id:d.id,n:d.n,best:d.best});
+  if(!quiet)achToastMsg('已成為好友',esc(d.n||''));frReqRedraw();renderPlayer();
+  const db=await ptDb();if(!db)return;
+  try{await db.doc('fans/'+d.code+'/'+FRQ.code).set({ok:1,id:FRP.id,code:FRQ.code,n:meName(),ts:Date.now()});await db.doc('freq/'+FRQ.code+'/'+d.code).delete();}catch(e){}}
+async function frDecline(code){const d=FRQ.inc[code];if(!d)return;delete FRQ.inc[code];frReqRedraw();const db=await ptDb();if(!db)return;
+  try{await db.doc('fans/'+d.code+'/'+FRQ.code).set({no:1,id:FRP.id,code:FRQ.code,n:meName(),ts:Date.now()});await db.doc('freq/'+FRQ.code+'/'+d.code).delete();}catch(e){}}
+async function frCancel(id){const o=(FR.out||[]).find(x=>x.id===id);if(!o)return;FR.out=FR.out.filter(x=>x!==o);frSave();frReqRedraw();
+  const db=await ptDb();if(db&&FRP.code)try{await db.doc('freq/'+o.code+'/'+FRP.code).delete();}catch(e){}}
+function frReqHTML(){const inc=Object.values(FRQ.inc).sort((a,b)=>(b.ts|0)-(a.ts|0)),out=(FR.out||[]).slice().sort((a,b)=>b.ts-a.ts),rec=FR.recent.filter(r=>!isFriend(r.id)&&!frOut(r.id)).slice(0,3);
+  return `<div class="frMe"><span>我的好友代碼</span><b>${FRP.code||'…'}</b><button class="frCp" ${FRP.code?'':'disabled'}>複製</button></div>
+    <form class="frAddC"><input id="frIn" maxlength="8" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="輸入對方的好友代碼"><button type="submit" ${FRP.busy?'disabled':''}>送出申請</button></form>${FRP.msg?`<p class="frMsg">${esc(FRP.msg)}</p>`:''}
+    <div class="frScr"><h5 class="frSec"><span>收到的申請</span><em>${inc.length}</em></h5><div class="frl">${inc.length?inc.map(d=>`<div class="fri"><b>${esc(d.n||'玩家')}</b><span class="frCd">${esc(d.code)}</span><button class="frOk" data-acc="${esc(d.code)}">同意</button><button class="frx" data-dec="${esc(d.code)}">拒絕</button></div>`).join(''):'<p class="frE">目前沒有人申請加你。</p>'}</div>
+    <h5 class="frSec"><span>等待對方同意</span><em>${out.length}</em></h5><div class="frl">${out.length?out.map(o=>`<div class="fri"><b>${esc(o.name)}</b><span class="frCd">${esc(o.code||'')}</span><span class="frWt">等待中</span><button class="frx" data-can="${esc(o.id)}">取消</button></div>`).join(''):'<p class="frE">沒有等待中的申請。輸入對方的好友代碼送出申請，對方同意後就會出現在好友名單。</p>'}</div>
+    ${rec.length?`<div class="frrec"><small>最近對手</small>${rec.map(r=>`<button class="anFr" data-addr="${esc(r.id)}">${SVG_FR.add}<em>${esc(r.name)}</em></button>`).join('')}</div>`:''}</div>`;}
 // ---- achievements ----
 // c: badge colour, sh: badge outline (0 shield, 1 hexagon, 2 round, 3 star); conditions (d) are never shown on the page
 const ACH=[
@@ -8444,7 +8498,7 @@ function achBadge(a){const c=a.c||'#f0b43c',id='bg'+a.id,S=[
   return `<svg class="bdS" viewBox="0 0 80 80" style="width:${ACHV.bw}px;height:${ACHV.bw}px"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}"/><stop offset="1" stop-color="#1b2530"/></linearGradient></defs>
     <path d="${S}" fill="url(#${id})" stroke="#e9d9a6" stroke-width="3" stroke-linejoin="round"/><path d="${S}" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="1" transform="translate(40 40) scale(.8) translate(-40 -40)"/>
     <text x="40" y="${a.sh===3?50:51}" text-anchor="middle" font-size="${a.sh===3?24:30}">${a.ic}</text></svg>`;}
-function openAch(tab){ACHV.st=0;if((tab||'ach')==='ach'){AS.n.opens=(AS.n.opens||0)+1;achSave();if(AS.n.opens>=20)setTimeout(()=>achGive('hunter'),0);}ACHV.tab=tab||'ach';ACHV.sel=null;ACHV.pg=0;FRP.peek=null;FRP.msg='';profPush();let el=$('#achp');if(!el){el=document.createElement('div');el.id='achp';el.setAttribute('role','dialog');el.setAttribute('aria-label','成就與好友');document.body.appendChild(el);el.addEventListener('click',e=>{if(e.target===el)el.remove();});}renderAch();}
+function openAch(tab){ACHV.st=0;if((tab||'ach')==='ach'){AS.n.opens=(AS.n.opens||0)+1;achSave();if(AS.n.opens>=20)setTimeout(()=>achGive('hunter'),0);}if(tab==='fr'&&frIncN())tab='req';ACHV.tab=tab||'ach';ACHV.sel=null;ACHV.pg=0;FRP.peek=null;FRP.msg='';profPush();let el=$('#achp');if(!el){el=document.createElement('div');el.id='achp';el.setAttribute('role','dialog');document.body.appendChild(el);el.addEventListener('click',e=>{if(e.target===el)el.remove();});}el.setAttribute('aria-label',ACHV.tab==='ach'?'成就':'好友');renderAch();}
 function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body='';
   if(T==='ach'){const a=ACHM[ACHV.sel];achPer();
     const card=x=>{const [v,g]=achProg(x),got=!!AS.got[x.id];return `<button class="bd ${got?'got':''} ${ACHV.sel===x.id?'sel':''}" data-a="${x.id}">${achBadge(x)}${got?'':`<i class="bdL">${SVG_LOCK}</i>`}<b>${x.n}</b><span class="bdP"><i><u style="width:${Math.round(v/g*100)}%"></u></i>${v}/${g}</span></button>`;};
@@ -8453,16 +8507,15 @@ function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body
     if(0)body=`<div class="agrid">${ACH.map(x=>`<button class="ab ${AS.got[x.id]?'got':''} ${ACHV.sel===x.id?'sel':''}" data-a="${x.id}"><i>${x.ic}</i><b>${x.n}</b></button>`).join('')}</div>
     <div class="adet">${a?`<b>${a.ic} ${a.n}</b><span>${a.d}${a.goal?`（${Math.min(AS.n[a.k]||0,a.goal)}/${a.goal}）`:''}</span><em>${AS.got[a.id]?'已解鎖 · '+new Date(AS.got[a.id]).toLocaleDateString('zh-TW'):'尚未解鎖'}</em>`:'<span>點一下成就看條件</span>'}</div>`;}
   else if(FRP.peek)body=frPeekHTML();
+  else if(T==='req')body=frReqHTML();
   else{const per=matchMedia('(orientation:landscape) and (max-height:500px)').matches?2:5,L=FR.list.slice().sort((a,b)=>b.ts-a.ts),pages=Math.max(1,Math.ceil(L.length/per));ACHV.pg=Math.min(ACHV.pg,pages-1);
-    const rec=FR.recent.filter(r=>!isFriend(r.id)).slice(0,3);
-    body=`<div class="frMe"><span>我的好友代碼</span><b>${FRP.code||'…'}</b><button class="frCp" ${FRP.code?'':'disabled'}>複製</button></div>
-    <form class="frAddC"><input id="frIn" maxlength="8" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="輸入好友代碼"><button type="submit" ${FRP.busy?'disabled':''}>加好友</button></form>${FRP.msg?`<p class="frMsg">${esc(FRP.msg)}</p>`:''}
-    <div class="frl">${L.length?L.slice(ACHV.pg*per,ACHV.pg*per+per).map(frRowHTML).join(''):'<p class="frE">還沒有好友。輸入對方的好友代碼，或在連線對戰的戰鬥分析按對手名字旁的加好友圖示。</p>'}</div>
-    ${pages>1?`<div class="frpg"><button data-pg="-1" ${ACHV.pg?'':'disabled'}>‹</button><span>${ACHV.pg+1}/${pages}</span><button data-pg="1" ${ACHV.pg<pages-1?'':'disabled'}>›</button></div>`:''}
-    ${rec.length?`<div class="frrec"><small>最近對手</small>${rec.map(r=>`<button class="anFr" data-addr="${r.id}">${SVG_FR.add}<em>${esc(r.name)}</em></button>`).join('')}</div>`:''}`;}
-  el.innerHTML=`<div class="achBox"><div class="achHead"><div class="seg"><button class="${T==='ach'?'on':''}" data-t="ach">成就 ${achCount()}/${ACH.length}</button><button class="${T==='fr'?'on':''}" data-t="fr">好友 ${FR.list.length}</button></div><button class="achX" aria-label="關閉">✕</button></div>${body}</div>`;
+    body=`<div class="frl">${L.length?L.slice(ACHV.pg*per,ACHV.pg*per+per).map(frRowHTML).join(''):'<p class="frE">還沒有好友。到「申請好友」輸入對方的好友代碼送出申請，對方同意後就會出現在這裡。</p>'}</div>
+    ${pages>1?`<div class="frpg"><button data-pg="-1" ${ACHV.pg?'':'disabled'}>‹</button><span>${ACHV.pg+1}/${pages}</span><button data-pg="1" ${ACHV.pg<pages-1?'':'disabled'}>›</button></div>`:''}`;}
+  const nIn=frIncN(),head=T==='ach'?`<b class="achT">🏆 成就 <em>${achCount()}/${ACH.length}</em></b>`:`<div class="seg"><button class="${T==='req'?'on':''}" data-t="req">申請好友${nIn?` <i class="frDot">${nIn}</i>`:''}</button><button class="${T==='fr'?'on':''}" data-t="fr">好友名單 ${FR.list.length}</button></div>`;
+  el.innerHTML=`<div class="achBox"><div class="achHead">${head}<button class="achX" aria-label="關閉">✕</button></div>${body}</div>`;
   el.querySelector('.achX').onclick=()=>{el.remove();renderPlayer();};
-  el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ACHV.tab=b.dataset.t;ACHV.sel=null;FRP.peek=null;FRP.msg='';renderAch();});
+  el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ACHV.tab=b.dataset.t;ACHV.sel=null;ACHV.pg=0;FRP.peek=null;FRP.msg='';renderAch();});
+  el.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>frAccept(b.dataset.acc));el.querySelectorAll('[data-dec]').forEach(b=>b.onclick=()=>frDecline(b.dataset.dec));el.querySelectorAll('[data-can]').forEach(b=>b.onclick=()=>frCancel(b.dataset.can));
   el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{ACHV.sel=b.dataset.a;renderAch();});
   el.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{ACHV.pg+=+b.dataset.pg;ACHV.sel=null;renderAch();});
   el.querySelectorAll('[data-dot]').forEach(b=>b.onclick=()=>{ACHV.pg=+b.dataset.dot;ACHV.sel=null;renderAch();});
@@ -8474,14 +8527,14 @@ function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body
    const cp=el.querySelector('.frCp');if(cp)cp.onclick=()=>{try{navigator.clipboard.writeText(FRP.code).then(()=>{cp.textContent='已複製';},()=>{});}catch(e){}};
    const fm=el.querySelector('.frAddC');if(fm)fm.onsubmit=e=>{e.preventDefault();frAddCode(el.querySelector('#frIn').value);};}
   el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const id=b.dataset.del;if(ACHV.sel!==id){ACHV.sel=id;renderAch();return;}frDel(id);ACHV.sel=null;renderAch();});
-  el.querySelectorAll('[data-addr]').forEach(b=>b.onclick=()=>{const r=FR.recent.find(x=>x.id===b.dataset.addr);if(!b.classList.contains('arm')){b.classList.add('arm');b.querySelector('em').textContent='再點一下加 '+(r?r.name:'');return;}frAdd(r);renderAch();});}
+  el.querySelectorAll('[data-addr]').forEach(b=>b.onclick=()=>{const r=FR.recent.find(x=>x.id===b.dataset.addr);if(!r)return;if(!b.classList.contains('arm')){b.classList.add('arm');b.querySelector('em').textContent='再點一下申請 '+r.name;return;}frReqSend({id:r.id,code:frCode(r.id),n:r.name},m=>{FRP.msg=m;renderAch();});});}
 // ---- mirror to the signed-in player's private store ----
 let SOC_ID=null;
 async function socialLoad(id){SOC_ID=id;try{const db=await claude.use('db');if(!db)return;const s=await db.collection('data/users/'+id).doc('social').get();const d=s.exists&&s.data();if(!d)return socialPush();
-  (d.list||[]).forEach(f=>{if(!isFriend(f.id))FR.list.push(f);});(d.recent||[]).forEach(r=>{if(!FR.recent.some(x=>x.id===r.id))FR.recent.push(r);});FR.recent=FR.recent.sort((a,b)=>b.ts-a.ts).slice(0,6);
+  (d.list||[]).forEach(f=>{if(!isFriend(f.id))FR.list.push(f);});(d.recent||[]).forEach(r=>{if(!FR.recent.some(x=>x.id===r.id))FR.recent.push(r);});(d.out||[]).forEach(o=>{if(!frOut(o.id)&&!isFriend(o.id))FR.out.push(o);});FR.recent=FR.recent.sort((a,b)=>b.ts-a.ts).slice(0,6);
   for(const k in d.got||{})if(!AS.got[k])AS.got[k]=d.got[k];for(const k in d.n||{})AS.n[k]=Math.max(AS.n[k]||0,d.n[k]|0);
   try{localStorage.setItem(FKEY,JSON.stringify(FR));localStorage.setItem(AKEY,JSON.stringify(AS));}catch(e){}renderPlayer();}catch(e){}}
-let socT=0;function socialPush(){gaPush();if(!SOC_ID||ME.mode!=='account')return;clearTimeout(socT);socT=setTimeout(async()=>{try{const db=await claude.use('db');if(db)await db.collection('data/users/'+SOC_ID).doc('social').set({list:FR.list.slice(0,200),recent:FR.recent,got:AS.got,n:AS.n,ts:Date.now()});}catch(e){}},800);}
+let socT=0;function socialPush(){gaPush();if(!SOC_ID||ME.mode!=='account')return;clearTimeout(socT);socT=setTimeout(async()=>{try{const db=await claude.use('db');if(db)await db.collection('data/users/'+SOC_ID).doc('social').set({list:FR.list.slice(0,200),recent:FR.recent,out:FR.out||[],got:AS.got,n:AS.n,ts:Date.now()});}catch(e){}},800);}
 // ===== remaining operators: gadgets in the simplified digital rules =====
 var LOSW=false,LOSD=false,SHOTP=null,DRONEANY=false;
 var NOLOC=new Set(['nokk','iana','vigil']);
@@ -10975,7 +11028,7 @@ const coopMateName=()=>G&&G.coop?(G.coop[coopRole()==='h'?'g':'h']||'隊友'):''
 const bestAv=b=>b?`img/av/cop_${b.i?'m':'f'}${b.w?'_'+b.w:''}.webp`:'img/av/cop_f.webp';
 async function ptDb(){try{return window.claude&&claude.use?await claude.use('db'):null;}catch(e){return null;}}
 function ptMe(){return {id:FRP.id,code:FRP.code,name:meName(),best:frBest(),ts:Date.now()};}
-async function onPush(){try{if(!FRP.code)await profPush();if(!FRP.code)return;invListen();const db=await ptDb();if(!db)return;await db.doc('on/'+FRP.code).set({ts:Date.now(),st:G&&G.phase?'game':'lobby'});}catch(e){}}
+async function onPush(){try{if(!FRP.code)await profPush();if(!FRP.code)return;invListen();frReqListen();const db=await ptDb();if(!db)return;await db.doc('on/'+FRP.code).set({ts:Date.now(),st:G&&G.phase?'game':'lobby'});}catch(e){}}
 setTimeout(onPush,2500);setInterval(()=>{if(!document.hidden)onPush();},25000);
 async function invListen(){if(!FRP.code||INVCODE===FRP.code)return;const db=await ptDb();if(!db)return;if(INVUN)try{INVUN();}catch(e){}INVCODE=FRP.code;
   INVUN=db.doc('inv/'+FRP.code).onSnapshot(s=>{const d=s.exists&&s.data();if(d)invGot(d);},()=>{});}
@@ -11436,7 +11489,7 @@ function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement
 function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="pshead"><svg class="spheart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.4 13A4.9 4.9 0 0 1 11.3 6l.7.7.7-.7a4.9 4.9 0 0 1 6.9 7Z" fill="currentColor"/></svg><div><b>贊助作者</b></div><button class="tsX" aria-label="關閉">✕</button></div>
   <div class="splist">${SPONSOR.map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.n)}<em>前往 ›</em></a>`:`<span>${esc(x.n)}<em>即將開放</em></span>`).join('')}</div>
   <p class="pshint">本遊戲完全免費，贊助不會讓角色變強，但你的支持對我很有幫助。未來可能加入 R6 以外的角色和場景，敬請期待！</p></div>`);}
-const NEWS=[{d: "2026-11-05", v: "v178–v195", i: ["培養幹員開打後就不能靠退出逃避陣亡：按「離開」或關掉網頁都算陣亡；斷線的話 3 分鐘內回來可以接著打", "新增「撤離」（紫色按鈕）：培養幹員花 1 行動開始撤離，撐過敵方下一個階段就會被光束接走，這場算存活", "組隊：好友頁可以邀請在線的好友加入小隊，大廳右側會出現小隊圖示；組隊後按「對戰電腦」就是 4v4 合作，兩人各控 2 名幹員，順序是隊長 → 電腦 → 隊員 → 電腦", "好友代碼：好友頁顯示自己的 6 碼代碼，輸入對方代碼就能直接加好友；點好友名字可看他最強的培養幹員、擊殺和存活", "看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
+const NEWS=[{d: "2026-11-06", v: "v196", i: ["大廳右上的好友按鈕改成「申請好友」和「好友名單」兩頁，成就移回 🏆 按鈕；輸入好友代碼改成送出申請，對方在「申請好友」按同意後才會成為好友，等待同意的申請也列在那裡"]},{d: "2026-11-05", v: "v178–v195", i: ["培養幹員開打後就不能靠退出逃避陣亡：按「離開」或關掉網頁都算陣亡；斷線的話 3 分鐘內回來可以接著打", "新增「撤離」（紫色按鈕）：培養幹員花 1 行動開始撤離，撐過敵方下一個階段就會被光束接走，這場算存活", "組隊：好友頁可以邀請在線的好友加入小隊，大廳右側會出現小隊圖示；組隊後按「對戰電腦」就是 4v4 合作，兩人各控 2 名幹員，順序是隊長 → 電腦 → 隊員 → 電腦", "好友代碼：好友頁顯示自己的 6 碼代碼，輸入對方代碼就能直接加好友；點好友名字可看他最強的培養幹員、擊殺和存活", "看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
 const newsKey=()=>NEWS[0].d+'#'+NEWS[0].i.length;
 function newsUnread(){try{return localStorage.getItem('newsSeen')!==newsKey();}catch(e){return false;}}
 function newsBadge(){const n=$('#t-news');if(n)n.classList.toggle('unread',newsUnread());}
@@ -11475,10 +11528,10 @@ function openFeedback(){const el=tsDlg('feedback','回報',`<div class="psbox"><
       const j=await r.json().catch(()=>({}));if(!r.ok||j.success==='false'||j.success===false)throw {m:/activat/i.test(j.message||'')?'回報信箱還沒啟用，請稍後再試。':(j.message?'送出失敗：'+j.message:'')};
       msg.className='fbmsg ok';msg.textContent='已送出，謝謝你的回報！';tx.value='';cnt.textContent='0 / 2000';imgs.forEach(m=>URL.revokeObjectURL(m.url));imgs=[];drawImgs();bt.textContent='已送出';setTimeout(()=>{bt.disabled=false;bt.textContent='發送';},2500);}
     catch(e){msg.className='fbmsg err';msg.textContent=(e&&e.m)||'送出失敗，請檢查網路後再試一次。';bt.disabled=false;bt.textContent='發送';}};}
-{const s=$('#tside'),a=$('#t-love'),b=$('#t-fb');let n=$('#t-news');if(s&&!n){n=document.createElement('button');n.id='t-news';n.className='tsb news';n.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 10v4a1 1 0 0 0 1 1h1.6l1.3 4.3a1 1 0 0 0 1 .7h1.3a.7.7 0 0 0 .7-.9L8.2 15H9l9.5 4.6V4.4L9 9H3.5a1 1 0 0 0-1 1Z" fill="currentColor"/><path d="M21 10v4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';n.setAttribute('aria-label','版本公告');n.title='版本公告';s.insertBefore(n,a);}if(n){n.onclick=openNews;newsBadge();}{let f=$('#t-fr');if(s&&!f){f=document.createElement('button');f.id='t-fr';f.className='tsb';f.innerHTML=SVG_FR.add;f.setAttribute('aria-label','好友');f.title='好友';s.insertBefore(f,n||a);}if(f)f.onclick=()=>openAch('fr');}if(a)a.onclick=openSponsor;if(b)b.onclick=openFeedback;}
+{const s=$('#tside'),a=$('#t-love'),b=$('#t-fb');let n=$('#t-news');if(s&&!n){n=document.createElement('button');n.id='t-news';n.className='tsb news';n.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 10v4a1 1 0 0 0 1 1h1.6l1.3 4.3a1 1 0 0 0 1 .7h1.3a.7.7 0 0 0 .7-.9L8.2 15H9l9.5 4.6V4.4L9 9H3.5a1 1 0 0 0-1 1Z" fill="currentColor"/><path d="M21 10v4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';n.setAttribute('aria-label','版本公告');n.title='版本公告';s.insertBefore(n,a);}if(n){n.onclick=openNews;newsBadge();}{let f=$('#t-fr');if(s&&!f){f=document.createElement('button');f.id='t-fr';f.className='tsb';f.innerHTML=SVG_FR.add;f.setAttribute('aria-label','好友');f.title='好友';s.insertBefore(f,n||a);}if(f){f.onclick=()=>openAch('fr');frBadge();}}if(a)a.onclick=openSponsor;if(b)b.onclick=openFeedback;}
 function renderPlayer(){const el=$('#tplayer');if(!el)return;const acct=ME.mode==='account';
   el.innerHTML=`<button class="pcard" id="pcard" aria-label="玩家資料與設定"><img class="pav" src="${meAvatar()}" alt=""><span class="pinfo"><b>${esc(meName())}</b><span class="prank">${ecoTag()}</span></span></button>`;
-  el.insertAdjacentHTML('beforeend',`<button class="pach" id="pach" aria-label="成就與好友"><i>🏆</i><b>${achCount()}/${ACH.length}</b></button>`);$('#pach').onclick=()=>openAch();{const n=tkClaimable(),sd=$('#tside');let t=$('#t-task');if(sd&&!t){t=document.createElement('button');t.id='t-task';t.className='tsb task';t.setAttribute('aria-label','任務');t.title='任務';sd.insertBefore(t,sd.firstChild);}if(t){t.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2.5h6a1 1 0 0 1 1 1V5h2.5A1.5 1.5 0 0 1 20 6.5v14a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20.5v-14A1.5 1.5 0 0 1 5.5 5H8V3.5a1 1 0 0 1 1-1Z" fill="currentColor"/><path d="M7.5 12l1.6 1.6 2.9-3M7.5 17.2l1.6 1.6 2.9-3M14 12.2h3M14 17.4h3" fill="none" stroke="#11161b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'+(n?`<em>${n}</em>`:'');t.onclick=()=>{if(typeof G!=='undefined'&&G&&!G.over&&SCREEN!=='title'&&SCREEN!=='task')return;SCREEN='task';NETMSG='';renderTitle();};}}
+  el.insertAdjacentHTML('beforeend',`<button class="pach" id="pach" aria-label="成就"><i>🏆</i><b>${achCount()}/${ACH.length}</b></button>`);$('#pach').onclick=()=>openAch();{const n=tkClaimable(),sd=$('#tside');let t=$('#t-task');if(sd&&!t){t=document.createElement('button');t.id='t-task';t.className='tsb task';t.setAttribute('aria-label','任務');t.title='任務';sd.insertBefore(t,sd.firstChild);}if(t){t.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2.5h6a1 1 0 0 1 1 1V5h2.5A1.5 1.5 0 0 1 20 6.5v14a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20.5v-14A1.5 1.5 0 0 1 5.5 5H8V3.5a1 1 0 0 1 1-1Z" fill="currentColor"/><path d="M7.5 12l1.6 1.6 2.9-3M7.5 17.2l1.6 1.6 2.9-3M14 12.2h3M14 17.4h3" fill="none" stroke="#11161b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'+(n?`<em>${n}</em>`:'');t.onclick=()=>{if(typeof G!=='undefined'&&G&&!G.over&&SCREEN!=='title'&&SCREEN!=='task')return;SCREEN='task';NETMSG='';renderTitle();};}}
   $('#pcard').onclick=openSettings;}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function openSettings(){let el=$('#psettings');if(!el){el=document.createElement('div');el.id='psettings';el.className='psettings';el.setAttribute('role','dialog');el.setAttribute('aria-label','玩家設定');document.body.appendChild(el);
@@ -11494,7 +11547,7 @@ function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;cons
   el.innerHTML=`<div class="psbox"><div class="pshead"><img class="pav" src="${meAvatar()}" alt=""><div><b>${esc(meName())}</b><span>${GA.u?'Google 帳號':acct?'線上身分':'訪客'}</span></div><button id="psClose" aria-label="關閉">✕</button></div>
   <section><h4>名稱</h4><div class="psrow"><input id="psNick" maxlength="16" value="${esc(ME.nick)}" placeholder="${esc(acct&&ME.acct.name?ME.acct.name:ME.guest)}"><button id="psNickOk">儲存</button></div></section>
   <section><h4>頭貼</h4><div class="avgrid">${acct&&ME.acct.photo?`<button class="avb ${ME.usePhoto?'on':''}" data-av="__photo" title="帳號照片"><img src="${ME.acct.photo}" alt="帳號照片"></button>`:''}${avs}</div><p class="pshint">幹員熟練度 Lv1 解鎖頭像、Lv3 解鎖半身像、Lv5 解鎖稱號。已擁有的幹員可用照片當頭像，培養幹員轉職過的職業也能當頭像。</p></section><section><h4>稱號</h4>${ttls.length?`<div class="psrow wrap"><button class="ttl ${!ECO.title?'on':''}" data-ttl="">不顯示</button>${ttls.map(b=>`<button class="ttl ${ECO.title===b?'on':''}" data-ttl="${b}">${esc(mxTitle(b))}</button>`).join('')}</div>`:'<p class="pshint">把任一名幹員練到熟練度 Lv5，就能拿到他的專屬稱號。</p>'}</section>
-  <section><h4>成就與好友</h4><div class="psrow"><button id="psAch">🏆 成就 ${achCount()}/${ACH.length}</button><button id="psFr">好友 ${FR.list.length} 人</button></div></section>
+  <section><h4>成就與好友</h4><div class="psrow"><button id="psAch">🏆 成就 ${achCount()}/${ACH.length}</button><button id="psFr">好友 ${FR.list.length} 人${frIncN()?`（${frIncN()} 個申請）`:''}</button></div></section>
   <section><h4>登入資料</h4>${window.R6FB?gaHTML():acct?`<p class="pshint">已用 線上身分登入。</p><div class="psrow"><button id="psLogout">改用訪客身分</button></div>`:
     `<p class="pshint">目前是訪客，所有模式都能玩。聲望、解鎖的幹員和熟練度存在這台裝置上。</p><div class="pslogin"><button class="primary" id="psLogin"><span class="lgico">C</span>啟用線上身分</button><button disabled title="Google 登入目前還沒開放"><span class="lgico g">G</span>Google 登入（此頁面不支援）</button><button class="on" disabled><span class="lgico">訪</span>訪客（目前）</button></div>`}${PMSG?`<p class="terr">${PMSG}</p>`:''}</section>
   <section><h4>設定</h4><div class="psrow"><span>🌐 語言</span>${langSelect('psLang')}</div><div class="psrow pstg"><span>射擊特寫</span><button id="psCine">${CINE.on?'開':'關'}</button><span>音樂</span><button id="psMus">${SFX.mOn?'開':'關'}</button><span>音效</span><button id="psSfx">${SFX.on?'開':'關'}</button></div></section></div>`;
