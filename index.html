@@ -2407,6 +2407,8 @@ body.hasClk #tracker .seg{display:none}
 #anal .anAch.ico span{width:40px;height:40px;padding:0;display:grid;place-items:center;font-size:22px;line-height:1;position:relative;cursor:pointer;border-radius:4px}
 #anal .anAch.ico span.show::after{content:attr(title);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#0b121a;border:1px solid rgba(240,180,60,.5);color:#f3d48a;font-size:12px;padding:3px 8px;z-index:5}
 @media (orientation:landscape) and (max-height:500px){#anal .anAch.ico span{width:30px;height:30px;font-size:17px}}
+#anal .anAch.ico span{background:none;border:0}#anal .anAch.ico span .achImg{width:100%!important;height:100%!important;display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+.achImg{object-fit:contain;vertical-align:middle;display:inline-block}#achToast .achImg{margin-right:6px;vertical-align:-8px}
 /* v49: shop */
 .opsel.shop .osT:not(.lk){outline:1px solid rgba(255,255,255,.08)}
 .osEco #osBuy{font-size:15px;padding:8px 16px}
@@ -6624,7 +6626,7 @@ function showAnalysis(w,why){if(!G||!G.over||G.tut)return;let o=$('#anal');if(o)
     <div class="anScroll"><table class="anT a">${anCap('A')}${head}${rows('A')}</table>
     <table class="anT d">${anCap('D')}${head}${rows('D')}</table></div>
     <div class="anFoot"><div class="anS a"><small>進攻方總傷害</small><b>${TA.dmg}</b></div><div class="anS mid"><small>本場 MVP</small><b>${mvp?OPS[mvp.op].name:'–'}</b></div><div class="anS d"><small>防守方總傷害</small><b>${TD.dmg}</b></div></div>
-    ${(G._newAch||[]).length?`<div class="anAch ico"><b>成就達成</b>${G._newAch.map(id=>{const a=ACHM[id];return `<span title="${esc(a.n)}" aria-label="${esc(a.n)}" onclick="this.classList.toggle('show')">${a.ic}</span>`;}).join('')}</div>`:''}<div class="anBtns">${!G.net&&!G.bot?'<button id="anAgain">再來一局</button>':''}<button class="primary" id="anHome">結束任務・回大廳</button></div></div>`;
+    ${(G._newAch||[]).length?`<div class="anAch ico"><b>成就達成</b>${G._newAch.map(id=>{const a=ACHM[id];return `<span title="${esc(a.n)}" aria-label="${esc(a.n)}" onclick="this.classList.toggle('show')">${achIc(a,40)}</span>`;}).join('')}</div>`:''}<div class="anBtns">${!G.net&&!G.bot?'<button id="anAgain">再來一局</button>':''}<button class="primary" id="anHome">結束任務・回大廳</button></div></div>`;
   document.body.appendChild(o);const rk=$('#rkres');if(rk)o.querySelector('.anTop').appendChild(rk);
   $('#anHome').onclick=()=>{o.remove();$('#banner').hidden=true;goTitle();};
   o.querySelectorAll('.anFr').forEach(b=>b.onclick=()=>frTap(b));
@@ -8523,12 +8525,16 @@ const ACH=[
 const ACHSEC=[['基本',a=>!a.goal&&!a.x],['長期目標',a=>a.goal&&!a.x],['刁鑽',a=>a.x]];
 function achProg(a){const n=AS.n,g=a.goal||1;if(!a.goal)return[AS.got[a.id]?1:0,1];
   const v=a.k==='ops'?(n.ops||[]).length:a.k==='friends'?FR.list.length:a.k==='achN'?ACH.filter(x=>x.id!=='hunter'&&AS.got[x.id]).length:a.k==='mainN'?Math.max(0,...Object.values(n.opN||{})):(n[a.k]||0);return[Math.min(AS.got[a.id]?g:v,g),g];}
+// v212: every achievement has a metal badge picture in img/ach/<id>.webp; an achievement without a picture is left out
+const ACHIMG=new Set(["ace", "butter", "clutch", "deadWin", "deadline", "defuse", "double", "ff", "ff3", "first", "flaw", "friend", "friend5", "gad100", "gad20", "gadget", "games50", "gift", "hk", "hk3", "hunter", "kC4", "kClay", "kFar", "kFire", "kFrag", "kGas", "kMulti", "kNear", "kShield", "kZap", "kills200", "kills50", "lose5", "lunch", "main", "mime", "onehp", "online", "ops10", "opsAll", "owl", "plant", "plant5", "quiet", "ranked", "reader", "rescue", "rescue5", "retreat", "sandbag", "sharp", "shields", "speedL", "spotless", "spray", "storm", "streakL", "streakW", "tank", "thenwhat", "timeWin", "tourist", "tut", "vet", "win", "winA", "winD", "wins10", "wins25", "wipeWin", "zen", "zero"]);
+for(let i=ACH.length-1;i>=0;i--){if(ACHIMG.has(ACH[i].id))ACH[i].img='img/ach/'+ACH[i].id+'.webp';else ACH.splice(i,1);}
+const achIc=(a,px)=>a.img?`<img class="achImg" src="${a.img}" alt="" style="width:${px}px;height:${px}px">`:a.ic;
 const ACHM=Object.fromEntries(ACH.map(a=>[a.id,a]));
 const AKEY='r6bg.ach';
 const AS=(()=>{let p=null;try{p=JSON.parse(localStorage.getItem(AKEY)||'null');}catch(e){}return Object.assign({got:{},n:{games:0,wins:0,winA:0,winD:0}},p||{});})();
 const achCount=()=>ACH.filter(a=>AS.got[a.id]).length;
 function achSave(){try{localStorage.setItem(AKEY,JSON.stringify(AS));}catch(e){}socialPush();}
-function achGive(id){if(!ACHM[id]||AS.got[id])return false;AS.got[id]=Date.now();achSave();const a=ACHM[id];achToastMsg(`${a.ic} 成就解鎖：${a.n}`,a.t?`「${a.t}」`:'到作戰檔案的成就頁看看');if(G&&G.over)(G._newAch=G._newAch||[]).push(id);return true;}
+function achGive(id){if(!ACHM[id]||AS.got[id])return false;AS.got[id]=Date.now();achSave();const a=ACHM[id];achToastMsg(`${achIc(a,30)} 成就解鎖：${a.n}`,a.t?`「${a.t}」`:'到作戰檔案的成就頁看看');if(G&&G.over)(G._newAch=G._newAch||[]).push(id);return true;}
 function achFinish(w){if(!G||G._achDone)return;G._achDone=true;G._newAch=[];
   if(G.tut){if(w==='A')achGive('tut');return;}
   const win=w===G.player,P=G.player,mine=G.units.filter(u=>u.side===P),en=G.units.filter(u=>u.side!==P),c=AS.n,got=[];
@@ -8581,7 +8587,7 @@ const SVG_LOCK='<svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="1
 // how many badges fit on one page without scrolling, for this screen
 function achPer(){const W=Math.min(innerWidth-24,640),H=innerHeight,land=innerWidth>innerHeight&&H<520,cols=land?6:W<480?3:4;let bw=Math.min(84,(W-24)/cols-18);
   const avail=H-24-24-46-(land?44:58)-26-(land?16:30),rows=land?2:Math.max(1,Math.min(4,Math.floor(avail/(bw+50))));if(land)bw=Math.max(44,Math.min(bw,avail/2-46));ACHV.cols=cols;ACHV.bw=Math.round(bw);return cols*rows;}
-function achBadge(a){const c=a.c||'#f0b43c',id='bg'+a.id,S=[
+function achBadge(a){if(a.img)return `<img class="bdS" src="${a.img}" alt="" style="width:${ACHV.bw}px;height:${ACHV.bw}px;object-fit:contain">`;const c=a.c||'#f0b43c',id='bg'+a.id,S=[
   'M40 5 L70 15 V40 C70 57 57 69 40 76 C23 69 10 57 10 40 V15 Z',
   'M40 4 L71 22 V58 L40 76 L9 58 V22 Z',
   'M40 4 A36 36 0 1 1 39.9 4 Z',
@@ -8594,9 +8600,9 @@ function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body
   if(T==='ach'){const a=ACHM[ACHV.sel];achPer();
     const card=x=>{const [v,g]=achProg(x),got=!!AS.got[x.id];return `<button class="bd ${got?'got':''} ${ACHV.sel===x.id?'sel':''}" data-a="${x.id}">${achBadge(x)}${got?'':`<i class="bdL">${SVG_LOCK}</i>`}<b>${x.n}</b><span class="bdP"><i><u style="width:${Math.round(v/g*100)}%"></u></i>${v}/${g}</span></button>`;};
     body=`<div class="bscroll">${ACHSEC.map(([t,f])=>{const L=ACH.filter(f);return `<h5 class="bsec"><span>${t}</span><em>${L.filter(x=>AS.got[x.id]).length}/${L.length}</em></h5><div class="bgrid" style="--cols:${ACHV.cols}">${L.map(card).join('')}</div>`;}).join('')}</div>
-    <div class="adet">${a?`<b>${a.ic} ${a.n}</b>${a.t?`<i class="aTag">「${a.t}」</i>`:''}${AS.got[a.id]?`<span>達成條件：${a.d}</span><em>已解鎖 · ${new Date(AS.got[a.id]).toLocaleDateString('zh-TW')}</em>`:'<em>尚未解鎖 · 條件保密，繼續玩就會知道</em>'}`:'<span>點徽章看名稱；已解鎖的會顯示達成條件</span>'}</div>`;
+    <div class="adet">${a?`<b>${achIc(a,22)} ${a.n}</b>${a.t?`<i class="aTag">「${a.t}」</i>`:''}${AS.got[a.id]?`<span>達成條件：${a.d}</span><em>已解鎖 · ${new Date(AS.got[a.id]).toLocaleDateString('zh-TW')}</em>`:'<em>尚未解鎖 · 條件保密，繼續玩就會知道</em>'}`:'<span>點徽章看名稱；已解鎖的會顯示達成條件</span>'}</div>`;
     if(0)body=`<div class="agrid">${ACH.map(x=>`<button class="ab ${AS.got[x.id]?'got':''} ${ACHV.sel===x.id?'sel':''}" data-a="${x.id}"><i>${x.ic}</i><b>${x.n}</b></button>`).join('')}</div>
-    <div class="adet">${a?`<b>${a.ic} ${a.n}</b><span>${a.d}${a.goal?`（${Math.min(AS.n[a.k]||0,a.goal)}/${a.goal}）`:''}</span><em>${AS.got[a.id]?'已解鎖 · '+new Date(AS.got[a.id]).toLocaleDateString('zh-TW'):'尚未解鎖'}</em>`:'<span>點一下成就看條件</span>'}</div>`;}
+    <div class="adet">${a?`<b>${achIc(a,22)} ${a.n}</b><span>${a.d}${a.goal?`（${Math.min(AS.n[a.k]||0,a.goal)}/${a.goal}）`:''}</span><em>${AS.got[a.id]?'已解鎖 · '+new Date(AS.got[a.id]).toLocaleDateString('zh-TW'):'尚未解鎖'}</em>`:'<span>點一下成就看條件</span>'}</div>`;}
   else if(FRP.peek)body=frPeekHTML();
   else if(T==='req')body=frReqHTML();
   else{const per=matchMedia('(orientation:landscape) and (max-height:500px)').matches?2:5,L=FR.list.slice().sort((a,b)=>b.ts-a.ts),pages=Math.max(1,Math.ceil(L.length/per));ACHV.pg=Math.min(ACHV.pg,pages-1);
@@ -13049,7 +13055,7 @@ function achApply(t){const R=skCsv(t);if(!R.length)return false;const h=R[0].map
   if(iI<0||F.every(f=>f[1]<0))return false;const seen=new Set();
   for(const r of R.slice(1)){const id=(r[iI]||'').trim(),a=ACHM[id];if(!a)continue;
     if(!ACHT.def[id])ACHT.def[id]={ic:a.ic,n:a.n,d:a.d};seen.add(id);
-    for(const [k,i] of F){const v=i>=0?(r[i]||'').trim():'';a[k]=v||ACHT.def[id][k];}}
+    for(const [k,i] of F){let v=i>=0?(r[i]||'').trim():'';if(k==='ic'&&/\.(png|webp|jpe?g)$/i.test(v))v='';a[k]=v||ACHT.def[id][k];}}
   for(const id of ACHT.on)if(!seen.has(id))Object.assign(ACHM[id],ACHT.def[id]);
   ACHT.on=seen;return true;}
 function tblLoad(key,urls,apply){try{const t=localStorage.getItem(key);if(t)apply(t);}catch(e){}
