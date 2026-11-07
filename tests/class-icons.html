@@ -5,7 +5,9 @@
 <script>
 fetch('index.html').then(r=>r.text()).then(html=>{
  const source=html.slice(html.indexOf('const WSVG='),html.indexOf('// class skills (職業技能)'));
- const WPN=Function(source+';return WPN')();
- document.querySelector('main').innerHTML=['hs','sh','mg','sg','rf','sn','smg'].map(w=>`<article><h2>${WPN[w].t}</h2><div class="large">${WPN[w].ic}</div><div>${WPN[w].ic}</div></article>`).join('');
+ const iconSource=html.slice(html.indexOf('const skillIcon='),html.indexOf('\n',html.indexOf('const skillIcon=')));
+ const {WPN,skillIcon}=Function(source+';const classOf=k=>k.slice(4);'+iconSource+';return {WPN,skillIcon}')();
+ const style=document.createElement('style');style.textContent=html.split('\n').filter(l=>l.startsWith('.cpSlot')||l.startsWith('.cpGi')).join('\n');document.head.append(style);
+ document.querySelector('main').innerHTML=['hs','sh','mg','sg','rf','sn','smg'].map(w=>`<article><h2>${WPN[w].t}</h2><div class="large">${WPN[w].ic}</div><div>${WPN[w].ic}</div><button class="cpSlot s f" style="width:124px;--accent:#e3aa3e" aria-label="${WPN[w].t}">${skillIcon('cls:'+w,true)}</button></article>`).join('');
 }).catch(e=>document.body.textContent=e.stack);
 </script>

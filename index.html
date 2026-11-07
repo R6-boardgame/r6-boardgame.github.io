@@ -2717,8 +2717,10 @@ body.hasClk #tracker .seg{display:none}
 .cpSlot.g{height:50px}.cpSlot.s{height:70px;font-size:30px!important}
 .cpSlot.f{border:1.5px solid var(--accent)!important;color:#e2e8ee!important}
 .cpGi,.cpGi>*{display:grid;place-items:center;width:40px;height:40px}.cpGi img,.cpGi svg{width:40px;height:40px;object-fit:contain}
-.cpSlot.s img{width:40px;height:40px}.cpSkN{position:absolute;left:0;right:0;bottom:2px;font-size:10px;text-align:center;color:#c9d3dc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 3px}
-.cpSlot.s.f{align-content:start;padding-top:6px}
+.cpSlot.s img{width:64px;height:64px;object-fit:contain}
+.cpSlot.s.f{align-content:center;padding:3px}
+.cpSlot.s>.cpGi{width:100%;height:62px}
+.cpSlot.s>.cpGi>svg{width:100%;height:100%}
 .cpStats{padding:0 12px;display:flex;flex-direction:column;gap:3px;flex:none}
 .cpRow{display:grid;grid-template-columns:52px 1fr 30px 30px;align-items:center;gap:5px;height:clamp(32px,4.7vh,40px);background:linear-gradient(90deg,#16202a,#121a23);border-left:3px solid var(--ln);padding:0 6px 0 8px}
 .cpRow.dice{border-left-color:var(--Y)}.cpRow.arm{border-left-color:var(--G)}.cpRow.spd{border-left-color:var(--B)}.cpRow.vis{border-left-color:var(--V)}
@@ -13260,7 +13262,7 @@ const classOf=k=>typeof k==='string'&&k.startsWith('cls:')&&CSK[k.slice(4)]?k.sl
 const classEquipped=c=>!!c.w&&c.sk===classKey(c.w);
 const hasClassSkill=u=>!!u.w&&u.clsSkill===u.w;
 const skillOwned=(c,k)=>classOf(k)?classOf(k)===c.w:ECO.sk.includes(k);
-const skillIcon=k=>classOf(k)?`<span class="cpGi">${WPN[classOf(k)].ic}</span>`:`<img src="${opIcon(k)}" alt="">`;
+const skillIcon=(k,fill=false)=>{const w=classOf(k);if(!w)return `<img src="${opIcon(k)}" alt="">`;let ic=WPN[w].ic;if(fill){const b=CLASS_ART_BOX[w],h=400*b[3]/b[2];ic=ic.replace('viewBox="0 0 400 400"',`viewBox="0 ${(400-h)/2} 400 ${h}"`);}return `<span class="cpGi">${ic}</span>`;};
 const WORD=['hs','sh','mg','sg','rf','sn','smg'],WART={hs:1,sh:1,rf:1,sn:1,sg:1,mg:1,smg:1},RANKD={R:3,O:2,Y:1};
 const bMax=(c,b)=>{const l=WPN[c.w]&&WPN[c.w].lim&&WPN[c.w].lim[b];return Math.min(4,l?l.max:4);};
 const bNoR=(c,b)=>{const l=WPN[c.w]&&WPN[c.w].lim&&WPN[c.w].lim[b];return !!(l&&l.noR);};
@@ -13438,7 +13440,7 @@ function renderCop(){const el=$('#cop');if(!el||el.hidden)return;const cs=copAll
       <div class="cpKd"><div><b>${c.k}</b><span>擊殺</span></div><div><b>${c.sv}</b><span>存活場數</span></div></div></div>
     ${cpPenta(sc)}</div>
     <div class="cpKit"><div class="cpKl"><span>道具</span></div><div class="cpGs">${[0,1].map(i=>`<button class="cpSlot g ${c.g[i]?'f':''}" data-gs="${i}" aria-label="攜帶道具 ${i+1}">${slot(c.g[i])}</button>`).join('')}</div>
-      <div class="cpKl"><span>技能</span></div><button class="cpSlot s ${sk?'f':''}" id="cpSk" aria-label="技能">${sk?`${skillIcon(sk)}${skNo?'<em class="cpNo">職業不符</em>':''}<span class="cpSkN">${esc(skName(sk))}</span>`:'+'}</button></div></div>
+      <div class="cpKl"><span>技能</span></div><button class="cpSlot s ${sk?'f':''}" id="cpSk" aria-label="${sk?esc(skName(sk)):'技能'}">${sk?`${skillIcon(sk,true)}${skNo?'<em class="cpNo" aria-label="職業不符">!</em>':''}`:'+'}</button></div></div>
   <div class="cpStats">${cpRows()}</div>
   <div class="cpPbar"><div class="cpPv"><span>可用點數</span><b>${left}</b></div><div class="cpPt"><div class="cpTr"><i style="width:${(tot-pend)/COP_CAP*100}%"></i><i class="pd" style="left:${(tot-pend)/COP_CAP*100}%;width:${pend/COP_CAP*100}%"></i></div><div class="cpLg"><span>已獲得 ${tot}</span><span>上限 ${COP_CAP}</span></div></div></div>
   <div class="cpFoot"><button class="cpBtn g" id="cpRt">重新訓練<small>${fmtN(COP_RT)} 聲望</small></button><button class="cpBtn p" id="cpOk" ${cpDirty()?'':'disabled'}>確認${pend>0?`<small>${pend} 點待確認</small>`:''}</button></div>
