@@ -474,3 +474,8 @@
 - `defenderOutside` 讓屋外防守方可見並解除隱藏；煙霧仍優先遮蔽。`outsideCam` 在進攻方觀看敵方階段時跟隨屋外行動者，階段結束恢復 `enemyView` 保存的原視角；射擊特寫期間延後還原，避免互搶。
 - `aiAttacker` 每次啟動固定威脅圖並沿已選路線推進；任務狀態改變才重新選路，不再追著隊長往返。進屋即略過入口集合點；隊友佔格改尋路繞行；有 1 行動也可奔跑。人質局找不到路不再誤轉向炸彈點。
 - 回歸測試：`tests/combat-flow-v236.cjs`、`tests/movement-intel.cjs`、`tests/smoke-vision.cjs`、`tests/class-skill-slots.cjs`。
+
+## v237 排行榜
+- `boardHTML` 改成固定外框、兩分類按鈕、上下捲動前 50 名與常駐我的排名。前三名人物層與文字層分離，第一名人物最前、所有名次文字在人物之上。
+- `board/<uid>_<slot>` 補 `i/w/dead:false`；陣亡名冊同步到 `board/<uid>_fallen_<ts>_<slot>`（`dead:true`）。所屬玩家用 `meName()`，不可把 `ECO.alum[].by`（擊殺者）當玩家。舊玩家要進新版才補圖片與陣亡記錄；舊資料沒有職業時用新兵圖。
+- `lbRows()` 預設現役，保持大廳前三名行為。`lbMyRank(tab)` 在完整排行找自己的最高名次，不受 50 名上限影響。`tests/leaderboard.cjs` 為邏輯測試，`tests/leaderboard.html` 為不連雲端的虛構資料 UI 測試。

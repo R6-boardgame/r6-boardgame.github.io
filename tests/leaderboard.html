@@ -1,0 +1,12 @@
+<!doctype html><html class="gnav"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../"><title>排行榜 UI 測試（虛構資料，不連雲端）</title><body data-scr="title"><div id="title" data-s="board"><div id="tmenu"></div></div><script>
+// Isolated fixture: actual CSS/render functions; no accounts, localStorage or cloud writes.
+(async()=>{const html=await(await fetch('index.html')).text();
+ for(const m of html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)){const s=document.createElement('style');s.textContent=m[1];document.head.append(s);}
+ const src=html.slice(html.indexOf('const LB='),html.indexOf('function trainHTML'));
+ const setup=`const WPN={hs:{},sh:{},mg:{},sg:{},rf:{},sn:{},smg:{}},ECO={alum:[{i:1,ts:123,w:'hs',nm:'鋼鐵意志',k:30,sv:9}]};const copAll=()=>[{nm:'我的幹員',w:'sn',k:1,sv:3}],lobNm=c=>c.nm,meName=()=> '測試玩家',copArt=(c,i)=>'img/cop/'+(i?'m':'f')+(c.w?'_'+c.w:'')+'.webp',esc=s=>String(s).replace(/</g,'&lt;');let SCREEN='board';`;
+ const script=document.createElement('script');script.textContent=setup+src+`;
+ LB.t=Date.now();LB.list=Array.from({length:120},(_,i)=>({id:'demo_'+i,nm:['雪影','鐵壁先鋒','雷霆'][i%3],by:i%5===0?'很長的測試玩家名稱':'戰術玩家'+i,k:150-i,sv:20,i:i%2,w:['sn','hs','mg','sh','rf','smg'][i%6],dead:i>=60}));
+ function renderTitle(){document.querySelector('#tmenu').innerHTML=boardHTML();document.querySelectorAll('[data-lbtab]').forEach(b=>b.onclick=()=>{LB.tab=b.dataset.lbtab;renderTitle()});}renderTitle();`;
+ document.body.append(script);
+})();
+</script></body></html>
