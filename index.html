@@ -1036,6 +1036,100 @@ i.die.bolt{outline:1.5px dashed rgba(255,255,255,.85);outline-offset:-3px}
 .mfFt{display:flex;gap:8px}.mfFt button{padding:12px;font-size:15px;text-align:center}.mfFt #mfRnd{flex:none;width:96px}.mfFt #mfLock{flex:1}
 .avb{position:relative}.avb.cop img,.avb.pic img{object-position:50% 50%}.avW{position:absolute;right:2px;bottom:2px;width:18px;height:18px;background:rgba(0,0,0,.7);display:grid;place-items:center}.avW svg{width:15px;height:15px}
 @media (max-width:700px){.mfArt{height:62vh;bottom:120px}.mfP{padding-bottom:calc(84px + env(safe-area-inset-bottom))}.mfInfo>b{font-size:20px}.mfCop{font-size:11.5px}}
+/* v225: match-found HUD (drone-feed look shared with #dq) */
+.mflow.mh{--g:#9fe0a8;--red:#ff4d4d;user-select:none;-webkit-user-select:none}
+.mflow.mh *{box-sizing:border-box}
+.mh .mhF{position:absolute;inset:-6%;background:center/cover no-repeat;filter:grayscale(1) contrast(1.3) brightness(.32) sepia(.4) hue-rotate(55deg) saturate(1.7);animation:dqPan 26s ease-in-out infinite alternate}
+.mh .mhV{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(0,0,0,.15) 0 30%,rgba(0,0,0,.85) 90%)}
+.mh .mhL{position:absolute;inset:0;pointer-events:none;z-index:6;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px);animation:dqFl 3.2s steps(1) infinite}
+.mh .mhS{position:absolute;left:0;right:0;top:0;height:90px;pointer-events:none;z-index:6;background:linear-gradient(180deg,transparent,rgba(159,224,168,.08) 80%,rgba(159,224,168,.35) 99%,transparent);animation:dqSw 3.4s linear infinite}
+.mh .mhB{position:absolute;z-index:7;width:22px;height:22px;border:2px solid var(--accent)}
+.mh .mhB.tl{left:16px;top:calc(14px + env(safe-area-inset-top));border-right:0;border-bottom:0}.mh .mhB.tr{right:16px;top:calc(14px + env(safe-area-inset-top));border-left:0;border-bottom:0}
+.mh .mhB.bl{left:16px;bottom:calc(14px + env(safe-area-inset-bottom));border-right:0;border-top:0}.mh .mhB.br{right:16px;bottom:calc(14px + env(safe-area-inset-bottom));border-left:0;border-top:0}
+.mh .mhH{position:absolute;z-index:7;left:46px;right:46px;top:calc(22px + env(safe-area-inset-top));display:flex;justify-content:space-between;font:600 12px var(--mono);letter-spacing:.18em;color:#fff}
+.mh .mhH i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--red);margin-right:7px;box-shadow:0 0 10px var(--red);animation:dqRec 1.2s steps(1) infinite}
+.mh .mhH span b{font:inherit;color:#ff8a8a}.mh .mhH span.ok b{color:#fff}.mh .mhH em{font-style:normal;color:var(--g)}
+.mh .mhStage{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(60px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom))}
+/* lock-on */
+.mh .mhLock{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;transition:opacity .3s,transform .3s;pointer-events:none}
+.mh .mhLock small{font:600 12px var(--mono);letter-spacing:.3em;color:var(--red);margin-top:18px;animation:dqRec .35s steps(1) 3}
+.mh .mhLock h2{margin:0;font:700 clamp(30px,6vw,48px)/1.1 var(--display);letter-spacing:.12em;color:#fff;text-shadow:0 0 18px rgba(255,77,77,.55)}
+.mh .mhRet{position:relative;width:120px;height:120px;border:2px solid var(--red);border-radius:50%;animation:mhRet .55s cubic-bezier(.2,.9,.3,1) both}
+.mh .mhRet:after{content:"";position:absolute;inset:44px;border:2px solid var(--red);transform:rotate(45deg)}
+.mh .mhRet b,.mh .mhRt b{position:absolute;background:var(--red)}
+.mh .mhRet b:nth-child(1){left:59px;top:-22px;width:2px;height:40px}.mh .mhRet b:nth-child(2){left:59px;bottom:-22px;width:2px;height:40px}
+.mh .mhRet b:nth-child(3){top:59px;left:-22px;height:2px;width:40px}.mh .mhRet b:nth-child(4){top:59px;right:-22px;height:2px;width:40px}
+@keyframes mhRet{from{transform:scale(2.6) rotate(-45deg);opacity:0}to{transform:none;opacity:1}}
+.mh .mhStage.in .mhLock{opacity:0;transform:translate(-50%,-50%) scale(.85)}
+/* dossiers */
+.mh .mhVs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:clamp(10px,3vw,48px);width:100%;max-width:980px;opacity:0;pointer-events:none}
+.mh .mhStage.in .mhVs{opacity:1;pointer-events:auto}
+.mh .mhC{display:flex;flex-direction:column;align-items:center;min-width:0;--c:var(--def);opacity:0}
+.mh .mhC.a{--c:var(--atk)}
+.mh .mhStage.in .mhC.me{animation:mhInL .5s cubic-bezier(.2,.9,.3,1) both}.mh .mhStage.in .mhC.op{animation:mhInR .5s .12s cubic-bezier(.2,.9,.3,1) both}
+@keyframes mhInL{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}@keyframes mhInR{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+.mh .mhCh{align-self:stretch;display:flex;align-items:center;gap:8px;font:600 11px var(--mono);letter-spacing:.2em;color:var(--g);padding:0 2px 8px;white-space:nowrap;overflow:hidden}
+.mh .mhC.op .mhCh{color:#ff8a8a}.mh .mhCh i{width:8px;height:8px;flex:none;background:var(--g);box-shadow:0 0 8px var(--g)}.mh .mhC.op .mhCh i{background:var(--red);box-shadow:0 0 8px var(--red);animation:dqRec 1s steps(1) infinite}
+.mh .mhPf{position:relative;width:100%;max-width:330px;aspect-ratio:3/4;max-height:min(52vh,440px);overflow:hidden;background:linear-gradient(180deg,rgba(5,8,11,.55),rgba(5,8,11,.92)),radial-gradient(70% 60% at 50% 70%,color-mix(in srgb,var(--c) 38%,transparent),transparent 70%);border:1px solid color-mix(in srgb,var(--c) 45%,transparent)}
+.mh .mhPf:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--c);box-shadow:0 0 14px var(--c)}
+.mh .mhGr{position:absolute;inset:0;background-image:linear-gradient(rgba(159,224,168,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(159,224,168,.07) 1px,transparent 1px);background-size:24px 24px}
+.mh .mhArt{position:absolute;left:0;right:0;bottom:0;width:100%;height:96%;object-fit:contain;object-position:50% 100%;filter:drop-shadow(0 6px 18px rgba(0,0,0,.7))}
+.mh .mhArt.ph{inset:14% 14% auto;width:72%;height:auto;aspect-ratio:1;object-fit:cover;border:2px solid rgba(255,255,255,.7)}
+.mh .mhK{position:absolute;width:16px;height:16px;border:2px solid var(--c);z-index:2}
+.mh .mhK.tl{left:6px;top:6px;border-right:0;border-bottom:0}.mh .mhK.tr{right:6px;top:6px;border-left:0;border-bottom:0}.mh .mhK.bl{left:6px;bottom:9px;border-right:0;border-top:0}.mh .mhK.br{right:6px;bottom:9px;border-left:0;border-top:0}
+.mh .mhRt{position:absolute;left:50%;top:24%;width:64px;height:64px;margin:-32px 0 0 -32px;border:1.5px solid var(--red);border-radius:50%;z-index:2;opacity:0}
+.mh .mhStage.in .mhRt{animation:mhRt .6s .55s cubic-bezier(.2,.9,.3,1) forwards}
+.mh .mhRt b:nth-child(1){left:31px;top:-10px;width:1.5px;height:18px}.mh .mhRt b:nth-child(2){left:31px;bottom:-10px;width:1.5px;height:18px}.mh .mhRt b:nth-child(3){top:31px;left:-10px;height:1.5px;width:18px}.mh .mhRt b:nth-child(4){top:31px;right:-10px;height:1.5px;width:18px}
+@keyframes mhRt{0%{opacity:0;transform:scale(2.2)}60%{opacity:1;transform:scale(.9)}100%{opacity:.9;transform:scale(1)}}
+.mh .mhLk{position:absolute;right:10px;top:30px;z-index:2;font:600 10px var(--mono);letter-spacing:.2em;color:#fff;background:var(--red);padding:2px 6px;opacity:0}
+.mh .mhStage.in .mhLk{animation:mhRt .3s 1s forwards}
+.mh .mfSt{position:absolute;left:10px;top:28px;z-index:2;display:flex;flex-direction:column;align-items:center}.mh .mhC.op .mfSt{left:auto;right:10px;top:54px}
+.mh .mfSt b{font-size:clamp(24px,4vw,40px)}.mh .mfFl{width:clamp(26px,4vw,38px)}
+.mh .mhNm{align-self:stretch;display:flex;flex-direction:column;gap:2px;padding-top:10px;min-width:0}
+.mh .mhC.op .mhNm{text-align:right;align-items:flex-end}
+.mh .mhNm em{font-style:normal;display:flex;gap:8px;font-size:12px;letter-spacing:.2em;color:var(--c)}.mh .mhNm em .you{color:#fff;opacity:.75}
+.mh .mhC.op .mhNm em{justify-content:flex-end}
+.mh .mhNm>b{font:700 clamp(18px,3.4vw,34px)/1.15 var(--display);color:#fff;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.mh .mfCop{justify-content:inherit}.mh .mhC.op .mfCop{justify-content:flex-end}
+.mh .mhX{display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0}
+.mh .mhStage.in .mhX{animation:mhX .45s .3s cubic-bezier(.2,1.5,.4,1) both}
+.mh .mhX b{font:700 clamp(34px,6vw,64px)/1 var(--mono);color:#fff;letter-spacing:.04em;text-shadow:0 0 18px rgba(159,224,168,.45)}
+.mh .mhX small{font:600 10px var(--mono);letter-spacing:.3em;color:var(--g)}
+.mh .mhX:before,.mh .mhX:after{content:"";width:1px;height:clamp(30px,10vh,90px);background:linear-gradient(transparent,rgba(159,224,168,.6),transparent)}
+@keyframes mhX{from{opacity:0;transform:scale(2.4)}to{opacity:1;transform:none}}
+.mh .mhLd{position:absolute;left:50%;bottom:calc(28px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(560px,calc(100% - 64px));display:flex;flex-direction:column;gap:8px;opacity:0;transition:opacity .4s .5s}
+.mh .mhStage.in .mhLd{opacity:1}
+.mh .mhLr{display:flex;justify-content:space-between;align-items:flex-end}.mh .mhLr small{display:block;font:600 10px var(--mono);letter-spacing:.28em;color:var(--g)}.mh .mhLr b{font-size:14px;color:#d9eedc;font-weight:600}
+.mh .mhLr em{font:600 22px/1 var(--mono);font-style:normal;color:#fff}
+.mh .mhG{display:flex;gap:3px}.mh .mhG i{flex:1;height:6px;background:rgba(159,224,168,.16);transition:background .2s}.mh .mhG i.on{background:var(--g);box-shadow:0 0 6px rgba(159,224,168,.55)}
+/* camera sweep to the map */
+.mh .mhMap{width:100%;max-width:820px;display:flex;flex-direction:column;align-items:center;gap:14px;animation:mhInL .01s both}
+.mh .mhHd{align-self:stretch;display:flex;align-items:baseline;gap:12px}.mh .mhHd small{font:600 11px var(--mono);letter-spacing:.3em;color:var(--g)}.mh .mhHd b{font-size:15px;letter-spacing:.2em;color:#d9eedc;font-weight:600}
+.mh .mhMon{position:relative;width:100%;aspect-ratio:16/9;max-height:52vh;border:1px solid rgba(159,224,168,.35);background:#000;--c:var(--g)}
+.mh .mhMap.done .mhMon{--c:var(--accent);border-color:var(--accent);animation:mfPulse .6s ease-out;box-shadow:0 0 24px rgba(227,170,62,.45)}
+.mh .mhScr{position:absolute;inset:0;overflow:hidden}
+.mh .mhScr img{width:100%;height:100%;object-fit:cover;display:block;transition:filter .7s}
+.mh .mhScr.nv img{filter:grayscale(1) contrast(1.25) brightness(.62) sepia(.4) hue-rotate(55deg) saturate(1.7)}
+.mh .mhNz{position:absolute;inset:0;pointer-events:none;opacity:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.22) 0 1px,transparent 1px 2px),rgba(159,224,168,.18);mix-blend-mode:screen}
+.mh .mhScr.sw .mhNz{animation:mhNz .16s steps(2) both}.mh .mhScr.sw img{animation:mhSw .16s steps(2) both}
+@keyframes mhNz{0%{opacity:1;transform:translateY(-6px)}100%{opacity:0;transform:none}}@keyframes mhSw{0%{transform:translateX(8px) scale(1.03)}100%{transform:none}}
+.mh .mhCam{position:absolute;left:12px;bottom:10px;z-index:2;display:flex;gap:10px;align-items:baseline;text-shadow:0 1px 4px #000}.mh .mhCam b{font:600 12px var(--mono);letter-spacing:.2em;color:var(--c)}.mh .mhCam span{font-size:15px;font-weight:700;color:#fff;letter-spacing:.08em}
+.mh .mhTag{position:absolute;right:12px;top:10px;z-index:2;font:600 11px var(--mono);letter-spacing:.24em;color:var(--g);animation:dqRec .8s steps(1) infinite}
+.mh .mhMap.done .mhTag{color:#1a1206;background:var(--accent);padding:2px 8px;animation:none}
+.mh .mhRes{display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;transform:translateY(10px);transition:opacity .35s,transform .35s}
+.mh .mhMap.done .mhRes{opacity:1;transform:none}
+.mh .mhRes small{font:600 11px var(--mono);letter-spacing:.3em;color:var(--accent)}
+.mh .mhRes>b{font:700 clamp(30px,6vw,54px)/1.05 var(--display);letter-spacing:.1em;color:#fff;text-shadow:0 0 22px rgba(227,170,62,.45)}
+.mh .mhRr{display:flex;align-items:center;gap:14px}
+.mh .mfSide{font-size:15px;font-weight:700}.mh .mfMis{font-size:18px;padding:4px 14px 4px 6px}.mh .mfMi{width:32px;height:32px}
+@media (max-width:700px){
+ .mh .mhVs{gap:8px}.mh .mhX b{font-size:30px}.mh .mhX:before,.mh .mhX:after{height:40px}.mh .mhX small{display:none}
+ .mh .mhPf{max-height:46vh}.mh .mhCh{font-size:9.5px;letter-spacing:.12em;gap:6px}.mh .mhNm em{font-size:11px;gap:6px;letter-spacing:.12em}.mh .mhNm>b{font-size:18px}
+ .mh .mhC.op .mhNm>b{direction:ltr}.mh .mfCop{font-size:11px}.mh .mhRt{width:46px;height:46px;margin:-23px 0 0 -23px}
+ .mh .mhRt b:nth-child(1),.mh .mhRt b:nth-child(2){left:22px}.mh .mhRt b:nth-child(3),.mh .mhRt b:nth-child(4){top:22px}
+ .mh .mhLk{top:24px;right:6px;font-size:9px}.mh .mhC.op .mfSt{top:44px;right:6px}.mh .mfSt{left:6px;top:24px}
+ .mh .mhH{left:44px;right:44px;font-size:10.5px;letter-spacing:.12em}.mh .mhMap{gap:12px}.mh .mhMon{max-height:none}}
+@media (prefers-reduced-motion:reduce){.mh .mhF,.mh .mhS,.mh .mhL{animation:none}.mh .mhS{display:none}}
 @keyframes mrIn{from{opacity:0}to{opacity:1}}@keyframes mrPop{0%{transform:scale(1.4);opacity:.2}100%{transform:scale(1);opacity:1}}
 body[data-scr="setup"] .panel{display:none!important}
 body[data-scr="setup"] header.top{visibility:hidden}
@@ -12130,35 +12224,52 @@ function mfStart(o){mfEnd();const side=o.side;
   const el=document.createElement('div');el.id='mflow';el.className='mflow';el.setAttribute('role','dialog');el.setAttribute('aria-label','配對成功');document.body.appendChild(el);MF.el=el;
   setTimeout(()=>{try{render();}catch(e){console.warn(e);}},30); // build the 3D board under the overlay
   mfVs();}
-function mfEnd(){if(!MF)return;clearInterval(MF.iv);clearTimeout(MF.bt);clearTimeout(MF.bl);if(MF.el)MF.el.remove();MF=null;}
+function mfEnd(){if(!MF)return;clearInterval(MF.iv);clearInterval(MF.rc);clearTimeout(MF.bt);clearTimeout(MF.bl);if(MF.el)MF.el.remove();MF=null;}
 const FLAME='<svg class="mfFl" viewBox="0 0 32 40" aria-hidden="true"><path d="M16 1c2 7 9 11 9 21a9 9 0 0 1-18 0c0-5 3-8 4-11 1 3 2 5 4 6-1-6 0-11 1-16z" fill="#ff6a1a"/><path d="M16 17c1 4 5 6 5 11a5 5 0 0 1-10 0c0-3 2-5 3-7 0 2 1 3 2 3-.6-3 0-5 0-7z" fill="#ffd34a"/></svg>';
-function mfCard(p,side){const me=side===MF.side;
-  return `<div class="mfP ${side==='D'?'d':'a'}"><div class="mfBg"></div><img class="mfArt${p.ph?' ph':copAv(p.av)?' cop':''}" src="${profArt(p)}" alt="" onerror="this.style.visibility='hidden'">
-    <div class="mfInfo"><em>${side==='D'?'防守方':'進攻方'}${me?' · 你':''}</em><b>${esc(p.n||'玩家')}</b>
-    ${p.cop?`<div class="mfCop"><span>${esc(p.cop.nm)}</span><i>擊殺 <b>${p.cop.k|0}</b></i><i>存活 <b>${p.cop.sv|0}</b> 場</i></div>`:''}</div>
-    ${(p.st|0)>=2?`<div class="mfSt"><b>${p.st|0}</b>${FLAME}<small>連勝</small></div>`:''}</div>`;}
-function mfVs(){const D=MF.side==='D'?MF.me:MF.opp,A=MF.side==='A'?MF.me:MF.opp;MF.st='vs';
-  MF.el.innerHTML=`<div class="mfVs">${mfCard(D,'D')}${mfCard(A,'A')}<div class="mfX">VS</div>
-    <div class="mfLoad"><span id="mfLt">讀取場地中…</span><div class="mfBar"><i id="mfLb"></i></div></div></div>`;
-  setTimeout(()=>{if(!MF||MF.st!=='vs')return;const v=MF.el.querySelector('.mfVs');if(v)v.classList.add('hit');try{SFX.slam&&SFX.slam();}catch(e){}},430);
-  // cache: every map photo the reel shows, the layout thumbnail, both art pieces, and my side's operator portraits for the pick screen
-  const urls=[...new Set([...ONLINE_MAPS.map(mapBig),profArt(MF.me),profArt(MF.opp),...mfPool(MF.side,true).map(opIcon)])].filter(u=>u&&!/^data:/.test(u));
+// v225: match found → drone-feed HUD (same look as the queue screen #dq): hostile lock-on, friendly/hostile dossiers, then a camera sweep that lands on the map
+const MFHD=new Set(['bank','clubhouse','consulate']);function mfMapImg(k){return MFHD.has(k)?'img/map/'+k+'_hd.webp':mapBig(k);}
+function mfHud(){const ks=ONLINE_MAPS,fk=ks[Math.floor(Math.random()*ks.length)];
+  MF.el.classList.add('mh');MF.el.innerHTML=`<div class="mhF" style="background-image:url(${mfMapImg(fk)})"></div><div class="mhV"></div><div class="mhS"></div><div class="mhL"></div>
+  <span class="mhB tl"></span><span class="mhB tr"></span><span class="mhB bl"></span><span class="mhB br"></span>
+  <div class="mhH"><span><i></i><b id="mhSt">HOSTILE DETECTED</b></span><em id="mhRc">REC 00:00</em></div><div class="mhStage"></div>`;
+  const t0=Date.now();MF.rc=setInterval(()=>{const r=MF&&MF.el.querySelector('#mhRc');if(!r)return clearInterval(MF&&MF.rc);r.textContent='REC '+fmtClock(Date.now()-t0);},500);}
+function mfHudSt(s,cls){const b=MF&&MF.el.querySelector('#mhSt');if(!b)return;b.textContent=s;b.parentNode.className=cls||'';}
+function mfCard(p,side){const me=side===MF.side,cop=copAv(p.av);
+  return `<div class="mhC ${me?'me':'op'} ${side==='D'?'d':'a'}"><div class="mhCh"><i></i>${me?'FRIENDLY · CAM 01':'HOSTILE · TGT 01'}</div>
+    <div class="mhPf"><div class="mhGr"></div><img class="mhArt${p.ph?' ph':cop?' cop':''}" src="${profArt(p)}" alt="" onerror="this.style.visibility='hidden'">
+      <span class="mhK tl"></span><span class="mhK tr"></span><span class="mhK bl"></span><span class="mhK br"></span>${me?'':'<div class="mhRt"><b></b><b></b><b></b><b></b></div><div class="mhLk">LOCKED</div>'}
+      ${(p.st|0)>=2?`<div class="mfSt"><b>${p.st|0}</b>${FLAME}<small>連勝</small></div>`:''}</div>
+    <div class="mhNm"><em><span>${side==='D'?'防守方':'進攻方'}</span>${me?'<span class="you">你</span>':''}</em><b>${esc(p.n||'玩家')}</b>
+    ${p.cop?`<div class="mfCop"><span>${esc(p.cop.nm)}</span><i>擊殺 <b>${p.cop.k|0}</b></i><i>存活 <b>${p.cop.sv|0}</b> 場</i></div>`:''}</div></div>`;}
+function mfVs(){MF.st='vs';mfHud();const st=MF.el.querySelector('.mhStage');
+  st.innerHTML=`<div class="mhLock"><div class="mhRet"><b></b><b></b><b></b><b></b></div><small>HOSTILE DETECTED</small><h2>發現對手</h2></div>
+    <div class="mhVs">${mfCard(MF.me,MF.side)}<div class="mhX"><b>VS</b><small>ENGAGE</small></div>${mfCard(MF.opp,MF.side==='A'?'D':'A')}</div>
+    <div class="mhLd"><div class="mhLr"><span><small>SYNCING MAP DATA</small><b id="mfLt">同步場地資料</b></span><em id="mfLp">0%</em></div><div class="mhG">${'<i></i>'.repeat(30)}</div></div>`;
+  try{SFX.slam&&SFX.slam();}catch(e){}
+  setTimeout(()=>{if(!MF||MF.st!=='vs')return;st.classList.add('in');mfHudSt('LINK ESTABLISHED','ok');try{SFX.ui&&SFX.ui();}catch(e){}},900);
+  // cache: every map photo the camera sweep shows, both art pieces, and my side's operator portraits for the pick screen
+  const urls=[...new Set([...ONLINE_MAPS.map(mfMapImg),profArt(MF.me),profArt(MF.opp),...mfPool(MF.side,true).map(opIcon)])].filter(u=>u&&!/^data:/.test(u));
   let done=0;const tot=urls.length+2,bump=()=>{done++;};
   urls.forEach(u=>{const i=new Image();i.onload=i.onerror=()=>{if(i.decode)i.decode().catch(()=>{}).then(bump);else bump();};i.src=u;});
   setTimeout(()=>{try{mapThumb(MF.mk);}catch(e){}bump();},60);
   setTimeout(()=>{try{if(G)render();}catch(e){}bump();},400);
-  const t0=performance.now();MF.iv=setInterval(()=>{if(!MF){return;}const el=performance.now()-t0,f=Math.min(done/tot,el/3200),fin=f>=1||el>9000,b=$('#mfLb');
-    if(b)b.style.width=Math.round((fin?1:f)*100)+'%';const t=$('#mfLt');if(t)t.textContent=fin?'讀取完成':`讀取場地中… ${Math.round(f*100)}%`;
-    if(fin){clearInterval(MF.iv);setTimeout(()=>MF&&mfSlot(),450);}},80);}
-function mfSlot(){MF.st='slot';const ks=ONLINE_MAPS,N=5,seq=[];for(let r=0;r<N;r++)for(const k of shuffle(ks.slice()))seq.push(k);seq.push(MF.mk);
-  MF.el.innerHTML=`<div class="mfSlot"><small>場地抽選</small><div class="mfReel"><div class="mfStrip">${seq.map(k=>`<div class="mfCell"><img src="${mapBig(k)}" alt=""><b>${MAPS[k].name}</b></div>`).join('')}</div><i class="mfMark"></i></div>
-    <div class="mfRes"><b>${MAPS[MF.mk].name}</b><span class="mfMis ${MF.mis}"><i class="mfMi">${MF.mis==='hostage'?WZI.hostage||'':WZI.bomb||''}</i><em>${MFMIS[MF.mis]}</em></span><span class="mfSide ${MF.side==='A'?'a':'d'}">你是${MF.side==='A'?'進攻方':'防守方'}</span></div></div>`;
-  const reel=MF.el.querySelector('.mfReel'),strip=MF.el.querySelector('.mfStrip'),cw=strip.firstChild.getBoundingClientRect().width,rw=reel.clientWidth,last=seq.length-1;
-  strip.style.transform=`translateX(${rw}px)`;strip.getBoundingClientRect();
-  strip.style.transition='transform 2.7s cubic-bezier(.15,.55,.1,1)';strip.style.transform=`translateX(${-(last*cw-(rw-cw)/2)}px)`;
-  let tk=0;const tick=setInterval(()=>{if(!MF||MF.st!=='slot'||++tk>22)return clearInterval(tick);try{SFX.tick&&SFX.tick();}catch(e){}},120);
-  MF.bt=setTimeout(()=>{if(!MF)return;MF.el.querySelector('.mfSlot').classList.add('done');try{SFX.ui&&SFX.ui();}catch(e){}MF.bt=setTimeout(()=>MF&&mfPick(),1500);},2800);}
-function mfPick(){MF.st='pick';MF.pick0=Date.now();mfDraw();
+  const segs=st.querySelectorAll('.mhG i'),t0=performance.now();
+  MF.iv=setInterval(()=>{if(!MF){return;}const el=performance.now()-t0,f=Math.min(done/tot,el/3600),fin=f>=1||el>9000,pc=fin?1:f;
+    segs.forEach((e,i)=>e.classList.toggle('on',i<Math.round(pc*30)));const p=$('#mfLp');if(p)p.textContent=Math.round(pc*100)+'%';
+    if(fin){clearInterval(MF.iv);const t=$('#mfLt');if(t)t.textContent='同步完成';setTimeout(()=>MF&&mfSlot(),600);}},80);}
+function mfSlot(){MF.st='slot';mfHudSt('SITE RECON','ok');const st=MF.el.querySelector('.mhStage');if(!st)return;const ks=ONLINE_MAPS;
+  st.className='mhStage';st.innerHTML=`<div class="mhMap"><div class="mhHd"><small>SITE RECON</small><b>場地偵查</b></div>
+    <div class="mhMon"><div class="mhScr nv"><img id="mhImg" alt=""><div class="mhNz"></div></div><span class="mhK tl"></span><span class="mhK tr"></span><span class="mhK bl"></span><span class="mhK br"></span>
+      <div class="mhCam"><b id="mhCam">CAM 01</b><span id="mhMn"></span></div><div class="mhTag" id="mhTag">SCANNING</div></div>
+    <div class="mhRes"><small>SITE LOCKED</small><b>${MAPS[MF.mk].name}</b><div class="mhRr"><span class="mfMis ${MF.mis}"><i class="mfMi">${MF.mis==='hostage'?WZI.hostage||'':WZI.bomb||''}</i><em>${MFMIS[MF.mis]}</em></span><span class="mfSide ${MF.side==='A'?'a':'d'}">你是${MF.side==='A'?'進攻方':'防守方'}</span></div></div></div>`;
+  const img=st.querySelector('#mhImg'),scr=st.querySelector('.mhScr'),cam=st.querySelector('#mhCam'),mn=st.querySelector('#mhMn');
+  let n=0,cur=null,d=70;const show=k=>{cur=k;img.src=mfMapImg(k);cam.textContent='CAM '+String(n%8+1).padStart(2,'0');mn.textContent=MAPS[k].name;scr.classList.remove('sw');void scr.offsetWidth;scr.classList.add('sw');};
+  const step=()=>{if(!MF||MF.st!=='slot')return;n++;d*=1.2;
+    if(d>560){show(MF.mk);scr.classList.remove('nv');st.querySelector('.mhMap').classList.add('done');const tg=st.querySelector('#mhTag');if(tg)tg.textContent='LOCKED';
+      mfHudSt('SITE LOCKED','ok');try{SFX.slam&&SFX.slam();}catch(e){}MF.bt=setTimeout(()=>MF&&mfPick(),1900);return;}
+    const o=ks.filter(k=>k!==cur);show(o[Math.floor(Math.random()*o.length)]);try{SFX.tick&&SFX.tick();}catch(e){}MF.bt=setTimeout(step,d);};
+  step();}
+function mfPick(){MF.st='pick';MF.pick0=Date.now();clearInterval(MF.rc);MF.el.classList.remove('mh');mfDraw();
   let beep=-1;MF.iv=setInterval(()=>{if(!MF)return;const left=MFT-(Date.now()-MF.pick0)/1000,s=Math.max(0,Math.ceil(left)),t=$('#mfTm');
     if(t){t.textContent=s;t.classList.toggle('hot',s<=5&&!MF.lock);}
     if(s<=5&&s>0&&s!==beep&&!MF.lock){beep=s;try{SFX.soft&&SFX.soft();}catch(e){}}
