@@ -463,3 +463,7 @@
 
 ## v231 選玩法畫面的人質用回原圖
 - `GIMG.hostageFig` 換回原本的人質照片（340×628），選任務、任務標籤、配對過場這些 2D 畫面都用原圖；只有進遊戲後棋盤上的人質是 3D 模型（`makeHostageFig`，不讀這張圖）。
+
+## v233 職業技能圖
+- 在 v232 基礎上，七職業 `WPN[w].ic` 改用使用者指定的原圖 `img/ui/class-skills-v233.jpg`，`CLASS_ART_BOX` 以 SVG 視窗分別顯示徽章、排除圖下文字；技能收藏、戰鬥技能按鈕與轉職視窗共用。技能數值與規則未改。
+- 檢查：`node tests/class-icons.cjs`；`tests/class-icons.html` 提供原圖裁切與 40px 小尺寸預覽。

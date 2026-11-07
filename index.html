@@ -13215,6 +13215,13 @@ const WPN={
     trig:c=>c.d[2].length>=4&&nR(c.d[2])>=2,fx:'視野距離 14 格。',lim:{0:{max:2,noR:1},1:{max:3}}},
   smg:{n:'衝鋒槍',t:'衝鋒兵',en:'RUSHER',ic:WSVG('<path d="M10 14l10 10-10 10"/><path d="M24 14l10 10-10 10"/>'),
     trig:c=>c.run>=5&&[0,1].every(b=>c.d[b].length>=3&&nOR(c.d[b])>=1),fx:'衝鋒陷陣：移動時遭武器攻擊，攻擊方鎖住一顆骰子，優先紅骰、其次橘骰、最後黃骰。'}};
+// v233: approved class artwork, clipped from the original sheet without redrawing.
+// Nested viewports exclude printed labels while retaining the artwork outside each frame.
+const CLASS_ART_BOX={hs:[60,4,340,288],sh:[432,12,385,280],mg:[45,344,370,258],sg:[456,344,350,258],rf:[48,654,340,255],sn:[455,654,340,255],smg:[218,966,420,260]};
+for(const [w,[x,y,width,height]] of Object.entries(CLASS_ART_BOX)){
+  const h=400*height/width;
+  WPN[w].ic=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" aria-hidden="true"><svg x="0" y="${(400-h)/2}" width="400" height="${h}" viewBox="${x} ${y} ${width} ${height}" overflow="hidden"><image href="img/ui/class-skills-v233.jpg" width="853" height="1280"/></svg></svg>`;
+}
 // class skills (職業技能): one use per round, button in the action panel
 const CSK={mg:{n:'掃射',ap:'1 行動',d:'不用指定目標；選擇一個方位後沿直線掃射。路徑上的第一名敵人受到 2 點傷害，後方目標不受傷。'},
   hs:{n:'此路不通',ap:'免費',d:'點擊切換模式：免疫正面 120° 的武器攻擊；仍可被道具鎖定及範圍攻擊波及。啟用時可以移動、轉向，但不能攻擊或使用道具；關閉後恢復。'},

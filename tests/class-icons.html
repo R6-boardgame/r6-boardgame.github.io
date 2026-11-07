@@ -1,0 +1,11 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="../"><title>Class icon visual check</title>
+<style>body{background:#131720;color:white;font:16px sans-serif;margin:20px}main{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:20px}article{background:#222a35;padding:12px}svg{width:40px;height:40px}.large svg{width:128px;height:128px}h2{font-size:16px}</style>
+<main></main>
+<script>
+fetch('index.html').then(r=>r.text()).then(html=>{
+ const source=html.slice(html.indexOf('const WSVG='),html.indexOf('// class skills (職業技能)'));
+ const WPN=Function(source+';return WPN')();
+ document.querySelector('main').innerHTML=['hs','sh','mg','sg','rf','sn','smg'].map(w=>`<article><h2>${WPN[w].t}</h2><div class="large">${WPN[w].ic}</div><div>${WPN[w].ic}</div></article>`).join('');
+}).catch(e=>document.body.textContent=e.stack);
+</script>
