@@ -467,3 +467,10 @@
 ## v233 職業技能圖
 - 在 v232 基礎上，七職業 `WPN[w].ic` 改用使用者指定的原圖 `img/ui/class-skills-v233.jpg`，`CLASS_ART_BOX` 以 SVG 視窗分別顯示徽章、排除圖下文字；技能收藏、戰鬥技能按鈕與轉職視窗共用。技能數值與規則未改。
 - 檢查：`node tests/class-icons.cjs`；`tests/class-icons.html` 提供原圖裁切與 40px 小尺寸預覽。
+
+## v236 監視、轉向、屋外現形與進攻 AI
+- `riposte` 不再要求 `_actMoved`；動作完成即可觸發。移動參數仍獨立，衝鋒兵鎖骰被動仍只對移動反應生效。補上玩家／AI 奔跑、AI 安裝拆彈器與拆捕獸夾的 `afterAct`。
+- `flowBtnUpd` 讓未啟動的己方幹員也可以免費轉向，不必先移動。
+- `defenderOutside` 讓屋外防守方可見並解除隱藏；煙霧仍優先遮蔽。`outsideCam` 在進攻方觀看敵方階段時跟隨屋外行動者，階段結束恢復 `enemyView` 保存的原視角；射擊特寫期間延後還原，避免互搶。
+- `aiAttacker` 每次啟動固定威脅圖並沿已選路線推進；任務狀態改變才重新選路，不再追著隊長往返。進屋即略過入口集合點；隊友佔格改尋路繞行；有 1 行動也可奔跑。人質局找不到路不再誤轉向炸彈點。
+- 回歸測試：`tests/combat-flow-v236.cjs`、`tests/movement-intel.cjs`、`tests/smoke-vision.cjs`、`tests/class-skill-slots.cjs`。

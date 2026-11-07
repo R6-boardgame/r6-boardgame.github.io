@@ -6488,7 +6488,8 @@ function viewers(side){return G.units.filter(u=>u.alive&&u.side===side&&u.x>=0).
 // fog of war: an enemy shows only while one of your operators has line of sight to it, or after it was hit (until it moves); a located enemy is only a marker on the map
 // v173: 入門 training levels have no fog of war
 const noFog=()=>!!(G&&G.lv&&G.lv.t===0);
-function seenBy(side,e){if(G.over)return true;if(noFog()&&side===G.player&&e.alive&&e.x>=0&&G.phase!=='setup')return true;if(smokeAt(e.x,e.y))return false;if(e.side===side)return true;if(!e.alive||e.x<0||G.phase==='setup')return false;if(e.exp&&e.exp[0]===e.x&&e.exp[1]===e.y&&G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&!smokeBlocks(a.x,a.y,e.x,e.y)))return true;return G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&inSight(a,e))||sharedCells(side).has(e.y*G.W+e.x);}
+const defenderOutside=u=>!!(G&&G.phase==='play'&&u&&u.alive&&u.side==='D'&&u.x>=0&&cell(u.x,u.y)?.t==='out');
+function seenBy(side,e){if(G.over)return true;if(noFog()&&side===G.player&&e.alive&&e.x>=0&&G.phase!=='setup')return true;if(smokeAt(e.x,e.y))return false;if(e.side===side)return true;if(!e.alive||e.x<0||G.phase==='setup')return false;if(defenderOutside(e))return true;if(e.exp&&e.exp[0]===e.x&&e.exp[1]===e.y&&G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&!smokeBlocks(a.x,a.y,e.x,e.y)))return true;return G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&inSight(a,e))||sharedCells(side).has(e.y*G.W+e.x);}
 function sees(side){if(G.phase==='setup'&&!G.over)return new Set();const s=new Set();for(const e of G.units){if(!e.alive||e.side===side||e.x<0)continue;if(seenBy(side,e))s.add(e.id);}return s;}
 // v89: every operator sees a 120° fan in front of him (10 cells, snipers 14), straight-line distance, nothing behind; seeing an enemy is what lets you shoot him
 const SNIPE=new Set(['glaz','kali']),VR=u=>u.vr||(SNIPE.has(u.op)?14:10),edist=(a,b,c,d)=>Math.round(Math.hypot(a-c,b-d));
@@ -6513,7 +6514,7 @@ function sharedCells(side){if(!G||!G.grid)return new Set();
 // attackers with line of sight unmask hidden defenders and see through decoys
 function revealCheck(){if(!G||G.phase!=='play'||G.over)return;const atk=alive('A').filter(a=>a.x>=0);
   const sh=sharedCells('A');
-  for(const d of alive('D'))if(d.hidden&&((d.spotted>0&&!d.wmark)||atk.some(a=>inSight(a,d))||sh.has(d.y*G.W+d.x)))reveal(d,'被看見，');
+  for(const d of alive('D'))if(d.hidden&&(defenderOutside(d)||(d.spotted>0&&!d.wmark)||atk.some(a=>inSight(a,d))||sh.has(d.y*G.W+d.x)))reveal(d,'被看見，');
   for(const k of G.decoys||[])if(k.alive&&(atk.some(a=>inFan(a,k.x,k.y)&&los(a.x,a.y,k.x,k.y))||sh.has(k.y*G.W+k.x))){k.alive=false;log('一個隱藏標記被識破，是誘餌','ka');}
   const h=G.hostage;if(h&&!h.known&&!h.by&&atk.some(a=>inFan(a,h.x,h.y)&&los(a.x,a.y,h.x,h.y,false,true)))hostFound();}
 function hostFound(){const h=G.hostage;if(!h||h.known)return;h.known=true;if(G.player==='A')bigNote('發現人質',`在 ${coord(h.x,h.y)}`,'a',1500);log('進攻方發現了人質的位置','ka');}
@@ -6828,9 +6829,9 @@ async function step(u,x,y){DMGBY=null;
   if(G.hostage&&G.hostage.by===u.id&&cell(x,y).t==='out'&&G.map.spawns.some(z=>z.cells.some(([a,b])=>a===x&&b===y))){render();finish('A','人質已安全撤離');return false;}
   return u.alive&&!G.over&&u.mp>0;
 }
-// overwatch covers a 180° arc; every enemy that enters or acts inside it draws a free shot (riposte)
+// Overwatch reacts after movement or a completed action, even without prior movement.
 async function riposte(u,moving=false){
-  trackMovement();moving=moving||u._moveReaction===movementPhase();delete u._moveReaction;if(!u._actMoved)return u.alive&&!G.over;
+  trackMovement();moving=moving||u._moveReaction===movementPhase();delete u._moveReaction;
   for(const e of G.units){
     if(!u.alive||G.over)return false;
     if(e.alive&&e.side!==u.side&&e.overwatch&&e.x>=0&&(e.mgOw||(u.x-e.x)*e.owd[0]+(u.y-e.y)*e.owd[1]>0)&&losAs(e,()=>inSight(e,u))&&(!u.hidden||u.spotted>0||los(e.x,e.y,u.x,u.y))&&!(e.owHit&&e.owHit.has(u.id))&&!(e.owShot&&!e.mgOw)&&!rayBlk(e,u))
@@ -7357,7 +7358,7 @@ function pathCost(u,x,y){
   const c=cell(x,y);
   if(c.t==='hard')return Infinity;
   const vis=G._vis;const o=unitAt(x,y);
-  if(o&&o!==u){if(o.side!==u.side&&vis&&vis.has(o.id))return Infinity; if(o.side===u.side)return 4;}
+  if(o&&o!==u){if(o.side!==u.side&&vis&&vis.has(o.id))return Infinity; if(o.side===u.side)return u.side==='A'?Infinity:4;}
   if(shieldAt(x,y))return Infinity;
   const dz=u.side==='A'&&G._danger?G._danger[y*G.W+x]:0;
   if(c.t==='out'||c.t==='floor')return enterCost(x,y)+dz+(u.side==='A'&&(inGas(x,y)||gadgetAt(x,y,'wire')||inFire(x,y))?4:0)+(u.side==='A'&&u.side!==G.player&&cedAt(x,y)?3:0)+(u.side==='D'&&(inFire(x,y)||traxNear(x,y))?4:0)+(u.side==='D'&&u.side!==G.player&&clayZone(x,y,'D')?40:0);
@@ -7406,11 +7407,11 @@ async function aiBreach(u,x,y){
   return false;
 }
 async function aiAttacker(u){
-  beginAct(u);let guard=0;
-  if(u.matStuck&&canDo(u,'unmat'))await unMat(u,true);
+  beginAct(u);let guard=0,route=null,routeState='';G._danger=dangerMap();
+  if(u.matStuck&&canDo(u,'unmat')){await unMat(u,true);await afterAct(u);}
   if(u.op==='lion'&&u.ch>0&&G.round>=2&&!sees('A').size&&canDo(u,'special'))await BH(u,'useGadget'),await useGadget(u);
   while(u.alive&&!G.over&&(u.ap>0||u.mp>0)&&guard++<40){
-    G._vis=sees('A');G._danger=dangerMap();aiTurn(u);
+    G._vis=sees('A');aiTurn(u);
     const tg=shootables(u);const units=tg.filter(t=>t.kind==='unit');
     if(units.length&&canDo(u,'shoot')&&canDo(u,'tactical')&&G.flash>0){const t=units.find(t=>throwTargets(u).some(([x,y])=>x===t.x&&y===t.y));if(t&&!t.t.stun){await BH(u,'throwGadget'),await throwGadget(u,'flash',t.x,t.y);continue;}}
     if(units.length&&canDo(u,'shoot')){units.sort((a,b)=>a.t.hp-b.t.hp||cheb(u.x,u.y,a.x,a.y)-cheb(u.x,u.y,b.x,b.y));await BH(u,'shoot'),await doShoot(u,G.bot?botTarget(u,units):units[0]);if(u.hp<=2)await botCover(u);continue;}
@@ -7423,27 +7424,31 @@ async function aiAttacker(u){
     if(canDo(u,'special')&&u.op==='thatcher'&&u.ch>0){const g=G.gadgets.find(g=>g.alive&&g.side==='D'&&g.type!=='trap'&&g.type!=='gas'&&gadgetVisibleTo(g,'A')&&cheb(u.x,u.y,g.x,g.y)<=4);
       if(g){const t=within(u.x,u.y,3).sort((a,b)=>cheb(a[0],a[1],g.x,g.y)-cheb(b[0],b[1],g.x,g.y))[0];await BH(u,'useGadget'),await useGadget(u,t[0],t[1]);continue;}}
     if(canDo(u,'special')&&u.ch>0&&AIG[u.op]){const t=AIG[u.op](u);if(t){await BH(u,'useGadget'),await useGadget(u,...(t==='self'?[]:t));continue;}}
-    if(canDo(u,'obj')&&plantOK(u)){plant(u);continue;}
+    if(canDo(u,'obj')&&plantOK(u)){plant(u);await afterAct(u);continue;}
     if(canDo(u,'obj')&&escortOK(u)){await escort(u);continue;}
     if(G.defuser&&man(u.x,u.y,G.defuser.x,G.defuser.y)<=3)break;
     const goal=aiGoal(u);
-    let r=findPath(u,goal);
+    const state=[G.aiSite,G.hostage&&G.hostage.by,!!G.defuser,G.aiPlan&&G.aiPlan.wp[u.id]&&G.aiPlan.wp[u.id].ok].join('|');
+    if(routeState!==state){route=null;routeState=state;}
+    if(route){const i=route.p.findIndex(([x,y])=>x===u.x&&y===u.y);route=i>=0?{p:route.p.slice(i),cost:route.cost}:null;}
+    let r=route&&route.p.length>1?route:findPath(u,goal);
     if(!r&&G.aiPlan&&G.aiPlan.wp[u.id]&&!G.aiPlan.wp[u.id].ok){G.aiPlan.wp[u.id].ok=1;r=findPath(u,aiGoal(u));}
-    if(!r&&!G.defuser){G.aiSite=G.aiSite==='A'?'B':'A';r=findPath(u,siteGoal(G.aiSite));}
+    if(!r&&!G.defuser&&G.mission!=='hostage'){const alt=G.aiSite==='A'?'B':'A';r=findPath(u,siteGoal(alt));if(r)G.aiSite=alt;}
     if(!r||r.p.length<2)break;
+    route=r;
     const [nx,ny]=r.p[1],c=cell(nx,ny);
     if(!blocks(c)){
       const o=unitAt(nx,ny);
       if(o&&o.side===u.side)break;
       if(u.mp>=enterCost(nx,ny)+(winOpen(c)?1:0)){await BH(u,'step'),await step(u,nx,ny);continue;}
-      if(u.run&&canDo(u,'run')&&u.ap>=2){sprint(u);continue;}
+      if(u.run&&canDo(u,'run')){sprint(u);await afterAct(u);continue;}
       break;
     }
     if(u.ap<=0)break;
     if(!(await BH(u,'aiBreach'),await aiBreach(u,nx,ny)))break;
   }
   G._danger=null;
-  if(u.alive&&u.ap>0&&!G.over)overwatch(u);
+  if(u.alive&&u.ap>0&&!G.over){overwatch(u);await afterAct(u);}
   endAct(u);
 }
 function dangerMap(){const W=G.W,d=new Float32Array(W*G.H);
@@ -7485,7 +7490,7 @@ function aiPlan(){if(G.aiPlan)return G.aiPlan;
   return P;}
 function aiGoal(u){
   if(u.side==='A'&&!G.defuser&&!(G.mission==='hostage'&&G.hostage&&G.hostage.by)&&!G.tut2&&!TU){const P=aiPlan(),w=P.wp[u.id];
-    if(P.sty==='stack'&&P.lead!==u.id){const l=G.units.find(a=>a.id===P.lead);if(l&&l.alive&&l.x>=0&&cheb(u.x,u.y,l.x,l.y)>3&&!(w&&w.ok))return (x,y)=>cheb(x,y,l.x,l.y)<=2;}
+    if(w&&cell(u.x,u.y).indoor)w.ok=1;
     if(w&&!w.ok){if(cheb(u.x,u.y,w[0],w[1])<=1)w.ok=1;else return (x,y)=>cheb(x,y,w[0],w[1])<=1;}}
   if(G.mission==='hostage'&&G.hostage){const h=G.hostage;
     if(h.by===u.id){const sp=G.map.spawns.flatMap(z=>z.cells);return (x,y)=>sp.some(([a,b])=>a===x&&b===y);}
@@ -7508,9 +7513,9 @@ async function aiDefender(u){
     if(canDo(u,'destroy')){const g=destroyTargets(u).find(([x,y])=>gadgetAt(x,y,'drone')||(gadgetAt(x,y,'clay')&&cheb(u.x,u.y,x,y)>1));if(g){await BH(u,'doDestroy'),await doDestroy(u,...g);continue;}}
     if(!u.hidden&&canDo(u,'tactical')&&G.nitro>0){const t=throwTargets(u).find(([x,y])=>{const a=unitAt(x,y);return a&&a.side==='A'&&pub(a)&&blastArea(x,y).every(([i,j])=>{const b=unitAt(i,j);return !b||b.side==='A';});});if(t){await BH(u,'throwGadget'),await throwGadget(u,'nitro',...t);continue;}}
     if(G.defuser){
-      if(canDo(u,'obj')&&defuseOK(u)){defuse(u);continue;}
+      if(canDo(u,'obj')&&defuseOK(u)){defuse(u);await afterAct(u);continue;}
       const r=findPath(u,(x,y)=>man(x,y,G.defuser.x,G.defuser.y)<=1);
-      if(r&&r.p.length>1&&!blocks(cell(...r.p[1]))&&!unitAt(...r.p[1])){if(u.mp>=enterCost(...r.p[1])){await BH(u,'step'),await step(u,...r.p[1]);continue;}if(u.run&&canDo(u,'run')){sprint(u);continue;}}
+      if(r&&r.p.length>1&&!blocks(cell(...r.p[1]))&&!unitAt(...r.p[1])){if(u.mp>=enterCost(...r.p[1])){await BH(u,'step'),await step(u,...r.p[1]);continue;}if(u.run&&canDo(u,'run')){sprint(u);await afterAct(u);continue;}}
       if(r&&r.p.length>1&&cell(...r.p[1]).t==='bar'&&canDo(u,'destroy')){await BH(u,'aiBreach'),await aiBreach(u,...r.p[1]);continue;}
       break;
     }
@@ -7521,7 +7526,7 @@ async function aiDefender(u){
     if(hc){if(u.mp<=0&&u.ap<=0)break;const r=findPath(u,hc.goal);
       if(!r||r.p.length<2){u.fd=[hc.c.x-u.x,hc.c.y-u.y];break;}
       const [nx,ny]=r.p[1],nc=cell(nx,ny);
-      if(!blocks(nc)){if(unitAt(nx,ny))break;if(u.mp>=enterCost(nx,ny)){await BH(u,'step');if(!(await step(u,nx,ny)))break;continue;}if(u.run&&canDo(u,'run')){sprint(u);continue;}break;}
+      if(!blocks(nc)){if(unitAt(nx,ny))break;if(u.mp>=enterCost(nx,ny)){await BH(u,'step');if(!(await step(u,nx,ny)))break;continue;}if(u.run&&canDo(u,'run')){sprint(u);await afterAct(u);continue;}break;}
       if(nc.t==='bar'&&canDo(u,'destroy')){await BH(u,'aiBreach'),await aiBreach(u,nx,ny);continue;}
       if(nc.t==='soft'&&BOTBR===u&&(await BH(u,'breach'),await botBreachD(u,nx,ny)))continue;
       break;}
@@ -7548,7 +7553,7 @@ async function aiDefender(u){
   }
   u.peeked=false;
   if(u.alive&&!G.over&&!aiTurn(u)&&!knownFoe(u)){const hc=hostChase();u.fd=hc?[hc.c.x-u.x,hc.c.y-u.y]:bestFace(u);}
-  if(u.alive&&u.ap>0&&!G.over)overwatch(u);
+  if(u.alive&&u.ap>0&&!G.over){overwatch(u);await afterAct(u);}
   endAct(u);
 }
 async function runAI(){
@@ -7654,7 +7659,7 @@ async function botDefender(u){
     const [nx,ny]=r.p[1],c=cell(nx,ny);
     if(!blocks(c)){if(unitAt(nx,ny))break;
       if(u.mp>=enterCost(nx,ny)){await BH(u,'step');if(!(await step(u,nx,ny)))break;continue;}
-      if(u.run&&canDo(u,'run')&&u.ap>=2){sprint(u);continue;}break;}
+      if(u.run&&canDo(u,'run')&&u.ap>=2){sprint(u);await afterAct(u);continue;}break;}
     if(u.ap<=0)break;
     await BH(u,'breach');if(!(await botBreachD(u,nx,ny)))break;
   }}finally{BOTBR=null;}
@@ -9104,10 +9109,10 @@ function escBtnUpd(){let b=document.getElementById('escBtn');const u=G&&G.sel;
   if(!b){b=document.createElement('button');b.id='escBtn';b.innerHTML='<svg viewBox="0 0 48 48" fill="none" stroke="#5fe08a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="10" r="5"/><circle cx="32" cy="13" r="4"/><path d="M17 15v14l-5 13M17 29l6 13M17 20l8 4 7-5M32 17v11l4 13M32 28l-4 13"/></svg><span>'+tt('護送人質')+'</span>';document.body.appendChild(b);}
   const sh=document.getElementById('sheetT'),r0=sh&&sh.getBoundingClientRect(),r=r0&&r0.width?r0:null;b.style.bottom=(r&&r.top>innerHeight*.4?Math.round(innerHeight-r.top+10):Math.round(innerHeight*.3))+'px';
   b.onclick=ev=>{ev.stopPropagation();const v=G.sel;if(!v||!escortOK(v)||!commit(v))return;act(()=>escort(v));};}
-// v183/v184: floating 轉向 (the active unit, or one that already acted this round; not ones still waiting to act) and 完成 (overwatch toward the facing direction, then end) buttons, stacked above the barricade slot
+// Floating free turning is available before movement/activation; completion ends the active unit.
 function flowBtnUpd(){const scr=document.body.dataset.scr==='game',u=G&&G.sel,a=G&&G.active;
   const base=G&&scr&&G.phase==='play'&&!G.over&&!G.busy&&myPh()&&!dmOf()&&!(TU&&TU.ph==='game');
-  const showT=base&&u&&u.side===G.player&&u.alive&&u.x>=0&&!u.defusing&&(u===a||u.activated);
+  const showT=base&&u&&u.side===G.player&&u.alive&&u.x>=0&&!u.defusing;
   const showD=base&&a&&a===u&&a.side===G.player&&a.alive;
   const mk=(id,html)=>{let b=document.getElementById(id);if(!b){b=document.createElement('button');b.id=id;b.className='flowBtn';b.innerHTML=html;document.body.appendChild(b);}return b;};
   let t=document.getElementById('turnBtn'),d=document.getElementById('doneBtn');
@@ -9292,7 +9297,7 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
     {const sht=shootables(u),sb=btn('射擊',sub('shoot',sht.length||!ok?'1 行動':'沒有目標'),G.mode==='shoot',!can('shoot')||!sht.length,tmode('shoot',sht));
       if(sb.dis&&ok)sb.why=isA&&u.ap<=0?['沒有行動點','這名幹員的 2 個行動點都用完了']:isA&&u.used.has('shoot')?['這次啟動已經射擊過','每次啟動只能射擊一次']:isA&&u.heavyGuard?['重盾架起中','先關閉重盾才能射擊']:!sht.length?(G.units.some(e=>e.alive&&e.side!==u.side&&e.x>=0&&(!e.hidden||e.spotted>0)&&seenBy(u.side,e)&&Math.hypot(e.x-u.x,e.y-u.y)<=VR(u)+.01)?['被擋住了','看得到敵人是靠隊友或攝影機，但這名幹員和他之間有牆或煙擋住']:['看不到敵人','視線內沒有現身或被標記的敵人，先用無人機或攝影機找人']):null;
       L.push(sb);}
-    L.push(btn('奔跑',u.run?sub('run',`1 行動 · +${u.run} 移動點`):'這名幹員不能奔跑',false,!can('run')||!u.run,wrap(async()=>{if(G.active!==u)return;sprint(u);})));
+    L.push(btn('奔跑',u.run?sub('run',`1 行動 · +${u.run} 移動點`):'這名幹員不能奔跑',false,!can('run')||!u.run,wrap(async()=>{if(G.active!==u)return;sprint(u);await afterAct(u);})));
     const dt=destroyTargets(u);{const db=btn('破壞',sub('destroy',(PROF[u.op].dz||1)>=2?'路障、軟牆或道具':'路障或道具'),G.mode==='destroy',!can('destroy')||!dt.length,tmode('destroy',dt));
       if(db.dis&&ok&&!dt.length&&(!isA||canDo(u,'destroy')))db.why=['沒有可破壞的目標','相鄰或視線內沒有路障或看得到的敵方道具'];L.push(db);}
     const o=OPS[u.op];GB=null;
@@ -9558,6 +9563,23 @@ function flyTo(p,t,snap,ev){if(R3.intro&&R3.intro.lock)return;if(R3.evc&&!ev){if
 function playCam(){if(!R3||!G)return;const u=(G.active&&G.active.side===G.player&&G.active)||G.sel||G.units.find(u=>u.alive&&u.x>=0&&u.side===G.player);if(!u||u.x<0)return setView('angle');
   R3.followId=u.id;followCam(u,true);}
 // v229: when your side's phase starts, the camera turns to one of your operators who can still act (the one nearest a known enemy): angled, about 6 squares around him in view
+function outsideCam(){
+  if(!R3||!G)return false;
+  const phase=G.round+':'+G.phaseIdx,s=R3.outsideSave;
+  if(s&&(s.game!==G||s.phase!==phase||G.over||G.phase!=='play')){
+    if(R3.cine||R3.cineSave)return true;
+    R3.outsideSave=null;R3.turnPend=false;R3.turnKey=phase;
+    if(s.game===G&&!G.over){evCamOff();flyTo(s.p,s.t,false,true);R3.followId=null;R3.followPos=null;}
+    return true;
+  }
+  const u=G.active;
+  if(G.over||G.player!=='A'||curSide()!=='D'||!defenderOutside(u)||smokeAt(u.x,u.y))return false;
+  if(R3.cine||R3.cineSave||R3.evc)return true;
+  if(!s){const saved=R3.enemyView,b=saved&&saved.game===G&&saved.phase===phase?saved:R3.camGoal||{p:R3.camera.position,t:R3.controls.target};R3.outsideSave={game:G,phase,p:b.p.clone(),t:b.t.clone()};}
+  const pos=u.id+':'+u.x+','+u.y;
+  if(R3.outsideSave.pos!==pos){R3.outsideSave.pos=pos;R3.followId=u.id;R3.followPos=u.x+','+u.y;followCam(u);}
+  return true;
+}
 function turnCam(){if(!R3||!G||G.over||G.phase!=='play'||G.tut2||curSide()!==G.player||(G.coop&&!coopMyTurn()))return false;
   let us=unspent(G.player);if(G.coop)us=us.filter(u=>u.own===coopOwner());if(!us.length)return false;
   const fo=G.units.filter(e=>e.alive&&e.x>=0&&e.side!==G.player&&pub(e)),dd=u=>fo.length?Math.min(...fo.map(e=>Math.hypot(e.x-u.x,e.y-u.y))):0;
@@ -10846,12 +10868,14 @@ function tick3D(){
   if(R3.camGoal){const g=R3.camGoal,k=1-Math.pow(.002,rdt);R3.camera.position.lerp(g.p,k);R3.controls.target.lerp(g.t,k);if(R3.camera.position.distanceTo(g.p)<.01&&R3.controls.target.distanceTo(g.t)<.01)R3.camGoal=null;}
   if(R3.controls.autoRotate)R3.controls.autoRotate=false;
   if(G&&G.phase!==R3.camPhase){const was=R3.camPhase;R3.camPhase=G.phase;if(G.phase==='setup')setTimeout(()=>R3&&introCam(),60);else if(was==='setup'&&G.phase==='play')setTimeout(playCam,80);}
+  if(G&&G.phase==='play'&&curSide()!==G.player){const phase=G.round+':'+G.phaseIdx;if(!R3.enemyView||R3.enemyView.game!==G||R3.enemyView.phase!==phase){const b=R3.camGoal||{p:R3.camera.position,t:R3.controls.target};R3.enemyView={game:G,phase,p:b.p.clone(),t:b.t.clone()};}}
+  const outsideFocus=outsideCam();
   // v229: a new phase of ours: wait until any close-up / swing is over, then turn to one of our operators
   if(G&&G.phase==='play'&&!G.over){const tk=G.round+':'+G.phaseIdx;if(tk!==R3.turnKey){const first=R3.turnKey==null||R3.camPhase0!=='play';R3.turnKey=tk;R3.turnPend=!first;}
-    if(R3.turnPend&&!R3.cine&&!R3.cineSave&&!R3.evc&&!(R3.intro&&R3.intro.lock)&&!document.querySelector('.sintro')){R3.turnPend=false;try{turnCam();}catch(e){}}}
+    if(!outsideFocus&&R3.turnPend&&!R3.cine&&!R3.cineSave&&!R3.evc&&!(R3.intro&&R3.intro.lock)&&!document.querySelector('.sintro')){R3.turnPend=false;try{turnCam();}catch(e){}}}
   if(G)R3.camPhase0=G.phase;
   // whoever is acting (our selected unit, or a visible enemy taking its turn) gets the camera
-  if(G&&G.phase==='play'&&!G.over&&!R3.cine){const u=G.active||G.sel,k=u&&u.alive&&u.x>=0&&(u.side===G.player||pub(u))?u.id:null;const pk=k&&u.x+','+u.y;if(k!==R3.followId||(k&&pk!==R3.followPos)){R3.followId=k;R3.followPos=pk;if(k&&R3.camPhase==='play')setTimeout(()=>followCam(u),40);}}
+  if(!outsideFocus&&G&&G.phase==='play'&&!G.over&&!R3.cine){const u=G.active||G.sel,k=u&&u.alive&&u.x>=0&&(u.side===G.player||pub(u))?u.id:null;const pk=k&&u.x+','+u.y;if(k!==R3.followId||(k&&pk!==R3.followPos)){R3.followId=k;R3.followPos=pk;if(k&&R3.camPhase==='play')setTimeout(()=>followCam(u),40);}}
   if(R3.owA&&R3.owA.parent){const k=.78+.12*Math.sin(t*7);for(const a of R3.owA.children){const d=a.userData.d,n=d[0]&&d[1]?.78:1;a.position.set(d[0]*k*n,.35,d[1]*k*n);}}
   try{stunFx(t);}catch(e){}try{burnFx();}catch(e){}try{matFx();}catch(e){}
   // v104: however the view is dragged, the orbit centre stays over the board, so the map never leaves the screen

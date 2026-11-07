@@ -15,7 +15,7 @@ vm.runInContext(cut('async function riposte(u,','// ---- v88:'),ctx);
 (async()=>{await vm.runInContext(`(async()=>{
 let shots=0;globalThis.shootUnit=async()=>shots++;globalThis.losAs=(e,fn)=>fn();globalThis.inSight=()=>true;globalThis.los=()=>true;globalThis.rayBlk=()=>false;
 Object.assign(a,{overwatch:true,owd:[1,1],owHit:new Set(),owShot:0});d._actMoved=false;G.active=d;
-assert.equal(await riposte(d),true);assert.equal(shots,0);
+assert.equal(await riposte(d),true);assert.equal(shots,1);
 d.y++;await riposte(d);assert.equal(shots,1);await riposte(d);assert.equal(shots,1);
-d._actMoved=false;a.owHit=new Set();a.owShot=0;await riposte(d);assert.equal(shots,1);
-})()`,ctx);console.log('PASS: no overwatch before movement, fire after movement, once per watcher, activation reset, previous-phase Lion, round boundary and hidden markers');})().catch(e=>{console.error(e);process.exit(1)});
+d._actMoved=false;a.owHit=new Set();a.owShot=0;await riposte(d);assert.equal(shots,2);
+})()`,ctx);console.log('PASS: stationary actions trigger overwatch, movement triggers overwatch, once per watcher, previous-phase Lion, round boundary and hidden markers');})().catch(e=>{console.error(e);process.exit(1)});
