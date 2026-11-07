@@ -9534,7 +9534,7 @@ function introStep(k){const I=R3.intro;if(!I)return;const e=k<.5?4*k*k*k:1-Math.
 function lvIntroCam(h){if(!R3||!h||h.x<0)return;setView('top');const g=R3.camGoal;if(!g)return;R3.camGoal=null;const off=g.p.clone().sub(g.t),R=off.length(),az1=Math.atan2(off.x,off.z),el1=Math.asin(Math.min(1,off.y/R));
   const f=h.fd||[0,1],az0=Math.atan2(f[0],f[1]);let d=((az1-az0)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);if(d<Math.PI*.6)d+=2*Math.PI;
   R3.intro={lock:1,t0:performance.now()+900,dur:3400,t:g.t.clone(),ta:new THREE.Vector3(cwx(h.x,h.y),.85,cwz(h.x,h.y)),R,r0:2.3,az0,az1:az0+d,el0:.16,el1};introStep(0);}
-function flyTo(p,t,snap){if(R3.intro&&R3.intro.lock)return;R3.intro=null;const c=R3.controls,cam=R3.camera;if(snap){cam.position.copy(p);c.target.copy(t);c.update();R3.camGoal=null;}else R3.camGoal={p,t};}
+function flyTo(p,t,snap,ev){if(R3.intro&&R3.intro.lock)return;if(R3.evc&&!ev){if(snap)R3.evc=null;else{R3.evc.pend={p,t};return;}}R3.intro=null;const c=R3.controls,cam=R3.camera;if(snap){cam.position.copy(p);c.target.copy(t);c.update();R3.camGoal=null;}else R3.camGoal={p,t};}
 // after deployment: angled and close, on the unit that acts first (or the first of ours)
 function playCam(){if(!R3||!G)return;const u=(G.active&&G.active.side===G.player&&G.active)||G.sel||G.units.find(u=>u.alive&&u.x>=0&&u.side===G.player);if(!u||u.x<0)return setView('angle');
   R3.followId=u.id;followCam(u,true);}
@@ -10410,7 +10410,7 @@ const CINE={on:true,mode:'fp'};
 async function shotCam(sh,t){
   if(!R3||!CINE.on||document.hidden||(G&&G.tut2))return false;
   const c=R3.controls,cam=R3.camera,V3=THREE.Vector3;
-  if(!R3.cineSave)R3.cineSave={p:(R3.camGoal?R3.camGoal.p:cam.position).clone(),t:(R3.camGoal?R3.camGoal.t:c.target).clone()};
+  if(!R3.cineSave)R3.cineSave=evCamOff()||{p:(R3.camGoal?R3.camGoal.p:cam.position).clone(),t:(R3.camGoal?R3.camGoal.t:c.target).clone()};
   const S=new V3(cwx(sh.x,sh.y),0,cwz(sh.x,sh.y)),T=new V3(cwx(t.x,t.y),0,cwz(t.x,t.y)),dir=T.clone().sub(S);dir.y=0;dir.normalize();
   const right=new V3(-dir.z,0,dir.x);
   aimPose(sh,S,T);
@@ -10840,14 +10840,29 @@ function tick3D(){
 }
 // ---------- v118: map effects shared by both players (online they ride in the game state as G.fxq) ----------
 let FXSEEN=0;
-function fxEv(e){if(!G)return null;e.id=G.fxn=(G.fxn||0)+1;(G.fxq||(G.fxq=[])).push(e);if(G.fxq.length>12)G.fxq.splice(0,G.fxq.length-12);FXSEEN=e.id;return fxPlay(e);}
+function fxEv(e){if(!G)return null;e.id=G.fxn=(G.fxn||0)+1;e.ts=Date.now();(G.fxq||(G.fxq=[])).push(e);if(G.fxq.length>12)G.fxq.splice(0,G.fxq.length-12);FXSEEN=e.id;return fxPlay(e);}
 function fxSync(){if(!G||!G.fxq)return;if((G.fxn||0)<FXSEEN)FXSEEN=0;for(const e of G.fxq){if(e.id<=FXSEEN)continue;FXSEEN=e.id;try{fxPlay(e);}catch(x){}}}
 function fxPlay(e){if(!G)return null;const foe=!!e.side&&e.side!==G.player;
   if(e.k==='throw'){if(foe)edgeAlert(e.x1,e.y1);return mapThrow(e);}
   if(e.k==='shot'){if(foe){edgeAlert(e.x0,e.y0);edgeAlert(e.x1,e.y1);}return null;}
   if(e.k==='evac')return evacBeam(e);
-  if(e.k==='wall'){if(foe&&G.units.some(u=>u.alive&&u.side===G.player&&u.x>=0&&inRoomOf(u,e.x,e.y)))edgeAlert(e.x,e.y);return null;}
+  if(e.k==='wall'){evCamQ(e,foe);if(foe&&G.units.some(u=>u.alive&&u.side===G.player&&u.x>=0&&inRoomOf(u,e.x,e.y)))edgeAlert(e.x,e.y);return null;}
   return null;}
+// v228: a wall / door broken where your side can see it (an operator's fan, a camera, a drone), by the enemy or off screen: the camera swings to it for a second, then back
+function evCamQ(e,foe){try{if(!R3||!R3.camera||!G||G.over||G.tut2||G.phase!=='play'||document.hidden||document.body.dataset.scr!=='game')return;
+  if(e.ts&&Math.abs(Date.now()-e.ts)>15000)return;
+  {const vs=visCells(G.player);if(![[0,0],[1,0],[-1,0],[0,1],[0,-1]].some(([a,b])=>{const x=e.x+a,y=e.y+b;return x>=0&&y>=0&&x<G.W&&y<G.H&&vs.has(y*G.W+x)&&(!a&&!b||!isWallC(cell(x,y)));}))return;}
+  if(!foe){const cam=R3.camera;cam.updateMatrixWorld();const v=new THREE.Vector3(cwx(e.x,e.y),.6,cwz(e.x,e.y)),bh=v.clone().applyMatrix4(cam.matrixWorldInverse).z>0;v.project(cam);if(!bh&&Math.abs(v.x)<.85&&Math.abs(v.y)<.85)return;}
+  (R3.evq||(R3.evq=[])).push([e.x,e.y]);if(R3.evqT)return;R3.evqT=setTimeout(()=>{R3.evqT=0;const q=R3.evq||[];R3.evq=[];if(q.length)evCam(q);},60);}catch(x){}}
+function evCamOff(){const v=R3&&R3.evc;if(!v)return null;clearTimeout(v.tm);R3.evc=null;const b=v.pend||v.save;return {p:b.p.clone(),t:b.t.clone()};}
+function evCam(q){if(!R3||!G||G.over||R3.cine||R3.cineSave||R3.intro)return;const c=R3.controls,cam=R3.camera,V=THREE.Vector3;
+  const x=q.reduce((a,p)=>a+p[0],0)/q.length,y=q.reduce((a,p)=>a+p[1],0)/q.length,xi=Math.round(x),yi=Math.round(y);
+  if(!R3.evc)R3.evc={save:{p:(R3.camGoal?R3.camGoal.p:cam.position).clone(),t:(R3.camGoal?R3.camGoal.t:c.target).clone()}};else clearTimeout(R3.evc.tm);
+  let h=cam.position.clone().sub(c.target);h.y=0;if(h.lengthSq()<1e-4)h.set(0,0,1);h.normalize();
+  const t=new V(cwx(xi,yi)+(x-xi),.4,cwz(xi,yi)+(y-yi)),e=52*Math.PI/180,d=cam.aspect<1?9:7.5,tV=Math.tan(cam.fov*Math.PI/360),tH=tV*cam.aspect,right=new V(h.z,0,-h.x);
+  const [cx,cy]=camFree();t.addScaledVector(right,-cx*tH*d);t.addScaledVector(h,cy*tV*d/Math.sin(e));
+  flyTo(t.clone().addScaledVector(h,d*Math.cos(e)).add(new V(0,d*Math.sin(e),0)),t,false,1);
+  R3.evc.tm=setTimeout(()=>{const v=R3.evc;if(!v)return;R3.evc=null;if(R3.cine||R3.cineSave)return;const b=v.pend||v.save;flyTo(b.p,b.t);},1400);}
 // is the wall square (x,y) on the edge of the room u stands in (flood over floor, not through walls, doors, the breach itself)
 function inRoomOf(u,x,y){const W=G.W,seen=new Set([u.y*W+u.x]),q=[[u.x,u.y]];let n=0;
   while(q.length&&n++<500){const [a,b]=q.shift();if(Math.abs(a-x)+Math.abs(b-y)===1)return true;
@@ -12967,7 +12982,7 @@ function matFx(){if(!R3||!R3.figs||!G)return;for(const id in R3.figs){const f=R3
 // v144: stepping on a Welcome Mat cuts to a 45-degree side close-up of the operator's feet
 async function matCine(u){try{if(!R3||!R3.figs||!CINE.on||document.hidden||u.x<0)return false;const f=R3.figs[u.id];if(!f||!f.grp||!f.grp.visible)return false;
   const c=R3.controls,cam=R3.camera,V3=THREE.Vector3;
-  if(!R3.cineSave)R3.cineSave={p:(R3.camGoal?R3.camGoal.p:cam.position).clone(),t:(R3.camGoal?R3.camGoal.t:c.target).clone()};
+  if(!R3.cineSave)R3.cineSave=evCamOff()||{p:(R3.camGoal?R3.camGoal.p:cam.position).clone(),t:(R3.camGoal?R3.camGoal.t:c.target).clone()};
   const S=new V3(cwx(u.x,u.y),0,cwz(u.x,u.y)),fd=new V3((u.fd&&u.fd[0])||0,0,(u.fd&&u.fd[1])||0);if(fd.lengthSq()<1e-4)fd.set(0,0,1);fd.normalize();
   const right=new V3(-fd.z,0,fd.x),side=right.clone().multiplyScalar(cam.position.clone().sub(S).dot(right)<0?-1:1);
   const look=S.clone();look.y=.4;const p=S.clone().addScaledVector(fd.clone().add(side).normalize(),2.2);p.y=1.1;

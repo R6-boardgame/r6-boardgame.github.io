@@ -447,3 +447,8 @@
 ## v227 人質改成 3D 模型
 - 棋盤上的人質從紙板立牌（`standee('hostageFig')`）改成 3D 公仔 `makeHostageFig()`：跪姿、橄欖綠蒙眼布、銀色膠帶封嘴、黑長髮（後面一片 + 兩側垂到胸前）、髒污白色長袖短版上衣、深藍破洞內搭褲、白球鞋、雙手反綁在背後（麻繩）。衣服貼圖由 `hostTex('top'|'legs')` 用 canvas 畫。模型建一次放在 `R3.hostFig`，`hostage3D` 每次 `clone()`，轉向鏡頭；被帶著走時（`h.by`）縮成 .55 倍、不畫黃色六角框。
 - 任務標籤、配對過場、選任務畫面用的 `GIMG.hostageFig`（`WZI.hostage`）換成這個 3D 模型的渲染圖（340×714，去掉底座）。舊的照片已移除。
+
+## v228 視線內動靜強制特寫
+- 牆或門（路障）被破壞時（`destroyCell` → `fxEv({k:'wall'})` → `fxPlay`），`evCamQ` 判斷：玩家這方看得到那一格（`visCells(G.player)` 含幹員扇形、攝影機、無人機；該格或旁邊的地板格亮著），而且是對手造成、或自己造成但在畫面外，就把鏡頭飛到那裡（`evCam`，60 毫秒內的多格合併成中心點），約 1 秒後飛回原視角。
+- 特寫期間其他 `flyTo` 不會打斷，會記在 `R3.evc.pend`，結束時改飛去那裡；射擊／捕獸夾特寫開始時用 `evCamOff()` 取回原視角當 `cineSave`。教學（`G.tut2`）不觸發。`fxEv` 事件加上 `ts`，連線重連時超過 15 秒的舊事件不觸發。
+- 注意：`edgeAlert` 檢查的 `SCREEN!=='game'` 永遠成立（`SCREEN` 不會是 'game'），螢幕邊緣紅光目前其實不會出現；遊戲畫面要用 `document.body.dataset.scr==='game'` 判斷。
