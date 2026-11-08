@@ -11,7 +11,7 @@ const roomCells=()=>Array.from({length:100},(_,i)=>i);
 const roomOf=()=>roomCells().map(q=>[q%10,Math.floor(q/10)]);
 const inFan=()=>true,inSight=(a,b)=>los(a.x,a.y,b.x,b.y);
 const within=()=>roomOf(),shieldAt=()=>null,adj8=()=>[],PROF={};
-`+html.match(/const smokeAt=.*;/)[0]+cut('function lineCells(','function segCells(')+cut('function smokeBlocks(','// light protection:')+cut('const defenderOutside=','function sees(')+cut('function sharedCells(','// attackers with line of sight')+html.match(/const throwTargets=.*;/)[0]+cut('function protection(sh,t){','const OBSTK=')+`
+`+html.match(/const smokeAt=.*;/)[0]+cut('function lineCells(','const hardC=')+cut('function smokeBlocks(','// light protection:')+cut('const defenderOutside=','function sees(')+cut('function sharedCells(','// attackers with line of sight')+html.match(/const throwTargets=.*;/)[0]+cut('function protection(sh,t){','const OBSTK=')+`
 const a={side:'A',alive:true,x:0,y:2},e={side:'D',alive:true,x:5,y:2};G.units=[a,e];
 assert(seenBy('A',e));
 const smoke={alive:true,type:'smk',x:2,y:2};G.gadgets.push(smoke);
