@@ -17,6 +17,7 @@ G.active=d;assert(outsideCam());assert.equal(follows,1);outsideCam();assert.equa
 G.phaseIdx=2;assert(outsideCam());assert.deepEqual(restored,[1,2]);assert.equal(R3.outsideSave,null);assert.equal(R3.turnPend,false);
 `,ctx);
 const ai=vm.createContext({assert,console});
+ai.twUser=()=>false;
 vm.runInContext(`
 let G={units:[],round:1,mission:'bomb',aiSite:'A'},calls=0,dangers=0,steps=[],breaches=0,reactions=0;
 const u={id:'A0',side:'A',alive:true,x:0,y:0,ap:1,mp:2,run:2,hp:5,ch:0,op:'ash'};

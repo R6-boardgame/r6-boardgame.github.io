@@ -1,5 +1,7 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v242：Twitch 改持續存在的電擊無人機（`tw*` 函式區塊），左側紫色無字按鈕部署／切換。`twRound/twActor` 在首次移動、轉向或動作鎖定本體／電車到本輪結束；部署選電車。單位仍由本體持有啟動與行動點；電車獨立 5 步、180°／10 格視野、6 格攻擊，直接扣 1 HP（`damage` 的 direct 參數保留擊殺記帳）。每場 2 台、同時 1 台；不用舊 disposable `moving` 無人機流程。Twitch 死亡後電車持續提供視野，不能操作，但仍可被敵人摧毀。對電車的射擊／監視／範圍傷害走 `twReceive`，1 顆特殊骰 3 MISS／3 準星，命中摧毀。移入火、毒氣、電流仍是環境危害。`tests/twitch-drone.cjs` 覆蓋規則，`tests/twitch.html` 是不連雲端的模型／按鈕／骰面測試。
+
 - v241：黑鏡不提供獨立視野、不自動標記。`los` 的最後一個 `sight` 參數只供視覺判定，搭配 `mirSightPass` 允許內側往外看；射擊仍走原本不可穿鏡的路徑。`inSight` 預設維持射擊判定，視覺呼叫要傳第三參數 true。`tests/mira-vision.cjs` 驗證單向視線與雙向擋彈。
 
 - v240：Mira 黑鏡保留軟牆／鐵牆宿主，`mirAsk` 以兩側箭頭選內側；`mirCanOpen` 驗證內側、本人視線與距離。`mirror3D` 分內外框、玻璃及紅色氣瓶，`mirrorDropPose` 驅動掉落，`SFX.mirror` 合成氣閥與碎玻璃音。`destroyCell` 清除鏡與洞口旗標；測試 `tests/mira.cjs`、視覺測試 `tests/mira.html`。
