@@ -1,5 +1,7 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v241：黑鏡不提供獨立視野、不自動標記。`los` 的最後一個 `sight` 參數只供視覺判定，搭配 `mirSightPass` 允許內側往外看；射擊仍走原本不可穿鏡的路徑。`inSight` 預設維持射擊判定，視覺呼叫要傳第三參數 true。`tests/mira-vision.cjs` 驗證單向視線與雙向擋彈。
+
 - v240：Mira 黑鏡保留軟牆／鐵牆宿主，`mirAsk` 以兩側箭頭選內側；`mirCanOpen` 驗證內側、本人視線與距離。`mirror3D` 分內外框、玻璃及紅色氣瓶，`mirrorDropPose` 驅動掉落，`SFX.mirror` 合成氣閥與碎玻璃音。`destroyCell` 清除鏡與洞口旗標；測試 `tests/mira.cjs`、視覺測試 `tests/mira.html`。
 
 給接手的 AI 程式助理（Codex 等）。先讀完這份再動手。

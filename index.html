@@ -6396,12 +6396,13 @@ function segCells(x0,y0,x1,y1){const o=[],dx=x1-x0,dy=y1-y0,nx=Math.abs(dx),ny=M
     if(!(x===x1&&y===y1))o.push({c:[x,y]});}return o;}
 const hardC=([x,y])=>{const c=cell(x,y);return !!c&&(c.t==='hard'||c.t==='reinf'||c.mirror)&&!c.mOpen;};
 function smokeBlocks(x0,y0,x1,y1){return smokeAt(x0,y0)||smokeAt(x1,y1)||lineCells(x0,y0,x1,y1).some(([x,y])=>smokeAt(x,y));}
-function los(x0,y0,x1,y1,located,noOps,ignoreSmoke=false){
+function mirSightPass(x,y,ox,oy){const c=cell(x,y);if(!c||!c.mirror||c.mOpen)return false;const g=G.gadgets.find(g=>g.alive&&g.type==='mirror'&&g.x===x&&g.y===y&&g.mi);return !!g&&((ox-x)*g.mi[0]+(oy-y)*g.mi[1]>0);}
+function los(x0,y0,x1,y1,located,noOps,ignoreSmoke=false,sight=false){
   if(!ignoreSmoke&&smokeBlocks(x0,y0,x1,y1))return false;
   if(located)for(const s of segCells(x0,y0,x1,y1))if(s.c2?hardC(s.c)&&hardC(s.c2):hardC(s.c))return false;
   for(const [x,y] of lineCells(x0,y0,x1,y1)){const c=cell(x,y);
     if(located){if((c.t==='hard'||c.t==='reinf'||c.mirror)&&!c.mOpen)return false;if(!noOps&&G.units.some(u=>u.alive&&u.x===x&&u.y===y&&!u.hidden))return false;continue;}
-    if((blocks(c)&&!(c&&(c.mOpen||(c.t==='soft'&&c.hole&&!c.mirror)))))return false;
+    if((blocks(c)&&!(c&&(c.mOpen||(sight&&c.mirror&&mirSightPass(x,y,x0,y0))||(c.t==='soft'&&c.hole&&!c.mirror)))))return false;
     if(!noOps&&G.units.some(u=>u.alive&&u.x===x&&u.y===y&&!u.hidden))return false;}
   return true;
 }
@@ -6505,16 +6506,16 @@ function viewers(side){return G.units.filter(u=>u.alive&&u.side===side&&u.x>=0).
 // v173: 入門 training levels have no fog of war
 const noFog=()=>!!(G&&G.lv&&G.lv.t===0);
 const defenderOutside=u=>!!(G&&G.phase==='play'&&u&&u.alive&&u.side==='D'&&u.x>=0&&cell(u.x,u.y)?.t==='out');
-function seenBy(side,e){if(G.over)return true;if(noFog()&&side===G.player&&e.alive&&e.x>=0&&G.phase!=='setup')return true;if(smokeAt(e.x,e.y))return false;if(e.side===side)return true;if(!e.alive||e.x<0||G.phase==='setup')return false;if(defenderOutside(e))return true;if(e.exp&&e.exp[0]===e.x&&e.exp[1]===e.y&&G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&!smokeBlocks(a.x,a.y,e.x,e.y)))return true;return G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&inSight(a,e))||sharedCells(side).has(e.y*G.W+e.x);}
+function seenBy(side,e){if(G.over)return true;if(noFog()&&side===G.player&&e.alive&&e.x>=0&&G.phase!=='setup')return true;if(smokeAt(e.x,e.y))return false;if(e.side===side)return true;if(!e.alive||e.x<0||G.phase==='setup')return false;if(defenderOutside(e))return true;if(e.exp&&e.exp[0]===e.x&&e.exp[1]===e.y&&G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&!smokeBlocks(a.x,a.y,e.x,e.y)))return true;return G.units.some(a=>a.alive&&a.side===side&&a.x>=0&&inSight(a,e,true))||sharedCells(side).has(e.y*G.W+e.x);}
 function sees(side){if(G.phase==='setup'&&!G.over)return new Set();const s=new Set();for(const e of G.units){if(!e.alive||e.side===side||e.x<0)continue;if(seenBy(side,e))s.add(e.id);}return s;}
 // v89: every operator sees a 120° fan in front of him (10 cells, snipers 14), straight-line distance, nothing behind; seeing an enemy is what lets you shoot him
 const SNIPE=new Set(['glaz','kali']),VR=u=>u.vr||(SNIPE.has(u.op)?14:10),edist=(a,b,c,d)=>Math.round(Math.hypot(a-c,b-d));
 function inFan(u,x,y,r,half){const dx=x-u.x,dy=y-u.y;if(!dx&&!dy)return true;const d=Math.hypot(dx,dy);if(d>(r??VR(u))+.01)return false;
   const f=u.fd||[0,1],l=Math.hypot(f[0],f[1])||1;return (dx*f[0]+dy*f[1])/(d*l)>=Math.cos((half??(u.fh||60))*Math.PI/180)-1e-6;}
-function inSight(a,b){return inFan(a,b.x,b.y)&&los(a.x,a.y,b.x,b.y);}
+function inSight(a,b,sight=false){return inFan(a,b.x,b.y)&&los(a.x,a.y,b.x,b.y,false,false,false,sight);}
 function fanCells(u){const s=new Set([u.y*G.W+u.x]),r=VR(u);
-  for(let y=Math.max(0,u.y-r);y<=Math.min(G.H-1,u.y+r);y++)for(let x=Math.max(0,u.x-r);x<=Math.min(G.W-1,u.x+r);x++)if(inFan(u,x,y,r)&&los(u.x,u.y,x,y))s.add(y*G.W+x);return s;}
-// shared sight: drones and room cameras light their whole room; wall cameras, Black Mirrors and the outside cameras look out over a half-plane
+  for(let y=Math.max(0,u.y-r);y<=Math.min(G.H-1,u.y+r);y++)for(let x=Math.max(0,u.x-r);x<=Math.min(G.W-1,u.x+r);x++)if(inFan(u,x,y,r)&&los(u.x,u.y,x,y,false,false,false,true))s.add(y*G.W+x);return s;}
+// Shared sight comes from drones and cameras only; mirrors never act as sensors.
 function sharedCells(side){if(!G||!G.grid)return new Set();
   const k=side+'|'+(G._wv||0)+'|'+G.gadgets.map(g=>g.alive&&['drone','cam','mirror','smk'].includes(g.type)?g.type+g.x+','+g.y+(g.moving?'m':'')+(g.open?'o':'')+(jammed(g.x,g.y)?'j':''):'').join(';');
   const C=G._shc||(G._shc={});if(C[side]&&C[side].k===k)return C[side].s;const s=new Set();
@@ -6525,12 +6526,12 @@ function sharedCells(side){if(!G||!G.grid)return new Set();
       if(g.wall)look(g,10,(x,y)=>(x-g.x)*g.wall[0]+(y-g.y)*g.wall[1]<=0);
       else if(outCam(g))look(g,8,()=>true);
       else if(cell(g.x,g.y).indoor)for(const [x,y] of roomOf(g.x,g.y)){if(los(g.x,g.y,x,y,false,true))s.add(y*G.W+x);}}// v104: 360° but only what the lens can see; a wall corner inside the room hides what is behind it
-    else if(side==='D'&&g.type==='mirror'&&g.mi)look(g,10,(x,y)=>mirSide(g,x,y)<=0);}
+    }
   C[side]={k,s};return s;}
 // attackers with line of sight unmask hidden defenders and see through decoys
 function revealCheck(){if(!G||G.phase!=='play'||G.over)return;const atk=alive('A').filter(a=>a.x>=0);
   const sh=sharedCells('A');
-  for(const d of alive('D'))if(d.hidden&&(defenderOutside(d)||(d.spotted>0&&!d.wmark)||atk.some(a=>inSight(a,d))||sh.has(d.y*G.W+d.x)))reveal(d,'被看見，');
+  for(const d of alive('D'))if(d.hidden&&(defenderOutside(d)||(d.spotted>0&&!d.wmark)||atk.some(a=>inSight(a,d,true))||sh.has(d.y*G.W+d.x)))reveal(d,'被看見，');
   for(const k of G.decoys||[])if(k.alive&&(atk.some(a=>inFan(a,k.x,k.y)&&los(a.x,a.y,k.x,k.y))||sh.has(k.y*G.W+k.x))){k.alive=false;log('一個隱藏標記被識破，是誘餌','ka');}
   const h=G.hostage;if(h&&!h.known&&!h.by&&atk.some(a=>inFan(a,h.x,h.y)&&los(a.x,a.y,h.x,h.y,false,true)))hostFound();}
 function hostFound(){const h=G.hostage;if(!h||h.known)return;h.known=true;if(G.player==='A')bigNote('發現人質',`在 ${coord(h.x,h.y)}`,'a',1500);log('進攻方發現了人質的位置','ka');}
@@ -6548,7 +6549,7 @@ function gadgetVisibleTo(g,side){
   const own=alive(side).filter(u=>u.x>=0);
   if(side==='A'&&own.some(u=>u.op==='iq'&&cheb(u.x,u.y,g.x,g.y)<=5))return true;
   if(g.type==='trap'||g.type==='gu'||g.type==='mat')return false;
-  if(own.some(u=>inFan(u,g.x,g.y)&&los(u.x,u.y,g.x,g.y))){g.found=true;return true;}
+  if(own.some(u=>inFan(u,g.x,g.y)&&los(u.x,u.y,g.x,g.y,false,false,false,true))){g.found=true;return true;}
   return false;
 }
 function elecVisible(x,y){
@@ -6920,7 +6921,7 @@ function mirIn(u,x,y){if(u&&u.x>=0&&man(u.x,u.y,x,y)===1)return [u.x-x,u.y-y];
   return n.find(([a,b])=>{const o=cell(x-a,y-b);return !o||!o.indoor||blocks(o);})||n[0]||[0,1];}
 const mirSide=(g,x,y)=>(x-g.x)*g.mi[0]+(y-g.y)*g.mi[1];
 // attackers passing in front of a mirror get marked; the line of sight still matters
-function mirSees(u){return u.side==='A'&&u.x>=0&&G.gadgets.some(g=>g.alive&&g.type==='mirror'&&g.mi&&mirSide(g,u.x,u.y)<0&&cheb(g.x,g.y,u.x,u.y)<=10&&los(g.x,g.y,u.x,u.y));}
+function mirSees(u){return false;} // A black mirror never automatically spots or marks units.
 // wall-mounted bulletproof cameras look out from their wall: a 180° half-plane, by line of sight
 function bpSees(u){return u.side==='A'&&u.x>=0&&G.gadgets.some(g=>g.alive&&g.type==='cam'&&g.wall&&!jammed(g.x,g.y)&&((u.x-g.x)*g.wall[0]+(u.y-g.y)*g.wall[1])<=0&&cheb(g.x,g.y,u.x,u.y)<=10&&los(g.x,g.y,u.x,u.y));}
 const mirCanOpen=(u,g)=>!!(u&&u.alive&&u.x>=0&&g&&g.alive&&g.type==='mirror'&&!g.open&&g.mi&&cell(g.x,g.y).mirror&&mirSide(g,u.x,u.y)>0&&Math.hypot(u.x-g.x,u.y-g.y)<=VR(u)&&inFan(u,g.x,g.y)&&los(u.x,u.y,g.x,g.y,false,true));
@@ -6946,7 +6947,9 @@ function mirror3D(gd,grp){const WH=WALLH[R3.wall]||1.45,{cy,h,y0,y1,hw}=mirSize(
   // Exterior trim is flush; only the room-side frame protrudes.
   for(const [z,depth,w] of [[inside,.105,.055],[-th/2-.004,.008,.025]]){mk(BOX3,fr,[.94,w,depth],0,y1+w/2,z);mk(BOX3,fr,[.94,w,depth],0,y0-w/2,z);mk(BOX3,fr,[w,h+.1,depth],-hw-w/2,cy,z);mk(BOX3,fr,[w,h+.1,depth],hw+w/2,cy,z);}
   for(const x of [-.31,.31]){mk(BOX3,edge,[.07,.045,.13],x,y1+.055,inside);mk(BOX3,edge,[.07,.045,.13],x,y0-.055,inside);}
-  const pane=new THREE.Group();pane.position.set(0,cy,0);sg.add(pane);mk(BOX3,glass,[.84,h,.025],0,0,0,pane);
+  const pane=new THREE.Group();pane.position.set(0,cy,0);sg.add(pane);
+  const innerGlass=gm('mir241inside',()=>std(0x18222b,{transparent:true,opacity:.18,depthWrite:false,metalness:.15,roughness:.2}));
+  mk(BOX3,[glass,glass,glass,glass,innerGlass,glass],[.84,h,.025],0,0,0,pane);
   // Muted diagonal highlights are only on the inside glass surface.
   for(const x of [-.26,-.08,.1,.28]){const glint=mk(BOX3,gm('mir240glint',()=>std(0x697078,{metalness:.6,roughness:.2})),[.018,h*.48,.002],x,0,.014,pane);glint.rotation.z=-.65;}
   const valve=new THREE.Group();valve.position.set(0,y0-.1,inside+.075);sg.add(valve);
@@ -8874,7 +8877,7 @@ var GDX={
  ying:['〔行動〕坎德拉：丟到 6 格內（可越過一面輕牆），該房間內除了 Ying 以外的所有幹員都被震暈。',2],
  zofia:['〔行動〕KS79 震盪彈：看得到的一名敵人被震暈，並固定受到 2 點傷害。',2],
  dokkaebi:['〔行動〕邏輯炸彈：讓最近一名還沒被標記的防守方手機響起，他被標記並現身。',2],
- mira:['〔佈防／行動〕黑鏡：安裝於軟牆或加固牆，選擇紅色氣瓶朝向；不改變牆體強度。關閉時外側經過的進攻方會被標記，雙方不能隔鏡射擊。內側幹員可在自身視線內花 1 行動遠距打開：玻璃與氣瓶掉落，只留下窗框，雙方可看穿、射擊。原牆遭破壞時黑鏡一併消失。',2],
+ mira:['〔佈防／行動〕黑鏡：安裝於軟牆或加固牆，選擇紅色氣瓶朝向，不改變牆體強度。黑鏡本身不提供視野或自動標記；關閉時只允許內側幹員依自身方向、視距看向外側，外側看不到內側，雙方不能隔鏡射擊。內側視線內花 1 行動可遠距打開，之後雙向可看穿、射擊；原牆破壞時一併消失。',2],
  lesion:['〔佈防／行動〕蠱毒地雷：佈防時放在室內，對戰中丟在 3 格內。進攻方看不到，踩到被標記並受 1 傷。',3],
  ela:['〔佈防／行動〕Grzmot 地雷：佈防時放在室內，對戰中丟在 3 格內，可裝在地上或牆上。進攻方走到地雷或旁邊一格就被震暈。',3],
  vigil:['〔被動〕ERC-7：永遠不會被標記（無人機、Lion 都抓不到）；射擊他的人少擲一顆骰。',0],
@@ -10703,7 +10706,7 @@ function wallSolid(x,y){const cx=Math.floor(x),cy=Math.floor(y),c=cell(cx,cy);if
 function visRays(u){const R=VR(u),f=u.fd||[0,1],a0=Math.atan2(f[1],f[0]),n=150,o=[u.x+.5,u.y+.5],pts=[],hit=[];if(smokeAt(u.x,u.y))return {o,pts:Array.from({length:n+1},()=>o.slice()),hit:Array(n+1).fill(false),R};
   for(let i=0;i<=n;i++){const fh=u.fh||60,a=a0+(-fh+2*fh*i/n)*Math.PI/180,dx=Math.cos(a),dy=Math.sin(a);let t=0,px=o[0]+dx*R,py=o[1]+dy*R,h=false;
     while(t<R){t+=.03;const x=o[0]+dx*t,y=o[1]+dy*t,cx=Math.floor(x),cy=Math.floor(y);if(!inB(cx,cy)){px=x;py=y;break;}
-      if(cx===u.x&&cy===u.y)continue;if(wallSolid(x,y)){px=x;py=y;h=true;break;}if(smokeAt(cx,cy)){px=x;py=y;break;}}
+      if(cx===u.x&&cy===u.y)continue;if(wallSolid(x,y)&&!mirSightPass(cx,cy,u.x,u.y)){px=x;py=y;h=true;break;}if(smokeAt(cx,cy)){px=x;py=y;break;}}
     pts.push([px,py]);hit.push(h);}
   return {o,pts,hit,R};}
 // the stretch of wall the selected operator's sight lands on glows: a soft vertical ribbon along the hit points
@@ -12038,7 +12041,7 @@ function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="
 const NEWS=[{d: "2026-11-07", v: "v229–v235", i: ["移動紀錄：「✕陣亡」只標在幹員倒下的那一筆，並寫出死因（例如被誰射擊、闊刀地雷）；陣亡幹員的資訊卡改顯示「已陣亡」，不再顯示行動點與移動 5", "人質局：人質被帶走後，防守方電腦會全力追擊：衝向帶著人質的進攻方、搶到射擊位置，或先堵在他撤離的路線上", "電腦版射擊特寫：右上角被攻擊者的角色圖移到右側面板左邊，不再壓在面板上", "輪到自己的階段時，鏡頭會自動轉到一名還能行動的幹員（優先離已知敵人最近的），斜角、周圍大約 6 格都看得到", "射擊特寫修正：隔牆射擊時被打穿的牆也會變半透明，看得到牆後的目標；擋在中間的盾牌、道具也會淡出；看不到的敵人在特寫時會照樣畫出來；開槍者在特寫結束後馬上出現"]},{d: "2026-11-06", v: "v196–v211", i: ["移除幹員 Flores 與 Thunderbird：選角、電腦對手、圖鑑與技能表都不再出現，「使用所有幹員」成就的數量跟著減少", "訓練選單每次打開都會回到最外層的三大類，不再停在上次看的子頁", "新手教學修正：手機上要點的格子不會再跑到畫面外或被右邊的動作按鈕蓋住，鏡頭會自動把它移進畫面", "4v4 合作選角改版：左邊是兩人的隊伍、中間選幹員和裝備、右邊是地圖平面圖和幹員資訊；手機版改成直排", "4v4 合作每人各帶 2 個裝備，對戰時只有自己的幹員能用自己帶的", "4v4 合作改成各自部署：隊長先放自己的 2 名，再換隊員放；防守方選角時就看得到炸彈點，進攻方顯示「目標未知」", "破牆、手榴彈爆炸時不再卡一下：爆炸的閃光不再讓整張地圖重新編譯材質，破牆後重建地圖也快很多（手機、電腦都有感）", "線上對戰改成兩台裝置直接連線（WebRTC），不再繞國外伺服器，動作幾乎即時同步；打不通的網路會自動退回原本的方式", "合作模式修正：隊友還開著舊版網頁時不會再卡在「開始中」（會提醒對方重新整理）；也不會讀到上一場留下來的對戰", "線上對戰同步更快：每次傳的資料縮小到原本的幾十分之一，也不用先讀再寫", "線上對戰的計時改成兩邊共用同一個時間：切到別的頁面或 App 時間照走，對方不會卡住；對手超過時間又沒有回應，8 秒後自動跳過他的階段", "培養幹員頁下方的能力條、可用點數和按鈕變扁，上面的幹員和能力雷達圖有更多空間", "培養幹員頁在手機上不再擠成一團：名字、擊殺／存活和能力雷達圖會依螢幕高度自動縮放，不再互相重疊", "拿掉防守方的誘餌標記和「移動誘餌」按鈕","每個 Google 帳號都是各自獨立的遊戲帳號：換另一個 Google 帳號登入會是全新的進度，不會再沿用上一個帳號的聲望、幹員和成就", "登出 Google 後，這台裝置會回到全新的訪客", "大廳右上的好友按鈕改成「申請好友」和「好友名單」兩頁，成就移回 🏆 按鈕；輸入好友代碼改成送出申請，對方在「申請好友」按同意後才會成為好友，等待同意的申請也列在那裡"]},{d: "2026-11-05", v: "v178–v195", i: ["培養幹員開打後就不能靠退出逃避陣亡：按「離開」或關掉網頁都算陣亡；斷線的話 3 分鐘內回來可以接著打", "新增「撤離」（紫色按鈕）：培養幹員花 1 行動開始撤離，撐過敵方下一個階段就會被光束接走，這場算存活", "組隊：好友頁可以邀請在線的好友加入小隊，大廳右側會出現小隊圖示；組隊後按「對戰電腦」就是 4v4 合作，兩人各控 2 名幹員，順序是隊長 → 電腦 → 隊員 → 電腦", "好友代碼：好友頁顯示自己的 6 碼代碼，輸入對方代碼就能直接加好友；點好友名字可看他最強的培養幹員、擊殺和存活", "看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
 NEWS.unshift({d:'2026-11-08',v:'v237',i:['排行榜新增現役菁英與英勇烈士，前三名展示幹員立繪與所屬玩家，向下捲動最多顯示 50 名，底部固定顯示我的排名。']});
 NEWS[0].v='v237–v238';NEWS[0].i.unshift('部署護盾與 Goyo 護盾可以像窗戶一樣翻越，不能停在盾牌格；Goyo 護盾被破壞才會引燃。');
-NEWS[0].v='v237–v240';NEWS[0].i.unshift('Mira 黑鏡改為附掛窗體：可選內側朝向、保留軟牆／鐵牆材質，內側視線內可遠距開鏡，新增氣閥音效與玻璃、氣瓶掉落動畫。');NEWS[0].i.unshift('掩護只計算射線穿過的格子，鄰格牆壁不再額外減傷；站在掩體上不享有家具掩護。');
+NEWS[0].v='v237–v241';NEWS[0].i.unshift('黑鏡不再提供獨立視野或自動標記；關閉時僅讓內側幹員的自身視線穿往外側，開鏡後才雙向通視。');NEWS[0].i.unshift('Mira 黑鏡改為附掛窗體：可選內側朝向、保留軟牆／鐵牆材質，內側視線內可遠距開鏡，新增氣閥音效與玻璃、氣瓶掉落動畫。');NEWS[0].i.unshift('掩護只計算射線穿過的格子，鄰格牆壁不再額外減傷；站在掩體上不享有家具掩護。');
 const newsKey=()=>NEWS[0].d+'#'+NEWS[0].i.length;
 function newsUnread(){try{return localStorage.getItem('newsSeen')!==newsKey();}catch(e){return false;}}
 function newsBadge(){const n=$('#t-news');if(n)n.classList.toggle('unread',newsUnread());}
