@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mira render test</title>
+<style>body{margin:0;background:#18202a;color:white;font:16px system-ui}nav{position:fixed;top:8px;left:8px;z-index:2}button{padding:10px;margin:3px}canvas{display:block}#state{padding:5px}</style>
+<nav><button id="side">內／外側</button><button id="open">開鏡</button><button id="wall">軟牆／鐵牆</button><div id="state">內側 · 軟牆</div></nav>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script>
+(async()=>{const text=await (await fetch('../index.html')).text();
+const scene=new THREE.Scene(),renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);document.body.appendChild(renderer.domElement);
+const camera=new THREE.PerspectiveCamera(40,innerWidth/innerHeight,.01,30);let inside=true;
+scene.add(new THREE.HemisphereLight(0xffffff,0x37414c,2));const light=new THREE.DirectionalLight(0xffffff,2);light.position.set(2,4,3);scene.add(light);
+const c={t:'soft'},gd={x:0,y:0,type:'mirror',alive:true,mi:[0,1]},G={gadgets:[gd]},cell=()=>c,WALLH={full:1.45},R3={wall:'full',mats:{soft:new THREE.MeshStandardMaterial({color:0x9c9a87}),reinf:new THREE.MeshStandardMaterial({color:0x676e77,metalness:.7,roughness:.5})}};
+const BOX3=new THREE.BoxGeometry(1,1,1),CYL3=new THREE.CylinderGeometry(1,1,1,20),std=(color,opt)=>new THREE.MeshStandardMaterial({color,...opt}),cache={},gm=(key,make)=>cache[key]||(cache[key]=make());
+const addBox=(g,mat,x,y,z,w,h,d)=>{const m=new THREE.Mesh(BOX3,mat);m.position.set(x-.5,y,z-.5);m.scale.set(w,h,d);g.add(m);};
+eval(text.slice(text.indexOf('function mirSize('),text.indexOf('function camRooms('))+';window.miraRender={buildMirror,mirror3D,mirrorDropPose}');
+let group;function draw(){if(group)scene.remove(group);group=new THREE.Group();scene.add(group);miraRender.buildMirror(group,0,0,c,1.45);miraRender.mirror3D(gd,group);camera.position.set(.8,1.6,inside?2.9:-2.9);camera.lookAt(0,.8,0);document.querySelector('#state').textContent=(inside?'內側':'外側')+' · '+(c.t==='soft'?'軟牆':'鐵牆')+(gd.open?' · 已開鏡':'');}
+document.querySelector('#side').onclick=()=>{inside=!inside;draw()};document.querySelector('#open').onclick=()=>{gd.open=!gd.open;gd.openedAt=Date.now();draw()};document.querySelector('#wall').onclick=()=>{c.t=c.t==='soft'?'reinf':'soft';draw()};draw();
+function tick(){requestAnimationFrame(tick);group.traverse(o=>miraRender.mirrorDropPose(o));renderer.render(scene,camera)}tick();
+})();
+</script>

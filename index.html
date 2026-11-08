@@ -6394,14 +6394,14 @@ function lineCells(x0,y0,x1,y1){const dx=x1-x0,dy=y1-y0,n=Math.ceil(Math.max(Mat
 function segCells(x0,y0,x1,y1){const o=[],dx=x1-x0,dy=y1-y0,nx=Math.abs(dx),ny=Math.abs(dy),sx=Math.sign(dx),sy=Math.sign(dy);let x=x0,y=y0,ix=0,iy=0;
   while(ix<nx||iy<ny){const d=(1+2*ix)*ny-(1+2*iy)*nx;if(d===0){o.push({c:[x+sx,y],c2:[x,y+sy]});x+=sx;y+=sy;ix++;iy++;}else if(d<0){x+=sx;ix++;}else{y+=sy;iy++;}
     if(!(x===x1&&y===y1))o.push({c:[x,y]});}return o;}
-const hardC=([x,y])=>{const c=cell(x,y);return !!c&&(c.t==='hard'||c.t==='reinf')&&!c.mOpen;};
+const hardC=([x,y])=>{const c=cell(x,y);return !!c&&(c.t==='hard'||c.t==='reinf'||c.mirror)&&!c.mOpen;};
 function smokeBlocks(x0,y0,x1,y1){return smokeAt(x0,y0)||smokeAt(x1,y1)||lineCells(x0,y0,x1,y1).some(([x,y])=>smokeAt(x,y));}
 function los(x0,y0,x1,y1,located,noOps,ignoreSmoke=false){
   if(!ignoreSmoke&&smokeBlocks(x0,y0,x1,y1))return false;
   if(located)for(const s of segCells(x0,y0,x1,y1))if(s.c2?hardC(s.c)&&hardC(s.c2):hardC(s.c))return false;
   for(const [x,y] of lineCells(x0,y0,x1,y1)){const c=cell(x,y);
-    if(located){if((c.t==='hard'||c.t==='reinf')&&!(c&&c.mOpen))return false;if(!noOps&&G.units.some(u=>u.alive&&u.x===x&&u.y===y&&!u.hidden))return false;continue;}
-    if((blocks(c)&&!(c&&(c.mOpen||(c.t==='soft'&&c.hole)))))return false;
+    if(located){if((c.t==='hard'||c.t==='reinf'||c.mirror)&&!c.mOpen)return false;if(!noOps&&G.units.some(u=>u.alive&&u.x===x&&u.y===y&&!u.hidden))return false;continue;}
+    if((blocks(c)&&!(c&&(c.mOpen||(c.t==='soft'&&c.hole&&!c.mirror)))))return false;
     if(!noOps&&G.units.some(u=>u.alive&&u.x===x&&u.y===y&&!u.hidden))return false;}
   return true;
 }
@@ -6411,7 +6411,7 @@ function shDef(x,y){let b=null,bd=1e9;for(const z of G.map.spawns||[])for(const 
 const shFaces=(g,sh)=>{const D=g.dir||(g.dir=shDef(g.x,g.y));return (sh.x-g.x)*D[0]+(sh.y-g.y)*D[1]>0;};
 // Cover requires an actual crossed cell, excluding endpoints and corner-only touches.
 function protection(sh,t){let n=PROF[t.op]&&PROF[t.op].shield?2:0,ob=0,sd=0;const L=segCells(sh.x,sh.y,t.x,t.y).filter(s=>!s.c2).map(s=>s.c),tc=cell(t.x,t.y),standing=!!(tc&&tc.obst&&tc.stand);
-  for(const [x,y] of L){const c=cell(x,y);if(c.shotOut)continue;if(c.t==='soft'&&c.hole){n+=1;continue;}if(c.t==='bar'&&c.kind==='window'&&!c.breach){n+=1;continue;}if(winOpen(c)){n+=1;continue;}/* v145: a window gives 1 */if(c.breach||c.t==='soft'||c.t==='bar'){n+=2;continue;}
+  for(const [x,y] of L){const c=cell(x,y);if(c.shotOut||c.mOpen)continue;if(c.t==='soft'&&c.hole){n+=1;continue;}if(c.t==='bar'&&c.kind==='window'&&!c.breach){n+=1;continue;}if(winOpen(c)){n+=1;continue;}/* v145: a window gives 1 */if(c.breach||c.t==='soft'||c.t==='bar'){n+=2;continue;}
     const g=shieldAt(x,y);if(g&&cheb(x,y,t.x,t.y)<=1){if(!sd&&shFaces(g,sh)){sd=1;n+=2;}continue;}
     if(c.obst&&!standing&&!ob&&cheb(x,y,t.x,t.y)<=1){ob=1;n++;}}
   if(t.op==='montagne'&&t.rnd===G.round)n=Math.max(n,4);return n;}
@@ -6586,6 +6586,7 @@ const SFX=(()=>{
   function tone(t,dur,f,f2,vol,type){const o=ac.createOscillator();o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);
     const g=ac.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(fxBus);o.start(t);o.stop(t+dur+.05);}
   const S={
+    mirror(){if(!ok())return;const t=ac.currentTime;noise(t,.2,3500,.7,.25,'highpass',1600);noise(t+.16,.28,5500,.5,.4,'highpass',1800);for(let i=0;i<5;i++)tone(t+.17+i*.025,.12,2400+i*731,900+i*310,.07,'triangle');},
     shot(n){if(!ok())return;const t=ac.currentTime;for(let i=0;i<(n||3);i++){const k=t+i*.085;noise(k,.16,1800,.7,.9);noise(k,.07,5000,.5,.5,'highpass');tone(k,.18,140,45,.9);}},
     hit(){if(!ok())return;const t=ac.currentTime+.05;tone(t,.22,220,60,.7,'triangle');noise(t,.18,900,1.2,.8);tone(t+.02,.12,1400,700,.15,'square');},
     miss(){if(!ok())return;const t=ac.currentTime+.04;noise(t,.35,5200,6,.5,'bandpass',1400);tone(t+.08,.25,2600,1900,.06,'sine');},
@@ -6922,23 +6923,36 @@ const mirSide=(g,x,y)=>(x-g.x)*g.mi[0]+(y-g.y)*g.mi[1];
 function mirSees(u){return u.side==='A'&&u.x>=0&&G.gadgets.some(g=>g.alive&&g.type==='mirror'&&g.mi&&mirSide(g,u.x,u.y)<0&&cheb(g.x,g.y,u.x,u.y)<=10&&los(g.x,g.y,u.x,u.y));}
 // wall-mounted bulletproof cameras look out from their wall: a 180° half-plane, by line of sight
 function bpSees(u){return u.side==='A'&&u.x>=0&&G.gadgets.some(g=>g.alive&&g.type==='cam'&&g.wall&&!jammed(g.x,g.y)&&((u.x-g.x)*g.wall[0]+(u.y-g.y)*g.wall[1])<=0&&cheb(g.x,g.y,u.x,u.y)<=10&&los(g.x,g.y,u.x,u.y));}
-const mirOpenable=u=>u&&u.side==='D'&&u.x>=0?G.gadgets.filter(g=>g.alive&&g.type==='mirror'&&!g.open&&g.mi&&cheb(u.x,u.y,g.x,g.y)<=1&&mirSide(g,u.x,u.y)>0):[];
-async function mirOpen(u,g){useAct(u,'mirror');g.open=true;const c=cell(g.x,g.y);c.mOpen=true;G._wv=(G._wv||0)+1;if(R3)R3.sig='';try{SFX.boom();}catch(e){}
-  log(`${nm(u)} 打開黑鏡，洞口兩邊都看得到、打得到了`,'kd');render();await afterAct(u);}
-function buildMirror(g,x,y,c,WH){const m=G.gadgets.find(q=>q.type==='mirror'&&q.x===x&&q.y===y);const hz=m&&m.mi?m.mi[1]!==0:(isWallC(cell(x-1,y))||isWallC(cell(x+1,y)));
-  const M3=R3.mats,mats=M3.reinf,cc=[x,y],th=.42,cx=x+.5,cz=y+.5,y0=WH*.31,y1=WH*.79,hw=.3;
-  const eA=wj(cell(hz?x-1:x,hz?y:y-1))?.5:th/2,eB=wj(cell(hz?x+1:x,hz?y:y+1))?.5:th/2;
-  const seg=(a,b,yy,h)=>{const L=b-a,o=(a+b)/2;hz?addBox(g,mats,cx+o,yy,cz,L+.002,h,th,cc):addBox(g,mats,cx,yy,cz+o,th,h,L+.002,cc);};
-  seg(-eA,eB,y0/2,y0);seg(-eA,eB,(y1+WH)/2,WH-y1);seg(-eA,-hw,(y0+y1)/2,y1-y0);seg(hw,eB,(y0+y1)/2,y1-y0);return true;}
-function mirror3D(gd,grp){const WH=WALLH[R3.wall]||1.45,y0=WH*.31,y1=WH*.79,h=y1-y0,mi=gd.mi||[0,1];
+const mirCanOpen=(u,g)=>!!(u&&u.alive&&u.x>=0&&g&&g.alive&&g.type==='mirror'&&!g.open&&g.mi&&cell(g.x,g.y).mirror&&mirSide(g,u.x,u.y)>0&&Math.hypot(u.x-g.x,u.y-g.y)<=VR(u)&&inFan(u,g.x,g.y)&&los(u.x,u.y,g.x,g.y,false,true));
+const mirOpenable=u=>G.gadgets.filter(g=>mirCanOpen(u,g));
+function mirDirs(u,x,y){const h=[[-1,0],[1,0]].filter(([a,b])=>isWallC(cell(x+a,y+b))).length,v=[[0,-1],[0,1]].filter(([a,b])=>isWallC(cell(x+a,y+b))).length;const d=h===v?mirIn(u,x,y):h>v?[0,1]:[1,0];return [d,[-d[0],-d[1]]];}
+function mirAsk(u,x,y){return new Promise(resolve=>{const game=G,dirs=mirDirs(u,x,y),el=document.createElement('div');el.className='rerollAsk wallAsk';el.id='mirAsk';let done=false;
+  const finish=d=>{if(done)return;done=true;el.remove();game.mirPend=null;game._mirPick=null;render();resolve(d);};
+  game.mirPend={x,y,dirs};game._mirPick=(a,b)=>{const d=dirs.find(([dx,dy])=>a===x+dx&&b===y+dy);if(d)finish(d);};
+  el.innerHTML=`<b>黑鏡內側朝哪一邊？</b><span>箭頭側是紅色氣瓶與操作面</span><div>${dirs.map((d,i)=>`<button data-mi="${i}">${dirName(d)}</button>`).join('')}<button data-cancel>取消</button></div>`;
+  el.querySelectorAll('[data-mi]').forEach(b=>b.onclick=()=>finish(dirs[+b.dataset.mi]));el.querySelector('[data-cancel]').onclick=()=>finish(null);document.body.appendChild(el);render();});}
+async function mirOpen(u,g,action='mirror'){if(!mirCanOpen(u,g)||!canDo(u,action))return false;useAct(u,action);u.fd=[g.x-u.x,g.y-u.y];g.open=true;g.openedAt=Date.now();const c=cell(g.x,g.y);c.mOpen=true;G._wv=(G._wv||0)+1;if(R3)R3.sig='';
+  fxEv({k:'mirror',x:g.x,y:g.y,side:u.side});note(u,'打開黑鏡');log(`${nm(u)} 打開黑鏡，洞口兩邊都看得到、打得到了`,u.side==='A'?'ka':'kd');render();await sleep(760);await afterAct(u);return true;}
+function mirSize(WH){const cy=WH*.78,h=Math.min(.36,WH*.3);return {cy,h,y0:cy-h/2,y1:cy+h/2,hw:.42};}
+function buildMirror(g,x,y,c,WH){const m=G.gadgets.find(q=>q.alive&&q.type==='mirror'&&q.x===x&&q.y===y);if(!m)return false;const hz=m.mi[1]!==0;
+  const mats=R3.mats[c.t],cc=[x,y],th=c.t==='soft'?.18:.42,cx=x+.5,cz=y+.5,{y0,y1,hw}=mirSize(WH);
+  const seg=(a,b,yy,h)=>{const L=b-a,o=(a+b)/2;if(L<=0||h<=0)return;hz?addBox(g,mats,cx+o,yy,cz,L+.002,h,th,cc):addBox(g,mats,cx,yy,cz+o,th,h,L+.002,cc);};
+  seg(-.5,.5,y0/2,y0);seg(-.5,.5,(y1+WH)/2,WH-y1);seg(-.5,-hw,(y0+y1)/2,y1-y0);seg(hw,.5,(y0+y1)/2,y1-y0);return true;}
+function mirrorDropPose(o,now=Date.now()){const d=o.userData.mirDrop;if(!d)return;const p=Math.max(0,Math.min(1,(now-d.at-140)/600)),f=1-(1-p)*(1-p);o.position.y=d.y+(d.endY-d.y)*p*p;o.position.z=d.z+(d.endZ-d.z)*f;o.rotation.x=d.rx*f;o.rotation.z=d.rz*f;}
+function mirror3D(gd,grp){const WH=WALLH[R3.wall]||1.45,{cy,h,y0,y1,hw}=mirSize(WH),th=cell(gd.x,gd.y).t==='soft'?.18:.42,mi=gd.mi||[0,1];
   const sg=new THREE.Group();sg.rotation.y=Math.atan2(mi[0],mi[1]);grp.add(sg);
-  const mk=(geo,mat,s,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.scale.set(...s);m.position.set(x,y,z);m.castShadow=true;sg.add(m);return m;};
-  const fr=gm('mirfr',()=>std(0x4a5056,{metalness:.8,roughness:.3}));
-  for(const z of [.225,-.225]){mk(BOX3,fr,[.68,.05,.04],0,y1+.02,z);mk(BOX3,fr,[.68,.05,.04],0,y0-.02,z);mk(BOX3,fr,[.05,h+.08,.04],.32,(y0+y1)/2,z);mk(BOX3,fr,[.05,h+.08,.04],-.32,(y0+y1)/2,z);}
-  const can=mk(CYL3,gm(gd.open?'mircan0':'mircan',()=>std(gd.open?0x5a2420:0xc8322a,{metalness:.4,roughness:.4})),[.06,.26,.06],0,y0-.09,.29);can.rotation.z=Math.PI/2;
-  mk(BOX3,fr,[.3,.03,.08],0,y0-.04,.27);
-  if(!gd.open)mk(BOX3,gm('mirgl',()=>new THREE.MeshStandardMaterial({color:0x07090c,metalness:.95,roughness:.06,emissive:0x05080c})),[.6,h,.05],0,(y0+y1)/2,0);
-  else{const p=mk(BOX3,gm('mirgl',()=>new THREE.MeshStandardMaterial({color:0x07090c,metalness:.95,roughness:.06,emissive:0x05080c})),[.6,.03,h],.05,.02,.72);p.rotation.y=.18;}}
+  const mk=(geo,mat,s,x,y,z,parent=sg)=>{const m=new THREE.Mesh(geo,mat);m.scale.set(...s);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;};
+  const fr=gm('mir240frame',()=>std(0x303338,{metalness:.8,roughness:.42})),edge=gm('mir240edge',()=>std(0x62676c,{metalness:.8,roughness:.3})),glass=gm('mir240glass',()=>std(0x060a0f,{metalness:.7,roughness:.16})),inside=th/2+.052;
+  // Exterior trim is flush; only the room-side frame protrudes.
+  for(const [z,depth,w] of [[inside,.105,.055],[-th/2-.004,.008,.025]]){mk(BOX3,fr,[.94,w,depth],0,y1+w/2,z);mk(BOX3,fr,[.94,w,depth],0,y0-w/2,z);mk(BOX3,fr,[w,h+.1,depth],-hw-w/2,cy,z);mk(BOX3,fr,[w,h+.1,depth],hw+w/2,cy,z);}
+  for(const x of [-.31,.31]){mk(BOX3,edge,[.07,.045,.13],x,y1+.055,inside);mk(BOX3,edge,[.07,.045,.13],x,y0-.055,inside);}
+  const pane=new THREE.Group();pane.position.set(0,cy,0);sg.add(pane);mk(BOX3,glass,[.84,h,.025],0,0,0,pane);
+  // Muted diagonal highlights are only on the inside glass surface.
+  for(const x of [-.26,-.08,.1,.28]){const glint=mk(BOX3,gm('mir240glint',()=>std(0x697078,{metalness:.6,roughness:.2})),[.018,h*.48,.002],x,0,.014,pane);glint.rotation.z=-.65;}
+  const valve=new THREE.Group();valve.position.set(0,y0-.1,inside+.075);sg.add(valve);
+  mk(CYL3,gm('mir240red',()=>std(0xbd2119,{metalness:.45,roughness:.35})),[.055,.19,.055],0,0,0,valve).rotation.z=Math.PI/2;
+  mk(BOX3,gm('mir240yellow',()=>std(0xe6b925,{metalness:.35,roughness:.4})),[.045,.065,.025],0,.006,.056,valve);
+  if(gd.open){pane.userData.mirDrop={at:gd.openedAt||0,y:cy,z:0,endY:.045,endZ:th/2+.42,rx:-Math.PI/2,rz:.12};valve.userData.mirDrop={at:gd.openedAt||0,y:y0-.1,z:inside+.075,endY:.065,endZ:th/2+.7,rx:1.1,rz:.8};mirrorDropPose(pane);mirrorDropPose(valve);}}
 
 function camRooms(){const o=[];for(const g of G.gadgets)if(g.alive&&g.type==='cam'&&!g.wall&&!jammed(g.x,g.y)&&cell(g.x,g.y).indoor){const r=new Set(roomOf(g.x,g.y).filter(([x,y])=>los(g.x,g.y,x,y,false,true)).map(([x,y])=>y*G.W+x));o.push(r);}return o;}
 const outCam=g=>g.alive&&g.type==='cam'&&g.fixed&&cell(g.x,g.y)&&cell(g.x,g.y).t==='out'&&(G.map.spawns||[]).some(z=>z.cells.some(([a,b])=>cheb(a,b,g.x,g.y)<=2));
@@ -6983,7 +6997,7 @@ function chargePlant3D(u,x,y,ms){return new Promise(res=>{if(!R3||!R3.fxG||docum
   const t0=performance.now(),fin=()=>{if(done)return;done=true;R3.fxG.remove(g);pl.geometry.dispose();pl.material.dispose();tex.dispose();res();};setTimeout(fin,ms+120);
   R3.fx2.push(()=>{age=(performance.now()-t0)/1000;pl.scale.setScalar(Math.min(1,.2+age*5));led.visible=Math.sin(age*(10+age*30))>0;if(age*1000>=ms)fin();return !done;});
   try{SFX.tick();setTimeout(()=>SFX.tick(),ms*.45);setTimeout(()=>SFX.alert(),ms*.8);}catch(e){}});}
-function destroyCell(x,y){try{const t0=cell(x,y).t;if(['soft','reinf','bar','hard'].includes(t0)){wallBlast3D(x,y,t0);if(G&&!G.over&&G.phase==='play')setTimeout(()=>{try{fxEv({k:'wall',x,y,side:curSide()});}catch(e){}},0);if(G&&!G.over&&curSide()===G.player)G._wb=(G._wb||0)+1;}}catch(e){}G._wv=(G._wv||0)+1;G.gadgets.forEach(g=>{if(g.type==='mirror'&&g.x===x&&g.y===y)g.alive=false;if(g.type==='cam'&&g.wall&&g.x+g.wall[0]===x&&g.y+g.wall[1]===y)g.alive=false;});{const t1=cell(x,y).t;if(!(t1==='bar'&&SFX.fx('barricade'))&&!(t1==='soft'&&SFX.fx('wall')))SFX.boom();}const c=cell(x,y);if(c.t!=='bar')c.breach=true;if(c.t==='bar')c.wasBar=true;c.t='floor';c.rubble=c.breach;c.opened=true;c.elec=false;c.indoor=true;if(c.pair&&!c.breach){const q=cell(c.pair[0],c.pair[1]);if(q&&q.t==='bar')destroyCell(c.pair[0],c.pair[1]);}
+function destroyCell(x,y){try{const t0=cell(x,y).t;if(['soft','reinf','bar','hard'].includes(t0)){wallBlast3D(x,y,t0);if(G&&!G.over&&G.phase==='play')setTimeout(()=>{try{fxEv({k:'wall',x,y,side:curSide()});}catch(e){}},0);if(G&&!G.over&&curSide()===G.player)G._wb=(G._wb||0)+1;}}catch(e){}G._wv=(G._wv||0)+1;G.gadgets.forEach(g=>{if(g.type==='mirror'&&g.x===x&&g.y===y)g.alive=false;if(g.type==='cam'&&g.wall&&g.x+g.wall[0]===x&&g.y+g.wall[1]===y)g.alive=false;});{const t1=cell(x,y).t;if(!(t1==='bar'&&SFX.fx('barricade'))&&!(t1==='soft'&&SFX.fx('wall')))SFX.boom();}const c=cell(x,y);if(c.t!=='bar')c.breach=true;if(c.t==='bar')c.wasBar=true;c.t='floor';c.mirror=false;c.mOpen=false;if(R3)R3.sig='';c.rubble=c.breach;c.opened=true;c.elec=false;c.indoor=true;if(c.pair&&!c.breach){const q=cell(c.pair[0],c.pair[1]);if(q&&q.t==='bar')destroyCell(c.pair[0],c.pair[1]);}
   const tr=gadgetAt(x,y,'trap'); /* trap stays in doorway */ void tr;}
 
 function shootables(u){
@@ -7035,7 +7049,7 @@ async function clayCheck(u){if(!u||!u.alive||u.x<0||u.side!=='D'||G.over)return 
 function destroyTargets(u){const o=within(u.x,u.y,14).filter(([x,y])=>{const c=cell(x,y);if(c.t!=='bar')return false;return cheb(u.x,u.y,x,y)<=1||los(u.x,u.y,x,y,false,true);});
   for(const g of G.gadgets)if(canHitG(u,g))o.push([g.x,g.y]);
   return o;}
-function canHitG(u,g){return g.alive&&g.side!==u.side&&GNAME[g.type]&&g.type!=='trap'&&gadgetVisibleTo(g,u.side)&&(g.volcan?1:(GSTR[g.type]||1))<=(PROF[u.op].dz||1)&&(!g.volcan||volcSide(u,g))&&(cheb(u.x,u.y,g.x,g.y)<=1||(!isBP(g)&&cheb(u.x,u.y,g.x,g.y)<=14&&los(u.x,u.y,g.x,g.y,false,true)));}
+function canHitG(u,g){if(g.type==='mirror')return mirCanOpen(u,g);return g.alive&&g.side!==u.side&&GNAME[g.type]&&g.type!=='trap'&&gadgetVisibleTo(g,u.side)&&(g.volcan?1:(GSTR[g.type]||1))<=(PROF[u.op].dz||1)&&(!g.volcan||volcSide(u,g))&&(cheb(u.x,u.y,g.x,g.y)<=1||(!isBP(g)&&cheb(u.x,u.y,g.x,g.y)<=14&&los(u.x,u.y,g.x,g.y,false,true)));}
 // v131: barbed wire can sit on top of Frost's Welcome Mat (and a mat under wire); stepping in still springs the mat
 const groundG=g=>g.alive&&!g.wall&&g.type!=='mirror'&&g.type!=='trap';
 const groundAt=(x,y)=>G.gadgets.filter(g=>groundG(g)&&g.x===x&&g.y===y);
@@ -7044,7 +7058,7 @@ const gadgetOffset=g=>{if(!G||!groundG(g))return 0;const a=groundAt(g.x,g.y);ret
 const CAMT=['cam','argus','eye'];
 function camClicks(u){if(!u||u.side!==G.player||!canAct(u)||(G.active===u&&!canDo(u,'destroy')))return [];const dt=destroyTargets(u);
   return G.gadgets.filter(g=>canHitG(u,g)&&dt.some(([a,b])=>a===g.x&&b===g.y)).map(g=>[g.x,g.y]);}
-async function doDestroy(u,x,y){useAct(u,'destroy');const hs=G.gadgets.filter(g=>g.x===x&&g.y===y&&canHitG(u,g));const g=hs.find(g=>g.type==='mat')||hs[0];
+async function doDestroy(u,x,y){const mirror=G.gadgets.find(g=>g.x===x&&g.y===y&&mirCanOpen(u,g));if(mirror)return mirOpen(u,mirror,'destroy');useAct(u,'destroy');const hs=G.gadgets.filter(g=>g.x===x&&g.y===y&&canHitG(u,g));const g=hs.find(g=>g.type==='mat')||hs[0];
   if(g){g.alive=false;if(g.type!=='clay'&&!g.volcan)SFX.fx('camera');if(g.type==='clay')await clayBoom(g);if(g.volcan)await goyoBurn(g);note(u,'摧毀'+GNAME[g.type]);G.fx={x0:u.x,y0:u.y,x1:x,y1:y,until:performance.now()+400,c:u.side==='A'?COL.atk:COL.def};log(`${nm(u)} 摧毀了${GNAME[g.type]}`,u.side==='A'?'ka':'kd');}
   else{const c=cell(x,y),wall=c.t==='soft';note(u,wall?'打穿軟牆':'破壞路障');destroyCell(x,y);log(wall?`${nm(u)} 打穿了一面軟牆`:`${nm(u)} 破壞了${c.kind==='window'?'窗戶':'門'}路障`,u.side==='A'?'ka':'kd');}
   render();await sleep(G.ai?150:60);await afterAct(u);}
@@ -7090,7 +7104,7 @@ function gTargets(u){if(GT[u.op])return GT[u.op](u,G.phase==='setup');
   return [];
 }
 const setupGadget=op=>['mute','bandit','kapkan','valkyrie',...SETUPOPS].includes(op);
-async function useGadget(u,x,y){ST(u).gad++;if(u.side===G.player)(G._gt=G._gt||new Set()).add('op:'+u.op);DMGBY=u;if(x!=null)aimCam(u,[[x,y]]);
+async function useGadget(u,x,y){if(u.op==='mira'){const c=cell(x,y);if(!c||!['soft','reinf'].includes(c.t)||c.mirror)return;if(u.side===G.player&&!G.ai){const d=await mirAsk(u,x,y);if(!d)return;u._mirDir=d;}}ST(u).gad++;if(u.side===G.player)(G._gt=G._gt||new Set()).add('op:'+u.op);DMGBY=u;if(x!=null)aimCam(u,[[x,y]]);
   if(u.op!=='sledge'){u.ch--; if(G.phase!=='setup')useAct(u,'special');}
   const o=OPS[u.op],side=u.side==='A'?'ka':'kd';note(u,o.g);
   if(UG[u.op])await UG[u.op](u,x,y,side);else switch(u.op){
@@ -7808,7 +7822,7 @@ function startPlay(){if(G&&G.coop&&coopRole()!=='h')return;if(G&&G.net&&!G.coop&
 }
 
 // ---------- player input ----------
-function curTargets(){if(G&&G.wfPend)return G.wfPend;if(G&&G.mode==='cdir'&&cdirG()){const g=cdirG();return adj4(g.x,g.y);}
+function curTargets(){if(G&&G.mirPend)return G.mirPend.dirs.map(([dx,dy])=>[G.mirPend.x+dx,G.mirPend.y+dy]);if(G&&G.wfPend)return G.wfPend;if(G&&G.mode==='cdir'&&cdirG()){const g=cdirG();return adj4(g.x,g.y);}
   if(G&&G.mode==='bpface'&&G.bpPend)return G.bpPend.map(p=>p.w);
   if(G.mode==='pdir'){const g=pdirG();return g?adj8all(g.x,g.y):[];}
   if(G.mode==='shdir'&&G.shdir)return adj4(G.shdir.x,G.shdir.y);
@@ -7825,6 +7839,7 @@ function curTargets(){if(G&&G.wfPend)return G.wfPend;if(G&&G.mode==='cdir'&&cdir
   }
   switch(G.mode){
     case 'shoot':return shootables(u).map(t=>[t.x,t.y]);
+    case 'miropen':return mirOpenable(u).map(g=>[g.x,g.y]);
     case 'destroy':return destroyTargets(u);
     case 'decoy':return [...decoyReach(u).keys()].map(i=>[i%G.W,(i/G.W)|0]);
     case 'drone':return droneTargets(u);
@@ -7878,6 +7893,7 @@ async function act(fn){G.busy=true;render();try{await fn();}finally{G.busy=false
   revealCheck();
 }
 async function onCell(x,y){
+  if(G&&G.mirPend){if(G._mirPick)G._mirPick(x,y);return;}
   if(G&&G.wfPend){const w=G.wfPend.find(([a,b])=>a===x&&b===y);if(w&&G._wfRes)G._wfRes(w);return;}
   if(G&&G.mode==='cdir'){const g=cdirG();if(!g){G.cdir=null;G.mode='move';return render();}
     if(adj4(g.x,g.y).some(([a,b])=>a===x&&b===y)){g.dx=x-g.x;g.dy=y-g.y;G.cdir=null;G.mode='move';log(`闊劍地雷朝${dirName([g.dx,g.dy])}，紅線照出前方三格`,'ka');
@@ -7923,6 +7939,7 @@ async function onCell(x,y){
     return act(async()=>{
       if(mode==='shoot')await doShoot(u,shootables(u).find(t=>t.x===x&&t.y===y));
       else if(mode==='destroy')await doDestroy(u,x,y);
+      else if(mode==='miropen')await mirOpen(u,G.gadgets.find(g=>g.x===x&&g.y===y&&mirCanOpen(u,g)));
       else if(mode==='decoy'){await moveDecoy(u,x,y);G.mode=decoyReach(u).size?'decoy':'move';}
       else if(mode==='charge')await giBorrow(u,mode,()=>doCharge(u,x,y));
       else if(mode==='clay')await giBorrow(u,mode,()=>deployClay(u,x,y));
@@ -8857,7 +8874,7 @@ var GDX={
  ying:['〔行動〕坎德拉：丟到 6 格內（可越過一面輕牆），該房間內除了 Ying 以外的所有幹員都被震暈。',2],
  zofia:['〔行動〕KS79 震盪彈：看得到的一名敵人被震暈，並固定受到 2 點傷害。',2],
  dokkaebi:['〔行動〕邏輯炸彈：讓最近一名還沒被標記的防守方手機響起，他被標記並現身。',2],
- mira:['〔佈防／行動〕黑鏡：把相鄰的一面軟牆或加固牆變成黑鏡（加固牆）。關著時，外面經過的進攻方會被標記位置，外面看不進來，雙方都不能隔著它射擊；站在裡側旁邊的防守方花 1 行動可以打開，打開後洞口透明，雙方依視線互相看見、射擊。',2],
+ mira:['〔佈防／行動〕黑鏡：安裝於軟牆或加固牆，選擇紅色氣瓶朝向；不改變牆體強度。關閉時外側經過的進攻方會被標記，雙方不能隔鏡射擊。內側幹員可在自身視線內花 1 行動遠距打開：玻璃與氣瓶掉落，只留下窗框，雙方可看穿、射擊。原牆遭破壞時黑鏡一併消失。',2],
  lesion:['〔佈防／行動〕蠱毒地雷：佈防時放在室內，對戰中丟在 3 格內。進攻方看不到，踩到被標記並受 1 傷。',3],
  ela:['〔佈防／行動〕Grzmot 地雷：佈防時放在室內，對戰中丟在 3 格內，可裝在地上或牆上。進攻方走到地雷或旁邊一格就被震暈。',3],
  vigil:['〔被動〕ERC-7：永遠不會被標記（無人機、Lion 都抓不到）；射擊他的人少擲一顆骰。',0],
@@ -9008,7 +9025,7 @@ var PLACE={
  frost:(u,x,y)=>G.gadgets.push({type:'mat',x,y,side:'D',alive:true}),
  lesion:(u,x,y)=>G.gadgets.push({type:'gu',x,y,side:'D',alive:true}),
  ela:(u,x,y)=>{const ws=adj4(x,y).filter(w=>bpWall(...w)),w=ws.length&&Math.random()<.5?ws[0]:null;G.gadgets.push({type:'grz',x,y,side:'D',alive:true,wall:w?[w[0]-x,w[1]-y]:null});},
- mira:(u,x,y)=>{const c=cell(x,y);c.t='reinf';c.mirror=true;G._wv=(G._wv||0)+1;G.gadgets.push({type:'mirror',x,y,side:'D',alive:true,mi:mirIn(u,x,y)});if(R3)R3.sig='';},
+ mira:(u,x,y)=>{const c=cell(x,y);c.mirror=true;c.mOpen=false;G._wv=(G._wv||0)+1;G.gadgets.push({type:'mirror',x,y,side:u.side,alive:true,mi:u._mirDir||mirIn(u,x,y)});delete u._mirDir;if(R3)R3.sig='';},
  jager:(u,x,y)=>wallGadget(u,x,y,'ads','主動防禦系統',{n:2}),
  maestro:(u,x,y)=>{let w=G._eyeW;if(!w){const cs=bpCands(x,y);w=cs[0];}
    if(w){x=w.x;y=w.y;}G.gadgets.push({type:'eye',x,y,side:'D',alive:true,wall:w?[w.w[0]-x,w.w[1]-y]:null});},
@@ -9332,7 +9349,7 @@ function renderActs(){setTimeout(hudTop,0);GB=null;
       if(G.mission==='hostage'){if(G.tut2)L.push(btn('護送人質',sub('obj','相鄰人質'),false,!can('obj')||!escortOK(u),wrap(()=>escort(u)),'primary'));}
       else L.push(btn('安裝拆彈器',sub('obj','必須站在 A/B 炸彈點'),false,!can('obj')||!plantOK(u),wrap(async()=>{plant(u);await afterAct(u);}),'primary'));
     } else {
-      {const mg=mirOpenable(u);if(mg.length)L.push(btn('打開黑鏡',sub('mirror','1 行動 · 洞口變透明'),false,!can('mirror'),wrap(()=>mirOpen(u,mg[0])),'',`<img class="bic" src="${opIcon('mira')}" alt="">`));}
+      {const mg=mirOpenable(u);if(mg.length)L.push(btn('打開黑鏡',sub('mirror','1 行動 · 洞口變透明'),false,!can('mirror'),()=>setMode('miropen'),'',`<img class="bic" src="${opIcon('mira')}" alt="">`));}
       tac('impact','衝擊手榴彈',gq(u,'impact'),impactTargets(u));tac('nitro','C4 遙控炸藥',gq(u,'nitro'),throwTargets(u));
       if(G.mission!=='hostage'&&G.defuser)L.push(btn('解除拆彈器',sub('obj','站上或相鄰'),false,!can('obj')||!defuseOK(u),wrap(async()=>{defuse(u);await afterAct(u);}),'primary'));
     }
@@ -9744,7 +9761,7 @@ function buildStatic0(m){
     const cx=x+.5,cz=y+.5;
     if(c.t==='bar'){buildOpening(g,x,y,c,WH);continue;}
     if(c.panel&&c.t==='reinf'&&buildPanel(g,x,y,c,WH))continue;
-    if(c.mirror&&c.t==='reinf'&&buildMirror(g,x,y,c,WH))continue;
+    if(c.mirror&&['soft','reinf'].includes(c.t)&&buildMirror(g,x,y,c,WH))continue;
     const th={hard:.4,soft:.18,reinf:.42}[c.t],mats=M3[c.t];
     if(c.t==='soft'&&c.hole){holeWall(g,x,y,c,th,WH,mats,M3);continue;}
     if(c.curve)continue;
@@ -10357,8 +10374,7 @@ function g3x(gd,add,grp){const em=(k,c,i=1.4)=>gm(k,()=>new THREE.MeshStandardMa
   case 'magnet':{add(CYL3,gm('mag',()=>std(0x3a3f45,{metalness:.6})),[.16,.06,.16],0,.04,0);const r=add(new THREE.TorusGeometry(.17,.012,6,24),em('magl',0x4aa8e2,1.2),[1,1,1],0,.08,0);r.rotation.x=Math.PI/2;return true;}
   case 'banshee':{add(BOX3,gm('ban',()=>std(0x1d2026,{metalness:.4})),[.24,.24,.12],0,.12,0);add(CYL3,gm('banh',()=>std(0x30353c,{metalness:.5})),[.08,.08,.08],0,.14,.08).rotation.x=Math.PI/2;
     grp.userData.blink=add(SPH3,em('banl',0x4aa8e2),[.03,.03,.03],0,.27,0);return true;}
-  case 'mirror':{mirror3D(gd,grp);return true;const c=cell(gd.x,gd.y),vert=cell(gd.x-1,gd.y)&&cell(gd.x+1,gd.y)&&!blocks(cell(gd.x-1,gd.y))&&!blocks(cell(gd.x+1,gd.y));
-    const p=add(BOX3,gm('mirr',()=>new THREE.MeshStandardMaterial({color:0x1a2a3a,metalness:.9,roughness:.05,emissive:0x0a1a2a,emissiveIntensity:.5})),vert?[.08,.5,.7]:[.7,.5,.08],0,1.05,0);void c;void p;return true;}
+  case 'mirror':{mirror3D(gd,grp);return true;}
   }
   return false;}
 function gadget3D(gd){
@@ -10681,7 +10697,7 @@ function pin3D(x,y){const grp=new THREE.Group();grp.position.set(cwx(x,y),0,cwz(
 // ---- v89: soft fog of war and the selected operator's sight fan, painted on two canvases laid over the floor ----
 const DIEV={Y:1,O:1.5,R:2};
 // rays stop on the wall itself (walls are drawn thinner than a cell, joined toward neighbouring walls), smoke stops them at the cell
-function wallSolid(x,y){const cx=Math.floor(x),cy=Math.floor(y),c=cell(cx,cy);if(!blocks(c)||c.mOpen||(c.t==='soft'&&c.hole))return false;
+function wallSolid(x,y){const cx=Math.floor(x),cy=Math.floor(y),c=cell(cx,cy);if(!blocks(c)||c.mOpen||(c.t==='soft'&&c.hole&&!c.mirror))return false;
   const h=({hard:.4,soft:.3,reinf:.42}[c.t]||.3)/2+.02,fx=x-cx-.5,fy=y-cy-.5;if(Math.abs(fx)<=h&&Math.abs(fy)<=h)return true;
   return (Math.abs(fy)<=h&&(fx>0?wj(cell(cx+1,cy)):wj(cell(cx-1,cy))))||(Math.abs(fx)<=h&&(fy>0?wj(cell(cx,cy+1)):wj(cell(cx,cy-1))));}
 function visRays(u){const R=VR(u),f=u.fd||[0,1],a0=Math.atan2(f[1],f[0]),n=150,o=[u.x+.5,u.y+.5],pts=[],hit=[];if(smokeAt(u.x,u.y))return {o,pts:Array.from({length:n+1},()=>o.slice()),hit:Array(n+1).fill(false),R};
@@ -10877,6 +10893,7 @@ function owArc(u){const phi=Math.atan2(-u.owd[1],u.owd[0]);const col=u.side==='A
   const m=new THREE.Mesh(new THREE.RingGeometry(.5,1.1,24,1,phi-Math.PI/3,Math.PI*2/3),gm('ow'+col,()=>new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.22,side:THREE.DoubleSide,depthWrite:false})));
   m.rotation.x=-Math.PI/2;m.position.set(cwx(u.x,u.y),.03,cwz(u.x,u.y));return m;}
 function tick3D(){
+  if(R3&&R3.dynG)R3.dynG.traverse(o=>{if(o.userData.mirDrop)mirrorDropPose(o);});
   if(!R3)return;const t=R3.clock.getElapsedTime(),rdt=Math.min(.5,t-(R3.lastT||t)),dt=Math.min(.05,rdt);R3.lastT=t;
   if(R3.hero&&R3.hero.visible){R3.camGoal=null;const sw=Math.sin(t*.12);const ph=R3.camera.aspect<1;R3.camera.position.set(ph?4.9+sw*.5:6.6+sw*.9,ph?1.9:1.15,ph?23:19.2);R3.controls.target.set(ph?4.3:3.2+sw*.3,ph?.15:1.1,ph?14.2:13.6);}
   if(R3.intro){R3.camGoal=null;introStep(Math.max(0,Math.min(1,(performance.now()-R3.intro.t0)/R3.intro.dur)));}
@@ -10918,7 +10935,7 @@ function tick3D(){
 let FXSEEN=0;
 function fxEv(e){if(!G)return null;e.id=G.fxn=(G.fxn||0)+1;e.ts=Date.now();(G.fxq||(G.fxq=[])).push(e);if(G.fxq.length>12)G.fxq.splice(0,G.fxq.length-12);FXSEEN=e.id;return fxPlay(e);}
 function fxSync(){if(!G||!G.fxq)return;if((G.fxn||0)<FXSEEN)FXSEEN=0;for(const e of G.fxq){if(e.id<=FXSEEN)continue;FXSEEN=e.id;try{fxPlay(e);}catch(x){}}}
-function fxPlay(e){if(!G)return null;const foe=!!e.side&&e.side!==G.player;
+function fxPlay(e){if(!G)return null;if(e.k==='mirror'){if(!e.ts||Date.now()-e.ts<15000)SFX.mirror();return null;}const foe=!!e.side&&e.side!==G.player;
   if(e.k==='throw'){if(foe)edgeAlert(e.x1,e.y1);return mapThrow(e);}
   if(e.k==='shot'){if(foe){edgeAlert(e.x0,e.y0);edgeAlert(e.x1,e.y1);}return null;}
   if(e.k==='evac')return evacBeam(e);
@@ -11030,11 +11047,11 @@ function update3D(){
   setInst(R3.reachIM,reach,.065);setInst(R3.reachEdge,reach.map(([x,y])=>[x,y,.38]));setInst(R3.tgtIM,tg);tgtGlow(glow);R3.hl=new Set([...reach,...tg,...glow].map(c=>c[0]+','+c[1]));
   // gadgets, defuser, trail
   const dg=R3.dynG;while(dg.children.length)dg.remove(dg.children[0]);
-  for(const g of G.gadgets){if(!g.alive||g.type==='prisma')continue;if(!G.over&&!gadgetVisibleTo(g,G.player))continue;const gm3=gadget3D(g);if(CAMT.includes(g.type)||g.wall)gm3.userData.cell=[g.x,g.y];dg.add(gm3);}
+  for(const g of G.gadgets){if(!g.alive||g.type==='prisma')continue;if(!G.over&&!gadgetVisibleTo(g,G.player))continue;const gm3=gadget3D(g);if(CAMT.includes(g.type)||g.wall||g.type==='mirror')gm3.userData.cell=[g.x,g.y];dg.add(gm3);}
   if(G.phase==='play'&&!G.over){for(const u of G.units)if(u.alive&&u.x>=0&&u.side!==G.player&&u.spotted>0&&!smokeAt(u.x,u.y)&&!vis.has(u.id))dg.add(pin3D(u.x,u.y));
     if(G.player==='D')for(const k of G.decoys||[])if(k.alive)dg.add(token3D(k.x,k.y,true));
     for(const h of heatPins())dg.add(pin3D(h.x,h.y));}
-  if(G.mode==='cdir'&&cdirG())dg.add(owArrows(cdirG(),[[1,0],[-1,0],[0,1],[0,-1]]));else if(G.mode==='pdir'&&pdirG())dg.add(owArrows(pdirG(),[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]));else if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash'||G.mode==='mgscan'||G.mode==='face')&&G.sel&&G.sel.x>=0&&G.phase==='play')dg.add(owArrows(G.sel,G.mode==='face'||G.mode==='owdir'||G.mode==='owq'?[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]:null));else R3.owA=null;
+  if(G.mirPend)dg.add(owArrows(G.mirPend,G.mirPend.dirs));else if(G.mode==='cdir'&&cdirG())dg.add(owArrows(cdirG(),[[1,0],[-1,0],[0,1],[0,-1]]));else if(G.mode==='pdir'&&pdirG())dg.add(owArrows(pdirG(),[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]));else if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash'||G.mode==='mgscan'||G.mode==='face')&&G.sel&&G.sel.x>=0&&G.phase==='play')dg.add(owArrows(G.sel,G.mode==='face'||G.mode==='owdir'||G.mode==='owq'?[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]:null));else R3.owA=null;
   if(G.phase==='play'&&!G.over)for(const u of G.units)if(u.alive&&u.x>=0&&u.hitFrom&&u.side===G.player)dg.add(hitArrow(u));
   if(G.phase==='setup'&&G.player==='A')G.map.spawns.forEach((z,i)=>dg.add(spawn3D(z,i,i===G.spawn||G.spawn==null)));
   if(G.hostage&&hostSeen())dg.add(hostage3D(G.hostage));
@@ -12021,7 +12038,7 @@ function openSponsor(){tsDlg('sponsor','贊助',`<div class="psbox"><div class="
 const NEWS=[{d: "2026-11-07", v: "v229–v235", i: ["移動紀錄：「✕陣亡」只標在幹員倒下的那一筆，並寫出死因（例如被誰射擊、闊刀地雷）；陣亡幹員的資訊卡改顯示「已陣亡」，不再顯示行動點與移動 5", "人質局：人質被帶走後，防守方電腦會全力追擊：衝向帶著人質的進攻方、搶到射擊位置，或先堵在他撤離的路線上", "電腦版射擊特寫：右上角被攻擊者的角色圖移到右側面板左邊，不再壓在面板上", "輪到自己的階段時，鏡頭會自動轉到一名還能行動的幹員（優先離已知敵人最近的），斜角、周圍大約 6 格都看得到", "射擊特寫修正：隔牆射擊時被打穿的牆也會變半透明，看得到牆後的目標；擋在中間的盾牌、道具也會淡出；看不到的敵人在特寫時會照樣畫出來；開槍者在特寫結束後馬上出現"]},{d: "2026-11-06", v: "v196–v211", i: ["移除幹員 Flores 與 Thunderbird：選角、電腦對手、圖鑑與技能表都不再出現，「使用所有幹員」成就的數量跟著減少", "訓練選單每次打開都會回到最外層的三大類，不再停在上次看的子頁", "新手教學修正：手機上要點的格子不會再跑到畫面外或被右邊的動作按鈕蓋住，鏡頭會自動把它移進畫面", "4v4 合作選角改版：左邊是兩人的隊伍、中間選幹員和裝備、右邊是地圖平面圖和幹員資訊；手機版改成直排", "4v4 合作每人各帶 2 個裝備，對戰時只有自己的幹員能用自己帶的", "4v4 合作改成各自部署：隊長先放自己的 2 名，再換隊員放；防守方選角時就看得到炸彈點，進攻方顯示「目標未知」", "破牆、手榴彈爆炸時不再卡一下：爆炸的閃光不再讓整張地圖重新編譯材質，破牆後重建地圖也快很多（手機、電腦都有感）", "線上對戰改成兩台裝置直接連線（WebRTC），不再繞國外伺服器，動作幾乎即時同步；打不通的網路會自動退回原本的方式", "合作模式修正：隊友還開著舊版網頁時不會再卡在「開始中」（會提醒對方重新整理）；也不會讀到上一場留下來的對戰", "線上對戰同步更快：每次傳的資料縮小到原本的幾十分之一，也不用先讀再寫", "線上對戰的計時改成兩邊共用同一個時間：切到別的頁面或 App 時間照走，對方不會卡住；對手超過時間又沒有回應，8 秒後自動跳過他的階段", "培養幹員頁下方的能力條、可用點數和按鈕變扁，上面的幹員和能力雷達圖有更多空間", "培養幹員頁在手機上不再擠成一團：名字、擊殺／存活和能力雷達圖會依螢幕高度自動縮放，不再互相重疊", "拿掉防守方的誘餌標記和「移動誘餌」按鈕","每個 Google 帳號都是各自獨立的遊戲帳號：換另一個 Google 帳號登入會是全新的進度，不會再沿用上一個帳號的聲望、幹員和成就", "登出 Google 後，這台裝置會回到全新的訪客", "大廳右上的好友按鈕改成「申請好友」和「好友名單」兩頁，成就移回 🏆 按鈕；輸入好友代碼改成送出申請，對方在「申請好友」按同意後才會成為好友，等待同意的申請也列在那裡"]},{d: "2026-11-05", v: "v178–v195", i: ["培養幹員開打後就不能靠退出逃避陣亡：按「離開」或關掉網頁都算陣亡；斷線的話 3 分鐘內回來可以接著打", "新增「撤離」（紫色按鈕）：培養幹員花 1 行動開始撤離，撐過敵方下一個階段就會被光束接走，這場算存活", "組隊：好友頁可以邀請在線的好友加入小隊，大廳右側會出現小隊圖示；組隊後按「對戰電腦」就是 4v4 合作，兩人各控 2 名幹員，順序是隊長 → 電腦 → 隊員 → 電腦", "好友代碼：好友頁顯示自己的 6 碼代碼，輸入對方代碼就能直接加好友；點好友名字可看他最強的培養幹員、擊殺和存活", "看得到的敵人就算在側面或背後也能射擊，開槍時自動轉身面向他", "公告依日期分組，有新公告時大廳的大聲公按鈕會出現紅點", "對戰電腦選角改成跟線上一樣，幹員和裝備在同一頁切換", "線上選角倒數結束時保留已選的幹員，只隨機補空位", "選角頁幹員格依畫面大小自動放大，裝備頁不再被切到", "選角頁改用膠囊分頁鈕與兩欄裝備卡", "牆上的道具（電瓶、Ela 地雷等）可以點選破壞", "灰掉的行動鈕點一下會說明不能用的原因", "裝備頁爆破炸藥圖示大小修正", "新手教學只能選進攻、人質、銀行，結尾介紹培養與訓練", "圖鑑篩選改成「未擁有」，未擁有的幹員灰階顯示", "規則頁可回大廳，成就頁不再左右滑", "行動用完自動監視並結束，新增浮動「完成」「轉向」鍵", "轉向只給啟動中或已行動的幹員", "線上配對等待畫面改成無人機搜索", "幹員取名支援注音輸入法", "線上可以帶培養幹員，新增護送人質按鈕", "加入 Foley 音效與背景音樂"]}, {d: "2026-11-04", v: "v153–v177", i: ["全新大廳：手機版幹員舞台、電腦版方塊看板", "新增培養幹員排行榜", "新增訓練任務：各職業入門關卡、聲望與點數獎勵", "手機底部分頁列常駐（大廳、訓練、幹員、商店、檔案）", "作戰檔案改成幹員牆，加上規則與成就卡片", "讀取時預先載入圖片與選單，讀取條加入小語", "介面加入戰術感音效", "無人機移動時只看得到自己所在的格子，掃描鍵移到路障位置", "人質任務不再顯示 A/B 炸彈點", "鎮壓暴徒技能重做：衝刺三格、推人、撞牆夾擊", "任務頁改版"]}, {d: "2026-11-03", v: "v140–v152", i: ["登入頁加入讀取條，選地圖時立刻顯示格局圖", "一鍵選滿小隊，幹員卡改兩欄", "培養幹員護甲與奔跑點數規則調整", "回報問題可以附上截圖", "公告按鈕改成大聲公圖示", "衝鋒兵（男）換上新立繪與頭貼", "銀行：拿掉檔案室擋住窗戶的書架；櫃員室和行政辦公室之間的小方塊牆改成乾淨的轉角", "隔著窗戶射擊只扣 1 點掩護，而且會把窗戶打碎", "踩到捕獸夾時鏡頭切到角色側面 45 度特寫，播放被夾動畫", "爆破炸藥改為貼在牆面上，不再浮在牆前", "職業主動技改用技能格，與幹員技能互斥；機動盾減傷 1、重盾減傷 2", "衝鋒兵新增衝鋒陷陣鎖骰被動，主動技改為額外奔跑一次", "修正培養幹員以借用技能結束對局時，點數與存活場次未入帳", "拆彈器遭防守方破壞後，立即結束對局，防守方勝利", "煙霧遮擋視線、隱藏煙內角色；可向煙霧格投擲，煙霧不減傷", "監視只在本次啟動移動後觸發；Lion 標示上一階段移動的敵人", "新增重盾兵與機動盾兵，接入男女角色圖與護盾特效", "炸彈點、煙霧視線與已發現道具規則修正", "機槍掃射、Fuze、Amaru、Sledge、IQ 等技能更新", "地面道具可放兩個，牆面道具不再占用地面位置", "幹員圖鑑改為上下捲動，新增攻擊／防守篩選", "培養幹員每個距離區段最多 4 顆骰子"]}];
 NEWS.unshift({d:'2026-11-08',v:'v237',i:['排行榜新增現役菁英與英勇烈士，前三名展示幹員立繪與所屬玩家，向下捲動最多顯示 50 名，底部固定顯示我的排名。']});
 NEWS[0].v='v237–v238';NEWS[0].i.unshift('部署護盾與 Goyo 護盾可以像窗戶一樣翻越，不能停在盾牌格；Goyo 護盾被破壞才會引燃。');
-NEWS[0].v='v237–v239';NEWS[0].i.unshift('掩護只計算射線穿過的格子，鄰格牆壁不再額外減傷；站在掩體上不享有家具掩護。');
+NEWS[0].v='v237–v240';NEWS[0].i.unshift('Mira 黑鏡改為附掛窗體：可選內側朝向、保留軟牆／鐵牆材質，內側視線內可遠距開鏡，新增氣閥音效與玻璃、氣瓶掉落動畫。');NEWS[0].i.unshift('掩護只計算射線穿過的格子，鄰格牆壁不再額外減傷；站在掩體上不享有家具掩護。');
 const newsKey=()=>NEWS[0].d+'#'+NEWS[0].i.length;
 function newsUnread(){try{return localStorage.getItem('newsSeen')!==newsKey();}catch(e){return false;}}
 function newsBadge(){const n=$('#t-news');if(n)n.classList.toggle('unread',newsUnread());}
@@ -13288,6 +13305,8 @@ const CSK={mg:{n:'掃射',ap:'1 行動',d:'不用指定目標；選擇一個方�
   sg:{n:'榴彈發射',ap:'1 行動',d:'對 3×3 範圍造成 2 傷，敵我都會受傷。範圍內除了鐵牆和轉角柱，牆、路障、掩護和道具全部炸毀。'}};
 const CSKM={mg:'mgscan',sn:'heat',sh:'bash',sg:'gl'};
 Object.assign(I18X,{
+ '黑鏡內側朝哪一邊？':['Which side faces inward?','黒鏡の内側の向きは？'],
+ '箭頭側是紅色氣瓶與操作面':['The arrow points to the red canister and controls.','矢印側が赤いボンベと操作面です。'],
  '銀行地圖修整':['Bank map cleanup',''],
  '衝鋒兵新立繪':['New Rusher artwork',''],
  '衝鋒兵（男）換上新立繪與頭貼':['Male Rusher gets new full-body art and avatar',''],

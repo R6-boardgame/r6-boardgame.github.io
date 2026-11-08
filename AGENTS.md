@@ -1,5 +1,7 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v240：Mira 黑鏡保留軟牆／鐵牆宿主，`mirAsk` 以兩側箭頭選內側；`mirCanOpen` 驗證內側、本人視線與距離。`mirror3D` 分內外框、玻璃及紅色氣瓶，`mirrorDropPose` 驅動掉落，`SFX.mirror` 合成氣閥與碎玻璃音。`destroyCell` 清除鏡與洞口旗標；測試 `tests/mira.cjs`、視覺測試 `tests/mira.html`。
+
 給接手的 AI 程式助理（Codex 等）。先讀完這份再動手。
 
 ## 專案是什麼
