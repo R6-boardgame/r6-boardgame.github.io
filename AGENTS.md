@@ -479,3 +479,7 @@
 - `boardHTML` 改成固定外框、兩分類按鈕、上下捲動前 50 名與常駐我的排名。前三名人物層與文字層分離，第一名人物最前、所有名次文字在人物之上。
 - `board/<uid>_<slot>` 補 `i/w/dead:false`；陣亡名冊同步到 `board/<uid>_fallen_<ts>_<slot>`（`dead:true`）。所屬玩家用 `meName()`，不可把 `ECO.alum[].by`（擊殺者）當玩家。舊玩家要進新版才補圖片與陣亡記錄；舊資料沒有職業時用新兵圖。
 - `lbRows()` 預設現役，保持大廳前三名行為。`lbMyRank(tab)` 在完整排行找自己的最高名次，不受 50 名上限影響。`tests/leaderboard.cjs` 為邏輯測試，`tests/leaderboard.html` 為不連雲端的虛構資料 UI 測試。
+
+## v238 護盾翻越
+- 部署護盾與 Goyo 燃燒盾可翻越：`vaultAt` 共用翻窗抬身側傾姿勢與 260ms 停留，進入耗 2 移動點並預留落地一步，不能選護盾格當終點。玩家與 AI 路徑都支援，無人機規則不變。
+- Goyo 不再因敵人靠近自動引燃，破壞／爆炸引燃照舊。`tests/shield-vault.cjs` 覆蓋兩種盾、落地點數、AI 尋路及姿勢旗標。

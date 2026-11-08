@@ -22,7 +22,7 @@ let G={units:[],round:1,mission:'bomb',aiSite:'A'},calls=0,dangers=0,steps=[],br
 const u={id:'A0',side:'A',alive:true,x:0,y:0,ap:1,mp:2,run:2,hp:5,ch:0,op:'ash'};
 const beginAct=()=>{},dangerMap=()=>{dangers++;return []},sees=()=>new Set(),aiTurn=()=>{},shootables=()=>[];
 const canDo=(u,k)=>k==='run'&&u.ap>0,aiGoal=()=>()=>false,cell=(x)=>({t:x===2&&breaches===0?'soft':'floor'}),blocks=c=>c.t==='soft';
-const findPath=()=>{calls++;return {p:[[0,0],[1,0],[2,0],[3,0],[4,0]],cost:4}},unitAt=()=>null,enterCost=()=>1,winOpen=()=>false,BH=async()=>{};
+const findPath=()=>{calls++;return {p:[[0,0],[1,0],[2,0],[3,0],[4,0]],cost:4}},unitAt=()=>null,enterCost=()=>1,stepNeed=()=>1,winOpen=()=>false,BH=async()=>{};
 const step=async(u,x,y)=>{steps.push(x);u.x=x;u.y=y;u.mp--;return u.mp>0},aiBreach=async()=>{breaches++;return true};
 const sprint=u=>{u.ap--;u.mp+=u.run},afterAct=async()=>{reactions++},overwatch=()=>{},endAct=()=>{},plantOK=()=>false,escortOK=()=>false;
 `+cut('async function aiAttacker(u){','function dangerMap(){'),ai);
