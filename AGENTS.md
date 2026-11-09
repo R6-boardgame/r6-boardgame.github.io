@@ -1,5 +1,11 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v246：依使用者 14 張參考圖更新模型；`referenceGadget246/refMount246` 重製 Wamai、Nomad、Argus、Kaid、Lesion、Melusi，`echoModel` 改半透明四風扇機身；Dokkaebi 駭入按鈕使用 `img/ui/dokkaebi-hack-v246.jpg` 原圖。
+  - `autoMount246` 選接觸的實牆，保留原格與房間效果，沒有接觸牆時維持落地。Kaid 可直接貼在選取的鐵牆表面。`PLACE.castle` 一次處理成對門窗、只耗一次技能，保留窗台。
+  - Aruni 保留進入目標房間觸發的既有被動規則，`gateOpenings246/aruniGates246` 於對應門窗畫依尺寸縮放的雷射門，無剩餘次數不顯示；攻方僅視線內看得到。
+  - `timedBreach246` 發送同步 `breach246` 特效，等待 `breachFX246` 完成才破牆。Hibana 六顆五瓣紅彈 2×3 貼牆燃燒；Thermite 布包交叉綁帶與外緣一圈火花。沿用破牆／相鄰傷害，不新增點光源。
+  - `tests/browser-gadgets-v246.cjs`：隔離訪客實際 WebGL 模型、四風扇、雙格門消耗、門窗雷射與燃燒前後牆體狀態、手機駭入圖示；搭配 v245 規則及瀏覽器回歸測試。技能文字同步 CSV／英文。
+
 - v245：依使用者確認的 CSV 差異及補充更新技能。主 script 尾段 `v245: confirmed operator rules` 集中技能控制、動畫、包裝與 `SKILL245` 說明（同步 `data/skills.csv`）。沿用 v244 立繪，保留新版 Twitch、Mira、Iana、Goyo、Amaru。
   - `twUser/remoteDrone` 共用 Twitch、Echo、Mozzie 操作；Echo 5 步／180°／6 格，只己方可見且只能音波震暈，Mozzie 在進攻方部署普通／電擊無人機時立即獲得一次充能（掃描不重複給）。
   - `airjabCheck` 鄰格觸發並推離最多 5 格；`UG.gridlock` 四鄰格隨機連通擴張最多 10 格，新尖刺只影響所在格。`skillMoved` 同時處理 Caveira 三步解除與 Melusi 剩餘步數減半。

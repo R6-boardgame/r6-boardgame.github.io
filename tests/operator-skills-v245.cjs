@@ -10,6 +10,7 @@ const I18X={},GDX={},OPS={},CSK={mg:{}},WPN={mg:{}},NEWS=[{i:[]}],GT={},UG={zofi
 const tt=x=>x,log=()=>{},note=()=>{},sleep=async()=>{},performance={now:()=>0},ST=u=>u.stats||(u.stats={gad:0,shots:0,hits:0,dmg:0,k:0});
 const SFX={step(){},zap(){},shot(){},flash(){}},diceHide=()=>{},rollDice3D=async(...a)=>rolls.push(a),shotIntro=async()=>null,shotCamEnd=()=>{},protection=()=>0,heavyShieldBlocks=()=>false,hasClassSkill=u=>u.w==='mg';
 const inB=(x,y)=>x>=0&&y>=0&&x<G.W&&y<G.H,cell=(x,y)=>inB(x,y)?G.grid[y][x]:null,blocks=c=>!c||['hard','soft','reinf','bar'].includes(c.t),cheb=(a,b,c,d)=>Math.max(Math.abs(a-c),Math.abs(b-d));
+const bpWall=(x,y)=>!!cell(x,y)&&['hard','soft','reinf'].includes(cell(x,y).t);
 const within=(x,y,r)=>{const a=[];for(let j=y-r;j<=y+r;j++)for(let i=x-r;i<=x+r;i++)if(inB(i,j))a.push([i,j]);return a},allCells=()=>within(0,0,99),adj4=(x,y)=>[[x+1,y],[x-1,y],[x,y+1],[x,y-1]].filter(p=>inB(...p)),adj8all=(x,y)=>within(x,y,1).filter(p=>p[0]!==x||p[1]!==y),adj8=adj8all;
 const dir8=v=>[Math.sign(v[0]),Math.sign(v[1])],alive=s=>G.units.filter(u=>u.alive&&u.side===s),unitAt=(x,y)=>G.units.find(u=>u.alive&&u.x===x&&u.y===y),gadgetAt=(x,y,t)=>G.gadgets.find(g=>g.alive&&g.x===x&&g.y===y&&(!t||g.type===t)),shieldAt=(x,y)=>gadgetAt(x,y,'shield');
 const curSide=()=>G.side||'A',coopRole=()=> 'h',coopMyTurn=()=>true,canAct=()=>true,canDo=(u,k)=>u.ap>0&&!u.used.has(k),useAct=(u,k)=>{twChoose(u,u.twControl?'drone':'body');u.ap--;u.used.add(k)},commit=u=>{if(G.active!==u)beginAct(u);return true};
