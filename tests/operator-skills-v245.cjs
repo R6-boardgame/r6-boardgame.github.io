@@ -21,7 +21,7 @@ function destroyCell(x,y,quiet){quietCuts.push(quiet);cell(x,y).t='floor';cell(x
 const ignite=async(x,y,side,life)=>G.gadgets.push({type:'fire',alive:true,x,y,life,side}),goyoBurn=async()=>{},matCine=async()=>false,damage=async(u,n,src,direct)=>{u.hp-=n;if(u.hp<=0)u.alive=false;u.lastDamage={n,src,direct,by:DMGBY?.id}};
 function reset(){G={W:20,H:20,grid:Array.from({length:20},()=>Array.from({length:20},()=>({t:'floor',indoor:true}))),units:[],gadgets:[],phase:'play',round:1,acts:0,player:'A',side:'A'};blocked=false;jammedNow=false;rolls=[];events=[];reacts=0;}
 function unit(op,side='A',x=5,y=5){const u={id:op+G.units.length,op,side,x,y,fd:[1,0],alive:true,hp:20,ap:2,mp:5,ch:2,speed:5,used:new Set()};G.units.push(u);G.sel=u;return u}
-`+cut('function inFan(','function inSight(')+cut('function droneReach(','async function droneStep(')+cut('function twUser(','// ---------- phases ----------')+cut('async function catchThrow(','function dmgMod(')+cut('// ---------- v245: confirmed operator rules','// ---------- round clocks:'),c);
+`+cut('function inFan(','function inSight(')+cut('function droneReach(','async function droneStep(')+cut('function twUser(','// ---------- phases ----------')+cut('async function catchThrow(','function dmgMod(')+cut('// ---------- v245: confirmed operator rules','// ---------- v247: desktop tactical workspace;'),c);
 (async()=>{
 await vm.runInContext(`(async()=>{
  reset();let u=unit('pulse'),t=unit('ash','D',7,6);const back=unit('sledge','D',3,4),outside=unit('iq','D',8,5);blocked=true;assert.equal(pulseArea(u).length,15);await UG.pulse(u);assert.equal(t.spotted,1);assert.equal(back.spotted,1);assert(!outside.spotted);

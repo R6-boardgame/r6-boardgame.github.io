@@ -1,5 +1,12 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v247：使用者選定桌機 C 版。`desktop247` 在 ≥1000×620、一般 play 畫面啟用；手機、部署、新手教學、結算沿用舊版。`renderDesktop247` 左側小隊、右側行動／道具／情報，無底部操作列；未行動綠、已行動紅（`activated`），攻擊骰依實際 `pd/PROF.d` 分色 × 數量。
+  - 保留 `renderActs` 的既有合法性與 handler，附 `data-act-label` 後移到新介面；道具照固定快捷鍵排序。情報用最新 `skText/CSK`，不改技能規則與 CSV。角色名用 `OPS.name`，不可 escape `nm()`（它含 `<b>` HTML）。
+  - Alt／Cmd 暫時射擊、Ctrl 暫時破壞、Shift 暫時移動；Shift＋WASD 依鏡頭方向移動，保留路徑、翻越、監視等原判定。Q／E 左右 45°，R 奔跑，G/I/M 道具／情報／行動，T 技能，**Z 特殊按鈕（使用者已改掉 S）**，F 封門，Space 完成，Ctrl＋Space 結束階段，鍵盤上排 1–0/− 選道具。
+  - `deskSelect247`（左卡／滾輪）只切選取與鏡頭，下一次真正行動才 `commit`，不因檢視花點數或結束原幹員；忙碌、放置朝向與監視選向時禁止切換。`camFree` 計入左右兩側遮罩。
+  - `deskSpecial247` 代理原浮動按鈕；桌機隱藏原按鈕但保留 handler，手機仍顯示。原生特殊按鈕不可移除，否則代理無法操作。快捷鍵會避開輸入框及對話框；Ctrl＋左鍵在 Mac 不跳選單。
+  - 測試 `tests/desktop-workspace-v247.cjs`：隔離訪客，桌機／矮視窗／手機，分頁、實際色骰、綠紅狀態、滾輪、Shift＋WASD、Q/E、R、Alt/Cmd/Ctrl、Z、Space 與 Ctrl＋Space。v245 瀏覽器回歸改點桌機代理蠱毒按鈕；規則 VM 的擷取終點停在 v247 UI 區之前。
+
 - v246：依使用者 14 張參考圖更新模型；`referenceGadget246/refMount246` 重製 Wamai、Nomad、Argus、Kaid、Lesion、Melusi，`echoModel` 改半透明四風扇機身；Dokkaebi 駭入按鈕使用 `img/ui/dokkaebi-hack-v246.jpg` 原圖。
   - `autoMount246` 選接觸的實牆，保留原格與房間效果，沒有接觸牆時維持落地。Kaid 可直接貼在選取的鐵牆表面。`PLACE.castle` 一次處理成對門窗、只耗一次技能，保留窗台。
   - Aruni 保留進入目標房間觸發的既有被動規則，`gateOpenings246/aruniGates246` 於對應門窗畫依尺寸縮放的雷射門，無剩餘次數不顯示；攻方僅視線內看得到。
