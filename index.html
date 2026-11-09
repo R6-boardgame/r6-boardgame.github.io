@@ -7386,7 +7386,7 @@ function twBeam(e){if(!R3||!window.THREE)return;const g=new THREE.Group(),m=new 
 function twDieFace(v){const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');g.fillStyle='#8052a9';g.fillRect(0,0,256,256);g.strokeStyle='#d5b7ef';g.lineWidth=5;g.strokeRect(12,12,232,232);g.strokeStyle=g.fillStyle='#fff';
   if(v==='hit'){g.lineWidth=10;g.beginPath();g.arc(128,128,55,0,Math.PI*2);g.stroke();for(const [x,y,a,b] of [[128,42,128,94],[128,162,128,214],[42,128,94,128],[162,128,214,128]]){g.beginPath();g.moveTo(x,y);g.lineTo(a,b);g.stroke();}g.beginPath();g.arc(128,128,9,0,Math.PI*2);g.fill();}
   else{g.font='bold 56px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('MISS',128,132);}return c;}
-function twModel(d,grp){grp.rotation.y=Math.atan2((d.fd||[0,1])[0],(d.fd||[0,1])[1]);const mk=(geo,m,s,x,y,z)=>{const a=new THREE.Mesh(geo,m);a.scale.set(...s);a.position.set(x,y,z);a.castShadow=true;grp.add(a);return a;};
+function twModel(d,grp){grp.scale.setScalar(.5);grp.rotation.y=Math.atan2((d.fd||[0,1])[0],(d.fd||[0,1])[1]);const mk=(geo,m,s,x,y,z)=>{const a=new THREE.Mesh(geo,m);a.scale.set(...s);a.position.set(x,y,z);a.castShadow=true;grp.add(a);return a;};
   const black=gm('twBlack',()=>std(0x171b20,{metalness:.55,roughness:.5})),steel=gm('twSteel',()=>std(0x7e8586,{metalness:.8,roughness:.38})),blue=gm('twBlue',()=>std(0x338b9e,{metalness:.4,roughness:.45}));
   mk(BOX3,black,[.43,.13,.38],0,.17,0);mk(BOX3,blue,[.29,.025,.26],0,.25,0);mk(BOX3,steel,[.16,.012,.12],0,.267,.02);
   for(const x of [-.26,.26]){mk(CYL3,black,[.16,.11,.16],x,.16,0).rotation.z=Math.PI/2;mk(CYL3,steel,[.1,.114,.1],x,.16,0).rotation.z=Math.PI/2;for(let i=0;i<10;i++){const a=i*Math.PI/5,m=mk(BOX3,black,[.12,.065,.09],x,.16+Math.sin(a)*.14,Math.cos(a)*.14);m.rotation.x=-a;}}
@@ -7924,7 +7924,8 @@ function curTargets(){if(G&&G.sel&&(G.mode==='twdeploy'||twSelected()))return tw
     case 'decoy':return [...decoyReach(u).keys()].map(i=>[i%G.W,(i/G.W)|0]);
     case 'drone':return droneTargets(u);
     case 'dronemove':{const d=dmOf();return d?[...droneReach(u,d).keys()].filter(i=>i!==d.y*G.W+d.x).map(i=>[i%G.W,(i/G.W)|0]):[];}
-    case 'owdir':case 'owq':return adj8all(u.x,u.y);
+    case 'owq':{const a=owqActor(u);return a?adj8all(a.x,a.y):[];}
+    case 'owdir':return adj8all(u.x,u.y);
     case 'heat':case 'bash':case 'mgscan':return hasClassSkill(u)?adj4(u.x,u.y):[];
     case 'gl':return hasClassSkill(u)?throwTargets(u):[];
     case 'face':return adj8all(u.x,u.y);
@@ -7975,6 +7976,7 @@ async function act(fn){G.busy=true;render();try{await fn();}finally{G.busy=false
   revealCheck();
 }
 async function onCell(x,y){
+  if(G&&G.mode==='owq'){if(!G.over&&!G.busy)return owqTap(x,y);return;}
   if(G&&G.sel&&(G.mode==='twdeploy'||twSelected())){const o=unitAt(x,y);if(!(o&&o.side===G.player&&o!==G.sel))return twCell(G.sel,x,y);}
   if(G&&G.sel&&twUser(G.sel)&&twLock(G.sel)==='drone'&&!twSelected()&&G.mode!=='move')return;
   if(G&&G.mirPend){if(G._mirPick)G._mirPick(x,y);return;}
@@ -9289,7 +9291,7 @@ function render(){trackMovement();try{syncElec();}catch(e){}try{const a=G&&G.act
   if(G.mode==='pdir'){const g=pdirG();if(g){ctx.fillStyle='#ffc84a';for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){const L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,cx=(g.x+.5+dx*.75)*S,cy=(g.y+.5+dy*.75)*S,px=-uy,py=ux;ctx.beginPath();ctx.moveTo(cx+ux*S*.22,cy+uy*S*.22);ctx.lineTo(cx-ux*S*.1+px*S*.2,cy-uy*S*.1+py*S*.2);ctx.lineTo(cx-ux*S*.1-px*S*.2,cy-uy*S*.1-py*S*.2);ctx.closePath();ctx.fill();}}}
   if(!G.over)for(const u of G.units)if(u.alive&&u.x>=0&&u.side!==G.player&&u.spotted>0&&!smokeAt(u.x,u.y)&&!vis.has(u.id)){const cx=u.x*S+S/2,cy=u.y*S+S/2;ctx.fillStyle=COL.danger;ctx.beginPath();ctx.arc(cx,cy-S*.08,S*.2,Math.PI*.8,Math.PI*2.2);ctx.lineTo(cx,cy+S*.32);ctx.closePath();ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy-S*.08,S*.07,0,7);ctx.fill();}
   if(!G.over)for(const h of heatPins()){const cx=h.x*S+S/2,cy=h.y*S+S/2;ctx.fillStyle='#ff7a2e';ctx.beginPath();ctx.arc(cx,cy-S*.08,S*.2,Math.PI*.8,Math.PI*2.2);ctx.lineTo(cx,cy+S*.32);ctx.closePath();ctx.fill();ctx.fillStyle='#fff';ctx.font=`700 ${S*.24|0}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('?',cx,cy-S*.08);}
-  if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash'||G.mode==='mgscan')&&G.sel&&G.sel.x>=0){const u=G.sel;ctx.fillStyle='#ffc84a';for(const [dx,dy] of (G.mode==='owdir'||G.mode==='owq'?DIR8:[[1,0],[-1,0],[0,1],[0,-1]])){const L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,cx=(u.x+.5+dx*.75)*S,cy=(u.y+.5+dy*.75)*S,px=-uy,py=ux;ctx.beginPath();ctx.moveTo(cx+ux*S*.22,cy+uy*S*.22);ctx.lineTo(cx-ux*S*.1+px*S*.2,cy-uy*S*.1+py*S*.2);ctx.lineTo(cx-ux*S*.1-px*S*.2,cy-uy*S*.1-py*S*.2);ctx.closePath();ctx.fill();}}
+  if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash'||G.mode==='mgscan')&&G.sel&&G.sel.x>=0){const u=G.mode==='owq'?owqActor(G.sel):G.sel;ctx.fillStyle='#ffc84a';for(const [dx,dy] of (G.mode==='owdir'||G.mode==='owq'?DIR8:[[1,0],[-1,0],[0,1],[0,-1]])){const L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,cx=(u.x+.5+dx*.75)*S,cy=(u.y+.5+dy*.75)*S,px=-uy,py=ux;ctx.beginPath();ctx.moveTo(cx+ux*S*.22,cy+uy*S*.22);ctx.lineTo(cx-ux*S*.1+px*S*.2,cy-uy*S*.1+py*S*.2);ctx.lineTo(cx-ux*S*.1-px*S*.2,cy-uy*S*.1-py*S*.2);ctx.closePath();ctx.fill();}}
   if(G.fx&&performance.now()<G.fx.until){ctx.strokeStyle=G.fx.c;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(G.fx.x0*S+S/2,G.fx.y0*S+S/2);ctx.lineTo(G.fx.x1*S+S/2,G.fx.y1*S+S/2);ctx.stroke();setTimeout(()=>G&&G.fx&&performance.now()>=G.fx.until&&(G.fx=null,render()),520);}
   ctx.restore();
 }
@@ -11137,7 +11139,7 @@ function update3D(){
   if(G.phase==='play'&&!G.over){for(const u of G.units)if(u.alive&&u.x>=0&&u.side!==G.player&&u.spotted>0&&!smokeAt(u.x,u.y)&&!vis.has(u.id))dg.add(pin3D(u.x,u.y));
     if(G.player==='D')for(const k of G.decoys||[])if(k.alive)dg.add(token3D(k.x,k.y,true));
     for(const h of heatPins())dg.add(pin3D(h.x,h.y));}
-  if(G.mode==='twface'&&twSelected())dg.add(owArrows(twSelected(),[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]));else if(G.mirPend)dg.add(owArrows(G.mirPend,G.mirPend.dirs));else if(G.mode==='cdir'&&cdirG())dg.add(owArrows(cdirG(),[[1,0],[-1,0],[0,1],[0,-1]]));else if(G.mode==='pdir'&&pdirG())dg.add(owArrows(pdirG(),[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]));else if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash'||G.mode==='mgscan'||G.mode==='face')&&G.sel&&G.sel.x>=0&&G.phase==='play')dg.add(owArrows(G.sel,G.mode==='face'||G.mode==='owdir'||G.mode==='owq'?[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]:null));else R3.owA=null;
+  if(G.mode==='twface'&&twSelected())dg.add(owArrows(twSelected(),[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]));else if(G.mirPend)dg.add(owArrows(G.mirPend,G.mirPend.dirs));else if(G.mode==='cdir'&&cdirG())dg.add(owArrows(cdirG(),[[1,0],[-1,0],[0,1],[0,-1]]));else if(G.mode==='pdir'&&pdirG())dg.add(owArrows(pdirG(),[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]));else if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash'||G.mode==='mgscan'||G.mode==='face')&&G.sel&&G.sel.x>=0&&G.phase==='play')dg.add(owArrows(G.mode==='owq'?owqActor(G.sel):G.sel,G.mode==='face'||G.mode==='owdir'||G.mode==='owq'?[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]:null));else R3.owA=null;
   if(G.phase==='play'&&!G.over)for(const u of G.units)if(u.alive&&u.x>=0&&u.hitFrom&&u.side===G.player)dg.add(hitArrow(u));
   if(G.phase==='setup'&&G.player==='A')G.map.spawns.forEach((z,i)=>dg.add(spawn3D(z,i,i===G.spawn||G.spawn==null)));
   if(G.hostage&&hostSeen())dg.add(hostage3D(G.hostage));
@@ -12125,6 +12127,7 @@ const NEWS=[{d: "2026-11-07", v: "v229–v235", i: ["移動紀錄：「✕陣亡
 NEWS.unshift({d:'2026-11-08',v:'v237',i:['排行榜新增現役菁英與英勇烈士，前三名展示幹員立繪與所屬玩家，向下捲動最多顯示 50 名，底部固定顯示我的排名。']});
 NEWS[0].v='v237–v238';NEWS[0].i.unshift('部署護盾與 Goyo 護盾可以像窗戶一樣翻越，不能停在盾牌格；Goyo 護盾被破壞才會引燃。');
 NEWS[0].v='v237–v242';NEWS[0].i.unshift('Twitch 電擊無人機改為持續留場、人車互斥操作：5 步、180° 視野、6 格電擊直接扣 1 血；遭攻擊擲 50% 命中特殊骰。Twitch 陣亡後電車仍提供視野，但無法操作。');NEWS[0].i.unshift('黑鏡不再提供獨立視野或自動標記；關閉時僅讓內側幹員的自身視線穿往外側，開鏡後才雙向通視。');NEWS[0].i.unshift('Mira 黑鏡改為附掛窗體：可選內側朝向、保留軟牆／鐵牆材質，內側視線內可遠距開鏡，新增氣閥音效與玻璃、氣瓶掉落動畫。');NEWS[0].i.unshift('掩護只計算射線穿過的格子，鄰格牆壁不再額外減傷；站在掩體上不享有家具掩護。');
+NEWS.unshift({d:'2026-11-09',v:'v243',i:['電車行動後由電車選擇朝向，不再要求 Twitch 轉向；電車模型縮小一半。']});
 const newsKey=()=>NEWS[0].d+'#'+NEWS[0].i.length;
 function newsUnread(){try{return localStorage.getItem('newsSeen')!==newsKey();}catch(e){return false;}}
 function newsBadge(){const n=$('#t-news');if(n)n.classList.toggle('unread',newsUnread());}
@@ -13200,12 +13203,14 @@ function stunFx(t){if(!R3||!R3.figs||!G)return;for(const id in R3.figs){const f=
   if(on&&!f.stars){f.stars=new THREE.Group();f.stars.position.y=1.38;for(let i=0;i<3;i++){const s=new THREE.Sprite(starMat());s.scale.set(.16,.16,1);s.renderOrder=11;f.stars.add(s);}f.grp.add(f.stars);}
   if(f.stars){f.stars.visible=on;if(on)f.stars.children.forEach((s,i)=>{const a=t*3.2+i*2.094;s.position.set(Math.cos(a)*.24,Math.sin(t*5+i)*.03,Math.sin(a)*.24);});}}}
 // end of your phase: every operator that is not on overwatch yet picks a facing, one by one
-function owqNext(){const u=G.owq&&G.owq[0];if(!u)return;G.sel=u;G.mode='owq';render();
-  bigNote(`${OPS[u.op].name} 選監視方向`,`點角色旁的箭頭${G.owq.length>1?`（還有 ${G.owq.length-1} 名）`:''}`,u.side==='A'?'a':'d',1400);}
+Object.assign(I18X,{'電擊無人機選擇朝向':['Choose shock drone facing',''],'點電車旁的箭頭':['Tap an arrow beside the drone',''],'電車行動後由電車選擇朝向，不再要求 Twitch 轉向；電車模型縮小一半。':['After drone actions, choose the drone’s facing instead of Twitch’s. Drone model size halved.','']});
+function owqActor(u){return twUser(u)&&twLock(u)==='drone'?twDrone(u):u;}
+function owqNext(){const u=G.owq&&G.owq[0];if(!u)return;const a=owqActor(u);G.sel=u;G.mode='owq';if(a!==u&&a)followCam(a);render();
+  bigNote(a!==u?'電擊無人機選擇朝向':`${OPS[u.op].name} 選監視方向`,a!==u?'點電車旁的箭頭':`點角色旁的箭頭${G.owq.length>1?`（還有 ${G.owq.length-1} 名）`:''}`,u.side==='A'?'a':'d',1400);}
 function owqStart(s){if(G.coop&&!coopMyTurn())return false;if(G.over||s!==G.player||G.tut||G.tut2||G.owqDone||(G.clock&&G.clock[s]<=0))return false;if(G.active)endAct(G.active);
-  const q=alive(s).filter(u=>u.x>=0&&!u.overwatch&&(u.activated||u===G.active)&&(!G.coop||u.own===coopRole()));if(!q.length)return false;G.owq=q;G.busy=false;owqNext();return true;}
-function owqTap(x,y){const u=G.owq&&G.owq[0];if(!u)return;if(!adj8all(u.x,u.y).some(([a,b])=>a===x&&b===y))return render();
-  overwatch(u,false,[x-u.x,y-u.y]);G.owq.shift();if(G.owq.length)return owqNext();G.owq=null;G.mode='move';G.sel=null;G.owqDone=true;endPhase();}
+  const q=alive(s).filter(u=>u.x>=0&&owqActor(u)&&(owqActor(u)!==u||!u.overwatch)&&(u.activated||u===G.active)&&(!G.coop||u.own===coopRole()));if(!q.length)return false;G.owq=q;G.busy=false;owqNext();return true;}
+function owqTap(x,y){const u=G.owq&&G.owq[0];if(!u)return;const a=owqActor(u);if(a&&!adj8all(a.x,a.y).some(([b,c])=>b===x&&c===y))return render();
+  if(a&&a!==u){a.fd=[x-a.x,y-a.y];G._wv=(G._wv||0)+1;camDiscover();revealCheck();}else if(a)overwatch(u,false,[x-u.x,y-u.y]);G.owq.shift();if(G.owq.length)return owqNext();G.owq=null;G.mode='move';G.sel=null;G.owqDone=true;endPhase();}
 // cameras start hidden from the attackers: an operator who sees one, or a drone rolling into its room, finds it
 // v112: a bomb site stays hidden from the attacking player until a drone or an attacker lays eyes on the bomb itself
 const bombHid=s=>!!(G&&G.mission==='hostage')||!!(G&&G.mission==='bomb'&&G.player==='A'&&!G.over&&!G.tut&&!G.tut2&&G.bombC&&G.bombC[s]&&!(G.bombSeen&&G.bombSeen[s]));

@@ -19,6 +19,10 @@ const GSTR={jammer:1,drone:1},gadgetVisibleTo=()=>true;
 const dmgMod=()=>0,nm=u=>u.id,SRCOP={},cheb=(a,b,c,d)=>Math.max(Math.abs(a-c),Math.abs(b-d)),performance={now:()=>0},finkaSave=()=>false,onKill=()=>{},checkWin=()=>{};
 `+cut('function inFan(','function fanCells(')+cut('function sharedCells(','// attackers with line of sight')+cut('function droneReach(','async function droneStep(')+cut('async function damage(','function checkWin(')+cut('function twUser(','// ---------- phases ----------'),c);
 (async()=>{
+ vm.runInContext(cut('function owqActor(', '// cameras start hidden'),c);
+ vm.runInContext(`
+ const alive=s=>G.units.filter(u=>u.alive&&u.side===s),bigNote=()=>{},OPS={twitch:{name:'Twitch'}},endAct=u=>{u.twControl=false;G.active=null},endPhase=()=>{G.ended=true},overwatch=(u,b,fd)=>{u.fd=fd;u.overwatch=true};
+ `,c);
  await vm.runInContext(`(async()=>{
  assert.equal(twDeployTargets(u).length,4);assert(await twDeploy(u,3,2));const d=twDrone(u);
  assert.equal(u.ch,1);assert.equal(d.mp,5);assert.equal(twLock(u),'drone');assert.equal(twChoose(u,'body'),false);assert.equal(twDeployTargets(u).length,0);
@@ -28,7 +32,12 @@ const dmgMod=()=>0,nm=u=>u.id,SRCOP={},cheb=(a,b,c,d)=>Math.max(Math.abs(a-c),Ma
  assert(twTargets(d).includes(foe));foe.x=13;assert(!twTargets(d).includes(foe));foe.x=3;assert(!twTargets(d).includes(foe));foe.x=10;
  blocked=true;assert.equal(twTargets(d).length,0);blocked=false;smoke=true;assert.equal(twTargets(d).length,0);smoke=false;jam=true;assert.equal(twTargets(d).length,0);jam=false;
  await twAttack(u,10,2);assert.equal(foe.hp,3,'direct 1 HP bypasses armour and heavy shield');assert.equal(events.at(-1).k,'twzap');assert.equal(ST(u).dmg,1);
+ u.fd=[0,-1];assert(owqStart('A'));assert.equal(owqActor(u),d);assert.equal(u.twControl,false,'end activation clears control, not drone facing ownership');
+ owqTap(2,3);assert.equal(G.mode,'owq','body-adjacent arrow cannot rotate drone');assert.deepEqual(u.fd,[0,-1]);
+ owqTap(d.x,d.y+1);assert.deepEqual(d.fd,[0,1]);assert.deepEqual(u.fd,[0,-1],'drone facing must not rotate Twitch');assert(G.ended);assert.equal(d.overwatch,undefined,'drone does not gain overwatch');G.owqDone=false;
+ d.alive=false;assert.equal(owqStart('A'),false,'destroyed drone must not request body direction');d.alive=true;
  G.round++;u.activated=false;G.active=null;u.twControl=false;assert.equal(twLock(u),null);assert(twChoose(u,'body'));assert(!twChoose(u,'drone'));assert.equal(twDeployTargets(u).length,0);
+ assert.equal(owqActor(u),u,'body action keeps normal body facing');d.fd=[1,0];
  G.round++;u.twControl=true;twRefresh(u,d);assert.equal(d.mp,5);d.mp=2;twRefresh(u,d);assert.equal(d.mp,2,'cannot refresh by toggling');
  for(let i=0;i<6;i++){d.alive=true;Math.random=()=> (i+.1)/6;await twReceive(foe,d);assert.equal(d.alive,i<3);const r=rolls.at(-1);assert.equal(r[0],'Y');assert.deepEqual(r[1],[i]);assert.deepEqual(r[4],['miss','miss','miss','hit','hit','hit']);}
  d.alive=true;d.x=6;d.y=2;foe.x=10;foe.fd=[-1,0];foe.overwatch=true;foe.owd=[-1,0];foe.owShot=0;foe.owHit=new Set();Math.random=()=>0;
