@@ -1,5 +1,10 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v248：電腦大廳依使用者確認 C 版改為沉浸式主選單。`lobbyDesktop248/lobbyIcon248` 沿用原入口 id 與 `lobRender` handler（含組隊 `ptLobby`），手機 `.lob.m` 完全不變。`cinema248` 的 CSS 只限寬 >760px 的大廳，其他頁面與 v247 戰鬥介面不變。
+  - 左側三模式＋培養／商店／作戰檔案；右側沿用 `copArt` 立繪、可切幹員、真實擊殺／存活場次；底部 `lbRows` 前三名顯示立繪與所屬玩家、自己的排名。贊助與回報只顯示圖示，但保留 aria-label、tooltip 與原對話框。
+  - 背景 `img/ui/lobby-bank-v248.jpg` 是生成的獨立銀行環境素材，不是整張示意圖；按鈕、頭盔、電腦、盾牌心電圖等用 inline SVG，避免把示意數字或假排名寫進遊戲。
+  - `tests/lobby-v248.cjs` 隔離訪客檢查 1600/1400/1000/800/390px、真實戰績、圖示按鈕、切換幹員、贊助／回報與模式入口，無捲動／重疊／頁面錯誤。
+
 - v247：使用者選定桌機 C 版。`desktop247` 在 ≥1000×620、一般 play 畫面啟用；手機、部署、新手教學、結算沿用舊版。`renderDesktop247` 左側小隊、右側行動／道具／情報，無底部操作列；未行動綠、已行動紅（`activated`），攻擊骰依實際 `pd/PROF.d` 分色 × 數量。
   - 保留 `renderActs` 的既有合法性與 handler，附 `data-act-label` 後移到新介面；道具照固定快捷鍵排序。情報用最新 `skText/CSK`，不改技能規則與 CSV。角色名用 `OPS.name`，不可 escape `nm()`（它含 `<b>` HTML）。
   - Alt／Cmd 暫時射擊、Ctrl 暫時破壞、Shift 暫時移動；Shift＋WASD 依鏡頭方向移動，保留路徑、翻越、監視等原判定。Q／E 左右 45°，R 奔跑，G/I/M 道具／情報／行動，T 技能，**Z 特殊按鈕（使用者已改掉 S）**，F 封門，Space 完成，Ctrl＋Space 結束階段，鍵盤上排 1–0/− 選道具。
