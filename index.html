@@ -2831,6 +2831,64 @@ body.hasClk #tracker .seg{display:none}
 @keyframes obStun{0%{box-shadow:0 0 0 2px #ff3b30,0 0 12px #ff3b30}100%{box-shadow:0 0 0 2px rgba(255,59,48,.3),0 0 2px rgba(255,59,48,.3)}}
 @keyframes obGl{0%{transform:translate(0,0)}33%{transform:translate(-1px,1px)}66%{transform:translate(1px,-1px)}}
 @keyframes obSp{to{transform:rotate(360deg)}}
+/* v250: portrait viewports retain heads and full-width weapon silhouettes. */
+.opBust250{display:block;overflow:hidden;pointer-events:none;flex:none}
+.bPodium{overflow:visible;margin-top:44px;height:360px}
+.bPortrait.opBust250{bottom:108px;width:42%;height:260px;mask-image:linear-gradient(#000 90%,transparent);overflow:hidden}
+.bPortrait.opBust250.p1{left:23%;width:54%;height:310px;z-index:3}
+.bPortrait.opBust250.p2{left:-5%;z-index:1}.bPortrait.opBust250.p3{right:-5%;z-index:1}
+.bEntry>.opBust250{width:76px;height:68px;mask-image:linear-gradient(#000 88%,transparent)}
+.bOwn .bEntry>.opBust250{height:54px}
+#tlob .lcRank248{overflow:visible}
+#tlob .lcRank248>.opBust250{position:absolute;left:-7%;top:-8%;width:114%;height:94%;z-index:1;mask-image:linear-gradient(#000 76%,transparent 100%)}
+#tlob .lcRank248>span{z-index:4;background:linear-gradient(transparent,#16212bd9 35%);padding-top:5px}
+#tlob .lcRank248.rank1{z-index:3}
+#tlob .lcRank248>em{z-index:5}
+@media(max-width:760px){.bPodium{margin-top:36px;height:330px}.bPortrait.opBust250{bottom:112px;height:215px;width:46%}.bPortrait.opBust250.p1{left:20%;width:60%;height:260px}.bEntry>.opBust250{width:48px;height:58px}}
+#taskModal250{z-index:225;background:#03090dbb;backdrop-filter:blur(9px)}
+.taskBox250{width:min(1000px,94vw);max-height:calc(100dvh - 60px);padding:22px;overflow:hidden}
+.taskBox250 .pshead{flex:none}.taskBox250 .pshead small{color:var(--accent);font:11px var(--mono);letter-spacing:.2em;display:block}.taskBox250 .pshead b{font-size:26px}.taskBody250{min-height:0;overflow-y:auto;overscroll-behavior:contain}.taskBody250 .tkHero h2{display:none}.taskBody250 .tkWrap{margin-top:12px}.taskBody250 .tkFoot{font-size:11px}
+#menuBack250{position:fixed;left:28px;top:22px;z-index:215;width:44px;height:44px;display:grid;place-items:center;padding:0;background:#111d27ed;color:#d8e4eb;border:1px solid #667c8c;border-left:3px solid #e4b446;box-shadow:0 4px 15px #0005}
+#menuBack250[hidden]{display:none}#menuBack250 svg{width:24px;height:24px}#menuBack250:hover{border-color:var(--accent);color:var(--accent)}
+@media(min-width:1000px) and (min-height:620px){
+body.menuBack250 #tplayer{visibility:hidden}
+body.menuBack250 #cpBack,body.menuBack250 #cpSkBack,body.menuBack250 #alBack,body.menuBack250 #shBack,body.menuBack250 #osBack,body.menuBack250 #osX,body.menuBack250 #tmenu #t-back,body.menuBack250 #tlob .libHd>.lobAr,body.menuBack250 #wzBack{display:none!important}
+#cop .cpBox{inset:84px 32px 28px;width:auto;max-width:1480px;max-height:none;padding:0;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(430px,1fr);grid-template-rows:68px minmax(0,1fr) 74px 64px;gap:12px 30px;overflow:hidden;border:1px solid #334957;background:linear-gradient(125deg,#172733b8,#0d1721f2);box-shadow:0 20px 65px #0005}
+#cop .cpBox>.cpTop{grid-column:1/-1;padding:14px 24px;border-bottom:1px solid #3a4c59;background:#0e1924bd;gap:18px}
+#cop .cpTt h2{font-size:28px}#cop .cpTt small{font-size:11px}#cop .cpAlB{font-size:14px!important;padding:10px 18px!important}
+#cop .cpSw button{font-size:15px!important;padding:12px 24px!important}
+#cop .cpStage{grid-column:1;grid-row:2/5;margin:0;min-height:0;overflow:hidden;container-type:normal;background:radial-gradient(ellipse at 55% 50%,#385c7355,transparent 65%)}
+#cop .cpArt,#cop .cpArt.cw{left:10%;top:1%;width:82%;height:98%;max-height:none;transform:none;object-fit:contain;object-position:50% 100%;mask-image:linear-gradient(#000 88%,transparent)}
+#cop .cpBig{right:8px;top:10px;font-size:84px}
+#cop .cpL{left:24px;top:14px;bottom:20px;max-width:47%;gap:14px}
+#cop .cpNm{font-size:clamp(28px,3vw,44px)}#cop .cpTag{font-size:14px;padding:3px 10px}
+#cop .cpKd{gap:10px;margin-top:12px}#cop .cpKd div{padding:8px 12px}#cop .cpKd b{font-size:34px}#cop .cpKd span{font-size:12px}
+#cop .cpPenta{height:190px;max-height:190px;flex:0 1 190px;margin-top:auto;background:#0d1822ab;border:1px solid #395063}
+#cop .cpKit{right:16px;bottom:22px;width:150px;gap:9px}#cop .cpKl{font-size:13px}
+#cop .cpSlot.g{height:67px}#cop .cpSlot.s{height:115px}#cop .cpSlot.s>.cpGi{height:103px}#cop .cpSlot.s img{width:100px;height:100px}
+#cop .cpBox .cpStats{grid-column:2;grid-row:2;padding:16px 24px 0 0;justify-content:center;gap:12px;min-height:0}
+#cop .cpBox .cpRow{height:clamp(38px,6.4vh,68px);flex:0 1 68px;min-height:36px;grid-template-columns:66px minmax(0,1fr) 36px 36px;gap:8px;padding:0 10px;border:1px solid #314350;border-left-width:3px}
+#cop .cpBox .cpLb{font-size:15px}#cop .cpBox .cpC{height:25px;max-width:56px}#cop .cpBox .cpVal{font-size:16px}#cop .cpBox .cpPm{width:36px;height:34px;font-size:20px!important}
+#cop .cpBox .cpPbar{grid-column:2;grid-row:3;margin:0 24px 0 0;padding:12px 16px}#cop .cpPv span{font-size:13px}#cop .cpBox .cpPv b{font-size:38px}#cop .cpLg{font-size:12px}#cop .cpTr{height:8px}
+#cop .cpBox>.cpFoot{grid-column:2;grid-row:4;padding:0 24px 14px 0;gap:12px}#cop .cpBox>.cpFoot .cpBtn{height:50px;font-size:18px!important}
+#cop .cpFull{inset:84px 32px 28px;max-width:1480px;padding:16px 20px;display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:64px 48px auto minmax(0,1fr) 60px;gap:10px;border:1px solid #3b5060}
+#cop .cpFull>.cpTop{grid-column:1/-1;padding:0 10px}#cop .cpFull>.cpTabs{grid-column:1;grid-row:2;padding:0}#cop .cpFull>.cpNote{grid-column:1;grid-row:3}
+#cop .cpFull>.cpSg{grid-column:1;grid-row:4/6;grid-template-columns:repeat(5,minmax(0,1fr));padding:0;gap:10px;grid-auto-rows:140px}
+#cop .cpSk .ic img{width:56px;height:56px}#cop .cpSk .n{font-size:12px}#cop .cpSk .mt,#cop .cpSk .pr{font-size:11px}
+#cop .cpFull>.cpDet{grid-column:2;grid-row:2/5;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;margin:0;padding:24px;overflow-y:auto}
+#cop .cpDet img,#cop .cpDet>svg{width:110px;height:110px}#cop .cpDet b{font-size:26px}#cop .cpDet small{font-size:13px}#cop .cpDet p{font-size:15px;line-height:1.8;max-height:none;overflow:visible}
+#cop .cpFull>.cpFoot{grid-column:2;grid-row:5;padding:0}#cop .cpOv{justify-content:center;padding:28px}#cop .cpSheet{max-width:800px;max-height:90vh;overflow:auto;padding:24px}
+#copAl .alBox{padding-top:90px;max-width:1150px}
+#tlob .trn.d .trnBody{left:7%;right:7%;top:174px;bottom:6%;display:flex;align-items:center;justify-content:center}
+#tlob .trn.d .trnCats{width:100%;max-width:1250px;height:min(510px,100%);gap:24px}
+#tlob .trn.d .trnCat .ar{background-size:auto 94%;background-position:center 2%}
+#tlob .trn.d .trnCat .tx{left:22px;right:22px;bottom:24px}#tlob .trn.d .trnCat b{font-size:30px}
+#tlob .trn.d .trnJob{width:100%;max-width:1440px;height:min(640px,100%);gap:16px}
+#tlob .trn.d .trnCd .ar{background-size:auto 115%;background-position:center 2%}
+#tlob .trn.d .trnCd[data-w=smg] .ar{background-size:auto 90%}
+#tlob .trn.d .trnBr .op{height:76%;right:5%;max-width:45%}
+}
+@media(min-width:1000px) and (max-height:760px){#cop .cpBox{grid-template-rows:58px minmax(0,1fr) 60px 60px;gap:6px 18px}#cop .cpStats{gap:6px;padding-top:5px}#cop .cpRow{height:38px;flex-basis:38px}#cop .cpC{height:20px}#cop .cpPenta{max-height:140px}#cop .cpKd b{font-size:27px}#cop .cpKit{width:124px}#cop .cpSlot.g{height:52px}#cop .cpSlot.s{height:86px}#cop .cpSlot.s img{width:76px;height:76px}}
 /* v91 custom operator page */
 #cop{position:fixed;inset:0;z-index:115;background:radial-gradient(90% 55% at 50% 22%,#22405e99,transparent 70%),linear-gradient(180deg,#0e141b,#090d12);color:#e2e8ee;animation:shIn .22s ease;font-family:var(--body);font-size:13px;line-height:1.35;--Y:#e8c840;--O:#ef8a3a;--R:#e8574e;--G:#5fc27d;--B:#4aa8e2;--V:#b48cf0;--ln:#2c3b4a}
 #cop.out{animation:shOut .18s ease forwards}
@@ -11397,9 +11455,12 @@ function lbRowHTML(r,n){return `<li class="${r.mine?'me':''}"><em>${n}</em><div>
 function lbMeHTML(){const m=lbMyRank();return `<div class="lbMe"><span>我的排名</span>${m?`<div class="mer"><em>${m.n}</em><div><b>${esc(m.r.nm)}</b><span>存活 ${m.r.sv|0} 場 · 擊殺 ${m.r.k|0}</span></div></div>`:`<div class="mer none"><em>—</em><div><b>還沒上榜</b><span>培養幹員出戰，擊殺或存活就會上榜</span></div></div>`}</div>`;}
 function lbArt(r){const i=r.i===1?1:0;return copArt({w:Object.prototype.hasOwnProperty.call(WPN,r.w)?r.w:null},i);}
 function lbStats(r){return `<span class="bKills"><b>${r.k|0}</b> <small>擊殺</small></span><span><b>${r.sv|0}</b> <small>存活</small></span>`;}
-function lbEntry(r,n,cls=''){return `<div class="bEntry ${cls} ${r.mine?'mine':''}" data-rank="${n}"><em>${n}</em><img src="${lbArt(r)}" alt="" loading="lazy"><div class="bIdentity"><b>${esc(r.nm)}</b><small>${esc(r.by||'?')} <span>的幹員</span></small></div><div class="bStats">${lbStats(r)}</div></div>`;}
+// A source viewport, not object-fit:cover: keep the entire image width and head.
+// Long sniper barrels require the full source height; other classes end at the waist.
+function lbBust250(r,cls=''){const h={hs:520,sh:500,mg:500,sg:600,rf:580,sn:1000,smg:650}[r.w]||550;return `<svg class="opBust250 ${cls}" viewBox="0 0 1000 ${h}" preserveAspectRatio="xMidYMin meet" aria-hidden="true" data-bust="${h}"><svg width="1000" height="${h}" overflow="hidden"><image href="${lbArt(r)}" width="1000" height="1000" preserveAspectRatio="xMidYMin meet"/></svg></svg>`;}
+function lbEntry(r,n,cls=''){return `<div class="bEntry ${cls} ${r.mine?'mine':''}" data-rank="${n}"><em>${n}</em>${lbBust250(r)}<div class="bIdentity"><b>${esc(r.nm)}</b><small>${esc(r.by||'?')} <span>的幹員</span></small></div><div class="bStats">${lbStats(r)}</div></div>`;}
 function boardHTML(){lbLoad();const L=lbRows(LB.tab).slice(0,50),m=lbMyRank(LB.tab);
- return `<section class="boardPage"><header class="bHead"><button id="t-back" aria-label="返回">‹</button><div><small>HALL OF FAME</small><h2>排行榜</h2></div><span>TOP 50</span></header><nav class="bTabs" aria-label="排名分類">${[['alive','現役菁英'],['fallen','英勇烈士']].map(([k,n])=>`<button data-lbtab="${k}" aria-pressed="${LB.tab===k}" class="${LB.tab===k?'on':''}">${n}</button>`).join('')}</nav><div class="bScroll" tabindex="0"><p class="bNote">擊殺優先，同分依存活場數排名</p>${L.length?`<div class="bPodium">${[1,0,2].map(i=>{const r=L[i],n=i+1;return r?`<div class="bPlinth p${n}"></div><img class="bPortrait p${n}" src="${lbArt(r)}" alt=""><article class="bPodInfo p${n}" data-rank="${n}"><em>${n}</em><b>${esc(r.nm)}</b><small>${esc(r.by||'?')} <span>的幹員</span></small><div class="bStats">${lbStats(r)}</div></article>`:'';}).join('')}</div><div class="bRows">${L.slice(3).map((r,i)=>lbEntry(r,i+4)).join('')}</div>`:`<p class="bEmpty">${LB.list==null?'讀取中…':LB.tab==='fallen'?'尚無陣亡幹員上榜':'還沒有人上榜'}</p>`}</div><footer class="bOwn"><label>我的排名</label>${m?lbEntry(m.r,m.n):`<div class="bNoRank"><b>—</b><span>${LB.tab==='fallen'?'尚無陣亡幹員上榜':'培養幹員出戰，擊殺或存活就會上榜'}</span></div>`}</footer></section>`;}
+ return `<section class="boardPage"><header class="bHead"><button id="t-back" aria-label="返回">‹</button><div><small>HALL OF FAME</small><h2>排行榜</h2></div><span>TOP 50</span></header><nav class="bTabs" aria-label="排名分類">${[['alive','現役菁英'],['fallen','英勇烈士']].map(([k,n])=>`<button data-lbtab="${k}" aria-pressed="${LB.tab===k}" class="${LB.tab===k?'on':''}">${n}</button>`).join('')}</nav><div class="bScroll" tabindex="0"><p class="bNote">擊殺優先，同分依存活場數排名</p>${L.length?`<div class="bPodium">${[1,0,2].map(i=>{const r=L[i],n=i+1;return r?`<div class="bPlinth p${n}"></div>${lbBust250(r,'bPortrait p'+n)}<article class="bPodInfo p${n}" data-rank="${n}"><em>${n}</em><b>${esc(r.nm)}</b><small>${esc(r.by||'?')} <span>的幹員</span></small><div class="bStats">${lbStats(r)}</div></article>`:'';}).join('')}</div><div class="bRows">${L.slice(3).map((r,i)=>lbEntry(r,i+4)).join('')}</div>`:`<p class="bEmpty">${LB.list==null?'讀取中…':LB.tab==='fallen'?'尚無陣亡幹員上榜':'還沒有人上榜'}</p>`}</div><footer class="bOwn"><label>我的排名</label>${m?lbEntry(m.r,m.n):`<div class="bNoRank"><b>—</b><span>${LB.tab==='fallen'?'尚無陣亡幹員上榜':'培養幹員出戰，擊殺或存活就會上榜'}</span></div>`}</footer></section>`;}
 function trainHTML(){return `<h2 class="tsec">訓練任務</h2>`+`<button id="t-tu2" class="tbtn primary"><b>新手教學</b><span>重溫第一次的教學關卡</span></button><button class="tbtn" disabled style="opacity:.45"><b>更多關卡</b><span>敬請期待</span></button>`;}
 const lobNav=on=>`<nav class="lobNav">${[['home','t-home','home','大廳'],['train','t-train2','flag','訓練'],['cop','t-cop','user','培養'],['shop','t-shop','shop','商店'],['lib','t-lib','book','作戰檔案']].map(([k,id,ic,l])=>`<button id="${id}"${k===on?' class="on"':''}>${lobIc(ic)}<span>${l}</span></button>`).join('')}</nav>`;
 // v159: 作戰檔案 — roster first, rules and achievements as side cards
@@ -11538,7 +11599,7 @@ function libHTML(){const M=lobMob(),all=OPBASE.filter(b=>!/^recruit_/.test(b)),o
 // v248: cinematic desktop lobby; all controls keep their original handlers.
 function lobbyIcon248(k){const paths={monitor:'<rect x="3" y="4" width="18" height="13" rx="1"/><path d="M8 21h8M12 17v4"/>',helmet:'<path d="M4 13V10a8 8 0 0116 0v3M3 13h18v4h-5l-2 4h-4l-2-4H3zM8 13v3m8-3v3"/>',pulse:'<path d="M12 2l8 3v7c0 5-8 10-8 10S4 17 4 12V5zM6 12h3l2-5 2 10 2-5h3"/>',chevron:'<path d="M9 5l7 7-7 7"/>'};return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${paths[k]||LOBI_SVG[k]||LOBI_SVG.train}</svg>`;}
 const LOBBY249={tab:'alive',next:0,visible:false,busy:false};
-function lobbyBoard249(tab){const L=lbRows(tab).slice(0,3),m=lbMyRank(tab);return `<span class="lcBoardFace249" data-board-category="${tab}"><span class="lcBoardTitle248">${lobbyIcon248('trophy')}<b>排行榜</b><small>${tab==='fallen'?'英勇烈士':'現役菁英'}</small></span><span class="lcPodium248">${L.length?L.map((r,n)=>`<span class="lcRank248 rank${n+1}"><em>${n+1}</em><img src="${lbArt(r)}" alt="" loading="eager"><span><b>${esc(r.nm)}</b><small>${esc(r.by||'?')} 的幹員</small><small>擊殺 ${r.k|0} · 存活 ${r.sv|0}</small></span></span>`).join(''):`<span class="lcEmpty248">${LB.list==null?'讀取中…':tab==='fallen'?'尚無陣亡幹員上榜':'還沒有人上榜'}</span>`}</span><span class="lcMyRank248"><small>我的排名</small><b>${m?'# '+m.n:'—'}</b><small>${m?esc(m.r.nm):'還沒上榜'}</small></span></span>`;}
+function lobbyBoard249(tab){const L=lbRows(tab).slice(0,3),m=lbMyRank(tab);return `<span class="lcBoardFace249" data-board-category="${tab}"><span class="lcBoardTitle248">${lobbyIcon248('trophy')}<b>排行榜</b><small>${tab==='fallen'?'英勇烈士':'現役菁英'}</small></span><span class="lcPodium248">${L.length?L.map((r,n)=>`<span class="lcRank248 rank${n+1}"><em>${n+1}</em>${lbBust250(r)}<span><b>${esc(r.nm)}</b><small>${esc(r.by||'?')} 的幹員</small><small>擊殺 ${r.k|0} · 存活 ${r.sv|0}</small></span></span>`).join(''):`<span class="lcEmpty248">${LB.list==null?'讀取中…':tab==='fallen'?'尚無陣亡幹員上榜':'還沒有人上榜'}</span>`}</span><span class="lcMyRank248"><small>我的排名</small><b>${m?'# '+m.n:'—'}</b><small>${m?esc(m.r.nm):'還沒上榜'}</small></span></span>`;}
 async function lobbyFlip249(now=Date.now()){
  const board=document.querySelector('.cinema248 .lcBoard248');const visible=!!(board&&SCREEN==='title'&&!document.hidden&&!$('#title')?.hidden&&gnavState()==='home');
  if(!visible){LOBBY249.visible=false;return;}
@@ -13213,6 +13274,18 @@ function buyOp(b,after){const c=OPC[b];if(!c||owned(b))return after&&after();let
   $('#bdYes').onclick=()=>{if(ECO.rn<OPPRICE)return;ECO.rn-=OPPRICE;if(!ECO.own.includes(c.base))ECO.own.push(c.base);ecoSave();el.hidden=true;try{SFX.alert();}catch(e){}
     try{achToastMsg(`已解鎖 ${c.name}`,'現在可以帶他出戰了');}catch(e){}try{renderPlayer();}catch(e){}if(after)after();};}
 function ecoTag(){const t=ECO.title&&OPC[ECO.title]&&mxLv(ECO.mx[ECO.title]||0)>=5?mxTitle(ECO.title):'';return `<span class="ptag">${RNI}<b>${fmtN(ECO.rn)}</b>${t?`<em>${esc(t)}</em>`:''}</span>`;}
+{const base=renderPlayer;renderPlayer=function(){base();const b=$('#t-task');if(b)b.onclick=openTask250;};}
+function menuRoute250(){const vis=id=>{const e=document.getElementById(id);return e&&!e.hidden&&getComputedStyle(e).display!=='none';},click=id=>()=>document.getElementById(id)?.click();
+ if(!matchMedia('(min-width:1000px) and (min-height:620px)').matches||!preGame())return null;
+ if(vis('opsel'))return click('osBack');if(vis('rbook'))return click('rbX');if(vis('manual'))return click('manualClose');if(vis('achp'))return ()=>$('#achp')?.remove();
+ if(vis('copAl'))return click('alBack');
+ if(vis('cop'))return CP.sheet?(CP.sheet.t==='s'?click('cpSkBack'):()=>{CP.sheet=null;renderCop();}):click('cpBack');
+ if(vis('shop'))return vis('shDet')?click('shX'):click('shBack');
+ if(SCREEN==='train')return TRS.pk?()=>{TRS.pk=null;lobRender();}:()=>{if(TRS.v!=='cats'){trnTop();lobRender();}else{SCREEN='title';renderTitle();}};
+ if(SCREEN==='lib')return ()=>{SCREEN='title';renderTitle();};if(SCREEN==='board')return click('t-back');if(SCREEN==='setup')return click('wzBack');return null;
+}
+function menuSync250(){let b=$('#menuBack250');const route=menuRoute250();document.body.classList.toggle('menuBack250',!!route);if(!route){if(b)b.hidden=true;return;}if(!b){b=document.createElement('button');b.id='menuBack250';b.setAttribute('aria-label','返回');b.title=tt('返回');b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m14 5-7 7 7 7"/></svg>';document.body.appendChild(b);b.onclick=()=>{const fn=menuRoute250();if(fn)fn();menuSync250();};}b.hidden=false;}
+setInterval(menuSync250,150);
 function taskHTML(){ecoRoll();const row=(id,daily)=>{const t=TKALL[id],p=tkProg(id,daily),done=p>=t[3],got=(daily?ECO.dc:ECO.wc).includes(id),n=Math.min(t[3],12),on=Math.round(n*p/t[3]);
     return `<button class="tk ${got?'got':done?'done':''}" data-tk="${id}" ${done&&!got?'':'tabindex="-1"'}><span class="tkT">${t[1]}</span><span class="tkN">${got?'已領取':done?'領取':p+'/'+t[3]}</span><span class="tkR">${RNI}${fmtN(t[4])}</span><span class="tkPips">${Array.from({length:n},(_,i)=>`<i class="${i<on?'on':''}"></i>`).join('')}</span></button>`;};
   const left=()=>{const n=new Date(),m=new Date(n);m.setHours(24,0,0,0);const s=Math.max(0,m-n)/1000|0;return `${Math.floor(s/3600)} 小時 ${Math.floor(s%3600/60)} 分`;};
@@ -13221,8 +13294,12 @@ function taskHTML(){ecoRoll();const row=(id,daily)=>{const t=TKALL[id],p=tkProg(
   <div class="tkWrap"><div class="tkSec"><h4>每日任務</h4>${ECO.dt.map(id=>row(id,1)).join('')}</div>
   <div class="tkSec"><h4>每週任務<small>每週一更新</small></h4>${TK_W.map(t=>row(t[0],0)).join('')}</div></div>
   <p class="tkFoot">對局獎勵：線上對戰 勝 700／敗 500 · 電腦練習 勝 500／敗 300 · 額外：安裝／解除拆彈器 +50、人質護送成功 +100、傷害人質 −50</p>`;}
-function bindTask(){document.querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{const id=b.dataset.tk,daily=id[0]==='d',t=TKALL[id],L=daily?ECO.dc:ECO.wc;
-  if(L.includes(id)||tkProg(id,daily)<t[3])return;L.push(id);ecoAdd(t[4]);ecoSave();try{SFX.alert();}catch(e){}renderTitle();renderPlayer();});}
+function openTask250(){if(typeof G!=='undefined'&&G&&!G.over&&document.body.dataset.scr!=='title')return;
+ const el=tsDlg('taskModal250','任務',`<section class="psbox taskBox250"><header class="pshead"><div><small>MISSIONS</small><b>任務</b></div><button class="tsX" aria-label="關閉">✕</button></header><div class="taskBody250">${taskHTML()}</div></section>`);bindTask(el);el.querySelector('.tsX').focus();
+ if(!openTask250.bound){openTask250.bound=true;addEventListener('keydown',e=>{const m=$('#taskModal250');if(e.key==='Escape'&&m&&!m.hidden){e.preventDefault();m.hidden=true;$('#t-task')?.focus();}});}
+}
+function bindTask(root=document){root.querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{const id=b.dataset.tk,daily=id[0]==='d',t=TKALL[id],L=daily?ECO.dc:ECO.wc;
+  if(L.includes(id)||tkProg(id,daily)<t[3])return;L.push(id);ecoAdd(t[4]);ecoSave();try{SFX.alert();}catch(e){}if(root.id==='taskModal250')openTask250();else renderTitle();renderPlayer();});}
 // ---------- shop: a dedicated page for unlocking operators with renown ----------
 const SHOP={side:'A',filter:'all',pg:0,sel:null,per:12};
 const shopAll=s=>OPBASE.filter(b=>OPC[b].side===s&&!b.startsWith('recruit_'));
@@ -14118,6 +14195,8 @@ Object.assign(I18X,{'戰術指揮':['Tactical command',''],'對手行動中':['O
 Object.assign(I18X,{'此技能在部署階段放置，對戰中由裝置自動生效。':['Place this device during deployment; its effect triggers automatically in play.',''],'使用次數、範圍與效果依下方說明。':['Charges, range and effects are detailed below.',''],'這是被動技能，符合條件時自動觸發。':['This passive skill triggers automatically when its conditions are met.','']});
 NEWS[0].v='v243–v249';NEWS[0].i.unshift('電腦大廳重製背景構圖、幹員光影與斜角按鈕；排行榜每 10 秒在現役菁英與英勇烈士間向上翻換。','電腦版大廳改為沉浸式主選單：左側對戰入口、右側幹員與擊殺／存活場次，下方展示排行榜；保留愛心贊助與回報圖示。','電腦版戰術介面：左側小隊、右側行動／道具／情報，彩色攻擊骰數量、滾輪選角與完整鍵盤快捷操作；特殊按鈕改用 Z。');
 I18X['電腦大廳重製背景構圖、幹員光影與斜角按鈕；排行榜每 10 秒在現役菁英與英勇烈士間向上翻換。']=['Refined lobby scene, operator lighting and angled buttons; the leaderboard flips upward between active and fallen operators every 10 seconds.',''];
+NEWS.unshift({d:'2026-11-10',v:'v250',i:['排行榜改為半身視窗，保留頭部與武器；任務改為覆蓋視窗，電腦培養頁與技能收藏改為雙欄，縮小訓練圖片並統一選單返回位置。']});
+I18X['排行榜改為半身視窗，保留頭部與武器；任務改為覆蓋視窗，電腦培養頁與技能收藏改為雙欄，縮小訓練圖片並統一選單返回位置。']=['Leaderboard bust portraits preserve heads and weapons; missions open in a dialog, desktop training and skill collection use two columns, training artwork is smaller, and menu back controls share one position.',''];
 Object.assign(I18X,{'存活場次':['Matches survived',''],'幹員資訊':['Operator information',''],'電腦版大廳改為沉浸式主選單：左側對戰入口、右側幹員與擊殺／存活場次，下方展示排行榜；保留愛心贊助與回報圖示。':['Cinematic desktop lobby: play menu on the left, operator with kills and matches survived on the right, leaderboard below; support and feedback icons retained.','']});
 I18X['電腦版戰術介面：左側小隊、右側行動／道具／情報，彩色攻擊骰數量、滾輪選角與完整鍵盤快捷操作；特殊按鈕改用 Z。']=['Desktop tactical workspace: squad rail, Action/Gear/Intel tabs, color-coded dice counts, wheel selection and keyboard shortcuts; Z for special controls.',''];
 // ---------- round clocks: each squad gets (time per Operator x Operators in play) per round, shared by its two activation phases ----------
