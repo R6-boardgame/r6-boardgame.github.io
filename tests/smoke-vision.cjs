@@ -4,6 +4,7 @@ const cut=(a,b)=>html.slice(html.indexOf(a),html.indexOf(b,html.indexOf(a)));
 const ctx=vm.createContext({assert,console});
 vm.runInContext(`
 let G={W:10,H:10,grid:true,phase:'play',gadgets:[],units:[]};
+const remoteDrone=g=>g.type==='drone'&&['twitch','echo','mozzie'].includes(g.own);
 const floor={t:'floor',indoor:true},walls=new Set();
 const cell=(x,y)=>walls.has(x+','+y)?{t:'hard'}:floor;
 const blocks=c=>c.t==='hard',jammed=()=>false,outCam=()=>true,noFog=()=>false,winOpen=()=>false;

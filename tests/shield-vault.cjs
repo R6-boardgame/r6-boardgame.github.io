@@ -3,6 +3,7 @@ const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),
 const cut=(a,b)=>{const i=html.indexOf(a),j=html.indexOf(b,i);assert(i>=0&&j>i);return html.slice(i,j)};
 const c=vm.createContext({assert,console});
 c.twUser=()=>false;
+c.skillMoved=async()=>{};
 vm.runInContext(`
 let G={W:5,H:1,player:'A',units:[],gadgets:[],map:{spawns:[]}},DMGBY=null;
 let terrain=Array.from({length:5},()=>({t:'floor'})),waits=[],poses=[];

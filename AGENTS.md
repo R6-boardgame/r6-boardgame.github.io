@@ -1,5 +1,14 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v245：依使用者確認的 CSV 差異及補充更新技能。主 script 尾段 `v245: confirmed operator rules` 集中技能控制、動畫、包裝與 `SKILL245` 說明（同步 `data/skills.csv`）。沿用 v244 立繪，保留新版 Twitch、Mira、Iana、Goyo、Amaru。
+  - `twUser/remoteDrone` 共用 Twitch、Echo、Mozzie 操作；Echo 5 步／180°／6 格，只己方可見且只能音波震暈，Mozzie 在進攻方部署普通／電擊無人機時立即獲得一次充能（掃描不重複給）。
+  - `airjabCheck` 鄰格觸發並推離最多 5 格；`UG.gridlock` 四鄰格隨機連通擴張最多 10 格，新尖刺只影響所在格。`skillMoved` 同時處理 Caveira 三步解除與 Melusi 剩餘步數減半。
+  - Lesion 初始／攜帶上限 2、每輪 +1。`guPoison/guBy/guTick` 保留跟隨標記、來源與每輪一次傷害；`guTrigger/guRemove` 處理特寫和橘色拔除。`startPhase` 等待毒傷結算後才開始下一階段。
+  - Maverick 每次 1 行動、不限次；`mavHole` 支援鐵牆真洞，`destroyCell` 第三參數 `quiet` 不播音效。Capitão 共用 3 次，煙霧同煙霧彈、火焰 8 階段；Smoke 毒氣 4 階段。
+  - `catchThrow` 現在是 async，呼叫必須 await。ADS 紅光攔截，Mag-NET 緩慢吸入，每台兩次。
+  - `machineBurst` 視線內指定敵人；4 面職業圖／2 空白，圖示 +1 傷後繼續。培養 MG 每段最多 3 顆，`copDice` 另加免費黃骰，不算限制。
+  - 測試：`tests/operator-skills-v245.cjs`、`tests/twitch-drone.cjs`；`tests/browser-skills-v245.cjs` 用隔離訪客瀏覽器驗證實際操作和 390×844／1400×900 畫面（R6_PLAYWRIGHT 指向已安裝的套件）。既有 `shield-classes.cjs` 的 4 !== 3 是先前已存在的失敗。
+
 - v243：階段結束 `owqActor` 依本輪操作對象選電車／本體，電車選向只更新電車 fd；輸入、2D／3D 箭頭均以電車座標為準。電車被毀不回頭要求 Twitch 選向。`twModel` 等比例縮為 .5。
 
 - v242：Twitch 改持續存在的電擊無人機（`tw*` 函式區塊），左側紫色無字按鈕部署／切換。`twRound/twActor` 在首次移動、轉向或動作鎖定本體／電車到本輪結束；部署選電車。單位仍由本體持有啟動與行動點；電車獨立 5 步、180°／10 格視野、6 格攻擊，直接扣 1 HP（`damage` 的 direct 參數保留擊殺記帳）。每場 2 台、同時 1 台；不用舊 disposable `moving` 無人機流程。Twitch 死亡後電車持續提供視野，不能操作，但仍可被敵人摧毀。對電車的射擊／監視／範圍傷害走 `twReceive`，1 顆特殊骰 3 MISS／3 準星，命中摧毀。移入火、毒氣、電流仍是環境危害。`tests/twitch-drone.cjs` 覆蓋規則，`tests/twitch.html` 是不連雲端的模型／按鈕／骰面測試。

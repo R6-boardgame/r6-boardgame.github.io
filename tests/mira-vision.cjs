@@ -4,6 +4,7 @@ const cut=(a,b)=>html.slice(html.indexOf(a),html.indexOf(b,html.indexOf(a)));
 vm.runInNewContext(`
 const G={W:9,H:9,grid:true,gadgets:[{alive:true,type:'mirror',x:4,y:4,mi:[0,1],side:'D'}],units:[]};
 let wall={t:'soft',mirror:true},smoke=false;
+const remoteDrone=g=>g.type==='drone'&&['twitch','echo','mozzie'].includes(g.own);
 const cell=(x,y)=>x===4&&y===4?wall:{t:'floor'},blocks=c=>['soft','reinf','hard'].includes(c.t),smokeAt=()=>smoke,jammed=()=>false;
 `+cut('function lineCells(','// light protection:')+cut('function sharedCells(','// attackers with line of sight')+`
 assert.equal(sharedCells('D').size,0,'unattended mirror provides no sight');

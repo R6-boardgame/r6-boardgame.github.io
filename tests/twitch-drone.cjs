@@ -14,7 +14,7 @@ const adj8=(x,y)=>[[x+1,y],[x-1,y],[x,y+1],[x,y-1]].filter(([a,b])=>a>=0&&b>=0&&
 const unitAt=(x,y)=>G.units.find(u=>u.alive&&u.x===x&&u.y===y),droneOK=()=>true,droneNext=(u,x,y)=>adj8(x,y),droneCost=()=>1,droneHazard=()=>null;
 const jammed=()=>jam,los=()=>!blocked&&!smoke,smokeAt=()=>smoke,VR=u=>u.vr||10;
 const render=()=>{},note=()=>{},camDiscover=()=>{},revealCheck=()=>{},followCam=()=>{},log=()=>{},reveal=u=>u.hidden=false,sleep=async()=>{};
-const SFX={step(){},shot(){},zap(){},kill(){}},fxEv=e=>events.push(e),rollDice3D=async(...a)=>rolls.push(a),diceHide=()=>{};
+const SFX={step(){},shot(){},zap(){},kill(){}},fxEv=e=>events.push(e),rollDice3D=async(...a)=>rolls.push(a),diceHide=()=>{},mozzieFeed=()=>{};
 const GSTR={jammer:1,drone:1},gadgetVisibleTo=()=>true;
 const dmgMod=()=>0,nm=u=>u.id,SRCOP={},cheb=(a,b,c,d)=>Math.max(Math.abs(a-c),Math.abs(b-d)),performance={now:()=>0},finkaSave=()=>false,onKill=()=>{},checkWin=()=>{};
 `+cut('function inFan(','function fanCells(')+cut('function sharedCells(','// attackers with line of sight')+cut('function droneReach(','async function droneStep(')+cut('async function damage(','function checkWin(')+cut('function twUser(','// ---------- phases ----------'),c);
