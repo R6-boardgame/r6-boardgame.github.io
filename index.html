@@ -1264,6 +1264,85 @@ html body #title[data-s="title"] .ttopr{right:auto;left:36%;top:4%;font-size:11p
 @media (min-width:761px) and (min-height:521px){html body #title[data-s="title"] .tside,html body #title .tside{top:20px;right:28px;width:min(58%,980px);gap:10px;display:grid;grid-template-columns:repeat(5,1fr)}html body .tside .tsb{width:auto;height:52px;display:flex;align-items:center;justify-content:center;gap:10px;padding:0 14px;font:700 16px/1 var(--display,inherit);letter-spacing:.06em;color:#e6edf2;background:rgba(8,11,14,.8);border:1px solid rgba(255,255,255,.2)}html body .tside .tsb svg{width:24px;height:24px;flex:none}html body .tside .tsb::before{content:none}html body .tside .tsb.task svg,html body .tside .tsb.news svg{color:#ffd36b}html body .tside .tsb.heart svg{color:#ff5a6e}html body .tside .tsb::after{content:attr(aria-label)}html body .tside .tsb.news.unread::after{content:attr(aria-label);position:static;width:auto;height:auto;border-radius:0;background:none;box-shadow:none}html body .tside .tsb.news.unread{box-shadow:inset 0 -2px 0 #e5483b}html body .tside .tsb.news.unread svg{filter:drop-shadow(0 0 6px rgba(229,72,59,.9))}html body .tside .tsb:hover{border-color:var(--accent);background:rgba(30,24,10,.88)}}@media (min-width:761px) and (min-height:521px){html body #title .ttopr{top:30px;right:calc(28px + min(58%,980px) + 14px)}}
 @media(min-width:761px){html body #title[data-s="title"] .tside{top:3%;right:2.4%;width:auto;display:flex;gap:8px}html body #title[data-s="title"] .tside .tsb{height:44px;padding:0 15px;font-size:14px;background:#101820df;border-color:#75889744;gap:8px}html body #title[data-s="title"] .tside #t-love,html body #title[data-s="title"] .tside #t-fb{width:46px;padding:0}html body #title[data-s="title"] .tside #t-love::after,html body #title[data-s="title"] .tside #t-fb::after{content:none}html body #title[data-s="title"] .tside .tsb svg{width:22px;height:22px}html body #title[data-s="title"] .ttopr{right:auto;left:36%;top:4%}}
 @media(min-width:761px) and (max-width:1100px){html body #title[data-s="title"] .tside{gap:5px}html body #title[data-s="title"] .tside .tsb{padding:0 10px;font-size:12px;height:40px}html body #title[data-s="title"] .tside #t-love,html body #title[data-s="title"] .tside #t-fb{width:40px}}
+/* v249: match the approved reference's angled composition, not a capped tile layout. */
+@media(min-width:761px){
+#tlob .cinema248{--lcU:min(1vw,1.6vh)}
+#tlob .lcBackdrop248{background:linear-gradient(0deg,#0a131b80,transparent 45%),url(img/ui/lobby-bank-v249.jpg) center/cover no-repeat;filter:saturate(.72) brightness(.84)}
+#tlob .lcShade249{position:absolute;inset:0;pointer-events:none;z-index:2;background:linear-gradient(110deg,#08131aee,#0c1721dc 70%,#14202abb);clip-path:polygon(0 0,38% 0,24% 100%,0 100%);border-top:1px solid #8096a22b}
+#tlob .cinema248 .lobHero{height:107%;width:54%;max-width:none;right:0;bottom:-14%;object-position:bottom;filter:drop-shadow(-15px 12px 24px #10172066) brightness(1.06) contrast(1.02)}
+#tlob .cinema248 .lobHero.reference249{height:107%;width:51%;right:0;bottom:-14%;object-fit:contain}
+#tlob .lcMenu248{left:1.3%;top:18.8%;bottom:7.4%;width:33%;max-width:none;gap:3.2vh}
+#tlob .lcModes248{flex:1.4;gap:2.2vh;grid-template-rows:1.23fr 1fr 1fr}
+#tlob .lcEntry248{padding:calc(var(--lcU)*1.7) calc(var(--lcU)*2.6);gap:calc(var(--lcU)*1.5);background:linear-gradient(115deg,#a8c0cd55,#768a9644);border:0;position:relative;isolation:isolate;clip-path:polygon(6% 0,100% 0,93% 100%,0 100%);overflow:hidden;transform:none}
+#tlob .lcModes248 .lcEntry248::before{content:'';position:absolute;inset:1px;z-index:-1;clip-path:inherit;background:linear-gradient(105deg,#14212bea 26%,#15232dbb 55%,#101b26b8),url(img/map/bank_bg.webp) right center/cover}
+#tlob .lcModes248 .lcEntry248:nth-child(2){width:95%;margin-left:.5%}
+#tlob .lcModes248 .lcEntry248:nth-child(3){width:90%;margin-left:.2%}
+#tlob .lcModes248 .lcEntry248:nth-child(3)::before{background:linear-gradient(105deg,#14212bea 25%,#17232dbb 65%,#101b2666),url(img/ui/sides.webp) right center/cover}
+#tlob .lcEntry248.primary248{background:linear-gradient(115deg,#ffe386,#b28229);box-shadow:0 0 24px #f2b94738;color:#fff;filter:drop-shadow(0 0 8px #e5b04733)}
+#tlob .lcModes248 .primary248::before{inset:2px;background:linear-gradient(110deg,#e8af32c9,#c58b2599 70%,#97651d4d),url(img/ui/sides.webp) 75% center/cover}
+#tlob .primary248:hover{filter:brightness(1.12) drop-shadow(0 0 10px #e5b04744)}
+#tlob .lcEntry248:hover::before{filter:brightness(1.18)}
+#tlob .lcIcon248,#tlob .lcIcon248 svg{width:calc(var(--lcU)*2.25);height:calc(var(--lcU)*2.25)}
+#tlob .primary248 .lcIcon248{width:calc(var(--lcU)*.65);height:calc(var(--lcU)*3.8);background:#ffedaa;transform:skewX(-14deg);box-shadow:0 0 12px #ffd86466}
+#tlob .primary248 .lcIcon248 svg{display:none}
+#tlob .lcText248{gap:calc(var(--lcU)*.6)}
+#tlob .lcText248 b{font:850 calc(var(--lcU)*2.55)/1.17 var(--display);letter-spacing:.06em;text-shadow:0 3px 6px #0004}
+#tlob .primary248 .lcText248 b{font-size:calc(var(--lcU)*3.15)}
+#tlob .lcText248 small{font-size:calc(var(--lcU)*1.05);font-weight:500;letter-spacing:.03em;color:#bdcbd4}
+#tlob .primary248 small{color:#f3e9cc}
+#tlob .lcEntry248>svg{width:calc(var(--lcU)*1.05);height:calc(var(--lcU)*1.6);color:#e2e9eb}
+#tlob .lcLinks248{flex:1;max-width:80%;padding-top:calc(var(--lcU)*1.3);border-top:1px solid #b1c0c399}
+#tlob .lcLinks248 .lcEntry248{padding:calc(var(--lcU)*.6) calc(var(--lcU)*1.5);gap:calc(var(--lcU)*1.5);border-bottom:1px solid #bccbd64d}
+#tlob .lcLinks248 b{font-size:calc(var(--lcU)*1.8)}
+#tlob .lcLinks248 small{font-size:calc(var(--lcU)*.85)}
+#tlob .lcLinks248 .lcIcon248,#tlob .lcLinks248 .lcIcon248 svg{width:calc(var(--lcU)*1.9);height:calc(var(--lcU)*1.9)}
+#tlob .lcEvent248{display:none}
+#tlob .lcOperator248{right:1.6%;bottom:27%;width:42%;max-width:none;gap:3.7vh}
+#tlob .lcIdentity248{min-width:0;width:36%;max-width:none;padding:1.1vh 1.2vw;gap:.6vw;position:relative;transform:skewX(-10deg);border-left:3px solid #e6b84e;background:linear-gradient(105deg,#111e28ed,#22303bd9);box-shadow:0 4px 12px #050a1040}
+#tlob .lcIdentity248>*{transform:skewX(10deg)}
+#tlob .lcIdentity248 b{font-size:calc(var(--lcU)*2.45)}
+#tlob .lcIdentity248 small{font-size:calc(var(--lcU)*.95)}
+#tlob .lcIdentity248 b i{font-size:calc(var(--lcU)*.85);margin-left:.6vw}
+#tlob .lcIdentity248 .lobHint{font-size:calc(var(--lcU)*.7)}
+#tlob .lcIdentity248 .lobAr{width:22px;height:28px;background:#101b26b3;border-color:#ffffff20;flex:none}
+#tlob .lcStats248{background:linear-gradient(110deg,#7c313545,#111921dc 48%,#183244c9);border:1px solid #b4c6d282;box-shadow:inset 1px 1px 0 #ffffff15,0 6px 20px #0003;transform:skewX(-17deg);overflow:hidden}
+#tlob .lcStats248::before{content:'';position:absolute;inset:0 auto 0 0;width:9%;background:repeating-linear-gradient(90deg,transparent 0 12px,#ed6a6055 12px 18px);pointer-events:none}
+#tlob .lcStats248::after{content:'';position:absolute;inset:0 0 0 auto;width:6%;background:repeating-linear-gradient(90deg,#71bce633 0 5px,transparent 5px 10px);pointer-events:none}
+#tlob .lcStats248>div{transform:skewX(17deg);padding:1.65vh 1vw;gap:calc(var(--lcU)*1.1)}
+#tlob .lcStats248>div+div{position:relative}
+#tlob .lcStats248>div+div::before{content:'';position:absolute;left:0;height:60%;width:1px;background:#a8b8c455}
+#tlob .lcStats248 strong{font:800 calc(var(--lcU)*3.5)/1 var(--display);font-style:italic}
+#tlob .lcStats248 span{font-size:calc(var(--lcU)*1.35)}
+#tlob .lcStats248 svg{width:calc(var(--lcU)*2.5);height:calc(var(--lcU)*2.5)}
+#tlob .lcBoard248{left:31.5%;right:1.6%;bottom:3.6%;height:18.2%;min-height:90px;padding:0;display:block;perspective:900px;overflow:hidden;border-color:#bdc8d36b;background:linear-gradient(110deg,#26313cce,#18222cdd);box-shadow:inset 0 1px 0 #ffffff1a,0 8px 32px #070d1633;backdrop-filter:blur(8px);clip-path:polygon(.6% 0,100% 0,100% 100%,0 100%,0 4%)}
+#tlob .lcBoardFace249{position:absolute;inset:0;display:flex;align-items:stretch;gap:1vw;padding:1.3vh 1.4vw;transform-origin:50% 50%;will-change:transform;backface-visibility:hidden}
+#tlob .lcBoardTitle248{min-width:18%;padding-left:calc(var(--lcU)*2.5);gap:calc(var(--lcU)*.5)}
+#tlob .lcBoardTitle248 svg{display:block;width:calc(var(--lcU)*2.1);height:calc(var(--lcU)*2.1);left:0}
+#tlob .lcBoardTitle248 b{font-size:calc(var(--lcU)*2)}
+#tlob .lcBoardTitle248 small{font-size:calc(var(--lcU)*.9);color:#e5c16c;letter-spacing:.1em}
+#tlob .lcPodium248{gap:.8vw}
+#tlob .lcRank248{padding:0 .4vw 0 .8vw;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;overflow:hidden}
+#tlob .lcRank248>img{display:block;position:absolute;inset:0 5% 25%;width:90%;height:75%;object-fit:cover;object-position:50% 8%;mask-image:linear-gradient(#000 55%,transparent 100%);opacity:.9;pointer-events:none}
+#tlob .lcRank248>em{font:italic 850 calc(var(--lcU)*2) var(--display);left:6%;top:0;text-shadow:0 2px 8px #000;color:#e5b63b;z-index:2}
+#tlob .lcRank248>span{position:relative;z-index:3;flex:none;padding:0;gap:.2vh;width:100%;text-align:center;text-shadow:0 1px 6px #000}
+#tlob .lcRank248 b{font-size:calc(var(--lcU)*1.1);color:#fff}
+#tlob .lcRank248 small{font-size:calc(var(--lcU)*.75);color:#becbd6}
+#tlob .lcMyRank248{min-width:14%;padding-left:1.2vw;gap:.8vh}
+#tlob .lcMyRank248 b{font-size:calc(var(--lcU)*2.5);color:#fff}
+#tlob .lcMyRank248 small{font-size:calc(var(--lcU)*1)}
+#tlob .lcEmpty248{font-size:calc(var(--lcU)*1.1)}
+html body #title[data-s="title"] .tplayer{top:6.5%;left:2.4%;width:29%;max-width:none}
+html body #title[data-s="title"] .pcard{width:100%;min-width:0;gap:1vw;padding:.8vh 1.1vw .8vh .6vw;min-height:7.5vh;background:linear-gradient(100deg,#0c161de8,#0d1921aa);border-color:#c2d6de33}
+html body #title[data-s="title"] .pcard .pav{width:calc(var(--lcU,1vw)*3.2);height:calc(var(--lcU,1vw)*3.2)}
+html body #title[data-s="title"] .pinfo b{font-size:clamp(15px,1.25vw,27px);max-width:20vw}
+html body #title[data-s="title"] .tside{top:2%;right:1.6%;gap:.7vw}
+html body #title[data-s="title"] .tside .tsb{height:5vh;font-size:clamp(12px,1.15vw,22px);padding:0 1.2vw;gap:.6vw;clip-path:none;border-radius:2px;background:#0e171fe8;border-color:#758b9333}
+html body #title[data-s="title"] .tside .tsb svg{width:1.5vw;height:1.5vw;min-width:18px;min-height:18px}
+html body #title[data-s="title"] .tside #t-love,html body #title[data-s="title"] .tside #t-fb{width:4vw;max-width:70px;padding:0}
+html body #title[data-s="title"] .ttopr{left:34%;top:8%;right:auto;opacity:.8}
+}
+@media(min-width:761px) and (max-width:1100px){#tlob .lcText248 b{font-size:clamp(20px,2.55vw,30px)}#tlob .primary248 .lcText248 b{font-size:3.15vw}#tlob .lcText248 small{font-size:10px}#tlob .lcLinks248 b{font-size:18px}#tlob .lcLinks248 small{font-size:9px}#tlob .lcIdentity248{width:57%}#tlob .lcStats248 strong{font-size:28px}#tlob .lcStats248 span{font-size:11px}#tlob .lcBoardTitle248 b{font-size:18px}#tlob .lcBoardTitle248 small{font-size:10px}#tlob .lcBoardTitle248{padding-left:0;min-width:18%}#tlob .lcBoardTitle248 svg{display:none}#tlob .lcRank248 b{font-size:10px}#tlob .lcRank248 small{font-size:8px}#tlob .lcMyRank248 small{font-size:10px}#tlob .lcMyRank248 b{font-size:22px}}
+@media(prefers-reduced-motion:reduce){#tlob .lcBoardFace249{will-change:auto}}
 .psettings{position:fixed;inset:0;z-index:130;background:rgba(3,5,8,.72);display:grid;place-items:center;padding:16px}.psettings[hidden]{display:none}
 .psbox{width:min(560px,100%);max-height:calc(100dvh - 32px);overflow-x:hidden;overflow-y:auto;touch-action:pan-y;overscroll-behavior:contain;background:#0e141a;border:1px solid #2c3a47;border-top:3px solid var(--accent);padding:18px 20px;display:flex;flex-direction:column;gap:14px;color:#e6edf2}
 .pshead{display:flex;align-items:center;gap:12px}.pshead .pav{width:58px;height:58px;object-fit:cover;background:#10171e}.pshead div{flex:1;display:flex;flex-direction:column}.pshead b{font-size:20px}.pshead span{font-size:12.5px;color:#9aa7b2}
@@ -11458,11 +11537,29 @@ function libHTML(){const M=lobMob(),all=OPBASE.filter(b=>!/^recruit_/.test(b)),o
     </div></div>`;}
 // v248: cinematic desktop lobby; all controls keep their original handlers.
 function lobbyIcon248(k){const paths={monitor:'<rect x="3" y="4" width="18" height="13" rx="1"/><path d="M8 21h8M12 17v4"/>',helmet:'<path d="M4 13V10a8 8 0 0116 0v3M3 13h18v4h-5l-2 4h-4l-2-4H3zM8 13v3m8-3v3"/>',pulse:'<path d="M12 2l8 3v7c0 5-8 10-8 10S4 17 4 12V5zM6 12h3l2-5 2 10 2-5h3"/>',chevron:'<path d="M9 5l7 7-7 7"/>'};return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${paths[k]||LOBI_SVG[k]||LOBI_SVG.train}</svg>`;}
-function lobbyDesktop248(c,i,art,nmB,L){const m=lbMyRank();const entry=(id,ic,name,sub,cls='')=>`<button id="${id}" class="lcEntry248 ${cls}"><span class="lcIcon248">${lobbyIcon248(ic)}</span><span class="lcText248"><b>${name}</b><small>${sub}</small></span>${lobbyIcon248('chevron')}</button>`;
- return `<div class="lob d cinema248"><div class="lcBackdrop248" aria-hidden="true"></div><img class="lobHero" id="lobHero" src="${art}" alt="${esc(lobNm(c,i))}" role="button" tabindex="0" aria-label="培養幹員">
+const LOBBY249={tab:'alive',next:0,visible:false,busy:false};
+function lobbyBoard249(tab){const L=lbRows(tab).slice(0,3),m=lbMyRank(tab);return `<span class="lcBoardFace249" data-board-category="${tab}"><span class="lcBoardTitle248">${lobbyIcon248('trophy')}<b>排行榜</b><small>${tab==='fallen'?'英勇烈士':'現役菁英'}</small></span><span class="lcPodium248">${L.length?L.map((r,n)=>`<span class="lcRank248 rank${n+1}"><em>${n+1}</em><img src="${lbArt(r)}" alt="" loading="eager"><span><b>${esc(r.nm)}</b><small>${esc(r.by||'?')} 的幹員</small><small>擊殺 ${r.k|0} · 存活 ${r.sv|0}</small></span></span>`).join(''):`<span class="lcEmpty248">${LB.list==null?'讀取中…':tab==='fallen'?'尚無陣亡幹員上榜':'還沒有人上榜'}</span>`}</span><span class="lcMyRank248"><small>我的排名</small><b>${m?'# '+m.n:'—'}</b><small>${m?esc(m.r.nm):'還沒上榜'}</small></span></span>`;}
+async function lobbyFlip249(now=Date.now()){
+ const board=document.querySelector('.cinema248 .lcBoard248');const visible=!!(board&&SCREEN==='title'&&!document.hidden&&!$('#title')?.hidden&&gnavState()==='home');
+ if(!visible){LOBBY249.visible=false;return;}
+ if(!LOBBY249.visible){LOBBY249.visible=true;LOBBY249.next=now+10000;return;}
+ if(now<LOBBY249.next||LOBBY249.busy)return;
+ LOBBY249.next=now+10000;LOBBY249.tab=LOBBY249.tab==='alive'?'fallen':'alive';
+ const old=board.querySelector('.lcBoardFace249');board.insertAdjacentHTML('beforeend',lobbyBoard249(LOBBY249.tab));const fresh=board.lastElementChild;
+ board.setAttribute('aria-label',tt(LOBBY249.tab==='fallen'?'英勇烈士':'現役菁英'));
+ if(!old)return;
+ old.setAttribute('aria-hidden','true');LOBBY249.busy=true;
+ try{if(!matchMedia('(prefers-reduced-motion:reduce)').matches&&typeof fresh.animate==='function')await Promise.all([
+ old.animate([{transform:'translateY(0) rotateX(0)',opacity:1},{transform:'translateY(-105%) rotateX(18deg)',opacity:.2}],{duration:650,easing:'cubic-bezier(.22,.7,.18,1)',fill:'forwards'}).finished,
+ fresh.animate([{transform:'translateY(105%) rotateX(-18deg)',opacity:.3},{transform:'translateY(0) rotateX(0)',opacity:1}],{duration:650,easing:'cubic-bezier(.22,.7,.18,1)'}).finished
+ ]);}catch(e){}finally{old.remove();LOBBY249.busy=false;}
+}
+setInterval(()=>lobbyFlip249(),250);
+function lobbyDesktop248(c,i,art,nmB){const hero=!c.w&&i===0?'img/ui/lobby-operator-v249.png':art;const entry=(id,ic,name,sub,cls='')=>`<button id="${id}" class="lcEntry248 ${cls}"><span class="lcIcon248">${lobbyIcon248(ic)}</span><span class="lcText248"><b>${name}</b><small>${sub}</small></span>${lobbyIcon248('chevron')}</button>`;
+ return `<div class="lob d cinema248"><div class="lcBackdrop248" aria-hidden="true"></div><div class="lcShade249" aria-hidden="true"></div><img class="lobHero ${hero!==art?'reference249':''}" id="lobHero" src="${hero}" alt="${esc(lobNm(c,i))}" role="button" tabindex="0" aria-label="培養幹員">
  <nav class="lcMenu248" aria-label="主選單"><div class="lcModes248">${entry('t-rank','flag','線上對戰','PVP · 排名戰','primary248')}${entry('t-pve','monitor','對戰電腦','PVE · 選陣營、地圖與幹員')}${entry('t-train','train','訓練任務','新手教學 · 可重溫')}</div><div class="lcLinks248">${entry('t-cop','helmet','培養幹員','養成你的專屬幹員')}${entry('t-shop','shop','商店','解鎖幹員、技能')}${entry('t-lib','book','作戰檔案','規則 · 圖鑑 · 成就')}</div><button class="lcEvent248" disabled>${lobbyIcon248('gift')}<span>活動</span><small>準備中</small></button></nav>
  <section class="lcOperator248" aria-label="幹員資訊"><div class="lcIdentity248"><button class="lobAr" data-lob="-1" aria-label="上一位">‹</button><div>${nmB}<span class="lobHint">點角色進入培養</span></div><button class="lobAr" data-lob="1" aria-label="下一位">›</button></div><div class="lcStats248"><div class="kills248"><svg viewBox="0 0 24 24" aria-hidden="true">${LBSK}</svg><strong>${c.k|0}</strong><span>擊殺</span></div><div class="survival248">${lobbyIcon248('pulse')}<strong>${c.sv|0}</strong><span>存活場次</span></div></div></section>
- <button class="lcBoard248" id="t-board"><span class="lcBoardTitle248">${lobbyIcon248('trophy')}<b>排行榜</b><small>培養幹員</small></span><span class="lcPodium248">${L.length?L.map((r,n)=>`<span class="lcRank248 rank${n+1}"><em>${n+1}</em><img src="${lbArt(r)}" alt="" loading="lazy"><span><b>${esc(r.nm)}</b><small>${esc(r.by||'?')} 的幹員</small><small>擊殺 ${r.k|0} · 存活 ${r.sv|0}</small></span></span>`).join(''):`<span class="lcEmpty248">${LB.list==null?'讀取中…':'還沒有人上榜'}</span>`}</span><span class="lcMyRank248"><small>我的排名</small><b>${m?'# '+m.n:'—'}</b><small>${m?esc(m.r.nm):'還沒上榜'}</small></span></button></div>`;}
+ <button class="lcBoard248" id="t-board" aria-label="${LOBBY249.tab==='fallen'?'英勇烈士':'現役菁英'}">${lobbyBoard249(LOBBY249.tab)}</button></div>`;}
 function lobHTML(){const cs=copAll(),i=LOBI%2,c=cs[i],rk=copScore(c).rk,art=copArt(c,i),M=lobMob();
   const nmB=`<b>${esc(lobNm(c,i))}<i style="color:${RKC[rk]}">${rk}</i></b><small>${lobCls(c)}</small>`;
   if(M)return `<div class="lob m"><div class="lobGlow"></div><div class="lobRing"></div><img class="lobHero" id="lobHero" src="${art}" alt="">
@@ -11495,7 +11592,7 @@ function lobRender(){const t=$('#title');if(!t)return;let el=$('#tlob');if(!el){
   el.querySelectorAll('[data-lob]').forEach(b=>b.onclick=e=>{e.stopPropagation();LOBI=(LOBI+2+(+b.dataset.lob))%2;try{localStorage.setItem('r6bg.lobi',LOBI);}catch(x){}lobRender();});
   const h=$('#lobHero');if(h){const HSC={'m_smg':.68},k=(h.getAttribute('src').match(/([a-z_]+)\.\w+$/)||[])[1];if(HSC[k])h.style.setProperty('--hs',HSC[k]);}if(h){h.onclick=()=>{CP.i=LOBI;NETMSG='';openCop();};h.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();h.click();}};}
   const go=(id,fn)=>{const b=el.querySelector('#'+id);if(b){b.onclick=fn;if(b.tagName!=='BUTTON')b.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')fn();};}};
-  go('t-train',()=>{trnTop();SCREEN='train';NETMSG='';renderTitle();});go('t-train2',()=>{trnTop();SCREEN='train';NETMSG='';renderTitle();});go('t-board',()=>{SCREEN='board';NETMSG='';lbLoad(true);renderTitle();});
+  go('t-train',()=>{trnTop();SCREEN='train';NETMSG='';renderTitle();});go('t-train2',()=>{trnTop();SCREEN='train';NETMSG='';renderTitle();});go('t-board',()=>{if(el.querySelector('.cinema248'))LB.tab=LOBBY249.tab;SCREEN='board';NETMSG='';lbLoad(true);renderTitle();});
   go('t-pve',()=>{['A','D'].forEach(s=>{cfg.picks[s]=cfg.picks[s].filter(owned);});SCREEN='setup';WZ.step=0;WZ.seen=0;render();});go('t-rank',()=>{NETMSG='';rankQueue();});
   go('t-tu2',()=>{SCREEN='title';NETMSG='';renderTitle();tuStart();});gnavSync();go('t-lib',()=>{if(SCREEN==='lib')return;SCREEN='lib';NETMSG='';renderTitle();});go('t-home',()=>{if(SCREEN==='title')return;SCREEN='title';NETMSG='';renderTitle();});go('t-man',()=>openManual());go('t-ach',()=>openAch('ach'));go('t-cop',()=>{CP.i=LOBI;NETMSG='';openCop();});go('t-shop',()=>openShop());ptLobby(el);}
 {let lm=null;addEventListener('resize',()=>{const m=lobMob();if(m!==lm){lm=m;if(SCREEN==='title'||SCREEN==='lib'||SCREEN==='train')lobRender();}});}
@@ -13145,7 +13242,7 @@ window.__warm=(()=>{const W={done:false,n:0,tot:1,keep:[]};setTimeout(()=>{try{
   const U=new Set();Object.keys(OPART).forEach(b=>{const u=opArtU(b);if(u)U.add(u);});
   Object.keys(OPC).forEach(b=>{try{U.add(libFace(b));}catch(e){}});
   Object.keys(WPN).forEach(w=>['f','m'].forEach(g=>U.add(`img/cop/${g}_${w}.webp`)));COPART.forEach(u=>U.add(u));
-  Object.keys(MAPS).forEach(k=>U.add(`img/map/${k}_bg.webp`));
+  Object.keys(MAPS).forEach(k=>U.add(`img/map/${k}_bg.webp`));if(!lobMob()){U.add('img/ui/lobby-bank-v249.jpg');U.add('img/ui/lobby-operator-v249.png');}
   const L=[...U].filter(Boolean);W.tot=L.length||1;let i=0;
   const one=()=>{if(i>=L.length)return Promise.resolve();const im=new Image();im.decoding='async';W.keep.push(im);const u=L[i++];
     return new Promise(r=>{im.onload=()=>{(im.decode?im.decode():Promise.resolve()).catch(()=>{}).then(r);};im.onerror=r;im.src=u;}).then(()=>{W.n++;return one();});};
@@ -14019,7 +14116,8 @@ body.desktop247 #dsActions247 button[data-command247="shoot"],body.desktop247 #d
 Object.assign(I18X,{'戰術指揮':['Tactical command',''],'對手行動中':['Opponent acting',''],'本階段可啟動':['Activations left',''],'選擇左側幹員':['Select an operator on the left',''],'攻擊骰':['Attack dice',''],'黃骰':['Yellow die',''],'橘骰':['Orange die',''],'紅骰':['Red die',''],'操作分頁':['Command tabs',''],'技能詳細操作':['Skill instructions',''],'目前沒有可用道具':['No available gadgets',''],'戰鬥紀錄':['Combat log',''],'未行動':['Ready',''],'已行動':['Acted',''],'行動中':['Acting',''],'完成動作':['Finish action',''],'鍵盤操作':['Keyboard controls',''],'特殊按鈕':['Special control',''],'射擊＋左鍵':['Shoot + left click',''],'破壞＋左鍵':['Destroy + left click',''],'左右轉 45°':['Turn left/right 45°',''],'道具／情報／行動':['Gear / Intel / Actions',''],'選擇道具':['Select gadget',''],'情報':['Intel',''],
   '按 Z 部署或切換無人機，再點相鄰空格放出。':['Press Z to deploy or switch drones. Choose an adjacent empty space to deploy.',''],'按住 Shift 點格子，或用 Shift＋WASD 移動。':['Hold Shift and click a space, or move with Shift + WASD.',''],'按住 Alt／Cmd 點敵人，發射音波震暈。':['Hold Alt/Cmd and click an enemy for a sonic stun.',''],'按住 Alt／Cmd 點敵人電擊；按住 Ctrl 點道具破壞。':['Hold Alt/Cmd and click an enemy to zap; hold Ctrl and click a device to destroy it.',''],'本體和無人機本輪只能由其中一方行動。':['Only the operator or their drone may act during a round.',''],'按 T 發動技能；切換型技能可再按 T 關閉。':['Press T to activate. Toggle skills can be turned off by pressing T again.',''],'技能效果、次數與消耗依下方說明。':['Effects, charges and costs are detailed below.',''],'按 T 選擇技能，再點亮起的合法目標。':['Press T, then click a highlighted legal target.',''],'按住 Alt／Cmd 或 Ctrl 可暫時改為射擊或破壞。':['Hold Alt/Cmd or Ctrl to temporarily shoot or destroy.',''],'目標與行動點不足時，按鈕會顯示不可使用。':['Buttons are disabled when no legal target or action points remain.','']});
 Object.assign(I18X,{'此技能在部署階段放置，對戰中由裝置自動生效。':['Place this device during deployment; its effect triggers automatically in play.',''],'使用次數、範圍與效果依下方說明。':['Charges, range and effects are detailed below.',''],'這是被動技能，符合條件時自動觸發。':['This passive skill triggers automatically when its conditions are met.','']});
-NEWS[0].v='v243–v248';NEWS[0].i.unshift('電腦版大廳改為沉浸式主選單：左側對戰入口、右側幹員與擊殺／存活場次，下方展示排行榜；保留愛心贊助與回報圖示。','電腦版戰術介面：左側小隊、右側行動／道具／情報，彩色攻擊骰數量、滾輪選角與完整鍵盤快捷操作；特殊按鈕改用 Z。');
+NEWS[0].v='v243–v249';NEWS[0].i.unshift('電腦大廳重製背景構圖、幹員光影與斜角按鈕；排行榜每 10 秒在現役菁英與英勇烈士間向上翻換。','電腦版大廳改為沉浸式主選單：左側對戰入口、右側幹員與擊殺／存活場次，下方展示排行榜；保留愛心贊助與回報圖示。','電腦版戰術介面：左側小隊、右側行動／道具／情報，彩色攻擊骰數量、滾輪選角與完整鍵盤快捷操作；特殊按鈕改用 Z。');
+I18X['電腦大廳重製背景構圖、幹員光影與斜角按鈕；排行榜每 10 秒在現役菁英與英勇烈士間向上翻換。']=['Refined lobby scene, operator lighting and angled buttons; the leaderboard flips upward between active and fallen operators every 10 seconds.',''];
 Object.assign(I18X,{'存活場次':['Matches survived',''],'幹員資訊':['Operator information',''],'電腦版大廳改為沉浸式主選單：左側對戰入口、右側幹員與擊殺／存活場次，下方展示排行榜；保留愛心贊助與回報圖示。':['Cinematic desktop lobby: play menu on the left, operator with kills and matches survived on the right, leaderboard below; support and feedback icons retained.','']});
 I18X['電腦版戰術介面：左側小隊、右側行動／道具／情報，彩色攻擊骰數量、滾輪選角與完整鍵盤快捷操作；特殊按鈕改用 Z。']=['Desktop tactical workspace: squad rail, Action/Gear/Intel tabs, color-coded dice counts, wheel selection and keyboard shortcuts; Z for special controls.',''];
 // ---------- round clocks: each squad gets (time per Operator x Operators in play) per round, shared by its two activation phases ----------
