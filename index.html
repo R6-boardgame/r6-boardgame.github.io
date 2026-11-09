@@ -2833,6 +2833,7 @@ body.hasClk #tracker .seg{display:none}
 @keyframes obSp{to{transform:rotate(360deg)}}
 /* v250: portrait viewports retain heads and full-width weapon silhouettes. */
 .opBust250{display:block;overflow:hidden;pointer-events:none;flex:none}
+.opBust250>svg{mask-image:linear-gradient(#000 92%,transparent)}.opBust250[data-bust="1000"]>svg{mask-image:none}
 .bPodium{overflow:visible;margin-top:44px;height:360px}
 .bPortrait.opBust250{bottom:108px;width:42%;height:260px;mask-image:linear-gradient(#000 90%,transparent);overflow:hidden}
 .bPortrait.opBust250.p1{left:23%;width:54%;height:310px;z-index:3}
@@ -2869,6 +2870,7 @@ body.menuBack250 #cpBack,body.menuBack250 #cpSkBack,body.menuBack250 #alBack,bod
 #cop .cpBox .cpStats{grid-column:2;grid-row:2;padding:16px 24px 0 0;justify-content:center;gap:12px;min-height:0}
 #cop .cpBox .cpRow{height:clamp(38px,6.4vh,68px);flex:0 1 68px;min-height:36px;grid-template-columns:66px minmax(0,1fr) 36px 36px;gap:8px;padding:0 10px;border:1px solid #314350;border-left-width:3px}
 #cop .cpBox .cpLb{font-size:15px}#cop .cpBox .cpC{height:25px;max-width:56px}#cop .cpBox .cpVal{font-size:16px}#cop .cpBox .cpPm{width:36px;height:34px;font-size:20px!important}
+#cop .cpBox .cpRow.dice{border-left-color:var(--Y)}#cop .cpBox .cpRow.arm{border-left-color:var(--G)}#cop .cpBox .cpRow.spd{border-left-color:var(--B)}#cop .cpBox .cpRow.vis{border-left-color:var(--V)}
 #cop .cpBox .cpPbar{grid-column:2;grid-row:3;margin:0 24px 0 0;padding:12px 16px}#cop .cpPv span{font-size:13px}#cop .cpBox .cpPv b{font-size:38px}#cop .cpLg{font-size:12px}#cop .cpTr{height:8px}
 #cop .cpBox>.cpFoot{grid-column:2;grid-row:4;padding:0 24px 14px 0;gap:12px}#cop .cpBox>.cpFoot .cpBtn{height:50px;font-size:18px!important}
 #cop .cpFull{inset:84px 32px 28px;max-width:1480px;padding:16px 20px;display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:64px 48px auto minmax(0,1fr) 60px;gap:10px;border:1px solid #3b5060}
