@@ -3366,6 +3366,22 @@ html body #title[data-s=board] #tmenu{inset:78px 3% 3vh;max-width:none;width:aut
 @media(max-width:1100px){#cop>.cpBox .cpTt:before{height:28px}#cop>.cpBox .cpTt small{font-size:14px}}
 }
 </style>
+<style id="cultivation254">
+.cpName254{display:contents}
+@media(min-width:1000px) and (min-height:620px){
+#cop>.cpBox .cpId{padding:0}
+#cop>.cpBox .cpId:before,#cop>.cpBox .cpId:after{display:none}
+#cop>.cpBox .cpName254{display:block;position:relative;isolation:isolate;width:330px;height:90px;padding:16px 22px 0 27px}
+#cop>.cpBox .cpName254:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(105deg,#9f762b99,#28281c44 80%),var(--cpGlass252);background-size:cover;border:1px solid var(--cpEdge253);clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px)}
+#cop>.cpBox .cpName254:after{content:'';position:absolute;left:0;top:18px;height:54px;width:3px;background:linear-gradient(#ffe394,#d7a84d);pointer-events:none}
+#cop>.cpBox .cpNm{cursor:pointer}
+#cop>.cpBox .cpNm:focus-visible{outline:1px solid #ffe3a0;outline-offset:3px}
+#cop>.cpBox .cpId>.cpTag{display:flex;align-items:center;width:240px;height:34px;margin:10px 0 0;padding:0 18px;background:linear-gradient(100deg,#162936d9,#101d29a8)!important;border-left:3px solid #d4b468;color:#e7d5a4;line-height:1.3}
+#cop>.cpBox .cpKd{margin:20px 0 0 12px}
+#cop>.cpBox .cpAlB,#cop>.cpBox .cpSw button{display:flex;align-items:center;justify-content:center;text-align:center;text-indent:0}
+@supports(corner-shape:bevel){#cop>.cpBox .cpName254:before{clip-path:none;corner-shape:bevel;border-radius:18px 0 18px 0}}
+}
+</style>
 <div class="wrap">
   <header class="top">
     <div class="brand"><small>Tactical board game · 5v5</small><h1>彩六圍攻 戰術桌遊</h1></div>
@@ -14144,8 +14160,8 @@ function renderCop(){const el=$('#cop');if(!el||el.hidden)return;copScale252();c
   <div class="cpTop"><button class="cpBack" id="cpBack" aria-label="返回">‹</button><div class="cpTt"><small>TRAINING</small><h2>培養幹員</h2></div><button class="cpAlB" id="cpAlB">學長姐</button>
     <div class="cpSw" role="tablist">${COPN.map((n,i)=>`<button role="tab" data-ci="${i}" class="${i===CP.i?'on':''}" aria-selected="${i===CP.i}">${n}</button>`).join('')}</div></div>
   <div class="cpStage" data-class="${c.w||'recruit'}"><picture class="cpPortrait252">${!c.w&&CP.i===0?'<source media="(min-width:1000px) and (min-height:620px)" srcset="img/ui/lobby-operator-v249.png">':''}<img class="cpArt${c.w&&WART[c.w]?' cw':''}${!c.w&&CP.i===0?' hi252':''}" src="${copArt(c,CP.i)}" alt=""></picture><div class="cpBig">${c.w?WPN[c.w].en:'RECRUIT'}</div>
-    <div class="cpL"><div class="cpId" style="--cpName252:${copW(c.nm)>10?43:52}px">${CP.edit?`<div class="cpEd"><input id="cpNm" value="${esc(c.nm)}" autocomplete="off" aria-label="幹員名字"><span id="cpCnt">${copW(c.nm)}/12</span></div>`
-      :`<button class="cpPen" id="cpPen" aria-label="改名">${PENI}</button><div class="cpNm">${esc(c.nm)}</div>`}<span class="cpTag${c.w?' w':''}">${c.w?WPN[c.w].t:'新進人員'}</span>
+    <div class="cpL"><div class="cpId" style="--cpName252:${copW(c.nm)>10?43:52}px"><div class="cpName254">${CP.edit?`<div class="cpEd"><input id="cpNm" value="${esc(c.nm)}" autocomplete="off" aria-label="幹員名字"><span id="cpCnt">${copW(c.nm)}/12</span></div>`
+      :`<button class="cpPen" id="cpPen" aria-label="改名">${PENI}</button><div class="cpNm" role="button" tabindex="0" title="改名">${esc(c.nm)}</div>`}</div><span class="cpTag${c.w?' w':''}">${c.w?WPN[c.w].t:'新進人員'}</span>
       <div class="cpKd"><div><i class="cpStatIcon252" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor">${LBSK}</svg></i><b>${c.k}</b><span>擊殺</span></div><div><i class="cpStatIcon252" aria-hidden="true">${lobbyIcon248('pulse')}</i><b>${c.sv}</b><span>存活場數</span></div></div></div>
     ${cpPenta(sc)}</div>
     <div class="cpKit"><div class="cpKl"><span>道具</span></div><div class="cpGs">${[0,1].map(i=>`<button class="cpSlot g ${c.g[i]?'f':''}" data-gs="${i}" aria-label="攜帶道具 ${i+1}">${slot(c.g[i])}</button>`).join('')}</div>
@@ -14210,6 +14226,8 @@ function cpBind(el){const q=s=>el.querySelector(s),on=(s,f)=>{const b=q(s);if(b)
   on('#cpRt',()=>{CP.sheet={t:'rt'};renderCop();});on('#cpRtNo',()=>{CP.sheet=null;renderCop();});
   on('#cpRtYes',()=>{if(ECO.rn<COP_RT)return;ECO.rn-=COP_RT;const cs=copAll();Object.assign(cs[CP.i],{d:[['Y'],['Y'],['Y']],arm:1,run:0,vis:0,w:null});ecoSave();CP.sheet=null;copDraft();try{renderPlayer();}catch(e){}renderCop();});
   on('#cpPen',()=>{CP.edit=true;renderCop();const i=q('#cpNm');if(i){i.focus();i.select();}});
+  on('.cpNm',()=>q('#cpPen')?.click());
+  {const n=q('.cpNm');if(n)n.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();q('#cpPen')?.click();}};}
   {const i=q('#cpNm');if(i){const fit=()=>{let s='';for(const ch of i.value){if(copW(s+ch)>12)break;s+=ch;}if(s!==i.value)i.value=s;const n=q('#cpCnt');if(n)n.textContent=copW(s)+'/12';};
     const done=()=>{if(!CP.edit)return;fit();CP.edit=false;const v=i.value.trim()||'炮灰';cpSave(o=>o.nm=v);};
     // v181: while a Chinese input method is still composing (zhuyin/pinyin), don't count or cut the letters; trim once the word is chosen
@@ -14490,6 +14508,8 @@ NEWS.unshift({d:'2026-11-10',v:'v250',i:['排行榜改為半身視窗，保留�
 NEWS[0].v='v250–v251';NEWS[0].i.unshift('電腦選單全面換上銀行實景底圖、斜角金屬面板與光影材質：培養、技能收藏、訓練、商店、作戰檔案、排行榜及任務視窗。人物、技能與遊戲規則沿用原版。');
 NEWS[0].v='v250–v253';NEWS[0].i.unshift('電腦培養頁統一切角與邊框，拉開標題、能力、數值和輔助文字層級；分頁與資訊文字不再歪斜。材質、人物、手機和規則不變。','電腦培養頁校準整組縮放與近景構圖，超寬螢幕不再拉出大面積空白；新增拉絲金屬、霧金與煙燻玻璃材質，新兵沿用大廳既有高解析圖。手機與遊戲規則不變。');
 I18X['電腦培養頁統一切角與邊框，拉開標題、能力、數值和輔助文字層級；分頁與資訊文字不再歪斜。材質、人物、手機和規則不變。']=['Desktop training now uses consistent beveled corners and borders, with clearer title, attribute, value and supporting text hierarchy. Tabs and information remain upright. Materials, artwork, mobile and rules are unchanged.',''];
+NEWS[0].v='v250–v254';NEWS[0].i.unshift('電腦培養頁姓名與職業分開顯示，拉開戰績間距；點姓名可改名，右上學長姐與幹員按鈕文字置中。');
+I18X['電腦培養頁姓名與職業分開顯示，拉開戰績間距；點姓名可改名，右上學長姐與幹員按鈕文字置中。']=['Desktop training separates the editable name from the class label and adds space before the stats. Click the name to rename; senior and operator button labels are centered.',''];
 I18X['電腦培養頁校準整組縮放與近景構圖，超寬螢幕不再拉出大面積空白；新增拉絲金屬、霧金與煙燻玻璃材質，新兵沿用大廳既有高解析圖。手機與遊戲規則不變。']=['Desktop operator training now scales as one composition, with close-up framing and no oversized gaps on ultrawide screens. New brushed metal, satin gold and smoked glass materials; the recruit reuses existing high-resolution lobby artwork. Mobile and game rules are unchanged.',''];
 Object.assign(I18X,{'電腦選單全面換上銀行實景底圖、斜角金屬面板與光影材質：培養、技能收藏、訓練、商店、作戰檔案、排行榜及任務視窗。人物、技能與遊戲規則沿用原版。':['Desktop training, skills, missions, shop, archive, rankings and task dialog now share cinematic bank environments, angled metal panels, lighting and textures. Existing operators, icons and game rules are preserved.',''],'選擇訓練類別，掌握職業能力、部署與攻堅。':['Choose a training category to learn class abilities, deployment and breaching.',''],'各關卡獎勵與解鎖條件依實際任務顯示。':['Rewards and unlock requirements are shown in each mission briefing.',''],'查看任務':['View missions','']});
 I18X['排行榜改為半身視窗，保留頭部與武器；任務改為覆蓋視窗，電腦培養頁與技能收藏改為雙欄，縮小訓練圖片並統一選單返回位置。']=['Leaderboard bust portraits preserve heads and weapons; missions open in a dialog, desktop training and skill collection use two columns, training artwork is smaller, and menu back controls share one position.',''];
