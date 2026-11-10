@@ -6,7 +6,31 @@ const pvMode257=()=>PV_DESK257.matches&&!WZ.coop&&!(typeof TU!=='undefined'&&TU&
 const pvMapArt257=k=>k==='bank'?'img/ui/lobby-bank-v249.jpg':mapBig(k)||mapThumb(k);
 const pvName257=k=>copSlot(k)==null?mfName(k):copAll()[copSlot(k)].nm;
 const pvFace257=k=>copSlot(k)==null?opFace(k):opArt(k);
-const pvGear257=k=>WZI[k]||'';
+const pvGear257=k=>GIMG[k]?`<img src="${GIMG[k]}" alt="">`:WZI[k]||'';
+
+function pvPlan257(m){
+  const grid=parseMap(m),paths={hard:[],soft:[],door:[],window:[]},xs=[],ys=[];
+  const joined=(x,y)=>wj(grid[y]?.[x]);
+  grid.forEach((row,y)=>row.forEach((c,x)=>{
+    if(c.indoor){xs.push(x);ys.push(y);}
+    const cx=x+.5,cy=y+.5;
+    const line=(dx,dy,kind=c.t)=>paths[kind].push(`M${cx} ${cy}l${dx} ${dy}`);
+    if(c.kind){
+      const hz=c.pair?c.pair[1]===y:joined(x-1,y)||joined(x+1,y)||!(joined(x,y-1)||joined(x,y+1));
+      paths[c.kind].push(hz?`M${x} ${cy}h1`:`M${cx} ${y}v1`);
+    }else if(!c.curve&&paths[c.t]){
+      const dirs=[[1,0],[-1,0],[0,1],[0,-1]].filter(([dx,dy])=>joined(x+dx,y+dy));
+      if(dirs.length)dirs.forEach(([dx,dy])=>line(dx/2,dy/2));
+      else line(.02,0);
+    }
+  }));
+  if(m.spiral){
+    const {cx,cy,R}=m.spiral,r=R+.2;
+    paths.hard.push(`M${cx-r} ${cy}A${r} ${r} 0 0 1 ${cx+r} ${cy}`);
+  }
+  const x=Math.min(...xs),y=Math.min(...ys),w=Math.max(...xs)-x+1,h=Math.max(...ys)-y+1;
+  return `<svg class="pvPlan" viewBox="${x-.6} ${y-.6} ${w+1.2} ${h+1.2}" role="img" aria-label="${esc(m.name)}格局圖" fill="none" stroke-linecap="round">${Object.entries(paths).map(([k,L])=>`<path class="${k}" d="${L.join(' ')}"/>`).join('')}</svg>`;
+}
 
 function pvDrawMap257(el,mk){
   const canvas=el.querySelector('.pvMap3');
@@ -20,11 +44,29 @@ function pvDrawMap257(el,mk){
       const old=targets.visible;
       targets.visible=false;
       try{
-        const w=m.rows[0].length,h=m.rows.length,aspect=world.width/world.height;
-        const x=w/2,z=h/2,span=Math.max((w+.45*h)/aspect,.68*h+.43*w)*.63;
-        const cam=new THREE.OrthographicCamera(-span*aspect,span*aspect,span,-span,.1,240);
-        cam.position.set(x+w*.38,Math.max(w,h)*1.45,z+h*.75);
-        cam.lookAt(x,0,z);
+        const aspect=world.width/world.height,panel=canvas.clientWidth/canvas.clientHeight;
+        const visibleX=Math.min(1,panel/aspect),visibleY=Math.min(1,aspect/panel);
+        const w=m.rows[0].length,h=m.rows.length,x=w/2,z=h/2,d=Math.max(w,h)*1.09;
+        const cam=new THREE.PerspectiveCamera(38,aspect,.1,240);
+        cam.position.set(x+d*.56,d*.43,z+d*.73);
+        cam.lookAt(x,.5,z);
+        cam.updateMatrixWorld();
+        // Frame the building against the visible crop, allowing the table and base to extend off-screen.
+        const points=[],p=new THREE.Vector3(),wallH=WALLH[R3.wall];
+        m.rows.forEach((row,j)=>[...row].forEach((ch,i)=>{
+          if(ch==='~')return;
+          for(const dx of [0,1])for(const dz of [0,1]){
+            points.push(p.set(i+dx,0,j+dz).project(cam).clone());
+            if('#=WD'.includes(ch))points.push(p.set(i+dx,wallH,j+dz).project(cam).clone());
+          }
+        }));
+        const xs=points.map(p=>p.x),ys=points.map(p=>p.y);
+        const l=Math.min(...xs),r=Math.max(...xs),b=Math.min(...ys),t=Math.max(...ys);
+        cam.zoom=Math.min(visibleX*1.78/(r-l),visibleY*1.83/(t-b));
+        cam.updateProjectionMatrix();
+        cam.projectionMatrix.elements[8]+=(l+r)/2*cam.zoom-visibleX*.09;
+        cam.projectionMatrix.elements[9]+=(b+t)/2*cam.zoom+visibleY*.05;
+        cam.projectionMatrixInverse.copy(cam.projectionMatrix).invert();
         renderer.render(scene,cam);
         canvas.width=Math.min(world.width,1600);canvas.height=Math.round(canvas.width/aspect);
         canvas.getContext('2d').drawImage(world,0,0,canvas.width,canvas.height);
@@ -33,6 +75,28 @@ function pvDrawMap257(el,mk){
     }catch(e){/* map photo and exact floor plan remain visible without WebGL */}
     finally{G=previous;}
   });
+}
+
+const pvCanAdd257=(k,picks)=>owned(k)&&picks.length<5&&!picks.some(p=>mfBase(p)===mfBase(k));
+
+function pvDossier257(k,picks){
+  const c=copCard(OPC[k]),slot=copSlot(k),custom=slot==null?null:copAll()[slot];
+  const img=custom?opArt(k):opArtU(k)||opArt(k)||opFace(k);
+  const equipped=custom?(classEquipped(custom)?custom.sk:copSkOn(custom,c.side)):k;
+  const skill=custom?null:skGet(k),ability=skill?.g||c.zh.g,desc=skill?.d||cardText(c);
+  const unit=custom?copStat(custom):mkUnit(k,c.side,0);
+  const hp=custom?unit.hp:unit.max,steps=custom?unit.mv:unit.speed;
+  const part=picks.includes(k),can=part||pvCanAdd257(k,picks);
+  return `<div class="pvDossierContent">
+    <header><b>${esc(pvName257(k))}</b><small>幹員定位 <strong>${esc(c.zh.role||OPS[k]?.role||'幹員')}</strong></small></header>
+    <section class="pvSkill" aria-label="技能">
+      <div class="pvSkillTitle">${ability&&equipped?`<i>${skillIcon(equipped)}</i>`:''}<div><small>技能</small><b>${esc(ability||'沒有裝備技能')}</b></div></div>
+      ${desc?`<div class="pvSkillDesc">${desc}</div>`:''}
+    </section>
+    <div class="pvVitals"><div><small>血量</small><strong>${hp} <span>HP</span></strong></div><div><small>移動步數</small><strong>${steps} <span>步</span></strong></div></div>
+    <div class="pvDice">${['近距離','中距離','遠距離'].map((r,i)=>`<div><b>${r}</b><small>${['1–3','4–6','7+'][i]}</small><span>${hexDice(c.w[i]||[])}</span></div>`).join('')}</div>
+    <button id="mfAdd" class="pvUtility${can?' on':''}" ${can?'':'disabled'}>${part?'移出小隊':!owned(k)?'尚未解鎖':picks.length>=5?'小隊已滿':!can?'已帶另一位':'加入小隊'}</button>
+  </div><div class="pvHeroStage">${img?`<img class="pvHero" src="${esc(img)}" alt="">`:''}</div>`;
 }
 
 function pvRender257(el){
@@ -53,30 +117,25 @@ function pvRender257(el){
   }else if(st===2){
     const maps=['bank','clubhouse','consulate','kafe',...Object.keys(MAPS).filter(k=>!['bank','clubhouse','consulate','kafe'].includes(k))];
     body=`<div class="pvMaps"><div class="pvMapList">${maps.map(k=>`<button ${selected(k===mk,`data-wz-map="${k}"`)}>${mapImg(k)}<b>${MAPS[k].name}</b></button>`).join('')}</div>
-    <figure class="pvMapScene pvPlate">${mapImg(mk)}<canvas class="pvMap3" aria-hidden="true"></canvas><figcaption><b>${MAPS[mk].name}</b><img src="${mapPlan(mk)}" alt="${MAPS[mk].name}格局圖"></figcaption></figure></div>`;
+    <figure class="pvMapScene pvPlate">${mapImg(mk)}<canvas class="pvMap3" aria-hidden="true"></canvas>${pvPlan257(MAPS[mk])}</figure></div>`;
   }else if(st===3){
     const pool=mfPool(side,false);
     if(!pool.includes(WZ.cur)&&!picks.includes(WZ.cur))WZ.cur=picks[0]||pool[0];
-    const k=WZ.cur,c=copCard(OPC[k]),part=picks.includes(k),base=mfBase(k),clash=!part&&picks.some(x=>mfBase(x)===base),can=part||owned(k)&&!clash&&picks.length<5;
-    const img=copSlot(k)!=null?opArt(k):opArtU(k)||opArt(k)||opFace(k);
-    const skill=skGet(k),ability=skill?.g||c.zh.g,desc=skill?.d||cardText(c);
+    const k=WZ.cur;
     body=`<div class="pvSquad"><div class="pvRoster">
       <div class="pvSlots pvPlate">${Array.from({length:5},(_,i)=>picks[i]?`<button class="pvFace" data-pvslot="${i}" aria-label="${esc(pvName257(picks[i]))} · 移出">${portrait(picks[i])}</button>`:`<div class="pvFace empty">${i+1}</div>`).join('')}<strong>${picks.length}/5</strong></div>
-      <div class="pvRosterBox pvPlate"><div class="pvRosterHead"><span>${side==='A'?'進攻方':'防守方'}</span><button id="mfRnd" class="pvUtility">隨機</button></div><div class="pvOpGrid">${pool.map(id=>{
+      <div class="pvRosterBox pvPlate"><div class="pvRosterHead"><span>${side==='A'?'進攻方':'防守方'}</span><small>左鍵雙擊加入小隊</small><button id="mfRnd" class="pvUtility">隨機</button></div><div class="pvOpGrid">${pool.map(id=>{
         const shown=picks.find(p=>p===id||copSlot(p)==null&&copSlot(id)==null&&mfBase(p)===mfBase(id))||id;
         const picked=picks.includes(shown),locked=!owned(shown);
         return `<button class="pvFace${picked?' picked':''}${locked?' locked':''}${shown===k?' current':''}" data-k="${esc(shown)}" aria-pressed="${shown===k}">${portrait(shown)}${locked?'<em aria-label="尚未解鎖">🔒</em>':picked?'<em aria-hidden="true">✓</em>':''}</button>`;
       }).join('')}</div></div>
-    </div><article class="pvDossier pvPlate">${img?`<img class="pvHero" src="${esc(img)}" alt="">`:''}<div class="pvDossierInk"></div><div class="pvDossierContent">
-      <header><img src="${esc(opIcon(k))}" alt=""><div><b>${esc(pvName257(k))}</b><small>${esc(c.zh.role||'')}</small></div></header>
-      <div class="pvSkill"><small>專屬道具</small><b>${esc(ability||'沒有專屬道具')}</b><div>${desc||''}</div></div>
-      <div class="pvDice">${['近距離','中距離','遠距離'].map((r,i)=>`<div><b>${r}</b><small>${['1–3','4–6','7+'][i]}</small><span>${hexDice(c.w[i]||[])}</span></div>`).join('')}</div>
-      <button id="mfAdd" class="pvUtility${can?' on':''}" ${can?'':'disabled'}>${part?'移出小隊':!owned(k)?'尚未解鎖':clash?'已帶另一位':picks.length>=5?'小隊已滿':'加入小隊'}</button>
-    </div></article></div>`;
+    </div><article class="pvDossier pvPlate">${pvDossier257(k,picks)}</article></div>`;
   }else if(st===4){
     const fixed=side==='A'?'另有 3 架無人機。':'另有 3 捲鐵絲網與地圖上的攝影機。';
     body=`<div class="pvGear"><div class="pvGearRows">${Object.entries(INV[side]).map(([k,[label,max,desc]])=>`<article class="pvGearRow pvPlate"><i>${pvGear257(k)}</i><div><b>${label}</b><small>${desc}</small></div><div class="pvCount"><button data-iv="${k}" data-d="-1" aria-label="減少${label}" ${inv[k]<=0?'disabled':''}>−</button><strong>${inv[k]|0}</strong><button data-iv="${k}" data-d="1" aria-label="增加${label}" ${used>=cap||inv[k]>=max?'disabled':''}>＋</button></div></article>`).join('')}</div>
-      <aside class="pvBudget pvPlate"><header><b>共用裝備</b><strong>${used} / ${cap}</strong></header><div class="pvPips">${Array.from({length:cap},(_,i)=>`<i class="${i<used?'on':''}"></i>`).join('')}</div><div class="pvTray">${Object.keys(INV[side]).filter(k=>inv[k]>0).map(k=>`<span>${pvGear257(k)}<b>×${inv[k]}</b></span>`).join('')||'<small>未選</small>'}</div><footer>${fixed}<button id="mfRnd" class="pvUtility">隨機</button></footer></aside></div>`;
+      <aside class="pvBudget pvPlate"><header><b>共用裝備</b><strong>${used} / ${cap}</strong></header><div class="pvPips">${Array.from({length:cap},(_,i)=>`<i class="${i<used?'on':''}"></i>`).join('')}</div>
+      <div class="pvTray"><div class="pvCase"><img class="pvCasePhoto" src="${PV_ART257}gear-case-v263.jpg" alt=""><ul>${(side==='A'?['frag','charges','flash','smk','clay']:['bpcam',null,'impact','nitro','shield']).map((k,i)=>k?`<li data-case-item="${k}" class="${inv[k]>0?'on':'off'}" data-pocket="${i}" title="${INV[side][k][0]}"><span>${pvGear257(k)}</span><b ${inv[k]>0?'':'hidden'}>×${inv[k]|0}</b><small>${INV[side][k][0]} · ${inv[k]|0}</small></li>`:'').join('')}</ul></div></div>
+      <footer>${fixed}<button id="mfRnd" class="pvUtility">隨機</button></footer></aside></div>`;
   }else if(st===5){
     body=`<div class="pvTimer"><p>每輪時間 = 在場幹員數 × 秒數，兩個啟動階段共用。第一次玩建議不計時。</p><div>${PV_CLOCK257.map(([t,n])=>`<button ${selected((cfg.timer||0)===t,`data-tm="${t}"`)}><b>${n}</b><strong>${t||'∞'}${t?'<small> 秒</small>':''}</strong>${t?'<span>每名幹員</span>':''}</button>`).join('')}</div></div>`;
   }else{
@@ -114,13 +173,46 @@ function pvRender257(el){
   on('[data-wz-mis]',b=>{cfg.mission=b.dataset.wzMis;re();});
   on('[data-wz-map]',b=>{cfg.map=b.dataset.wzMap;re();});
   on('[data-tm]',b=>{cfg.timer=+b.dataset.tm;re();});
-  on('[data-k]',b=>{const k=b.dataset.k;if(WZ.cur===k&&picks.includes(k)){picks.splice(picks.indexOf(k),1);}WZ.cur=k;re();});
   on('[data-pvslot]',b=>{picks.splice(+b.dataset.pvslot,1);re();});
-  on('#mfAdd',()=>{
-    const k=WZ.cur,i=picks.indexOf(k);
-    if(i>=0)picks.splice(i,1);else if(owned(k)&&picks.length<5&&!picks.some(p=>mfBase(p)===mfBase(k)))picks.push(k);re();
+  if(st===3){
+    const dossier=el.querySelector('.pvDossier'),cards=el.querySelectorAll('.pvOpGrid [data-k]');
+    dossier.onclick=e=>{
+      if(!e.target.closest('#mfAdd'))return;
+      const k=WZ.cur,i=picks.indexOf(k);
+      if(i>=0)picks.splice(i,1);else if(pvCanAdd257(k,picks))picks.push(k);else return;
+      re();
+    };
+    cards.forEach(b=>{
+      const k=b.dataset.k;
+      b.onclick=()=>{
+        if(WZ.cur===k)return;
+        WZ.cur=k;
+        cards.forEach(card=>{const current=card===b;card.classList.toggle('current',current);card.setAttribute('aria-pressed',current);});
+        dossier.innerHTML=pvDossier257(k,picks);
+      };
+      b.ondblclick=e=>{
+        if(e.button!==0||!pvCanAdd257(k,picks))return;
+        picks.push(k);
+        re();
+      };
+    });
+  }
+  on('[data-iv]',b=>{
+    const k=b.dataset.iv,d=+b.dataset.d,n=(inv[k]|0)+d;
+    if(n<0||n>INV[side][k][1]||d>0&&invUsed(side)>=cap)return;
+    inv[k]=n;
+    const total=invUsed(side),item=el.querySelector(`[data-case-item="${k}"]`),count=item.querySelector('b');
+    item.classList.toggle('on',n>0);item.classList.toggle('off',!n);
+    count.textContent=`×${n}`;count.hidden=!n;
+    item.querySelector('small').textContent=`${INV[side][k][0]} · ${n}`;
+    b.parentElement.querySelector('strong').textContent=n;
+    el.querySelector('.pvBudget header strong').textContent=`${total} / ${cap}`;
+    el.querySelectorAll('.pvPips i').forEach((pip,i)=>pip.classList.toggle('on',i<total));
+    el.querySelectorAll('[data-iv]').forEach(btn=>{
+      const key=btn.dataset.iv;
+      btn.disabled=+btn.dataset.d<0?inv[key]<=0:total>=cap||inv[key]>=INV[side][key][1];
+    });
   });
-  on('[data-iv]',b=>{const k=b.dataset.iv,d=+b.dataset.d,n=(inv[k]|0)+d;if(n<0||n>INV[side][k][1]||d>0&&invUsed(side)>=cap)return;inv[k]=n;re();});
   on('#mfRnd',()=>{if(st===3){cfg.picks[side]=rndPicks(side,true);WZ.cur=cfg.picks[side][0];}else if(st===4)cfg.inv[side]=rndInv(side);re();});
   restore();
   if(fs){const b=[...el.querySelectorAll('button['+fs[0]+']')].find(e=>e.getAttribute(fs[0])===fs[1]&&e.getAttribute('data-d')===fs[2]);if(b&&!b.disabled)b.focus({preventScroll:true});}

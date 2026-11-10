@@ -3376,7 +3376,7 @@ html body #title[data-s=board] #tmenu{inset:78px 3% 3vh;max-width:none;width:aut
 @media(max-width:1100px){#cop>.cpBox .cpTt:before{height:28px}#cop>.cpBox .cpTt small{font-size:14px}}
 }
 </style>
-<link rel="stylesheet" href="pve257.css?v=257">
+<link rel="stylesheet" href="pve257.css?v=263">
 <style id="cultivation254">
 .cpName254{display:contents}
 @media(min-width:1000px) and (min-height:620px){
@@ -14614,6 +14614,11 @@ Object.assign(I18X,{
 I18X['電腦培養頁確認鍵提亮，保留金屬紋理及可按、不可按的狀態區別。']=['Brightened the desktop training confirm button while preserving its metallic texture and distinct enabled and disabled states.',''];
 NEWS[0].v='v250–v259';NEWS[0].v='v250–v260';NEWS[0].i.unshift('手機主畫面圖示換新：6 站在低角度的棋盤上，牆壁高低不平、金色格線。');I18X['手機主畫面圖示換新：6 站在低角度的棋盤上，牆壁高低不平、金色格線。']=['New home-screen icon: the 6 stands on a low-angle game board with uneven walls and gold grid lines.',''];NEWS[0].i.unshift('電腦版對戰電腦七步改為戰術簡報介面；返回鍵固定左上，Esc 優先關視窗、再返回上一層。');NEWS[0].v='v250–v262';NEWS[0].i.unshift('手機改回只有直式介面：橫放時畫面仍維持直式，轉向不會重新載入對局。');I18X['手機改回只有直式介面：橫放時畫面仍維持直式，轉向不會重新載入對局。']=['Phones are portrait-only again: turning the phone sideways keeps the portrait layout, and rotating does not reload the match.',''];
 Object.assign(I18X,{'電腦版對戰電腦七步改為戰術簡報介面；返回鍵固定左上，Esc 優先關視窗、再返回上一層。':['Desktop PvE now has a seven-step tactical briefing. Back stays at the upper left; Esc dismisses the top dialog or goes back one level.',''],'選擇陣營':['Choose a side',''],'確認任務':['Review mission',''],'安裝或破壞拆彈器':['Plant or destroy the defuser',''],'救出或守住人質':['Rescue or guard the hostage',''],'共用裝備':['Shared equipment',''],'加入小隊':['Add to squad',''],'移出小隊':['Remove from squad','']});
+NEWS[0].v='v250–v263';NEWS[0].i.unshift('電腦版對戰電腦：低角度地圖近景、無底色格局圖、雙擊幹員入隊，以及隨數量即時亮起的共用裝備箱。');
+Object.assign(I18X,{
+  '電腦版對戰電腦：低角度地圖近景、無底色格局圖、雙擊幹員入隊，以及隨數量即時亮起的共用裝備箱。':['Desktop PvE now has close low-angle map previews, transparent floor plans, double-click squad selection, and an equipment case that lights up as items are added.',''],
+  '左鍵雙擊加入小隊':['Double-click to add to squad',''],'幹員定位':['Operator role',''],'移動步數':['Movement','']
+});
 I18X['電腦培養頁姓名與職業分開顯示，拉開戰績間距；點姓名可改名，右上學長姐與幹員按鈕文字置中。']=['Desktop training separates the editable name from the class label and adds space before the stats. Click the name to rename; senior and operator button labels are centered.',''];
 I18X['電腦培養頁校準整組縮放與近景構圖，超寬螢幕不再拉出大面積空白；新增拉絲金屬、霧金與煙燻玻璃材質，新兵沿用大廳既有高解析圖。手機與遊戲規則不變。']=['Desktop operator training now scales as one composition, with close-up framing and no oversized gaps on ultrawide screens. New brushed metal, satin gold and smoked glass materials; the recruit reuses existing high-resolution lobby artwork. Mobile and game rules are unchanged.',''];
 Object.assign(I18X,{'電腦選單全面換上銀行實景底圖、斜角金屬面板與光影材質：培養、技能收藏、訓練、商店、作戰檔案、排行榜及任務視窗。人物、技能與遊戲規則沿用原版。':['Desktop training, skills, missions, shop, archive, rankings and task dialog now share cinematic bank environments, angled metal panels, lighting and textures. Existing operators, icons and game rules are preserved.',''],'選擇訓練類別，掌握職業能力、部署與攻堅。':['Choose a training category to learn class abilities, deployment and breaching.',''],'各關卡獎勵與解鎖條件依實際任務顯示。':['Rewards and unlock requirements are shown in each mission briefing.',''],'查看任務':['View missions','']});
@@ -14668,5 +14673,5 @@ render();loadPBR();loadModels();loadWallImg();loadC3D();
 {const _pl=plant;plant=function(u){const r=_pl(u);if(G&&G.lv&&G.lv.goal==='plant'&&u.side===G.player&&!G.over)setTimeout(()=>{if(G&&G.lv&&!G.over)finish('A','拆彈器已安裝');},900);return r;};}
 {const _fn=finish;finish=function(w,why){if(G&&G.lv)return lvFinish(w,why);return _fn(w,why);};}
 </script>
-<script src="pve257.js?v=257"></script>
+<script src="pve257.js?v=263"></script>
 </body></html>
