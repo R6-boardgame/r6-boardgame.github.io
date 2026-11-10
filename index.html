@@ -3376,7 +3376,7 @@ html body #title[data-s=board] #tmenu{inset:78px 3% 3vh;max-width:none;width:aut
 @media(max-width:1100px){#cop>.cpBox .cpTt:before{height:28px}#cop>.cpBox .cpTt small{font-size:14px}}
 }
 </style>
-<link rel="stylesheet" href="pve257.css?v=264">
+<link rel="stylesheet" href="pve257.css?v=265">
 <style id="cultivation254">
 .cpName254{display:contents}
 @media(min-width:1000px) and (min-height:620px){
@@ -7100,12 +7100,12 @@ const SFX=(()=>{
   // v172: recorded interface sounds (Kenney, CC0). Bytes are fetched right away; decoded once audio is allowed
   const SMP={tap:.32,tab:.5,back:.6,ok:.5,buy:.6,err:.45,tick:.35,open:.4,
     // v178: the owner's Foley set (snd/fx)
-    battle:.8,deploy1:.5,deploy2:.5,deploy3:.7,sniper:.75,shield:.65,nade_pin:.9,nade_hit:.6,boom1:.7,boom2:.65,fire:.4,barricade:.5,camera:.7,wall:.5},raw={},buf={};
-  const FXK=new Set(['back','battle','deploy1','deploy2','deploy3','sniper','shield','nade_pin','nade_hit','boom1','boom2','fire','barricade','camera','wall']);
+    battle:.8,deploy1:.5,deploy2:.5,deploy3:.7,sniper:.75,shield:.65,nade_pin:.9,nade_hit:.6,boom1:.7,boom2:.65,fire:.4,barricade:.5,camera:.7,wall:.5,'gear-foam':.92,'gear-case':.55},raw={},buf={};
+  const FXK=new Set(['back','battle','deploy1','deploy2','deploy3','sniper','shield','nade_pin','nade_hit','boom1','boom2','fire','barricade','camera','wall','gear-foam','gear-case']);
   Object.keys(SMP).forEach(k=>{raw[k]=fetch((FXK.has(k)?'snd/fx/':'snd/')+k+'.mp3?v=178').then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);});
   function decodeAll(){Object.keys(SMP).forEach(k=>{if(buf[k])return;buf[k]=1;raw[k].then(a=>{if(!a)return delete buf[k];ac.decodeAudioData(a.slice(0),d=>{buf[k]=d;},()=>{delete buf[k];});});});}
-  function play(k,vol,jit){if(!ok())return false;const b=buf[k];if(!b||b===1)return false;const s=ac.createBufferSource();s.buffer=b;s.playbackRate.value=1+(jit==null?.04:jit)*(Math.random()*2-1);
-    const g=ac.createGain();g.gain.value=(vol==null?1:vol)*SMP[k];s.connect(g);g.connect(fxBus);s.start();return true;}
+  function play(k,vol,jit,delay=0){if(!ok())return false;const b=buf[k];if(!b||b===1)return false;const s=ac.createBufferSource();s.buffer=b;s.playbackRate.value=1+(jit==null?.04:jit)*(Math.random()*2-1);
+    const g=ac.createGain();g.gain.value=(vol==null?1:vol)*SMP[k];s.connect(g);g.connect(fxBus);s.start(ac.currentTime+delay);return true;}
   // throttle so a burst of identical events (e.g. a breach destroying several cells) plays once
   const gate=(k,ms)=>{const n=performance.now();if(last[k]&&n-last[k]<ms)return false;last[k]=n;return true;};
   function noise(t,dur,f,q,vol,type,f2){const s=ac.createBufferSource();s.buffer=noiseBuf;const fl=ac.createBiquadFilter();fl.type=type||'bandpass';fl.frequency.setValueAtTime(f,t);if(f2)fl.frequency.exponentialRampToValueAtTime(f2,t+dur);fl.Q.value=q||1;
@@ -7127,7 +7127,7 @@ const SFX=(()=>{
     dice(){if(!ok())return;const t=ac.currentTime;for(let i=0;i<7;i++)noise(t+.05+i*.07+Math.random()*.04,.03,2400+Math.random()*1500,4,.35-i*.03);},
     alert(){if(!ok()||!gate('alert',600))return;const t=ac.currentTime;tone(t,.12,880,0,.18,'square');tone(t+.14,.18,660,0,.18,'square');},
     ui(k){if(!ok()||!gate('ui',40))return;if(play(k||'tap'))return;const t=ac.currentTime;tone(t,.04,1200,800,.06,'triangle');},
-    play(k,v,j){return play(k,v,j);},
+    play(k,v,j,delay){return play(k,v,j,delay);},
     click(){if(!ok()||!gate('click',40))return;if(!play('tick'))tone(ac.currentTime,.04,900,600,.05,'triangle');},
     buy(){if(!ok())return;play('buy');},
     err(){if(!ok()||!gate('err',200))return;play('err');},
@@ -7165,6 +7165,7 @@ const SFX=(()=>{
   document.addEventListener('visibilitychange',()=>{if(document.hidden){if(ac&&ac.state==='running'){try{ac.suspend().catch(()=>{});}catch(e){}}return;}if(ac&&ac.state!=='running'){try{ac.resume().catch(()=>{});}catch(e){}}});
   addEventListener('pagehide',()=>{if(ac&&ac.state==='running'){try{ac.suspend().catch(()=>{});}catch(e){}}});
   addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('button,[role=button]');if(!b)return;
+    if(b.matches('#wiz.pv257[data-pv-step="4"] :is([data-iv][data-d="1"],#wzNext)'))return;
     // pick the sound by what the button does
     const k=b.matches('#gnav [data-gn],[data-trc],[data-trv]:not(.lobAr),.lobNav button,[data-sb-tab],.trnCh button')?'tab'
       :b.matches('.lobAr,.trnX,#osX,[aria-label="返回"],[aria-label="關閉"],.back,.lgOut')?'back'
@@ -14616,7 +14617,9 @@ NEWS[0].v='v250–v259';NEWS[0].v='v250–v260';NEWS[0].i.unshift('手機主畫�
 Object.assign(I18X,{'電腦版對戰電腦七步改為戰術簡報介面；返回鍵固定左上，Esc 優先關視窗、再返回上一層。':['Desktop PvE now has a seven-step tactical briefing. Back stays at the upper left; Esc dismisses the top dialog or goes back one level.',''],'選擇陣營':['Choose a side',''],'確認任務':['Review mission',''],'安裝或破壞拆彈器':['Plant or destroy the defuser',''],'救出或守住人質':['Rescue or guard the hostage',''],'共用裝備':['Shared equipment',''],'加入小隊':['Add to squad',''],'移出小隊':['Remove from squad','']});
 NEWS[0].v='v250–v263';NEWS[0].i.unshift('電腦版對戰電腦：低角度地圖近景、無底色格局圖、雙擊幹員入隊，以及隨數量即時亮起的共用裝備箱。');
 NEWS[0].v='v250–v264';NEWS[0].i.unshift('電腦版共用裝備箱只顯示攜帶的裝備。增加時裝備落進凹槽，箱體輕震。');
+NEWS[0].v='v250–v265';NEWS[0].i.unshift('電腦版共用裝備箱換上新箱體和道具圖。道具入箱和裝備頁下一步各有專屬音效。');
 Object.assign(I18X,{
+  '電腦版共用裝備箱換上新箱體和道具圖。道具入箱和裝備頁下一步各有專屬音效。':['The desktop equipment case has new gear artwork and distinct sounds for inserting an item and proceeding from equipment.',''],
   '電腦版共用裝備箱只顯示攜帶的裝備。增加時裝備落進凹槽，箱體輕震。':['The desktop equipment case shows only carried gear. Added items drop into the foam slots and gently shake the case.',''],
   '電腦版對戰電腦：低角度地圖近景、無底色格局圖、雙擊幹員入隊，以及隨數量即時亮起的共用裝備箱。':['Desktop PvE now has close low-angle map previews, transparent floor plans, double-click squad selection, and an equipment case that lights up as items are added.',''],
   '左鍵雙擊加入小隊':['Double-click to add to squad',''],'幹員定位':['Operator role',''],'移動步數':['Movement','']
@@ -14675,5 +14678,5 @@ render();loadPBR();loadModels();loadWallImg();loadC3D();
 {const _pl=plant;plant=function(u){const r=_pl(u);if(G&&G.lv&&G.lv.goal==='plant'&&u.side===G.player&&!G.over)setTimeout(()=>{if(G&&G.lv&&!G.over)finish('A','拆彈器已安裝');},900);return r;};}
 {const _fn=finish;finish=function(w,why){if(G&&G.lv)return lvFinish(w,why);return _fn(w,why);};}
 </script>
-<script src="pve257.js?v=264"></script>
+<script src="pve257.js?v=265"></script>
 </body></html>

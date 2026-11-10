@@ -125,18 +125,18 @@
   #wiz.pv257 .pvPips i{width:clamp(17px,2.25vw,39px);aspect-ratio:1;border:1px solid #d4ae678a;border-radius:4px;background:#0b0c10}
   #wiz.pv257 .pvPips i.on{background:linear-gradient(#ffe3a2,#bc8f3f);border-color:#ffe1a0}
   #wiz.pv257 .pvTray{display:grid;place-items:center;min-height:0;container-type:size;border-block:1px solid #b4a99555;background:radial-gradient(ellipse,#28231d6b,transparent 70%)}
-  #wiz.pv257 .pvCase{position:relative;width:min(100%,150cqh);aspect-ratio:3/2;isolation:isolate}
+  #wiz.pv257 .pvCase{position:relative;width:min(100%,162.4cqh);aspect-ratio:929/572;isolation:isolate}
   #wiz.pv257 .pvCasePhoto,#wiz.pv257 .pvCase ul{position:absolute;inset:0;width:100%;height:100%;padding:0;margin:0}
-  #wiz.pv257 .pvCasePhoto{mask-image:radial-gradient(ellipse 72% 73%,#000 81%,transparent 100%)}
-  #wiz.pv257 .pvCase li{position:absolute;list-style:none;top:18%;left:var(--pocket);width:14%;height:33%;transform:translateX(-50%);display:grid;place-items:center;isolation:isolate}
+  #wiz.pv257 .pvCasePhoto{filter:drop-shadow(0 9px 9px #000a)}
+  #wiz.pv257 .pvCase li{position:absolute;list-style:none;top:17.5%;left:var(--pocket);width:var(--pocket-width);height:36%;transform:translateX(-50%);display:grid;place-items:center;isolation:isolate}
   #wiz.pv257 .pvCase li[hidden]{display:none}
-  #wiz.pv257 .pvCase li[data-pocket="0"]{--pocket:22%}
-  #wiz.pv257 .pvCase li[data-pocket="1"]{--pocket:40.5%}
-  #wiz.pv257 .pvCase li[data-pocket="2"]{--pocket:59.25%}
-  #wiz.pv257 .pvCase li[data-pocket="3"]{--pocket:78%}
-  #wiz.pv257 .pvCase li[data-pocket="4"]{left:50%;top:55%;width:43%;height:22%}
-  #wiz.pv257 .pvCase li::before{content:'';position:absolute;inset:1%;z-index:-1;border-radius:10px;background:radial-gradient(ellipse,#ffc96462,transparent 75%);box-shadow:inset 0 0 8px #ffc7774d}
-  #wiz.pv257 .pvCase li span{display:grid;place-items:center;width:98%;height:96%;min-height:0;filter:brightness(1.26) drop-shadow(0 0 4px #ffd68674) drop-shadow(0 3px 4px #000)}
+  #wiz.pv257 .pvCase li[data-pocket="0"]{--pocket:22.3%;--pocket-width:18.8%}
+  #wiz.pv257 .pvCase li[data-pocket="1"]{--pocket:45.1%;--pocket-width:16%;height:33.2%;top:18.6%}
+  #wiz.pv257 .pvCase li[data-pocket="2"]{--pocket:63.9%;--pocket-width:11.4%}
+  #wiz.pv257 .pvCase li[data-pocket="3"]{--pocket:81.4%;--pocket-width:12.5%}
+  #wiz.pv257 .pvCase li[data-pocket="4"]{--pocket:49.6%;--pocket-width:76%;top:59.6%;height:22%}
+  #wiz.pv257 .pvCase li::before{content:'';position:absolute;inset:5%;z-index:-1;background:radial-gradient(ellipse,#ffc96436,transparent 72%)}
+  #wiz.pv257 .pvCase li span{display:grid;place-items:center;width:98%;height:96%;min-height:0;filter:brightness(1.12) drop-shadow(1px 4px 3px #000c)}
   #wiz.pv257 .pvCase li span>*{width:100%;height:100%;object-fit:contain;min-height:0}
   #wiz.pv257 .pvCase li small{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
   #wiz.pv257 .pvCase li b{position:absolute;bottom:3%;right:4%;font:700 clamp(11px,calc(var(--pv-u)*1.25),21px)/1 var(--mono);color:#ffe1a2;text-shadow:0 2px 3px #000,0 0 6px #000}

@@ -1,12 +1,18 @@
 // v257: desktop solo PvE briefing. The mobile, tutorial and co-op wizards remain native.
 const PV_DESK257=matchMedia('(min-width:1000px) and (min-height:620px)');
 const PV_ART257='img/ui/pve-v257/';
+const PV_GEAR265=PV_ART257+'gear-v265/';
+const PV_ATTACK_POCKETS=['clay','frag','flash','smk','charges'];
+const PV_DEFEND_POCKETS=['bpcam',null,'impact','nitro','shield'];
 const PV_CLOCK257=[[0,'不計時'],[120,'入門'],[90,'冷靜'],[60,'標準'],[45,'極限']];
 const pvMode257=()=>PV_DESK257.matches&&!WZ.coop&&!(typeof TU!=='undefined'&&TU&&TU.ph==='pre');
 const pvMapArt257=k=>k==='bank'?'img/ui/lobby-bank-v249.jpg':mapBig(k)||mapThumb(k);
 const pvName257=k=>copSlot(k)==null?mfName(k):copAll()[copSlot(k)].nm;
 const pvFace257=k=>copSlot(k)==null?opFace(k):opArt(k);
-const pvGear257=k=>GIMG[k]?`<img src="${GIMG[k]}" alt="">`:WZI[k]||'';
+const pvGear257=k=>{
+  const src=PV_ATTACK_POCKETS.includes(k)?PV_GEAR265+k+'.webp':GIMG[k];
+  return src?`<img src="${src}" alt="">`:WZI[k]||'';
+};
 
 function pvPlan257(m){
   const grid=parseMap(m),paths={hard:[],soft:[],door:[],window:[]},xs=[],ys=[];
@@ -134,7 +140,7 @@ function pvRender257(el){
     const fixed=side==='A'?'另有 3 架無人機。':'另有 3 捲鐵絲網與地圖上的攝影機。';
     body=`<div class="pvGear"><div class="pvGearRows">${Object.entries(INV[side]).map(([k,[label,max,desc]])=>`<article class="pvGearRow pvPlate"><i>${pvGear257(k)}</i><div><b>${label}</b><small>${desc}</small></div><div class="pvCount"><button data-iv="${k}" data-d="-1" aria-label="減少${label}" ${inv[k]<=0?'disabled':''}>−</button><strong>${inv[k]|0}</strong><button data-iv="${k}" data-d="1" aria-label="增加${label}" ${used>=cap||inv[k]>=max?'disabled':''}>＋</button></div></article>`).join('')}</div>
       <aside class="pvBudget pvPlate"><header><b>共用裝備</b><strong>${used} / ${cap}</strong></header><div class="pvPips">${Array.from({length:cap},(_,i)=>`<i class="${i<used?'on':''}"></i>`).join('')}</div>
-      <div class="pvTray"><div class="pvCase"><img class="pvCasePhoto" src="${PV_ART257}gear-case-v263.jpg" alt=""><ul>${(side==='A'?['frag','charges','flash','smk','clay']:['bpcam',null,'impact','nitro','shield']).map((k,i)=>k?`<li data-case-item="${k}" ${inv[k]>0?'':'hidden'} data-pocket="${i}" title="${INV[side][k][0]}"><span>${pvGear257(k)}</span><b aria-hidden="true">×${inv[k]|0}</b><small>${INV[side][k][0]} · ${inv[k]|0}</small></li>`:'').join('')}</ul></div></div>
+      <div class="pvTray"><div class="pvCase"><img class="pvCasePhoto" src="${PV_GEAR265}case.webp" alt=""><ul>${(side==='A'?PV_ATTACK_POCKETS:PV_DEFEND_POCKETS).map((k,i)=>k?`<li data-case-item="${k}" ${inv[k]>0?'':'hidden'} data-pocket="${i}" title="${INV[side][k][0]}"><span>${pvGear257(k)}</span><b aria-hidden="true">×${inv[k]|0}</b><small>${INV[side][k][0]} · ${inv[k]|0}</small></li>`:'').join('')}</ul></div></div>
       <footer>${fixed}<button id="mfRnd" class="pvUtility">隨機</button></footer></aside></div>`;
   }else if(st===5){
     body=`<div class="pvTimer"><p>每輪時間 = 在場幹員數 × 秒數，兩個啟動階段共用。第一次玩建議不計時。</p><div>${PV_CLOCK257.map(([t,n])=>`<button ${selected((cfg.timer||0)===t,`data-tm="${t}"`)}><b>${n}</b><strong>${t||'∞'}${t?'<small> 秒</small>':''}</strong>${t?'<span>每名幹員</span>':''}</button>`).join('')}</div></div>`;
@@ -163,6 +169,7 @@ function pvRender257(el){
   on('#wzBack',()=>{if(returning())go(6);else if(st)go(st-1);else{WZ.ret=null;el.hidden=true;goTitle();}menuSync250();});
   on('#wzNext',()=>{
     if((st===3||last)&&!WZSTEPS[3].ok())return;
+    if(st===4)SFX.play('gear-case',1,0);
     if(last){WZ.ret=null;el.hidden=true;newGame();return;}
     go(returning()?6:st+1);
   });
@@ -214,7 +221,10 @@ function pvRender257(el){
     });
     const art=item.querySelector('span');
     if(!n||d>0)art.getAnimations().forEach(a=>a.cancel());
-    if(d>0&&!matchMedia('(prefers-reduced-motion:reduce)').matches){
+    const motion=!matchMedia('(prefers-reduced-motion:reduce)').matches;
+    // The foam recording's main contact is ~170 ms into the clip.
+    if(d>0)SFX.play('gear-foam',1,0,motion?.028:0);
+    if(d>0&&motion){
       const box=item.closest('.pvCase');
       box.getAnimations().forEach(a=>a.cancel());
       art.animate([
@@ -229,7 +239,7 @@ function pvRender257(el){
         {transform:'translate(-1.5px,-1px) rotate(-.22deg)'},
         {transform:'translate(.6px,.7px)'},
         {transform:'translate(0,0)'}
-      ],{duration:150,delay:186});
+      ],{duration:150,delay:198});
     }
   });
   on('#mfRnd',()=>{if(st===3){cfg.picks[side]=rndPicks(side,true);WZ.cur=cfg.picks[side][0];}else if(st===4)cfg.inv[side]=rndInv(side);re();});

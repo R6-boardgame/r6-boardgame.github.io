@@ -50,6 +50,23 @@ const fs=require('node:fs');
   await pv.locator('[data-k=ash]').click();await check(3);
   await pv.locator('[data-pvslot]').first().click();assert(await pv.locator('#wzNext').isDisabled());
   await pv.locator('#mfRnd').click();await next();await check(4);
+  await page.evaluate(()=>{
+   window.gearAudio=[];
+   const play=SFX.play;
+   SFX.play=(key,vol,jitter,delay)=>{
+    const played=play(key,vol,jitter,delay);
+    if(key.startsWith('gear-'))gearAudio.push([key,delay??0,played]);
+    return played;
+   };
+  });
+  const audioLog=()=>page.evaluate(()=>gearAudio.splice(0));
+  assert.deepEqual(await pv.locator('[data-case-item]').evaluateAll(items=>items.map(el=>el.dataset.caseItem)),['clay','frag','flash','smk','charges']);
+  await pv.locator('.pvCase').evaluate(box=>Promise.all([...box.querySelectorAll('img')].map(im=>im.decode())));
+  if(process.env.R6_SHOTS){
+   await page.evaluate(()=>{cfg.inv.A=invFor('A',{clay:1,frag:1,flash:1,smk:1,charges:1});renderWiz();});
+   await pv.locator('.pvCase').evaluate(box=>Promise.all([...box.querySelectorAll('img')].map(im=>im.decode())));
+   await snap(4);
+  }
   const gear=async(side,k)=>{
    await page.evaluate(side=>{cfg.side=side;cfg.inv[side]=invFor(side,{});renderWiz();},side);
    const item=pv.locator(`[data-case-item=${k}]`),btn=d=>pv.locator(`[data-iv=${k}][data-d="${d}"]`);
@@ -64,20 +81,27 @@ const fs=require('node:fs');
    await btn(1).click();
    assert(await item.isVisible());assert.equal(await item.locator('b').textContent(),'×1');
    assert.equal(await btn(1).getAttribute('data-animated'),'1,1');
+   assert.deepEqual(await audioLog(),[['gear-foam',.028,true]]);
    await btn(-1).click();assert(!(await item.isVisible()));
+   assert.deepEqual(await audioLog(),[]);
    await page.emulateMedia({reducedMotion:'reduce'});
    await captureAnimation();
    await btn(1).click();assert(await item.isVisible());
    assert.equal((await btn(1).getAttribute('data-animated')).split(',')[0],'0');
+   assert.deepEqual(await audioLog(),[['gear-foam',0,true]]);
    await page.emulateMedia({reducedMotion:'no-preference'});
   };
   await gear('D','shield');await gear('A','clay');
   await pv.locator('#mfRnd').click();assert.equal(await page.evaluate(()=>invUsed('A')),6);
   assert.equal(await pv.locator('[data-iv][data-d="1"]:enabled').count(),0);
   await key();await step(3);await next();await next();await step(5);
+  assert.deepEqual(await audioLog(),[['gear-case',0,true]]);
   assert.deepEqual(await pv.locator('[data-tm]').evaluateAll(es=>es.map(e=>+e.dataset.tm)),[0,120,90,60,45]);
   await pv.locator('[data-tm="0"]').click();await check(5);await next();await check(6);
   await pv.locator('[data-wz-edit="4"]').click();await step(4);await key();await step(6);
+  assert.deepEqual(await audioLog(),[]);
+  await pv.locator('[data-wz-edit="4"]').click();await step(4);await next();await step(6);
+  assert.deepEqual(await audioLog(),[['gear-case',0,true]]);
   await pv.locator('[data-wz-edit="5"]').click();await step(5);await pv.locator('[data-tm="45"]').click();await next();await step(6);
   assert.equal(await page.evaluate(()=>cfg.timer),45);
   await page.setViewportSize({width:1000,height:620});for(let i=6;i>=0;i--){await step(i);const l=await layout();assert(l.clear&&l.hit&&l.foot&&!l.scroll,JSON.stringify(l));if(i===3)assert(await portraitClear());await key();}
