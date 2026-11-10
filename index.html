@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="虹彩六號 戰術桌遊 網頁版：對戰電腦、連線對戰、排名戰。"><title>虹彩六號 戰術桌遊</title><link rel="icon" type="image/png" sizes="32x32" href="i2-32.png"><link rel="apple-touch-icon" href="i2-180.png"><link rel="manifest" href="app2.webmanifest"><meta name="apple-mobile-web-app-title" content="R6 桌遊"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><style>*,*::before,*::after{box-sizing:border-box}html,body{margin:0;padding:0;background:#06090d}#healGlow{position:fixed;left:0;right:0;bottom:0;height:50vh;height:50dvh;pointer-events:none;z-index:60;opacity:0;
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="虹彩六號 戰術桌遊 網頁版：對戰電腦、連線對戰、排名戰。"><title>虹彩六號 戰術桌遊</title><link rel="icon" type="image/png" sizes="32x32" href="i2-32.png"><link rel="apple-touch-icon" href="i2-180.png"><link rel="manifest" href="app2.webmanifest"><meta name="apple-mobile-web-app-title" content="R6 桌遊"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><script src="portrait.js?v=256"></script><style>*,*::before,*::after{box-sizing:border-box}html,body{margin:0;padding:0;background:#06090d}#healGlow{position:fixed;left:0;right:0;bottom:0;height:50vh;height:50dvh;pointer-events:none;z-index:60;opacity:0;
   background:linear-gradient(to top,rgba(70,255,140,.62) 0%,rgba(60,235,120,.38) 30%,rgba(40,210,110,.14) 65%,rgba(40,210,110,0) 100%);
   animation:healGlow 2.6s cubic-bezier(.2,.7,.3,1) forwards}
 #healGlow::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 100%,rgba(190,255,210,.45),rgba(190,255,210,0) 70%);mix-blend-mode:screen}
@@ -107,14 +107,34 @@ const fbLoad=()=>fbP||(fbP=new Promise((res,rej)=>{const ls=['fb/app.js','fb/aut
 const fbSet=u=>{fbUser=u?{uid:u.uid,name:u.displayName||'',email:u.email||'',photo:u.photoURL||''}:null;
   uid=fbUser?'g'+fbUser.uid:localUid;gName=fbUser?fbUser.name:'';gPhoto=fbUser?fbUser.photo:'';fbReady=true;fbSubs.forEach(fn=>{try{fn(fbUser);}catch(e){}});};
 const fbDoc=async()=>{const fb=await fbLoad();if(!fbUser)throw {code:'unauthenticated'};return fb.firestore().doc('users/'+fbUser.uid);};
+const fbGoogle=fb=>{const p=new fb.auth.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});return p;};
 window.R6FB={user:()=>fbUser,settled:()=>fbReady||fbFail,
   onUser(fn){fbSubs.add(fn);if(fbReady&&fbUser)fn(fbUser);return ()=>fbSubs.delete(fn);},
-  async signIn(){const fb=await fbLoad(),a=fb.auth(),p=new fb.auth.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});
-    try{await a.signInWithPopup(p);}catch(e){if(/popup-blocked|operation-not-supported|web-storage-unsupported/.test((e&&e.code)||''))return a.signInWithRedirect(p);throw e;}},
+  async signIn(){const fb=await fbLoad(),a=fb.auth(),p=fbGoogle(fb);
+    try{await a.signInWithPopup(p);}catch(e){
+      if(!/popup-blocked|operation-not-supported|web-storage-unsupported/.test((e&&e.code)||''))throw e;
+      if(window.frameElement?.id!=='r6PortraitFrame')return a.signInWithRedirect(p);
+      const u=new URL(location.href);u.searchParams.set('r6Auth256','start');
+      sessionStorage.setItem('r6.auth256','1');
+      parent.location.replace(u.href);
+    }},
   async signOut(){const fb=await fbLoad();await fb.auth().signOut();},
   async load(){const s=await (await fbDoc()).get();return s.exists?s.data():null;},
   async save(d){await (await fbDoc()).set(d);}};
-const fbBoot=()=>fbLoad().then(fb=>{const a=fb.auth();a.getRedirectResult().catch(()=>{});a.onAuthStateChanged(fbSet);}).catch(()=>{fbFail=true;});
+const fbBoot=()=>{
+  const u=new URL(location.href),mode=u.searchParams.get('r6Auth256');
+  let routed=false;try{routed=window.top===window&&['start','return'].includes(mode)&&!!sessionStorage.getItem('r6.auth256');}catch(e){}
+  const back=()=>{sessionStorage.removeItem('r6.auth256');u.searchParams.delete('r6Auth256');location.replace(new URL('./portrait.html'+u.search+u.hash,u));};
+  return fbLoad().then(async fb=>{
+    const a=fb.auth();
+    if(routed){
+      if(mode==='start'){u.searchParams.set('r6Auth256','return');history.replaceState(null,'',u);await a.signInWithRedirect(fbGoogle(fb));}
+      else{await a.getRedirectResult().catch(()=>{});back();}
+      return;
+    }
+    a.getRedirectResult().catch(()=>{});a.onAuthStateChanged(fbSet);
+  }).catch(()=>{fbFail=true;if(routed)back();});
+};
 if(document.readyState==='loading')addEventListener('DOMContentLoaded',fbBoot);else fbBoot();
 let lobby=null;
 const user={async id(){return uid;},async me(){let nick='';try{nick=(JSON.parse(localStorage.getItem('r6bg.profile')||'{}').nick)||'';}catch(e){}return{id:uid,name:nick||gName,avatarUrl:gPhoto};},
@@ -1565,13 +1585,6 @@ html.pg,html.pg body{touch-action:manipulation}html.pg .psbox,html.pg .avgrid{to
  .tutbox{left:12px!important;right:318px!important;width:auto!important;transform:none!important}
 }
 /* in a game on a phone held upright: ask to turn it sideways */
-#rotHint{display:none;position:fixed;inset:0;z-index:400;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:radial-gradient(90% 60% at 50% 40%,#16212c,#05080b);color:#e6edf2}
-#rotHint .ph{width:64px;height:110px;border:4px solid #cfd8df;border-radius:12px;position:relative;animation:rotPh 2.4s ease-in-out infinite}
-#rotHint .ph::after{content:'';position:absolute;left:50%;bottom:6px;width:14px;height:4px;margin-left:-7px;border-radius:2px;background:#cfd8df}
-#rotHint b{font-size:22px;letter-spacing:.06em}#rotHint p{margin:0;color:#9aa7b2;font-size:14px}
-#rotHint .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-@keyframes rotPh{0%,25%{transform:rotate(0)}55%,100%{transform:rotate(-90deg)}}
-@media (orientation:portrait) and (max-width:760px) and (pointer:coarse){body[data-scr="game"]:not(.portraitOK) #rotHint{display:flex}}
 .sintro .dicebox .dcap{top:30%;font-size:19px;gap:6px}.sintro .dicebox .dcap small{font-size:16px}.sintro .dicebox .dcap b{font-size:76px}.sintro .dicebox i.die{width:22px;height:22px;font-size:13px}
 @media (max-height:520px),(max-width:760px){.sintro .dicebox .dcap{font-size:14px}.sintro .dicebox .dcap small{font-size:12px}.sintro .dicebox .dcap b{font-size:46px}}
 /* v25: operator picker / codex — denser icons so both sides fit on one screen, compact detail card */
@@ -2153,10 +2166,6 @@ html body #clocks{display:none!important}
 html body.hasClk #tracker .seg{display:inline-flex}
 html body header.top.top{padding-top:max(6px,env(safe-area-inset-top))!important}
 @media (max-width:560px){html body #opsBar.hz{--ts:min(32px,calc((100vw - 96px)/10));gap:2px}#opsBar.hz .obTeam{gap:1px}#opsBar.hz .obMid{min-width:48px;padding:0 3px}#opsBar.hz .obMid b{font-size:17px}#opsBar.hz .obMid.inf b{font-size:24px}#opsBar.hz .obActs{padding:0 2px 0 0;gap:4px}#opsBar.hz .obActs i{width:6px;height:6px}#opsBar.hz .ob .obHp{left:2px;right:2px}}
-#rotLock,html body #rotHint{display:none!important}
-@media (orientation:landscape) and (max-height:520px) and (pointer:coarse) and (min-width:99999px){#rotLock{display:flex;position:fixed;inset:0;z-index:100000;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#070b0f;color:#e6edf2;font:600 18px/1.4 sans-serif;text-align:center}
- #rotLock svg{width:64px;height:64px;animation:rotHint 1.8s ease-in-out infinite}}
-@keyframes rotHint{0%,30%{transform:rotate(-90deg)}60%,100%{transform:rotate(0)}}
 #opsBar .ob.sel{border-color:#ffd166;box-shadow:inset 0 0 10px rgba(255,209,102,.45)}
 #opsBar .ob.act{border-color:var(--hblue);background:rgba(18,52,82,.95)}
 #opsBar .ob.done{opacity:.5}
@@ -12609,13 +12618,6 @@ function wzFit(){const el=$('#wiz');if(!el||el.hidden)return;const b=el.querySel
   if(!matchMedia('(max-width:700px),(orientation:landscape) and (max-height:520px)').matches){b.dataset.tight='0';return;}
   for(let t=0;t<=3;t++){b.dataset.tight=t;if(b.scrollHeight<=b.clientHeight+1)break;}}
 addEventListener('resize',()=>{if($('#wiz')&&!$('#wiz').hidden)wzFit();});
-// phones: the game plays sideways (desktop-like layout); an upright phone gets a prompt, with fullscreen + orientation lock where the browser allows it
-(()=>{const el=document.createElement('div');el.id='rotHint';el.setAttribute('role','dialog');
-  const canLock=!!(document.documentElement.requestFullscreen&&screen.orientation&&screen.orientation.lock);
-  el.innerHTML=`<div class="ph" aria-hidden="true"></div><b>請將手機橫放</b><p>橫式畫面和電腦版一樣：左邊是地圖，右邊是幹員與行動。</p><div class="row">${canLock?'<button class="primary" id="rotFs">全螢幕橫向</button>':''}<button id="rotNo">繼續用直式</button></div>`;
-  document.body.appendChild(el);
-  el.querySelector('#rotNo').onclick=()=>document.body.classList.add('portraitOK');
-  const fs=el.querySelector('#rotFs');if(fs)fs.onclick=()=>document.documentElement.requestFullscreen().then(()=>screen.orientation.lock('landscape')).catch(()=>{});})();
 // ---------- online count (people with this game open right now) ----------
 const ONLINE={n:0,room:null};
 (async()=>{try{if(!window.claude||!claude.use)return;const room=await claude.use('room');if(!room)return;ONLINE.room=room;
@@ -13827,7 +13829,7 @@ function showMapReveal(key,side,done){const m=MAPS[key];let el=$('#mreveal');if(
   tick();el.onclick=finish;}
 
 {const pr=document.createElement('div');pr.style.cssText='position:fixed;top:0;height:env(safe-area-inset-top);width:1px;visibility:hidden;pointer-events:none';document.body.appendChild(pr);
-  const sb=()=>{const env=pr.getBoundingClientRect().height,touch=matchMedia('(pointer:coarse)').matches,framed=window.top!==window||navigator.standalone;
+  const sb=()=>{const env=pr.getBoundingClientRect().height,touch=matchMedia('(pointer:coarse)').matches,framed=window.frameElement?.id!=='r6PortraitFrame'&&(window.top!==window||navigator.standalone);
     document.documentElement.style.setProperty('--sbt',(!env&&touch&&framed&&innerHeight>innerWidth)?'40px':'0px');};sb();addEventListener('resize',sb);}
 $('#manualBtn').onclick=()=>openManual();
 {const sb=$('#sndBtn'),f=()=>{sb.textContent=SFX.on?'🔊':'🔇';sb.title=SFX.on?'關閉音效':'開啟音效';};f();sb.onclick=()=>{SFX.toggle();f();try{musicLevel();}catch(e){}};}
@@ -14513,6 +14515,8 @@ NEWS[0].v='v250–v253';NEWS[0].i.unshift('電腦培養頁統一切角與邊框�
 I18X['電腦培養頁統一切角與邊框，拉開標題、能力、數值和輔助文字層級；分頁與資訊文字不再歪斜。材質、人物、手機和規則不變。']=['Desktop training now uses consistent beveled corners and borders, with clearer title, attribute, value and supporting text hierarchy. Tabs and information remain upright. Materials, artwork, mobile and rules are unchanged.',''];
 NEWS[0].v='v250–v254';NEWS[0].i.unshift('電腦培養頁姓名與職業分開顯示，拉開戰績間距；點姓名可改名，右上學長姐與幹員按鈕文字置中。');
 NEWS[0].v='v250–v255';NEWS[0].i.unshift('電腦培養頁確認鍵提亮，保留金屬紋理及可按、不可按的狀態區別。');
+NEWS[0].v='v250–v256';NEWS[0].i.unshift('手機橫放仍維持遊戲直式，轉向不會重新載入對局；桌機版不變。');
+I18X['手機橫放仍維持遊戲直式，轉向不會重新載入對局；桌機版不變。']=['The game stays in portrait on phones, even when turned sideways. Rotating does not reload the match. Desktop is unchanged.',''];
 I18X['電腦培養頁確認鍵提亮，保留金屬紋理及可按、不可按的狀態區別。']=['Brightened the desktop training confirm button while preserving its metallic texture and distinct enabled and disabled states.',''];
 I18X['電腦培養頁姓名與職業分開顯示，拉開戰績間距；點姓名可改名，右上學長姐與幹員按鈕文字置中。']=['Desktop training separates the editable name from the class label and adds space before the stats. Click the name to rename; senior and operator button labels are centered.',''];
 I18X['電腦培養頁校準整組縮放與近景構圖，超寬螢幕不再拉出大面積空白；新增拉絲金屬、霧金與煙燻玻璃材質，新兵沿用大廳既有高解析圖。手機與遊戲規則不變。']=['Desktop operator training now scales as one composition, with close-up framing and no oversized gaps on ultrawide screens. New brushed metal, satin gold and smoked glass materials; the recruit reuses existing high-resolution lobby artwork. Mobile and game rules are unchanged.',''];
@@ -14562,7 +14566,7 @@ setInterval(()=>{const el=document.getElementById('clock');if(!G||!G.tEnd||!G.ac
   const left=Math.max(0,(G.tEnd-performance.now())/1000);if(el){el.textContent=`⏱ ${Math.ceil(left)}s`;el.classList.toggle('low',left<10);}
   if(left<=0&&!G.busy&&G.active.side===G.player&&(!G.coop||coopMyTurn())){log(`${OPS[G.active.op].name} 的啟動時間用完了`,'ks');G.tEnd=0;playerAfterAct();}},250);
 try{init3D();}catch(e){console.error(e);R3=null;}
-render();loadPBR();loadModels();loadWallImg();loadC3D();{const r=document.createElement('div');r.id='rotLock';r.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="#e3aa3e" stroke-width="1.8"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18.5h2"/></svg><div>請把手機轉成直式<br><small style="opacity:.7">手機版只支援直式畫面</small></div>';document.body.appendChild(r);try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('portrait').catch(()=>{});}catch(e){}}
+render();loadPBR();loadModels();loadWallImg();loadC3D();
 // v162 level hooks (outermost wrappers)
 {const _sp=startPhase;startPhase=function(){if(G&&G.lv&&G.lv.passive&&!G.over&&curSide()!==G.player){G.acts=0;G.sel=null;G.ai=false;G.busy=false;log('防守方按兵不動','kd');render();return setTimeout(()=>{if(G&&G.lv&&!G.over&&curSide()!==G.player)endPhase();},450);}return _sp();};}
 {const _pl=plant;plant=function(u){const r=_pl(u);if(G&&G.lv&&G.lv.goal==='plant'&&u.side===G.player&&!G.over)setTimeout(()=>{if(G&&G.lv&&!G.over)finish('A','拆彈器已安裝');},900);return r;};}
