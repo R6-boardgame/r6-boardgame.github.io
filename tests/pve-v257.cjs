@@ -12,6 +12,14 @@ const fs=require('node:fs');
   await page.evaluate(()=>{G=null;SCREEN='title';WZ.coop=false;TU=null;render();renderTitle();});
   const pv=page.locator('#wiz.pv257'),next=()=>pv.locator('#wzNext').click(),key=()=>page.keyboard.press('Escape');
   const step=async i=>{await pv.waitFor();assert.equal(await pv.getAttribute('data-pv-step'),String(i));};
+  const validSquad=()=>page.evaluate(()=>{
+   const side=cfg.side,picks=cfg.picks[side];
+   return picks.length===5&&new Set(picks.map(mfBase)).size===5&&picks.every(k=>OPC[k].side===side&&owned(k));
+  });
+  const randomByNext=()=>page.locator('#wiz #mfRnd').evaluate(b=>{
+   const r=b.getBoundingClientRect(),n=b.parentElement.querySelector('#wzNext').getBoundingClientRect();
+   return r.width>0&&r.right<=n.left&&r.bottom<=innerHeight&&b.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));
+  });
   const snap=async i=>{if(process.env.R6_SHOTS){fs.mkdirSync(process.env.R6_SHOTS,{recursive:true});await page.screenshot({path:process.env.R6_SHOTS+'/0'+(i+1)+'.jpg',type:'jpeg',quality:91});}};
   const layout=async()=>pv.evaluate(el=>{
    const r=s=>el.querySelector(s).getBoundingClientRect(),a=r('.pvBack'),b=r('.pvHeader h2'),h=r('.pvHeader'),p=r('.pvMain'),f=r('.pvFooter');
@@ -46,7 +54,10 @@ const fs=require('node:fs');
    return text.right<=art.left && art.width>0 && art.height>0;
   });
   assert(await portraitClear());
-  await pv.locator('#mfRnd').click();assert.equal(await pv.locator('[data-pvslot]').count(),5);
+  const random=pv.getByRole('button',{name:'隨機選角',exact:true});
+  assert(await randomByNext());
+  await random.focus();await page.keyboard.press('Enter');assert(await validSquad());
+  assert(await random.evaluate(b=>b===document.activeElement));
   await pv.locator('[data-k=ash]').click();await check(3);
   await pv.locator('[data-pvslot]').first().click();assert(await pv.locator('#wzNext').isDisabled());
   await pv.locator('#mfRnd').click();await next();await check(4);
@@ -104,7 +115,7 @@ const fs=require('node:fs');
   assert.deepEqual(await audioLog(),[['gear-case',0,true]]);
   await pv.locator('[data-wz-edit="5"]').click();await step(5);await pv.locator('[data-tm="45"]').click();await next();await step(6);
   assert.equal(await page.evaluate(()=>cfg.timer),45);
-  await page.setViewportSize({width:1000,height:620});for(let i=6;i>=0;i--){await step(i);const l=await layout();assert(l.clear&&l.hit&&l.foot&&!l.scroll,JSON.stringify(l));if(i===3)assert(await portraitClear());await key();}
+  await page.setViewportSize({width:1000,height:620});for(let i=6;i>=0;i--){await step(i);const l=await layout();assert(l.clear&&l.hit&&l.foot&&!l.scroll,JSON.stringify(l));if(i===3){assert(await portraitClear());assert(await randomByNext());}await key();}
   assert.equal(await page.evaluate(()=>SCREEN),'title');assert(!(await pv.isVisible()));
   await page.evaluate(()=>openCop());await page.locator('#cop').waitFor();await page.locator('#cpSk').click();await page.locator('.cpFull').waitFor();
   await key();assert(!(await page.locator('.cpFull').isVisible()));assert(await page.locator('#cop').isVisible());
@@ -114,8 +125,11 @@ const fs=require('node:fs');
   await page.evaluate(()=>{WZ.step=6;WZ.seen=6;renderWiz();});await step(6);await next();
   assert.equal(await page.evaluate(()=>G.phase),'setup');assert(!(await pv.isVisible()));
   await page.setViewportSize({width:390,height:844});
-  await page.evaluate(()=>{G=null;SCREEN='setup';WZ.step=3;render();});await page.locator('#wiz .pvMode').waitFor();
+  await page.evaluate(()=>{G=null;SCREEN='setup';WZ.step=3;cfg.side='D';cfg.picks.D=[];render();});await page.locator('#wiz .pvMode').waitFor();
   assert.equal(await pv.count(),0);assert.equal(await page.locator('#wiz .pvSteps').count(),0);
+  assert(await randomByNext());
+  await page.locator('#wiz').getByRole('button',{name:'隨機選角',exact:true}).click();
+  assert(await validSquad());assert(await page.locator('#wiz #wzNext').isEnabled());
   assert.deepEqual(errors,[]);
   console.log('PASS desktop PvE steps, all four plans, squad double-click and details, live equipment case for both sides, gear cap, Escape, review, deployment and mobile');
  }finally{await browser.close();}

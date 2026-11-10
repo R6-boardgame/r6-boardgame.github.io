@@ -130,7 +130,7 @@ function pvRender257(el){
     const k=WZ.cur;
     body=`<div class="pvSquad"><div class="pvRoster">
       <div class="pvSlots pvPlate">${Array.from({length:5},(_,i)=>picks[i]?`<button class="pvFace" data-pvslot="${i}" aria-label="${esc(pvName257(picks[i]))} · 移出">${portrait(picks[i])}</button>`:`<div class="pvFace empty">${i+1}</div>`).join('')}<strong>${picks.length}/5</strong></div>
-      <div class="pvRosterBox pvPlate"><div class="pvRosterHead"><span>${side==='A'?'進攻方':'防守方'}</span><small>左鍵雙擊加入小隊</small><button id="mfRnd" class="pvUtility">隨機</button></div><div class="pvOpGrid">${pool.map(id=>{
+      <div class="pvRosterBox pvPlate"><div class="pvRosterHead"><span>${side==='A'?'進攻方':'防守方'}</span><small>左鍵雙擊加入小隊</small></div><div class="pvOpGrid">${pool.map(id=>{
         const shown=picks.find(p=>p===id||copSlot(p)==null&&copSlot(id)==null&&mfBase(p)===mfBase(id))||id;
         const picked=picks.includes(shown),locked=!owned(shown);
         return `<button class="pvFace${picked?' picked':''}${locked?' locked':''}${shown===k?' current':''}" data-k="${esc(shown)}" aria-pressed="${shown===k}">${portrait(shown)}${locked?'<em aria-label="尚未解鎖">🔒</em>':picked?'<em aria-hidden="true">✓</em>':''}</button>`;
@@ -160,7 +160,9 @@ function pvRender257(el){
     <h2>對戰電腦</h2><span id="wzOnline"></span><button id="wzRules" class="pvUtility">規則</button>
     </header><nav class="pvSteps" aria-label="對戰電腦設定">${WZSTEPS.map(({t},i)=>`<button data-wz-go="${i}" ${i===st?'aria-current="step"':canStep(i)?'':'disabled'}><span>${t}</span></button>`).join('')}</nav>
     <main class="pvMain"><h3>${heading}</h3>${body}</main>
-    <footer class="pvFooter"><span>${String(st+1).padStart(2,'0')} / 07</span><button id="wzNext" class="pvGold" ${(st===3||last)&&!full?'disabled':''}>${last?'開始任務':st===3&&!full?`再選 ${5-picks.length} 名`:'下一步'}<span aria-hidden="true">›</span></button></footer></div>`;
+    <footer class="pvFooter"><span>${String(st+1).padStart(2,'0')} / 07</span>
+    ${st===3?`<button id="mfRnd" class="pvUtility pvRandom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h2c5 0 8 12 13 12h3m-4-4 4 4-4 4M3 18h2c1.9 0 3.6-1.8 5-4m4-4c1.4-2.2 3.1-4 5-4h2m-4-4 4 4-4 4"/></svg><span>隨機選角</span></button>`:''}
+    <button id="wzNext" class="pvGold" ${(st===3||last)&&!full?'disabled':''}>${last?'開始任務':st===3&&!full?`再選 ${5-picks.length} 名`:'下一步'}<span aria-hidden="true">›</span></button></footer></div>`;
 
   const on=(sel,fn)=>el.querySelectorAll(sel).forEach(b=>b.onclick=()=>fn(b));
   const re=()=>renderWiz();
@@ -242,7 +244,13 @@ function pvRender257(el){
       ],{duration:150,delay:198});
     }
   });
-  on('#mfRnd',()=>{if(st===3){cfg.picks[side]=rndPicks(side,true);WZ.cur=cfg.picks[side][0];}else if(st===4)cfg.inv[side]=rndInv(side);re();});
+  on('#mfRnd',b=>{
+    const restoreFocus=document.activeElement===b;
+    if(st===3){cfg.picks[side]=rndPicks(side,true);WZ.cur=cfg.picks[side][0];}
+    else if(st===4)cfg.inv[side]=rndInv(side);
+    re();
+    if(restoreFocus)el.querySelector('#mfRnd')?.focus({preventScroll:true});
+  });
   restore();
   if(fs){const b=[...el.querySelectorAll('button['+fs[0]+']')].find(e=>e.getAttribute(fs[0])===fs[1]&&e.getAttribute('data-d')===fs[2]);if(b&&!b.disabled)b.focus({preventScroll:true});}
   if(st===2)pvDrawMap257(el,mk);
