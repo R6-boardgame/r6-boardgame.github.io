@@ -3376,7 +3376,7 @@ html body #title[data-s=board] #tmenu{inset:78px 3% 3vh;max-width:none;width:aut
 @media(max-width:1100px){#cop>.cpBox .cpTt:before{height:28px}#cop>.cpBox .cpTt small{font-size:14px}}
 }
 </style>
-<link rel="stylesheet" href="pve257.css?v=265">
+<link rel="stylesheet" href="pve257.css?v=266">
 <style id="cultivation254">
 .cpName254{display:contents}
 @media(min-width:1000px) and (min-height:620px){
@@ -12582,7 +12582,7 @@ function wzPick(el){const s=cfg.side,P=cfg.picks[s],inv=cfg.inv[s],used=invUsed(
     ${tab==='op'?mfDet(WZ.cur,P,false):''}
     <div class="mfBody">${tab==='op'?`<div class="mfOps">${ops}</div>`:`<div class="mfInvs">${invs}<p class="mfNote">${s==='A'?'另有 3 架無人機。':'另有 3 捲鐵絲網與地圖上的攝影機。'}</p></div>`}</div>
     <div class="mfSlots">${[0,1,2,3,4].map(i=>`<div class="mfSl">${P[i]&&OPC[P[i]]?`<img src="${copSlot(P[i])!=null?(opArt(P[i])||opIcon(P[i])):opIcon(P[i])}" class="${copSlot(P[i])!=null?'cop':''}" alt="${esc(mfName(P[i]))}">`:''}</div>`).join('')}</div>
-    <footer class="mfFt pv"><button id="wzBack">‹ 上一步</button><button id="mfRnd">隨機</button><button class="primary" id="wzNext"${full?'':' disabled'}>${full?'下一步 ›':P.length===5?'有幹員未解鎖':`再選 ${5-P.length} 名`}</button></footer></div></div>`;
+    <footer class="mfFt pv"><button id="wzBack">‹ 上一步</button><button id="mfRnd">${tab==='op'?'隨機選角':'隨機'}</button><button class="primary" id="wzNext"${full?'':' disabled'}>${full?'下一步 ›':P.length===5?'有幹員未解鎖':`再選 ${5-P.length} 名`}</button></footer></div></div>`;
   _rs();mfFit(el);
   const re=()=>renderWiz(),say=(t,d)=>{try{whyTip(t,d);}catch(e){}};
   const ad=el.querySelector('#mfAdd');if(ad&&WZ.cur&&!owned(WZ.cur)&&!P.includes(WZ.cur)){ad.disabled=false;ad.textContent='未解鎖';ad.classList.remove('primary');}
@@ -14617,8 +14617,12 @@ NEWS[0].v='v250–v259';NEWS[0].v='v250–v260';NEWS[0].i.unshift('手機主畫�
 Object.assign(I18X,{'電腦版對戰電腦七步改為戰術簡報介面；返回鍵固定左上，Esc 優先關視窗、再返回上一層。':['Desktop PvE now has a seven-step tactical briefing. Back stays at the upper left; Esc dismisses the top dialog or goes back one level.',''],'選擇陣營':['Choose a side',''],'確認任務':['Review mission',''],'安裝或破壞拆彈器':['Plant or destroy the defuser',''],'救出或守住人質':['Rescue or guard the hostage',''],'共用裝備':['Shared equipment',''],'加入小隊':['Add to squad',''],'移出小隊':['Remove from squad','']});
 NEWS[0].v='v250–v263';NEWS[0].i.unshift('電腦版對戰電腦：低角度地圖近景、無底色格局圖、雙擊幹員入隊，以及隨數量即時亮起的共用裝備箱。');
 NEWS[0].v='v250–v264';NEWS[0].i.unshift('電腦版共用裝備箱只顯示攜帶的裝備。增加時裝備落進凹槽，箱體輕震。');
-NEWS[0].v='v250–v265';NEWS[0].i.unshift('電腦版共用裝備箱換上新箱體和道具圖。道具入箱和裝備頁下一步各有專屬音效。');
+NEWS.unshift({d:'2026-11-11',v:'v265–v266',i:[
+  '對戰電腦選角頁的「隨機選角」放在下一步旁，可一鍵選出五名已解鎖幹員。',
+  '電腦版共用裝備箱換上新箱體和道具圖。道具入箱和裝備頁下一步各有專屬音效。'
+]});
 Object.assign(I18X,{
+  '隨機選角':['Random squad',''],'對戰電腦選角頁的「隨機選角」放在下一步旁，可一鍵選出五名已解鎖幹員。':['Random Squad sits beside Next in the PvE operator picker and selects five unlocked operators.',''],
   '電腦版共用裝備箱換上新箱體和道具圖。道具入箱和裝備頁下一步各有專屬音效。':['The desktop equipment case has new gear artwork and distinct sounds for inserting an item and proceeding from equipment.',''],
   '電腦版共用裝備箱只顯示攜帶的裝備。增加時裝備落進凹槽，箱體輕震。':['The desktop equipment case shows only carried gear. Added items drop into the foam slots and gently shake the case.',''],
   '電腦版對戰電腦：低角度地圖近景、無底色格局圖、雙擊幹員入隊，以及隨數量即時亮起的共用裝備箱。':['Desktop PvE now has close low-angle map previews, transparent floor plans, double-click squad selection, and an equipment case that lights up as items are added.',''],
@@ -14678,5 +14682,5 @@ render();loadPBR();loadModels();loadWallImg();loadC3D();
 {const _pl=plant;plant=function(u){const r=_pl(u);if(G&&G.lv&&G.lv.goal==='plant'&&u.side===G.player&&!G.over)setTimeout(()=>{if(G&&G.lv&&!G.over)finish('A','拆彈器已安裝');},900);return r;};}
 {const _fn=finish;finish=function(w,why){if(G&&G.lv)return lvFinish(w,why);return _fn(w,why);};}
 </script>
-<script src="pve257.js?v=265"></script>
+<script src="pve257.js?v=266"></script>
 </body></html>
