@@ -28,13 +28,14 @@
     if (!w || !h) return;
     const legacy = typeof window.orientation === 'number' ? window.orientation : null;
     const landscape = w > h && (orientation?.type ? orientation.type.startsWith('landscape') : legacy === null || Math.abs(legacy) === 90);
-    const deviceAngle = orientation?.angle ?? legacy;
-    const angle = landscape ? (deviceAngle === 270 || deviceAngle === -90 ? 90 : -90) : 0;
-    const visibleWidth = landscape ? h : w, visibleHeight = landscape ? w : h;
-    const scale = landscape ? Math.min(1, visibleWidth / 320) : 1;
-    frame.style.width = Math.floor(visibleWidth / scale) + 'px';
-    frame.style.height = Math.floor(visibleHeight / scale) + 'px';
-    frame.style.transform = 'translate(-50%, -50%) rotate(' + angle + 'deg) scale(' + scale + ')';
+    // v258: a phone held sideways shows the desktop design — the game gets a desktop-sized viewport, scaled down to fit
+    const DESK_H = 640;
+    const scale = landscape ? Math.min(1, h / DESK_H) : 1;
+    frame.style.width = Math.floor(w / scale) + 'px';
+    frame.style.height = Math.floor(h / scale) + 'px';
+    frame.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
+    stage.dataset.view = landscape ? 'desktop' : 'phone';
+    const angle = 0;
     stage.dataset.turn = String(angle);
   };
   sync();
@@ -44,7 +45,4 @@
   addEventListener('resize', sync);
   addEventListener('orientationchange', sync);
   orientation?.addEventListener('change', sync);
-  if (matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
-    try { orientation?.lock?.('portrait-primary')?.catch(() => {}); } catch (_) {}
-  }
 })();
