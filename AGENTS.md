@@ -1,6 +1,7 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
 - v275：手機大廳背景換成使用者給的夕陽軍事基地屋頂 `img/ui/lobby-phone-v275.jpg`（舊的 v266 倉庫圖已刪）。
+- v277：portrait.html 用 `@media (orientation:landscape)` 直接套旋轉（JS 只寫 CSS 變數 `--pw/--ph/--lw/--lh/--la/--ls`），橫放第一格就已轉好不閃；`enterCost` 對 `winOpen` 窗戶格不收基本 1 步，只收翻越 +1（穿窗共 2 點：+1 翻越、+1 落地格），仍標 pass 不能停。
 - v276：手機大廳幹員 `bottom:52px`、左移 22px、腳藏在 KD／模式按鈕後，加 sepia＋左上暖色 rim（配夕陽）；左上 `.pcard` 在 ≤760 限寬 `100vw-240px`、聲望字縮小；小隊欄標題可點收合（`.lobSq.mini`，localStorage `sqMini276`）。
 
 - v273：手機大廳 `HX` 水平位移（`m_smg` 右移 40px），設 `--hx` 加到 `.lobHero` 的 translateX。

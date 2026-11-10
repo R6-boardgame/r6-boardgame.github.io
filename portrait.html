@@ -13,12 +13,14 @@
   <style>
     html,body{margin:0;overflow:hidden;overscroll-behavior:none;background:#06090d;color:#eee}
     #r6PortraitStage{position:fixed;inset:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);overflow:hidden}
-    #r6PortraitFrame{position:absolute;display:block;left:50%;top:50%;border:0;max-width:none;max-height:none;background:#06090d;transform-origin:center}
+    #r6PortraitFrame{position:absolute;display:block;left:50%;top:50%;border:0;max-width:none;max-height:none;background:#06090d;transform-origin:center;transition:none;width:var(--pw,100%);height:var(--ph,100%);transform:translate(-50%,-50%)}
+    /* v277: the turn is applied by CSS on the very first landscape frame, so the sideways page never shows before the script catches up */
+    @media (orientation:landscape){#r6PortraitFrame{width:var(--lw,100vh);height:var(--lh,100vw);transform:translate(-50%,-50%) rotate(var(--la,-90deg)) scale(var(--ls,1))}}
   </style>
 </head>
 <body>
   <main id="r6PortraitStage"></main>
   <noscript>請開啟 JavaScript 以遊玩。</noscript>
-  <script src="portrait.js?v=262"></script>
+  <script src="portrait.js?v=277"></script>
 </body>
 </html>
