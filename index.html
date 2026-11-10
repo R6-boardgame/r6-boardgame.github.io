@@ -3398,7 +3398,7 @@ html body #title[data-s=board] #tmenu{inset:78px 3% 3vh;max-width:none;width:aut
 @media(max-width:1100px){#cop>.cpBox .cpTt:before{height:28px}#cop>.cpBox .cpTt small{font-size:14px}}
 }
 </style>
-<link rel="stylesheet" href="pve257.css?v=266">
+<link rel="stylesheet" href="pve257.css?v=269">
 <style id="cultivation254">
 .cpName254{display:contents}
 @media(min-width:1000px) and (min-height:620px){
@@ -7122,9 +7122,9 @@ const SFX=(()=>{
   // v172: recorded interface sounds (Kenney, CC0). Bytes are fetched right away; decoded once audio is allowed
   const SMP={tap:.32,tab:.5,back:.6,ok:.5,buy:.6,err:.45,tick:.35,open:.4,
     // v178: the owner's Foley set (snd/fx)
-    battle:.8,deploy1:.5,deploy2:.5,deploy3:.7,sniper:.75,shield:.65,nade_pin:.9,nade_hit:.6,boom1:.7,boom2:.65,fire:.4,barricade:.5,camera:.7,wall:.5,'gear-foam':.92,'gear-case':.55},raw={},buf={};
-  const FXK=new Set(['back','battle','deploy1','deploy2','deploy3','sniper','shield','nade_pin','nade_hit','boom1','boom2','fire','barricade','camera','wall','gear-foam','gear-case']);
-  Object.keys(SMP).forEach(k=>{raw[k]=fetch((FXK.has(k)?'snd/fx/':'snd/')+k+'.mp3?v=178').then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);});
+    battle:.8,deploy1:.5,deploy2:.5,deploy3:.7,sniper:.75,shield:.65,nade_pin:.9,nade_hit:.6,boom1:.7,boom2:.65,fire:.4,barricade:.5,camera:.7,wall:.5,'gear-foam':.92,'gear-case':.55,'briefing-roster':.7,'briefing-start':.6},raw={},buf={};
+  const FXK=new Set(['back','battle','deploy1','deploy2','deploy3','sniper','shield','nade_pin','nade_hit','boom1','boom2','fire','barricade','camera','wall','gear-foam','gear-case','briefing-roster','briefing-start']);
+  Object.keys(SMP).forEach(k=>{raw[k]=fetch((FXK.has(k)?'snd/fx/':'snd/')+k+(k==='briefing-roster'?'.wav':'.mp3')+'?v=178').then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);});
   function decodeAll(){Object.keys(SMP).forEach(k=>{if(buf[k])return;buf[k]=1;raw[k].then(a=>{if(!a)return delete buf[k];ac.decodeAudioData(a.slice(0),d=>{buf[k]=d;},()=>{delete buf[k];});});});}
   function play(k,vol,jit,delay=0){if(!ok())return false;const b=buf[k];if(!b||b===1)return false;const s=ac.createBufferSource();s.buffer=b;s.playbackRate.value=1+(jit==null?.04:jit)*(Math.random()*2-1);
     const g=ac.createGain();g.gain.value=(vol==null?1:vol)*SMP[k];s.connect(g);g.connect(fxBus);s.start(ac.currentTime+delay);return true;}
@@ -7187,7 +7187,7 @@ const SFX=(()=>{
   document.addEventListener('visibilitychange',()=>{if(document.hidden){if(ac&&ac.state==='running'){try{ac.suspend().catch(()=>{});}catch(e){}}return;}if(ac&&ac.state!=='running'){try{ac.resume().catch(()=>{});}catch(e){}}});
   addEventListener('pagehide',()=>{if(ac&&ac.state==='running'){try{ac.suspend().catch(()=>{});}catch(e){}}});
   addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('button,[role=button]');if(!b)return;
-    if(b.matches('#wiz.pv257[data-pv-step="4"] :is([data-iv][data-d="1"],#wzNext)'))return;
+    if(b.matches('#wiz #wzNext[data-wz-sfx],#wiz.pv257[data-pv-step="4"] [data-iv][data-d="1"]'))return;
     // pick the sound by what the button does
     const k=b.matches('#gnav [data-gn],[data-trc],[data-trv]:not(.lobAr),.lobNav button,[data-sb-tab],.trnCh button')?'tab'
       :b.matches('.lobAr,.trnX,#osX,[aria-label="返回"],[aria-label="關閉"],.back,.lgOut')?'back'
@@ -12612,7 +12612,7 @@ function wzPick(el){const s=cfg.side,P=cfg.picks[s],inv=cfg.inv[s],used=invUsed(
     ${tab==='op'?mfDet(WZ.cur,P,false):''}
     <div class="mfBody">${tab==='op'?`<div class="mfOps">${ops}</div>`:`<div class="mfInvs">${invs}<p class="mfNote">${s==='A'?'另有 3 架無人機。':'另有 3 捲鐵絲網與地圖上的攝影機。'}</p></div>`}</div>
     <div class="mfSlots">${[0,1,2,3,4].map(i=>`<div class="mfSl">${P[i]&&OPC[P[i]]?`<img src="${copSlot(P[i])!=null?(opArt(P[i])||opIcon(P[i])):opIcon(P[i])}" class="${copSlot(P[i])!=null?'cop':''}" alt="${esc(mfName(P[i]))}">`:''}</div>`).join('')}</div>
-    <footer class="mfFt pv"><button id="wzBack">‹ 上一步</button><button id="mfRnd">${tab==='op'?'隨機選角':'隨機'}</button><button class="primary" id="wzNext"${full?'':' disabled'}>${full?'下一步 ›':P.length===5?'有幹員未解鎖':`再選 ${5-P.length} 名`}</button></footer></div></div>`;
+    <footer class="mfFt pv"><button id="wzBack">‹ 上一步</button><button id="mfRnd">${tab==='op'?'隨機選角':'隨機'}</button><button class="primary" id="wzNext" ${tab==='op'?'data-wz-sfx':''}${full?'':' disabled'}>${full?'下一步 ›':P.length===5?'有幹員未解鎖':`再選 ${5-P.length} 名`}</button></footer></div></div>`;
   _rs();mfFit(el);
   const re=()=>renderWiz(),say=(t,d)=>{try{whyTip(t,d);}catch(e){}};
   const ad=el.querySelector('#mfAdd');if(ad&&WZ.cur&&!owned(WZ.cur)&&!P.includes(WZ.cur)){ad.disabled=false;ad.textContent='未解鎖';ad.classList.remove('primary');}
@@ -12623,13 +12623,25 @@ function wzPick(el){const s=cfg.side,P=cfg.picks[s],inv=cfg.inv[s],used=invUsed(
   el.querySelectorAll('[data-iv]').forEach(b=>b.onclick=()=>{const k=b.dataset.iv,v=(inv[k]|0)+(+b.dataset.d);if(v<0||v>INV[s][k][1]||(+b.dataset.d>0&&invUsed(s)>=cap))return;inv[k]=v;re();});
   el.querySelector('#mfRnd').onclick=()=>{if(tab==='op'){cfg.picks[s]=rndPicks(s,true);WZ.cur=cfg.picks[s][0];}else cfg.inv[s]=rndInv(s);re();};
   el.querySelector('#wzBack').onclick=()=>{WZ.ret=null;WZ.step=2;WZ.arm=null;re();};
-  el.querySelector('#wzNext').onclick=()=>{if(!full)return;const r=WZ.ret;WZ.ret=null;WZ.step=r!=null?r:5;WZ.arm=null;re();};
+  el.querySelector('#wzNext').onclick=()=>{
+    if(!full)return;
+    if(tab==='op')SFX.play('briefing-roster',1,0);
+    WZ.step=WZ.ret??5;WZ.ret=null;WZ.arm=null;re();
+    if(tab==='inv'&&WZ.step===5)wzTimingFlash(el);
+  };
   el.querySelectorAll('[data-wz-go]').forEach(b=>b.onclick=()=>{WZ.ret=null;WZ.step=+b.dataset.wzGo;WZ.arm=null;re();});}
 // v116: re-rendering a screen with innerHTML must not throw its scroll areas back to the top (avatar list, operator pick…)
 function scrollSnap(el){if(!el)return()=>{};const key=e=>e.tagName+'.'+String(typeof e.className==='string'?e.className:'').trim().split(/\s+/)[0];
   const walk=f=>{const c={};[el,...el.querySelectorAll('*')].forEach(e=>{const k=key(e);c[k]=(c[k]||0)+1;f(e,k+'#'+c[k]);});};
   const m={};walk((e,k)=>{if(e.scrollTop||e.scrollLeft)m[k]=[e.scrollTop,e.scrollLeft];});const wy=window.scrollY;
   return skip=>{walk((e,k)=>{const v=m[k];if(v&&!(skip&&e.closest(skip))){e.scrollTop=v[0];e.scrollLeft=v[1];}});if(window.scrollY!==wy)window.scrollTo(0,wy);};}
+function wzTimingFlash(el){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const flash=document.createElement('div');
+  flash.className='wzTimingFlash';flash.setAttribute('aria-hidden','true');
+  flash.addEventListener('animationend',()=>flash.remove(),{once:true});
+  el.append(flash);
+}
 function renderWiz(){let el=$('#wiz');const _rs=WZ.lastStep===WZ.step?scrollSnap(el):null;const keep=[...(el?el.querySelectorAll('.wzBody,.wzOg'):[])].map(e=>e.scrollTop);
   if(!el){el=document.createElement('div');el.id='wiz';el.className='wiz';el.setAttribute('role','dialog');el.setAttribute('aria-label','對戰電腦設定');document.body.appendChild(el);}
   el.hidden=false;const st=WZ.step;WZ.seen=Math.max(WZ.seen,st);if(WZ.coop&&st>=3){el.hidden=true;return cpHostGo();}
@@ -12639,7 +12651,7 @@ function renderWiz(){let el=$('#wiz');const _rs=WZ.lastStep===WZ.step?scrollSnap
   const reach=i=>i<=WZ.seen||WZSTEPS.slice(0,i).every(x=>x.ok());
   el.innerHTML=`<div class="wzTop"><h2>${WZ.coop?'4v4 組隊對戰電腦':'對戰電腦'}</h2><nav class="wzSteps">${WZSTEPS.map((x,i)=>`<button data-wz-go="${i}" class="${i===st?'cur':i<WZ.seen||(i<st)?'done':''}" ${reach(i)&&WZSTEPS.slice(0,i).every(y=>y.ok())?'':'disabled'}><i>${i<st?'✓':i+1}</i><span>${x.t}</span></button>`).join('')}</nav><span id="wzOnline"></span><button id="wzRules">規則</button></div>
     <div class="wzBody">${wzStepHTML()}</div>
-    <div class="wzFoot"><button id="wzBack">${st?'‹ 上一步':'‹ 返回主畫面'}</button><span class="msg">${[0,1,2,5].includes(st)?(WZ.arm?'再點一次確定':'點一下看說明，再點一次確定'):ok?`第 ${st+1} 步，共 ${WZSTEPS.length} 步`:WZSTEPS[st].why}</span><button class="primary${last?' start':''}" id="wzNext" ${ok?'':'disabled'} >${last?'開始任務':'下一步 ›'}</button></div>`;
+    <div class="wzFoot"><button id="wzBack">${st?'‹ 上一步':'‹ 返回主畫面'}</button><span class="msg">${[0,1,2,5].includes(st)?(WZ.arm?'再點一次確定':'點一下看說明，再點一次確定'):ok?`第 ${st+1} 步，共 ${WZSTEPS.length} 步`:WZSTEPS[st].why}</span><button class="primary${last?' start':''}" id="wzNext" ${last?'data-wz-sfx':''} ${ok?'':'disabled'} >${last?'開始任務':'下一步 ›'}</button></div>`;
   if(keep.length&&WZ.lastStep===st)el.querySelectorAll('.wzBody,.wzOg').forEach((e,i)=>{if(keep[i]!=null)e.scrollTop=keep[i];});if(_rs)_rs();WZ.lastStep=st;
   const go=i=>{WZ.step=i;WZ.arm=null;renderWiz();el.querySelector('.wzBody').scrollTop=0;};
   const twice=(key,set,after)=>{if(WZ.arm===key){WZ.arm=null;after();return;}WZ.arm=key;set();renderWiz();};
@@ -12666,7 +12678,7 @@ function renderWiz(){let el=$('#wiz');const _rs=WZ.lastStep===WZ.step?scrollSnap
   const c=$('#wzClear');if(c)c.onclick=()=>{cfg.picks[cfg.side]=[];render();};
   $('#wzRules').onclick=openRules;
   $('#wzBack').onclick=()=>{if(st)go(st-1);else{el.hidden=true;goTitle();}};
-  $('#wzNext').onclick=()=>{if(!WZSTEPS[st].ok())return;if(last){el.hidden=true;newGame();}else go(st+1);};
+  $('#wzNext').onclick=()=>{if(!WZSTEPS[st].ok())return;if(last){SFX.play('briefing-start',1,0);el.hidden=true;newGame();}else go(st+1);};
   placeOnline();wzFit();
 }
 // phones: every step fits one screen. Shrink the operator text first, then drop hints and blurbs until nothing scrolls.
@@ -14652,7 +14664,9 @@ NEWS.unshift({d:'2026-11-11',v:'v265–v266',i:[
   '電腦版共用裝備箱換上新箱體和道具圖。道具入箱和裝備頁下一步各有專屬音效。'
 ]});
 NEWS[0].v='v265–v267';NEWS[0].i.unshift('手機大廳換新背景，新兵改用大廳版立繪並站到下移的圓圈中央；左側排行榜下方常駐小隊欄，點＋就能邀請好友組隊。模式說明改成「單人或組隊」。');I18X['手機大廳換新背景，新兵改用大廳版立繪並站到下移的圓圈中央；左側排行榜下方常駐小隊欄，點＋就能邀請好友組隊。模式說明改成「單人或組隊」。']=['New phone lobby background; the recruit uses the lobby portrait and stands centered on the lowered ring. A squad column now sits under the leaderboard: tap + to invite a friend. Modes now read "Solo or squad".',''];I18X['單人或組隊']=['Solo or squad',''];I18X['邀請']=I18X['邀請']||['Invite',''];NEWS[0].v='v265–v268';NEWS[0].i.unshift('手機大廳拿掉地上的圓圈，幹員改回全身立繪。');I18X['手機大廳拿掉地上的圓圈，幹員改回全身立繪。']=['Phone lobby: the floor ring is gone and operators are shown full-body again.',''];
+NEWS[0].v='v265–v269';NEWS[0].i.unshift('對戰電腦新增選角確認與開始任務音效，從裝備進入計時時畫面輕閃一次。');
 Object.assign(I18X,{
+  '對戰電腦新增選角確認與開始任務音效，從裝備進入計時時畫面輕閃一次。':['PvE has new sounds for confirming the squad and starting the mission, plus a brief flash when entering the timer from equipment.',''],
   '隨機選角':['Random squad',''],'對戰電腦選角頁的「隨機選角」放在下一步旁，可一鍵選出五名已解鎖幹員。':['Random Squad sits beside Next in the PvE operator picker and selects five unlocked operators.',''],
   '電腦版共用裝備箱換上新箱體和道具圖。道具入箱和裝備頁下一步各有專屬音效。':['The desktop equipment case has new gear artwork and distinct sounds for inserting an item and proceeding from equipment.',''],
   '電腦版共用裝備箱只顯示攜帶的裝備。增加時裝備落進凹槽，箱體輕震。':['The desktop equipment case shows only carried gear. Added items drop into the foam slots and gently shake the case.',''],
@@ -14713,5 +14727,5 @@ render();loadPBR();loadModels();loadWallImg();loadC3D();
 {const _pl=plant;plant=function(u){const r=_pl(u);if(G&&G.lv&&G.lv.goal==='plant'&&u.side===G.player&&!G.over)setTimeout(()=>{if(G&&G.lv&&!G.over)finish('A','拆彈器已安裝');},900);return r;};}
 {const _fn=finish;finish=function(w,why){if(G&&G.lv)return lvFinish(w,why);return _fn(w,why);};}
 </script>
-<script src="pve257.js?v=266"></script>
+<script src="pve257.js?v=269"></script>
 </body></html>
