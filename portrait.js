@@ -32,9 +32,17 @@
     const angle = landscape ? (deviceAngle === 270 || deviceAngle === -90 ? 90 : -90) : 0;
     const visibleWidth = landscape ? h : w, visibleHeight = landscape ? w : h;
     const scale = landscape ? Math.min(1, visibleWidth / 320) : 1;
-    frame.style.width = Math.floor(visibleWidth / scale) + 'px';
-    frame.style.height = Math.floor(visibleHeight / scale) + 'px';
-    frame.style.transform = 'translate(-50%, -50%) rotate(' + angle + 'deg) scale(' + scale + ')';
+    // v277: sizes live in CSS variables; portrait.html picks the set by media query, so a turn never paints unrotated first.
+    const st = frame.style;
+    if (landscape) {
+      st.setProperty('--lw', Math.floor(visibleWidth / scale) + 'px');
+      st.setProperty('--lh', Math.floor(visibleHeight / scale) + 'px');
+      st.setProperty('--la', angle + 'deg');
+      st.setProperty('--ls', String(scale));
+    } else {
+      st.setProperty('--pw', w + 'px');
+      st.setProperty('--ph', h + 'px');
+    }
     stage.dataset.turn = String(angle);
   };
   sync();
