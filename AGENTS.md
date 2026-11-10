@@ -1,5 +1,8 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v257：部署畫面標題旁加「自動部署」`#autoDep257` → `autoDeploy257()`。防守方直接沿用電腦的 `autoDefSetup(true)`（幹員進目標房間、補強周圍牆、鐵絲網／盾牌／防彈攝影機、Mute/Kapkan/Bandit/Valkyrie 等道具），只用剩下的次數；調整場景改用 `G.rearr` 剩餘次數，不再固定 5 次。擺完清掉 AI 專用的 `anchor/roam`。進攻方隨機選一個出生點 `placeAttackers`。合作模式（雙人各管一半幹員）不顯示。擺完仍可手動調整；連線靠既有 `netSer` 整份狀態同步。使用者明確要求手機對局動作鈕維持原樣，不要放大。
+  - `tests/auto-deploy-v257.cjs`：手機（portrait 容器內）與 1100×700，防守目標房間／道具數／重按不重複扣次數／調整場景上限、進攻出生點、開始對戰、合作隱藏。`R6_THREE_DIR` 可指向本機 three@0.147.0 套件；`R6_VIEW=phone|desktop` 只跑一種。
+
 - v256：手機入口用 `portrait.js` 辨識手機，進入同源 `portrait.html`；只建一次直式 iframe 載入原遊戲。外層按左右轉向反向旋轉及重算安全區尺寸，不改遊戲的座標、版面判定或連線／對局狀態；桌機直接開 `index.html`。PWA manifest 設 `portrait-primary`，瀏覽器不給原生鎖仍可用直式容器。
   - Google 彈窗照舊；需要 redirect 才透過同源頂層與一次性 session 標記完成後回直式容器。移除失效的舊轉向提示。 `tests/portrait-v256.cjs` 驗證兩側轉向、不中斷、觸控按鈕與 3D 點格、窄螢幕直接橫放開啟、登入備援（模擬 SDK）及桌機不進容器。
 
