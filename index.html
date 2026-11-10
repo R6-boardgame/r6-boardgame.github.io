@@ -423,7 +423,7 @@ body:not([data-scr="game"]) #lvGoal{display:none}
 #tlob .lob.m{background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0) 20%,rgba(0,0,0,0) 58%,rgba(0,0,0,.72)),url(img/ui/lobby-phone-v266.jpg) center/cover #0b0d10}
 #tlob .m .lobGlow,#tlob .m .lobRing{display:none}
 #tlob .m .lobRing{bottom:calc(250px + env(safe-area-inset-bottom))}
-#tlob .m .lobHero{bottom:calc(262px + env(safe-area-inset-bottom));height:calc(min(62%,calc(100% - 262px - 72px)) * var(--hs,1))}
+#tlob .m .lobHero{bottom:calc(140px + env(safe-area-inset-bottom));height:calc(min(76%,calc(100% - 140px - 74px)) * var(--hs,1))}
 #tlob .m .lobHero.lh266{transform:translateX(-57%);max-width:none;-webkit-mask:linear-gradient(#000 80%,transparent 99%);mask:linear-gradient(#000 80%,transparent 99%);filter:drop-shadow(0 0 24px rgba(0,0,0,.8))}
 #tlob .m .lobSq{display:flex;flex-direction:column;align-items:center;gap:8px;width:64px;padding:8px 0 9px;background:rgba(10,14,18,.86);border:1px solid rgba(255,255,255,.14);border-top:3px solid #4fd27a;color:#e9edf1}
 #tlob .m .lobSq:empty{display:none}
@@ -12010,7 +12010,7 @@ function lobRender(){const t=$('#title');if(!t)return;let el=$('#tlob');if(!el){
   el.querySelectorAll('[data-libf]').forEach(b=>b.onclick=()=>{LIBF=b.dataset.libf;lobRender();});
   el.querySelectorAll('[data-libop]').forEach(b=>b.onclick=()=>{const k=b.dataset.libop;openOpSelect(OPC[k].side,null,true);OSEL.cur=k;renderOpSelect();});
   el.querySelectorAll('[data-lob]').forEach(b=>b.onclick=e=>{e.stopPropagation();LOBI=(LOBI+2+(+b.dataset.lob))%2;try{localStorage.setItem('r6bg.lobi',LOBI);}catch(x){}lobRender();});
-  const h=$('#lobHero');if(h){const HSC={'m_smg':.68},k=(h.getAttribute('src').match(/([a-z_]+)\.\w+$/)||[])[1];if(HSC[k])h.style.setProperty('--hs',HSC[k]);}if(h){h.onclick=()=>{CP.i=LOBI;NETMSG='';openCop();};h.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();h.click();}};}
+  const h=$('#lobHero');if(h){const HSC={'m_smg':.56,'f_sn':.66},k=(h.getAttribute('src').match(/([a-z_]+)\.\w+$/)||[])[1];if(HSC[k])h.style.setProperty('--hs',HSC[k]);}if(h){h.onclick=()=>{CP.i=LOBI;NETMSG='';openCop();};h.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();h.click();}};}
   const go=(id,fn)=>{const b=el.querySelector('#'+id);if(b){b.onclick=fn;if(b.tagName!=='BUTTON')b.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')fn();};}};
   go('t-train',()=>{trnTop();SCREEN='train';NETMSG='';renderTitle();});go('t-train2',()=>{trnTop();SCREEN='train';NETMSG='';renderTitle();});go('t-board',()=>{if(el.querySelector('.cinema248'))LB.tab=LOBBY249.tab;SCREEN='board';NETMSG='';lbLoad(true);renderTitle();});
   go('t-pve',()=>{['A','D'].forEach(s=>{cfg.picks[s]=cfg.picks[s].filter(owned);});SCREEN='setup';WZ.step=0;WZ.seen=0;render();});go('t-rank',()=>{NETMSG='';rankQueue();});
@@ -14651,7 +14651,7 @@ NEWS.unshift({d:'2026-11-11',v:'v265–v266',i:[
   '對戰電腦選角頁的「隨機選角」放在下一步旁，可一鍵選出五名已解鎖幹員。',
   '電腦版共用裝備箱換上新箱體和道具圖。道具入箱和裝備頁下一步各有專屬音效。'
 ]});
-NEWS[0].v='v265–v267';NEWS[0].i.unshift('手機大廳換新背景，新兵改用大廳版立繪並站到下移的圓圈中央；左側排行榜下方常駐小隊欄，點＋就能邀請好友組隊。模式說明改成「單人或組隊」。');I18X['手機大廳換新背景，新兵改用大廳版立繪並站到下移的圓圈中央；左側排行榜下方常駐小隊欄，點＋就能邀請好友組隊。模式說明改成「單人或組隊」。']=['New phone lobby background; the recruit uses the lobby portrait and stands centered on the lowered ring. A squad column now sits under the leaderboard: tap + to invite a friend. Modes now read "Solo or squad".',''];I18X['單人或組隊']=['Solo or squad',''];I18X['邀請']=I18X['邀請']||['Invite',''];NEWS[0].v='v265–v268';NEWS[0].i.unshift('手機大廳拿掉地上的圓圈，幹員改回全身立繪。');I18X['手機大廳拿掉地上的圓圈，幹員改回全身立繪。']=['Phone lobby: the floor ring is gone and operators are shown full-body again.',''];
+NEWS[0].v='v265–v267';NEWS[0].i.unshift('手機大廳換新背景，新兵改用大廳版立繪並站到下移的圓圈中央；左側排行榜下方常駐小隊欄，點＋就能邀請好友組隊。模式說明改成「單人或組隊」。');I18X['手機大廳換新背景，新兵改用大廳版立繪並站到下移的圓圈中央；左側排行榜下方常駐小隊欄，點＋就能邀請好友組隊。模式說明改成「單人或組隊」。']=['New phone lobby background; the recruit uses the lobby portrait and stands centered on the lowered ring. A squad column now sits under the leaderboard: tap + to invite a friend. Modes now read "Solo or squad".',''];I18X['單人或組隊']=['Solo or squad',''];I18X['邀請']=I18X['邀請']||['Invite',''];NEWS[0].v='v265–v268';NEWS[0].i.unshift('手機大廳拿掉地上的圓圈，幹員改回全身立繪。');I18X['手機大廳拿掉地上的圓圈，幹員改回全身立繪。']=['Phone lobby: the floor ring is gone and operators are shown full-body again.',''];NEWS[0].v='v265–v269';NEWS[0].i.unshift('手機大廳幹員改成全身置中、往下移，腳在按鈕後面；蹲姿的狙擊兵和衝鋒兵另外縮小。');I18X['手機大廳幹員改成全身置中、往下移，腳在按鈕後面；蹲姿的狙擊兵和衝鋒兵另外縮小。']=['Phone lobby: operators are full-body, centered and lower, with feet behind the buttons; the crouching sniper and SMG poses are scaled down.',''];
 Object.assign(I18X,{
   '隨機選角':['Random squad',''],'對戰電腦選角頁的「隨機選角」放在下一步旁，可一鍵選出五名已解鎖幹員。':['Random Squad sits beside Next in the PvE operator picker and selects five unlocked operators.',''],
   '電腦版共用裝備箱換上新箱體和道具圖。道具入箱和裝備頁下一步各有專屬音效。':['The desktop equipment case has new gear artwork and distinct sounds for inserting an item and proceeding from equipment.',''],
