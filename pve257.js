@@ -134,7 +134,7 @@ function pvRender257(el){
     const fixed=side==='A'?'另有 3 架無人機。':'另有 3 捲鐵絲網與地圖上的攝影機。';
     body=`<div class="pvGear"><div class="pvGearRows">${Object.entries(INV[side]).map(([k,[label,max,desc]])=>`<article class="pvGearRow pvPlate"><i>${pvGear257(k)}</i><div><b>${label}</b><small>${desc}</small></div><div class="pvCount"><button data-iv="${k}" data-d="-1" aria-label="減少${label}" ${inv[k]<=0?'disabled':''}>−</button><strong>${inv[k]|0}</strong><button data-iv="${k}" data-d="1" aria-label="增加${label}" ${used>=cap||inv[k]>=max?'disabled':''}>＋</button></div></article>`).join('')}</div>
       <aside class="pvBudget pvPlate"><header><b>共用裝備</b><strong>${used} / ${cap}</strong></header><div class="pvPips">${Array.from({length:cap},(_,i)=>`<i class="${i<used?'on':''}"></i>`).join('')}</div>
-      <div class="pvTray"><div class="pvCase"><img class="pvCasePhoto" src="${PV_ART257}gear-case-v263.jpg" alt=""><ul>${(side==='A'?['frag','charges','flash','smk','clay']:['bpcam',null,'impact','nitro','shield']).map((k,i)=>k?`<li data-case-item="${k}" class="${inv[k]>0?'on':'off'}" data-pocket="${i}" title="${INV[side][k][0]}"><span>${pvGear257(k)}</span><b ${inv[k]>0?'':'hidden'}>×${inv[k]|0}</b><small>${INV[side][k][0]} · ${inv[k]|0}</small></li>`:'').join('')}</ul></div></div>
+      <div class="pvTray"><div class="pvCase"><img class="pvCasePhoto" src="${PV_ART257}gear-case-v263.jpg" alt=""><ul>${(side==='A'?['frag','charges','flash','smk','clay']:['bpcam',null,'impact','nitro','shield']).map((k,i)=>k?`<li data-case-item="${k}" ${inv[k]>0?'':'hidden'} data-pocket="${i}" title="${INV[side][k][0]}"><span>${pvGear257(k)}</span><b aria-hidden="true">×${inv[k]|0}</b><small>${INV[side][k][0]} · ${inv[k]|0}</small></li>`:'').join('')}</ul></div></div>
       <footer>${fixed}<button id="mfRnd" class="pvUtility">隨機</button></footer></aside></div>`;
   }else if(st===5){
     body=`<div class="pvTimer"><p>每輪時間 = 在場幹員數 × 秒數，兩個啟動階段共用。第一次玩建議不計時。</p><div>${PV_CLOCK257.map(([t,n])=>`<button ${selected((cfg.timer||0)===t,`data-tm="${t}"`)}><b>${n}</b><strong>${t||'∞'}${t?'<small> 秒</small>':''}</strong>${t?'<span>每名幹員</span>':''}</button>`).join('')}</div></div>`;
@@ -201,9 +201,9 @@ function pvRender257(el){
     const k=b.dataset.iv,d=+b.dataset.d,n=(inv[k]|0)+d;
     if(n<0||n>INV[side][k][1]||d>0&&invUsed(side)>=cap)return;
     inv[k]=n;
-    const total=invUsed(side),item=el.querySelector(`[data-case-item="${k}"]`),count=item.querySelector('b');
-    item.classList.toggle('on',n>0);item.classList.toggle('off',!n);
-    count.textContent=`×${n}`;count.hidden=!n;
+    const total=invUsed(side),item=el.querySelector(`[data-case-item="${k}"]`);
+    item.hidden=n===0;
+    item.querySelector('b').textContent=`×${n}`;
     item.querySelector('small').textContent=`${INV[side][k][0]} · ${n}`;
     b.parentElement.querySelector('strong').textContent=n;
     el.querySelector('.pvBudget header strong').textContent=`${total} / ${cap}`;
@@ -212,6 +212,25 @@ function pvRender257(el){
       const key=btn.dataset.iv;
       btn.disabled=+btn.dataset.d<0?inv[key]<=0:total>=cap||inv[key]>=INV[side][key][1];
     });
+    const art=item.querySelector('span');
+    if(!n||d>0)art.getAnimations().forEach(a=>a.cancel());
+    if(d>0&&!matchMedia('(prefers-reduced-motion:reduce)').matches){
+      const box=item.closest('.pvCase');
+      box.getAnimations().forEach(a=>a.cancel());
+      art.animate([
+        {transform:'translateY(-36%) rotate(-8deg) scale(1.22)',opacity:.35,easing:'cubic-bezier(.5,0,.85,.5)'},
+        {transform:'translateY(5%) rotate(2deg) scale(.95)',opacity:1,offset:.64},
+        {transform:'translateY(-3%) rotate(-1deg) scale(1.02)',offset:.83},
+        {transform:'none'}
+      ],{duration:310});
+      box.animate([
+        {transform:'translate(0,0)'},
+        {transform:'translate(1.5px,2px) rotate(.3deg)'},
+        {transform:'translate(-1.5px,-1px) rotate(-.22deg)'},
+        {transform:'translate(.6px,.7px)'},
+        {transform:'translate(0,0)'}
+      ],{duration:150,delay:186});
+    }
   });
   on('#mfRnd',()=>{if(st===3){cfg.picks[side]=rndPicks(side,true);WZ.cur=cfg.picks[side][0];}else if(st===4)cfg.inv[side]=rndInv(side);re();});
   restore();

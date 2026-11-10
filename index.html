@@ -3376,7 +3376,7 @@ html body #title[data-s=board] #tmenu{inset:78px 3% 3vh;max-width:none;width:aut
 @media(max-width:1100px){#cop>.cpBox .cpTt:before{height:28px}#cop>.cpBox .cpTt small{font-size:14px}}
 }
 </style>
-<link rel="stylesheet" href="pve257.css?v=263">
+<link rel="stylesheet" href="pve257.css?v=264">
 <style id="cultivation254">
 .cpName254{display:contents}
 @media(min-width:1000px) and (min-height:620px){
@@ -14615,7 +14615,9 @@ I18X['電腦培養頁確認鍵提亮，保留金屬紋理及可按、不可按�
 NEWS[0].v='v250–v259';NEWS[0].v='v250–v260';NEWS[0].i.unshift('手機主畫面圖示換新：6 站在低角度的棋盤上，牆壁高低不平、金色格線。');I18X['手機主畫面圖示換新：6 站在低角度的棋盤上，牆壁高低不平、金色格線。']=['New home-screen icon: the 6 stands on a low-angle game board with uneven walls and gold grid lines.',''];NEWS[0].i.unshift('電腦版對戰電腦七步改為戰術簡報介面；返回鍵固定左上，Esc 優先關視窗、再返回上一層。');NEWS[0].v='v250–v262';NEWS[0].i.unshift('手機改回只有直式介面：橫放時畫面仍維持直式，轉向不會重新載入對局。');I18X['手機改回只有直式介面：橫放時畫面仍維持直式，轉向不會重新載入對局。']=['Phones are portrait-only again: turning the phone sideways keeps the portrait layout, and rotating does not reload the match.',''];
 Object.assign(I18X,{'電腦版對戰電腦七步改為戰術簡報介面；返回鍵固定左上，Esc 優先關視窗、再返回上一層。':['Desktop PvE now has a seven-step tactical briefing. Back stays at the upper left; Esc dismisses the top dialog or goes back one level.',''],'選擇陣營':['Choose a side',''],'確認任務':['Review mission',''],'安裝或破壞拆彈器':['Plant or destroy the defuser',''],'救出或守住人質':['Rescue or guard the hostage',''],'共用裝備':['Shared equipment',''],'加入小隊':['Add to squad',''],'移出小隊':['Remove from squad','']});
 NEWS[0].v='v250–v263';NEWS[0].i.unshift('電腦版對戰電腦：低角度地圖近景、無底色格局圖、雙擊幹員入隊，以及隨數量即時亮起的共用裝備箱。');
+NEWS[0].v='v250–v264';NEWS[0].i.unshift('電腦版共用裝備箱只顯示攜帶的裝備。增加時裝備落進凹槽，箱體輕震。');
 Object.assign(I18X,{
+  '電腦版共用裝備箱只顯示攜帶的裝備。增加時裝備落進凹槽，箱體輕震。':['The desktop equipment case shows only carried gear. Added items drop into the foam slots and gently shake the case.',''],
   '電腦版對戰電腦：低角度地圖近景、無底色格局圖、雙擊幹員入隊，以及隨數量即時亮起的共用裝備箱。':['Desktop PvE now has close low-angle map previews, transparent floor plans, double-click squad selection, and an equipment case that lights up as items are added.',''],
   '左鍵雙擊加入小隊':['Double-click to add to squad',''],'幹員定位':['Operator role',''],'移動步數':['Movement','']
 });
@@ -14673,5 +14675,5 @@ render();loadPBR();loadModels();loadWallImg();loadC3D();
 {const _pl=plant;plant=function(u){const r=_pl(u);if(G&&G.lv&&G.lv.goal==='plant'&&u.side===G.player&&!G.over)setTimeout(()=>{if(G&&G.lv&&!G.over)finish('A','拆彈器已安裝');},900);return r;};}
 {const _fn=finish;finish=function(w,why){if(G&&G.lv)return lvFinish(w,why);return _fn(w,why);};}
 </script>
-<script src="pve257.js?v=263"></script>
+<script src="pve257.js?v=264"></script>
 </body></html>
