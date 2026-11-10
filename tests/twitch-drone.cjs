@@ -14,7 +14,8 @@ const adj8=(x,y)=>[[x+1,y],[x-1,y],[x,y+1],[x,y-1]].filter(([a,b])=>a>=0&&b>=0&&
 const unitAt=(x,y)=>G.units.find(u=>u.alive&&u.x===x&&u.y===y),droneOK=()=>true,droneNext=(u,x,y)=>adj8(x,y),droneCost=()=>1,droneHazard=()=>null;
 const jammed=()=>jam,los=()=>!blocked&&!smoke,smokeAt=()=>smoke,VR=u=>u.vr||10;
 const render=()=>{},note=()=>{},camDiscover=()=>{},revealCheck=()=>{},followCam=()=>{},log=()=>{},reveal=u=>u.hidden=false,sleep=async()=>{};
-const SFX={step(){},shot(){},zap(){},kill(){}},fxEv=e=>events.push(e),rollDice3D=async(...a)=>rolls.push(a),diceHide=()=>{},mozzieFeed=()=>{};
+const sounds=[];
+const SFX={step(){},shot(){},zap(){},kill(){},gadgetShot(){sounds.push('shot');},play(key){sounds.push(key);}},fxEv=e=>events.push(e),rollDice3D=async(...a)=>rolls.push(a),diceHide=()=>{},mozzieFeed=()=>{};
 const GSTR={jammer:1,drone:1},gadgetVisibleTo=()=>true;
 const dmgMod=()=>0,nm=u=>u.id,SRCOP={},cheb=(a,b,c,d)=>Math.max(Math.abs(a-c),Math.abs(b-d)),performance={now:()=>0},finkaSave=()=>false,onKill=()=>{},checkWin=()=>{};
 `+cut('function inFan(','function fanCells(')+cut('function sharedCells(','// attackers with line of sight')+cut('function droneReach(','async function droneStep(')+cut('async function damage(','function checkWin(')+cut('function twUser(','// ---------- phases ----------'),c);
@@ -39,7 +40,11 @@ const dmgMod=()=>0,nm=u=>u.id,SRCOP={},cheb=(a,b,c,d)=>Math.max(Math.abs(a-c),Ma
  G.round++;u.activated=false;G.active=null;u.twControl=false;assert.equal(twLock(u),null);assert(twChoose(u,'body'));assert(!twChoose(u,'drone'));assert.equal(twDeployTargets(u).length,0);
  assert.equal(owqActor(u),u,'body action keeps normal body facing');d.fd=[1,0];
  G.round++;u.twControl=true;twRefresh(u,d);assert.equal(d.mp,5);d.mp=2;twRefresh(u,d);assert.equal(d.mp,2,'cannot refresh by toggling');
- for(let i=0;i<6;i++){d.alive=true;Math.random=()=> (i+.1)/6;await twReceive(foe,d);assert.equal(d.alive,i<3);const r=rolls.at(-1);assert.equal(r[0],'Y');assert.deepEqual(r[1],[i]);assert.deepEqual(r[4],['miss','miss','miss','hit','hit','hit']);}
+ for(let i=0;i<6;i++){
+  d.alive=true;Math.random=()=> (i+.1)/6;await twReceive(foe,d);assert.equal(d.alive,i<3);
+  const r=rolls.at(-1);assert.equal(r[0],'Y');assert.deepEqual(r[1],[i]);assert.deepEqual(r[4],['miss','miss','miss','hit','hit','hit']);
+  assert.deepEqual(sounds.splice(0),i<3?['shot']:['shot','gadget-short']);
+ }
  d.alive=true;d.x=6;d.y=2;foe.x=10;foe.fd=[-1,0];foe.overwatch=true;foe.owd=[-1,0];foe.owShot=0;foe.owHit=new Set();Math.random=()=>0;
  u.alive=false;assert.equal(twCan(u),false);assert.equal(twDrone(u),d);assert(twSight(d,10,2),'dead owner leaves drone vision active');assert(sharedCells('A').has(2*20+10),'team retains orphan drone vision');assert(!sharedCells('A').has(2*20+3),'no sight behind the drone');const oldX=d.x;await twMove(u,7,2);assert.equal(d.x,oldX);const oldHP=foe.hp;await twAttack(u,10,2);assert.equal(foe.hp,oldHP);assert(twCanHit(foe,d),'orphan drone remains destructible');u.alive=true;
  const n=rolls.length;await twReact(d);assert.equal(rolls.length,n+1);await twReact(d);assert.equal(rolls.length,n+1,'one overwatch shot per drone');

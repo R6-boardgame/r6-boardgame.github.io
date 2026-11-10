@@ -7123,9 +7123,9 @@ const SFX=(()=>{
   const SMP={tap:.32,tab:.5,back:.6,ok:.5,buy:.6,err:.45,tick:.35,open:.4,
     // v178: the owner's Foley set (snd/fx)
     battle:.8,deploy1:.5,deploy2:.5,deploy3:.7,sniper:.75,shield:.65,nade_pin:.9,nade_hit:.6,boom1:.7,boom2:.65,fire:.4,barricade:.5,camera:.7,wall:.5,'gear-foam':.92,'gear-case':.55,'briefing-roster':.7,'briefing-start':.6,
-    'camera-shot-1':.8,'camera-shot-3':.8},raw={},buf={};
-  const FXK=new Set(['back','battle','deploy1','deploy2','deploy3','sniper','shield','nade_pin','nade_hit','boom1','boom2','fire','barricade','camera','wall','gear-foam','gear-case','briefing-roster','briefing-start','camera-shot-1','camera-shot-3']);
-  Object.keys(SMP).forEach(k=>{raw[k]=fetch((FXK.has(k)?'snd/fx/':'snd/')+k+(k==='briefing-roster'?'.wav':'.mp3')+'?v=178').then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);});
+    'camera-shot-1':.8,'camera-shot-3':.8,'gadget-short':.7},raw={},buf={};
+  const FXK=new Set(['back','battle','deploy1','deploy2','deploy3','sniper','shield','nade_pin','nade_hit','boom1','boom2','fire','barricade','camera','wall','gear-foam','gear-case','briefing-roster','briefing-start','camera-shot-1','camera-shot-3','gadget-short']);
+  Object.keys(SMP).forEach(k=>{const ext=k==='briefing-roster'||k==='gadget-short'?'.wav':'.mp3';raw[k]=fetch((FXK.has(k)?'snd/fx/':'snd/')+k+ext+'?v=178').then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);});
   function decodeAll(){Object.keys(SMP).forEach(k=>{if(buf[k])return;buf[k]=1;raw[k].then(a=>{if(!a)return delete buf[k];ac.decodeAudioData(a.slice(0),d=>{buf[k]=d;},()=>{delete buf[k];});});});}
   function play(k,vol,jit,delay=0){if(!ok())return false;const b=buf[k];if(!b||b===1)return false;const s=ac.createBufferSource();s.buffer=b;s.playbackRate.value=1+(jit==null?.04:jit)*(Math.random()*2-1);
     const g=ac.createGain();g.gain.value=(vol==null?1:vol)*SMP[k];s.connect(g);g.connect(fxBus);s.start(ac.currentTime+delay);return true;}
@@ -7138,6 +7138,7 @@ const SFX=(()=>{
   const S={
     mirror(){if(!ok())return;const t=ac.currentTime;noise(t,.2,3500,.7,.25,'highpass',1600);noise(t+.16,.28,5500,.5,.4,'highpass',1800);for(let i=0;i<5;i++)tone(t+.17+i*.025,.12,2400+i*731,900+i*310,.07,'triangle');},
     shot(n){if(!ok())return;const t=ac.currentTime;for(let i=0;i<(n||3);i++){const k=t+i*.085;noise(k,.16,1800,.7,.9);noise(k,.07,5000,.5,.5,'highpass');tone(k,.18,140,45,.9);}},
+    gadgetShot(){if(!ok())return;if(!play(Math.random()<.5?'camera-shot-1':'camera-shot-3',1,0))S.shot(1);},
     hit(){if(!ok())return;const t=ac.currentTime+.05;tone(t,.22,220,60,.7,'triangle');noise(t,.18,900,1.2,.8);tone(t+.02,.12,1400,700,.15,'square');},
     miss(){if(!ok())return;const t=ac.currentTime+.04;noise(t,.35,5200,6,.5,'bandpass',1400);tone(t+.08,.25,2600,1900,.06,'sine');},
     kill(){if(!ok())return;const t=ac.currentTime+.1;tone(t,.6,90,30,1,'sine');noise(t,.5,300,.8,.6,'lowpass');tone(t+.05,.5,330,110,.18,'sawtooth');},
@@ -7611,15 +7612,16 @@ const groundAt=(x,y)=>G.gadgets.filter(g=>groundG(g)&&g.x===x&&g.y===y);
 const stackOK=(x,y,t)=>{const a=groundAt(x,y);return a.length<2&&!a.some(g=>g.type===t);};
 const gadgetOffset=g=>{if(!G||!groundG(g))return 0;const a=groundAt(g.x,g.y);return a.length===2?(a.indexOf(g)?0.22:-0.22):0;};
 const CAMT=['cam','argus','eye'];
+const ELECTRONIC_GADGETS=new Set(['ads','banshee','ced','claw','drone','grz','jammer','kona','magnet']);
 function camClicks(u){if(!u||u.side!==G.player||!canAct(u)||(G.active===u&&!canDo(u,'destroy')))return [];const dt=destroyTargets(u);
   return G.gadgets.filter(g=>canHitG(u,g)&&dt.some(([a,b])=>a===g.x&&b===g.y)).map(g=>[g.x,g.y]);}
 async function doDestroy(u,x,y){const td=G.gadgets.find(g=>g.x===x&&g.y===y&&remoteDrone(g)&&twCanHit(u,g));if(td){useAct(u,'destroy');await twReceive(u,td);await afterAct(u);return;}const mirror=G.gadgets.find(g=>g.x===x&&g.y===y&&mirCanOpen(u,g));if(mirror)return mirOpen(u,mirror,'destroy');useAct(u,'destroy');const hs=G.gadgets.filter(g=>g.x===x&&g.y===y&&canHitG(u,g));const g=hs.find(g=>g.type==='mat')||hs[0];
   if(g){
     g.alive=false;
-    if(CAMT.includes(g.type)){
-      const gun=Math.random()<.5?'camera-shot-1':'camera-shot-3';
-      if(!SFX.play(gun,1,0))SFX.shot(1);
-      SFX.play('camera',1,0,.16);
+    const hitSound=CAMT.includes(g.type)?'camera':ELECTRONIC_GADGETS.has(g.type)?'gadget-short':null;
+    if(hitSound){
+      SFX.gadgetShot();
+      SFX.play(hitSound,1,0,.16);
     }else if(g.type!=='clay'&&!g.volcan)SFX.fx('camera');
     if(g.type==='clay')await clayBoom(g);if(g.volcan)await goyoBurn(g);note(u,'摧毀'+GNAME[g.type]);G.fx={x0:u.x,y0:u.y,x1:x,y1:y,until:performance.now()+400,c:u.side==='A'?COL.atk:COL.def};log(`${nm(u)} 摧毀了${GNAME[g.type]}`,u.side==='A'?'ka':'kd');
   }
@@ -7917,9 +7919,9 @@ async function twDeploy(u,x,y){if(!twCan(u)||!twDeployTargets(u).some(([a,b])=>a
 function twSwitch(u){if(!twCan(u)||G.busy||twLock(u))return;const d=twDrone(u);if(!d){G.mode='twdeploy';render();return;}u.twControl=!u.twControl;if(u.twControl){twRefresh(u,d);G.mode='twmove';followCam(d);}else{G.mode='move';if(G.active===u)u.mp=u.speed;followCam(u);}render();}
 function twCanHit(u,d){return !!(d&&d.alive&&remoteDrone(d)&&d.own!=='echo'&&u&&u.alive&&u.side!==d.side&&inSight(u,d)&&!smokeAt(d.x,d.y));}
 async function twReceive(sh,d,ow=false){if(!d||!d.alive)return;const i=Math.floor(Math.random()*6),hit=i>=3;
-  if(sh){sh.fd=[d.x-sh.x,d.y-sh.y];ST(sh).shots++;if(sh.hidden)reveal(sh,'射擊電擊無人機');fxEv({k:'shot',x0:sh.x,y0:sh.y,x1:d.x,y1:d.y,side:sh.side});}SFX.shot(1);
+  if(sh){sh.fd=[d.x-sh.x,d.y-sh.y];ST(sh).shots++;if(sh.hidden)reveal(sh,'射擊電擊無人機');fxEv({k:'shot',x0:sh.x,y0:sh.y,x1:d.x,y1:d.y,side:sh.side});SFX.gadgetShot();}else SFX.shot(1);
   await rollDice3D('Y',[i],'電擊無人機 · '+(hit?'命中':'MISS'),!!G.ai,['miss','miss','miss','hit','hit','hit']);diceHide();
-  if(hit){if(sh)ST(sh).hits++;d.alive=false;d.moving=false;G._wv=(G._wv||0)+1;log('電擊無人機被擊毀','ks');}else log('電擊無人機：MISS','ks');render();}
+  if(hit){if(sh){ST(sh).hits++;SFX.play('gadget-short',1,0);}d.alive=false;d.moving=false;G._wv=(G._wv||0)+1;log('電擊無人機被擊毀','ks');}else log('電擊無人機：MISS','ks');render();}
 async function twReact(d){for(const e of G.units){if(!d.alive||G.over)return false;if(!e.alive||e.heavyGuard||e.side===d.side||!e.overwatch||e.x<0||(e.owShot&&!e.mgOw)||(e.owHit&&e.owHit.has(d.id)))continue;
     if((e.mgOw||(d.x-e.x)*e.owd[0]+(d.y-e.y)*e.owd[1]>0)&&twCanHit(e,d)){(e.owHit||(e.owHit=new Set())).add(d.id);e.owShot=1;await twReceive(e,d,true);}}
   return d.alive&&!G.over;}
@@ -14687,6 +14689,8 @@ Object.assign(I18X,{
 NEWS[0].v='v265–v272';NEWS[0].i.unshift('打掉攝影機時會先隨機播放一種槍聲，再接破裂聲。');NEWS[0].v='v265–v273';NEWS[0].i.unshift('手機大廳的男衝鋒兵再往右移一點。');I18X['手機大廳的男衝鋒兵再往右移一點。']=['Phone lobby: the male SMG moves a little to the right.',''];
 I18X['電腦培養頁姓名與職業分開顯示，拉開戰績間距；點姓名可改名，右上學長姐與幹員按鈕文字置中。']=['Desktop training separates the editable name from the class label and adds space before the stats. Click the name to rename; senior and operator button labels are centered.',''];
 I18X['電腦培養頁校準整組縮放與近景構圖，超寬螢幕不再拉出大面積空白；新增拉絲金屬、霧金與煙燻玻璃材質，新兵沿用大廳既有高解析圖。手機與遊戲規則不變。']=['Desktop operator training now scales as one composition, with close-up framing and no oversized gaps on ultrawide screens. New brushed metal, satin gold and smoked glass materials; the recruit reuses existing high-resolution lobby artwork. Mobile and game rules are unchanged.',''];
+NEWS[0].v='v265–v274';NEWS[0].i.unshift('用槍打掉電子道具時，先播槍聲，再接電流短路聲。');
+I18X['用槍打掉電子道具時，先播槍聲，再接電流短路聲。']=['Shooting out an electronic gadget plays a gunshot followed by a short circuit.',''];
 Object.assign(I18X,{'電腦選單全面換上銀行實景底圖、斜角金屬面板與光影材質：培養、技能收藏、訓練、商店、作戰檔案、排行榜及任務視窗。人物、技能與遊戲規則沿用原版。':['Desktop training, skills, missions, shop, archive, rankings and task dialog now share cinematic bank environments, angled metal panels, lighting and textures. Existing operators, icons and game rules are preserved.',''],'選擇訓練類別，掌握職業能力、部署與攻堅。':['Choose a training category to learn class abilities, deployment and breaching.',''],'各關卡獎勵與解鎖條件依實際任務顯示。':['Rewards and unlock requirements are shown in each mission briefing.',''],'查看任務':['View missions','']});
 I18X['排行榜改為半身視窗，保留頭部與武器；任務改為覆蓋視窗，電腦培養頁與技能收藏改為雙欄，縮小訓練圖片並統一選單返回位置。']=['Leaderboard bust portraits preserve heads and weapons; missions open in a dialog, desktop training and skill collection use two columns, training artwork is smaller, and menu back controls share one position.',''];
 Object.assign(I18X,{'存活場次':['Matches survived',''],'幹員資訊':['Operator information',''],'電腦版大廳改為沉浸式主選單：左側對戰入口、右側幹員與擊殺／存活場次，下方展示排行榜；保留愛心贊助與回報圖示。':['Cinematic desktop lobby: play menu on the left, operator with kills and matches survived on the right, leaderboard below; support and feedback icons retained.','']});
