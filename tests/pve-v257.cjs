@@ -60,17 +60,25 @@ const fs=require('node:fs');
   assert(await random.evaluate(b=>b===document.activeElement));
   await pv.locator('[data-k=ash]').click();await check(3);
   await pv.locator('[data-pvslot]').first().click();assert(await pv.locator('#wzNext').isDisabled());
-  await pv.locator('#mfRnd').click();await next();await check(4);
   await page.evaluate(()=>{
-   window.gearAudio=[];
+   window.briefingAudio=[];window.timingFlashes=[];
    const play=SFX.play;
    SFX.play=(key,vol,jitter,delay)=>{
     const played=play(key,vol,jitter,delay);
-    if(key.startsWith('gear-'))gearAudio.push([key,delay??0,played]);
+    if(/^(gear|briefing)-/.test(key))briefingAudio.push([key,delay??0,played]);
     return played;
    };
+   new MutationObserver(records=>{
+    for(const record of records)for(const el of record.addedNodes){
+     if(el.matches?.('.wzTimingFlash'))timingFlashes.push(getComputedStyle(el).animationIterationCount);
+    }
+   }).observe(document.querySelector('#wiz'),{childList:true});
   });
-  const audioLog=()=>page.evaluate(()=>gearAudio.splice(0));
+  const audioLog=()=>page.evaluate(()=>briefingAudio.splice(0));
+  const flashLog=()=>page.evaluate(()=>timingFlashes.splice(0));
+  await pv.locator('#mfRnd').click();await next();await check(4);
+  assert.deepEqual(await audioLog(),[['briefing-roster',0,true]]);
+  assert.deepEqual(await flashLog(),[]);
   assert.deepEqual(await pv.locator('[data-case-item]').evaluateAll(items=>items.map(el=>el.dataset.caseItem)),['clay','frag','flash','smk','charges']);
   await pv.locator('.pvCase').evaluate(box=>Promise.all([...box.querySelectorAll('img')].map(im=>im.decode())));
   if(process.env.R6_SHOTS){
@@ -106,13 +114,16 @@ const fs=require('node:fs');
   await pv.locator('#mfRnd').click();assert.equal(await page.evaluate(()=>invUsed('A')),6);
   assert.equal(await pv.locator('[data-iv][data-d="1"]:enabled').count(),0);
   await key();await step(3);await next();await next();await step(5);
-  assert.deepEqual(await audioLog(),[['gear-case',0,true]]);
+  assert.deepEqual(await audioLog(),[['briefing-roster',0,true],['gear-case',0,true]]);
+  assert.deepEqual(await flashLog(),['1']);
+  await page.locator('#wiz .wzTimingFlash').waitFor({state:'detached'});
   assert.deepEqual(await pv.locator('[data-tm]').evaluateAll(es=>es.map(e=>+e.dataset.tm)),[0,120,90,60,45]);
   await pv.locator('[data-tm="0"]').click();await check(5);await next();await check(6);
   await pv.locator('[data-wz-edit="4"]').click();await step(4);await key();await step(6);
   assert.deepEqual(await audioLog(),[]);
   await pv.locator('[data-wz-edit="4"]').click();await step(4);await next();await step(6);
   assert.deepEqual(await audioLog(),[['gear-case',0,true]]);
+  assert.deepEqual(await flashLog(),[]);
   await pv.locator('[data-wz-edit="5"]').click();await step(5);await pv.locator('[data-tm="45"]').click();await next();await step(6);
   assert.equal(await page.evaluate(()=>cfg.timer),45);
   await page.setViewportSize({width:1000,height:620});for(let i=6;i>=0;i--){await step(i);const l=await layout();assert(l.clear&&l.hit&&l.foot&&!l.scroll,JSON.stringify(l));if(i===3){assert(await portraitClear());assert(await randomByNext());}await key();}
@@ -124,12 +135,25 @@ const fs=require('node:fs');
   await page.locator('#t-pve').click();await step(0);
   await page.evaluate(()=>{WZ.step=6;WZ.seen=6;renderWiz();});await step(6);await next();
   assert.equal(await page.evaluate(()=>G.phase),'setup');assert(!(await pv.isVisible()));
+  assert.deepEqual(await audioLog(),[['briefing-start',0,true]]);
   await page.setViewportSize({width:390,height:844});
   await page.evaluate(()=>{G=null;SCREEN='setup';WZ.step=3;cfg.side='D';cfg.picks.D=[];render();});await page.locator('#wiz .pvMode').waitFor();
   assert.equal(await pv.count(),0);assert.equal(await page.locator('#wiz .pvSteps').count(),0);
   assert(await randomByNext());
   await page.locator('#wiz').getByRole('button',{name:'隨機選角',exact:true}).click();
   assert(await validSquad());assert(await page.locator('#wiz #wzNext').isEnabled());
+  const mobileNext=()=>page.locator('#wiz #wzNext').click();
+  await mobileNext();
+  assert.deepEqual(await audioLog(),[['briefing-roster',0,true]]);
+  assert.deepEqual(await flashLog(),[]);
+  const mobileGear=()=>page.evaluate(()=>{WZ.step=4;WZ.ret=null;renderWiz();});
+  await mobileGear();await mobileNext();
+  assert.equal(await page.evaluate(()=>WZ.step),5);
+  assert.deepEqual(await flashLog(),['1']);
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await mobileGear();await mobileNext();assert.deepEqual(await flashLog(),[]);
+  await mobileNext();await mobileNext();
+  assert.deepEqual(await audioLog(),[['briefing-start',0,true]]);
   assert.deepEqual(errors,[]);
   console.log('PASS desktop PvE steps, all four plans, squad double-click and details, live equipment case for both sides, gear cap, Escape, review, deployment and mobile');
  }finally{await browser.close();}

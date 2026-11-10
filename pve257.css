@@ -1,4 +1,7 @@
-/* Desktop PvE visual system; intentionally no styles for mobile or the online picker. */
+/* PvE equipment-to-timer transition, shared by the two wizard layouts. */
+#wiz .wzTimingFlash{position:absolute;inset:0;z-index:200;pointer-events:none;background:#ffe7b4;animation:wzTimingFlash .26s ease-out both}
+@keyframes wzTimingFlash{from{opacity:.42}to{opacity:0}}
+/* Desktop PvE visual system. */
 @media(min-width:1000px) and (min-height:620px){
   #wiz.pv257{
     --pv-gold:#f1c978;--pv-ink:#f4efe5;--pv-muted:#c8c7c3;--pv-edge:#b4aea264;

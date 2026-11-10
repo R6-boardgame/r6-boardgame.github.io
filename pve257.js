@@ -162,7 +162,7 @@ function pvRender257(el){
     <main class="pvMain"><h3>${heading}</h3>${body}</main>
     <footer class="pvFooter"><span>${String(st+1).padStart(2,'0')} / 07</span>
     ${st===3?`<button id="mfRnd" class="pvUtility pvRandom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h2c5 0 8 12 13 12h3m-4-4 4 4-4 4M3 18h2c1.9 0 3.6-1.8 5-4m4-4c1.4-2.2 3.1-4 5-4h2m-4-4 4 4-4 4"/></svg><span>隨機選角</span></button>`:''}
-    <button id="wzNext" class="pvGold" ${(st===3||last)&&!full?'disabled':''}>${last?'開始任務':st===3&&!full?`再選 ${5-picks.length} 名`:'下一步'}<span aria-hidden="true">›</span></button></footer></div>`;
+    <button id="wzNext" class="pvGold" ${st===3||st===4||last?'data-wz-sfx':''} ${(st===3||last)&&!full?'disabled':''}>${last?'開始任務':st===3&&!full?`再選 ${5-picks.length} 名`:'下一步'}<span aria-hidden="true">›</span></button></footer></div>`;
 
   const on=(sel,fn)=>el.querySelectorAll(sel).forEach(b=>b.onclick=()=>fn(b));
   const re=()=>renderWiz();
@@ -171,9 +171,12 @@ function pvRender257(el){
   on('#wzBack',()=>{if(returning())go(6);else if(st)go(st-1);else{WZ.ret=null;el.hidden=true;goTitle();}menuSync250();});
   on('#wzNext',()=>{
     if((st===3||last)&&!WZSTEPS[3].ok())return;
+    if(st===3)SFX.play('briefing-roster',1,0);
     if(st===4)SFX.play('gear-case',1,0);
-    if(last){WZ.ret=null;el.hidden=true;newGame();return;}
-    go(returning()?6:st+1);
+    if(last){SFX.play('briefing-start',1,0);WZ.ret=null;el.hidden=true;newGame();return;}
+    const dest=returning()?6:st+1;
+    go(dest);
+    if(st===4&&dest===5)wzTimingFlash(el);
   });
   on('#wzRules',()=>openRules());
   on('[data-wz-go]',b=>{const i=+b.dataset.wzGo;if(i!==st&&canStep(i))go(i);});
