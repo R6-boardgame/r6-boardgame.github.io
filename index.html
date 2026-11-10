@@ -419,6 +419,28 @@ body:not([data-scr="game"]) #lvGoal{display:none}
 #tlob .lib.m .libSd.ach{gap:8px}#tlob .lib.m .ring{width:58px;height:58px}#tlob .lib.m .ring>span{width:48px;height:48px}#tlob .lib.m .ring b{font-size:17px}#tlob .lib.m .ring small,#tlob .lib.m .libSd.ach .last{display:none}
 </style>
 <style id="autodep257">.depHd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}#autoDep257{margin-left:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;padding:5px 12px;background:linear-gradient(180deg,#1f3550,#152538);border:1px solid #5aa0e0;color:#dff0ff;cursor:pointer;line-height:1.15}#autoDep257 b{font-size:15px}#autoDep257 small{font-size:11px;opacity:.8}#autoDep257:hover{border-color:#8cc4f2}</style>
+<style id="lobby266">
+#tlob .lob.m{background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0) 20%,rgba(0,0,0,0) 58%,rgba(0,0,0,.72)),url(img/ui/lobby-phone-v266.jpg) center/cover #0b0d10}
+#tlob .m .lobGlow{display:none}
+#tlob .m .lobRing{bottom:calc(250px + env(safe-area-inset-bottom))}
+#tlob .m .lobHero{bottom:calc(285px + env(safe-area-inset-bottom));height:calc(min(60%,calc(100% - 285px - 72px)) * var(--hs,1))}
+#tlob .m .lobHero.lh266{transform:translateX(-57%);max-width:none;-webkit-mask:linear-gradient(#000 80%,transparent 99%);mask:linear-gradient(#000 80%,transparent 99%);filter:drop-shadow(0 0 24px rgba(0,0,0,.8))}
+#tlob .m .lobSq{display:flex;flex-direction:column;align-items:center;gap:8px;width:64px;padding:8px 0 9px;background:rgba(10,14,18,.86);border:1px solid rgba(255,255,255,.14);border-top:3px solid #4fd27a;color:#e9edf1}
+#tlob .m .lobSq:empty{display:none}
+#tlob .m .lobSq .lb{display:flex;flex-direction:column;align-items:center}
+#tlob .m .lobSq .lb svg{width:18px;height:18px;fill:none;stroke:#4fd27a;stroke-width:2;stroke-linecap:round}
+#tlob .m .lobSq .lb b{font:800 10px/1 'Noto Sans TC',sans-serif;color:#4fd27a;margin-top:2px;white-space:nowrap}
+#tlob .m .lobSq .av{position:relative;width:44px;height:44px;border:2px solid #4fd27a;background:#0d141b}
+#tlob .m .lobSq .av img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+#tlob .m .lobSq .av .cr{position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-size:11px}
+#tlob .m .lobSq .av .st{position:absolute;right:-4px;bottom:-4px;width:12px;height:12px;border-radius:50%;background:#4fd27a;border:2px solid #0a0e12}
+#tlob .m .lobSq .av.nr{border-color:#56636f}
+#tlob .m .lobSq .av.nr .st{background:#e3aa3e}
+#tlob .m .lobSq .nm{font-size:10px;color:#c9d2da;margin-top:-5px;max-width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#tlob .m .lobSq .add{width:44px;height:44px;border:2px dashed rgba(240,180,60,.6);background:none;display:grid;place-items:center;color:#f0b43c;font-size:22px;line-height:1;cursor:pointer}
+#tlob .m .lobSq .hint{font-size:10px;color:#f0b43c;margin-top:-5px}
+#tlob .m .lobSq .x{font:700 11px/1 'Noto Sans TC',sans-serif;color:#ff9d93;background:none;border:1px solid rgba(255,120,110,.45);padding:5px 6px;cursor:pointer}
+</style>
 </head><body><div id="boot" class="login" aria-busy="true" aria-label="讀取中"><style>
 html,body{background:#06090d}
 #boot{position:fixed;inset:0;z-index:9600;display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));background:#06090d;color:#fff;font-family:'Noto Sans TC',system-ui,-apple-system,'PingFang TC','Microsoft JhengHei',sans-serif;transition:opacity .35s}
@@ -11960,10 +11982,10 @@ function lobbyDesktop248(c,i,art,nmB){const hero=!c.w&&i===0?'img/ui/lobby-opera
  <button class="lcBoard248" id="t-board" aria-label="${LOBBY249.tab==='fallen'?'英勇烈士':'現役菁英'}">${lobbyBoard249(LOBBY249.tab)}</button></div>`;}
 function lobHTML(){const cs=copAll(),i=LOBI%2,c=cs[i],rk=copScore(c).rk,art=copArt(c,i),M=lobMob();
   const nmB=`<b>${esc(lobNm(c,i))}<i style="color:${RKC[rk]}">${rk}</i></b><small>${lobCls(c)}</small>`;
-  if(M)return `<div class="lob m"><div class="lobGlow"></div><div class="lobRing"></div><img class="lobHero" id="lobHero" src="${art}" alt="">
+  if(M)return `<div class="lob m"><div class="lobGlow"></div><div class="lobRing"></div><img class="lobHero${!c.w&&i===0?' lh266':''}" id="lobHero" src="${!c.w&&i===0?'img/ui/lobby-operator-v249.png':art}" alt="">
     <div class="lobOp"><button class="lobAr" data-lob="-1" aria-label="上一位">‹</button><div class="lobNm">${nmB}${lobKD(c.sv,c.k)}</div><button class="lobAr" data-lob="1" aria-label="下一位">›</button></div>
-    <div class="lobSide"><button class="lobEv ev" disabled aria-label="活動"><i class="pic" style="background-image:url(img/ui/event.webp)"><em>準備中</em></i><b>活動</b></button><button class="lobEv lb" id="t-board"><i>${lobIc('trophy')}</i><b>排行榜</b></button></div>
-    <div class="lobPlay"><button class="lobB" id="t-pve"><b>對戰電腦</b><small>PVE</small></button><button class="lobB play" id="t-rank"><b>線上對戰</b><small>PVP · 自動配對</small></button></div>
+    <div class="lobSide"><button class="lobEv ev" disabled aria-label="活動"><i class="pic" style="background-image:url(img/ui/event.webp)"><em>準備中</em></i><b>活動</b></button><button class="lobEv lb" id="t-board"><i>${lobIc('trophy')}</i><b>排行榜</b></button><div class="lobSq" id="lobSq"></div></div>
+    <div class="lobPlay"><button class="lobB" id="t-pve"><b>對戰電腦</b><small>PVE · 單人或組隊</small></button><button class="lobB play" id="t-rank"><b>線上對戰</b><small>PVP · 單人或組隊</small></button></div>
 </div>`;
   lbLoad();const L=lbRows().slice(0,3);
   return lobbyDesktop248(c,i,art,nmB,L);
@@ -12243,7 +12265,8 @@ function invShow(d){let el=$('#invc');if(el)el.remove();el=document.createElemen
     if(d.from&&!isFriend(d.from))frAdd({id:d.from,name:d.name});await ptSave();ptListen();ptUI();if(SCREEN==='title'&&!G)lobRender();achToastMsg('已加入小隊',`隊長：${esc(d.name||'')}`);};}
 async function ptLeave(){if(!PT.pid)return;const db=await ptDb();const me=PT.role,pid=PT.pid;if(db)try{await db.doc(`pt/${pid}/${me}`).set({left:1,ts:Date.now()});}catch(e){}ptReset();}
 // squad strip: a vertical column on the lobby's free right side (desktop: between the operator and the tiles)
-function ptUI(){let el=$('#sqd');const show=!!PT.pid&&SCREEN==='title'&&!G&&!($('#wiz')&&!$('#wiz').hidden)&&!$('#cpk');
+function ptUI(){let el=$('#sqd');const lobby=SCREEN==='title'&&!G&&!($('#wiz')&&!$('#wiz').hidden)&&!$('#cpk'),show=!!PT.pid&&lobby;
+  if(lobMob()){if(el)el.remove();ptSq266(lobby);return;}
   if(!show){if(el)el.remove();return;}
   if(!el){el=document.createElement('div');el.id='sqd';document.body.appendChild(el);}
   el.className='sqd '+(lobMob()?'m':'d');
@@ -12252,6 +12275,13 @@ function ptUI(){let el=$('#sqd');const show=!!PT.pid&&SCREEN==='title'&&!G&&!($(
   el.innerHTML=`<div class="lb"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 19c.5-3 2.8-5 6-5s5.5 2 6 5M12 14.6c1-.4 2.5-.6 4-.6 3.2 0 5.5 2 6 5"/></svg><b>小隊</b></div>${av(H,1)}${M?av(M):`<button class="add" aria-label="邀請好友">＋</button>`}<button class="x">離開</button>`;
   const a=el.querySelector('.add');if(a)a.onclick=()=>openAch('fr');el.querySelector('.x').onclick=()=>{if(confirm(host?'解散小隊？':'離開小隊？'))ptLeave();};}
 setInterval(ptUI,800);
+// v266: on phones the squad column is always in the lobby, under the leaderboard; empty slot opens friends to invite
+function ptSq266(lobby){const box=$('#lobSq');if(!box||!lobby)return;
+  const me={name:meName(),best:frBest()},inP=!!PT.pid,host=!inP||PT.role==='h',H=host?me:PT.mate,M=inP?(host?PT.mate:me):null;
+  const av=(p,cr)=>p?`<div class="av${p===me||Date.now()-(p.ts||0)<45000?'':' nr'}">${cr&&inP?'<span class="cr">👑</span>':''}<img src="${bestAv(p.best)}" alt=""><span class="st"></span></div><span class="nm">${esc(p.name||'')}</span>`:'';
+  const html=`<div class="lb"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 19c.5-3 2.8-5 6-5s5.5 2 6 5M12 14.6c1-.4 2.5-.6 4-.6 3.2 0 5.5 2 6 5"/></svg><b>小隊 ${M?2:1}/2</b></div>${av(H,1)}${M?av(M):`<button class="add" aria-label="邀請好友">＋</button><span class="hint">邀請</span>`}${inP?'<button class="x">離開</button>':''}`;
+  if(box._h===html)return;box._h=html;box.innerHTML=html;
+  const a=box.querySelector('.add');if(a)a.onclick=()=>openAch('fr');const x=box.querySelector('.x');if(x)x.onclick=()=>{if(confirm(host?'解散小隊？':'離開小隊？'))ptLeave();};}
 function ptLobby(el){if(!PT.pid)return;const pve=el.querySelector('#t-pve'),rk=el.querySelector('#t-rank');const sub=(b,t,s)=>{if(!b)return;const x=b.querySelector('b'),y=b.querySelector('small');if(x)x.textContent=t;if(y)y.textContent=s;};
   if(PT.role==='h'){if(PT.mate)sub(pve,'對戰電腦',`4v4 · 和 ${PT.mate.name} 組隊`);
     if(pve)pve.onclick=()=>{if(!PT.mate)return whyTip('隊友還沒加入','邀請送出後，等對方按「加入小隊」');['A','D'].forEach(s=>{cfg.picks[s]=cfg.picks[s].filter(owned);});SCREEN='setup';WZ.step=0;WZ.seen=0;WZ.coop=true;ptUI();render();};
@@ -14617,7 +14647,7 @@ NEWS[0].v='v250–v259';NEWS[0].v='v250–v260';NEWS[0].i.unshift('手機主畫�
 Object.assign(I18X,{'電腦版對戰電腦七步改為戰術簡報介面；返回鍵固定左上，Esc 優先關視窗、再返回上一層。':['Desktop PvE now has a seven-step tactical briefing. Back stays at the upper left; Esc dismisses the top dialog or goes back one level.',''],'選擇陣營':['Choose a side',''],'確認任務':['Review mission',''],'安裝或破壞拆彈器':['Plant or destroy the defuser',''],'救出或守住人質':['Rescue or guard the hostage',''],'共用裝備':['Shared equipment',''],'加入小隊':['Add to squad',''],'移出小隊':['Remove from squad','']});
 NEWS[0].v='v250–v263';NEWS[0].i.unshift('電腦版對戰電腦：低角度地圖近景、無底色格局圖、雙擊幹員入隊，以及隨數量即時亮起的共用裝備箱。');
 NEWS[0].v='v250–v264';NEWS[0].i.unshift('電腦版共用裝備箱只顯示攜帶的裝備。增加時裝備落進凹槽，箱體輕震。');
-NEWS[0].v='v250–v265';NEWS[0].i.unshift('電腦版共用裝備箱換上新箱體和道具圖。道具入箱和裝備頁下一步各有專屬音效。');
+NEWS[0].v='v250–v265';NEWS[0].i.unshift('電腦版共用裝備箱換上新箱體和道具圖。道具入箱和裝備頁下一步各有專屬音效。');NEWS[0].v='v250–v266';NEWS[0].i.unshift('手機大廳換新背景，新兵改用大廳版立繪並站到下移的圓圈中央；左側排行榜下方常駐小隊欄，點＋就能邀請好友組隊。模式說明改成「單人或組隊」。');I18X['手機大廳換新背景，新兵改用大廳版立繪並站到下移的圓圈中央；左側排行榜下方常駐小隊欄，點＋就能邀請好友組隊。模式說明改成「單人或組隊」。']=['New phone lobby background; the recruit uses the lobby portrait and stands centered on the lowered ring. A squad column now sits under the leaderboard: tap + to invite a friend. Modes now read "Solo or squad".',''];I18X['單人或組隊']=['Solo or squad',''];I18X['邀請']=I18X['邀請']||['Invite',''];
 Object.assign(I18X,{
   '電腦版共用裝備箱換上新箱體和道具圖。道具入箱和裝備頁下一步各有專屬音效。':['The desktop equipment case has new gear artwork and distinct sounds for inserting an item and proceeding from equipment.',''],
   '電腦版共用裝備箱只顯示攜帶的裝備。增加時裝備落進凹槽，箱體輕震。':['The desktop equipment case shows only carried gear. Added items drop into the foam slots and gently shake the case.',''],
