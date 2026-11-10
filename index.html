@@ -7122,8 +7122,9 @@ const SFX=(()=>{
   // v172: recorded interface sounds (Kenney, CC0). Bytes are fetched right away; decoded once audio is allowed
   const SMP={tap:.32,tab:.5,back:.6,ok:.5,buy:.6,err:.45,tick:.35,open:.4,
     // v178: the owner's Foley set (snd/fx)
-    battle:.8,deploy1:.5,deploy2:.5,deploy3:.7,sniper:.75,shield:.65,nade_pin:.9,nade_hit:.6,boom1:.7,boom2:.65,fire:.4,barricade:.5,camera:.7,wall:.5,'gear-foam':.92,'gear-case':.55,'briefing-roster':.7,'briefing-start':.6},raw={},buf={};
-  const FXK=new Set(['back','battle','deploy1','deploy2','deploy3','sniper','shield','nade_pin','nade_hit','boom1','boom2','fire','barricade','camera','wall','gear-foam','gear-case','briefing-roster','briefing-start']);
+    battle:.8,deploy1:.5,deploy2:.5,deploy3:.7,sniper:.75,shield:.65,nade_pin:.9,nade_hit:.6,boom1:.7,boom2:.65,fire:.4,barricade:.5,camera:.7,wall:.5,'gear-foam':.92,'gear-case':.55,'briefing-roster':.7,'briefing-start':.6,
+    'camera-shot-1':.8,'camera-shot-3':.8},raw={},buf={};
+  const FXK=new Set(['back','battle','deploy1','deploy2','deploy3','sniper','shield','nade_pin','nade_hit','boom1','boom2','fire','barricade','camera','wall','gear-foam','gear-case','briefing-roster','briefing-start','camera-shot-1','camera-shot-3']);
   Object.keys(SMP).forEach(k=>{raw[k]=fetch((FXK.has(k)?'snd/fx/':'snd/')+k+(k==='briefing-roster'?'.wav':'.mp3')+'?v=178').then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);});
   function decodeAll(){Object.keys(SMP).forEach(k=>{if(buf[k])return;buf[k]=1;raw[k].then(a=>{if(!a)return delete buf[k];ac.decodeAudioData(a.slice(0),d=>{buf[k]=d;},()=>{delete buf[k];});});});}
   function play(k,vol,jit,delay=0){if(!ok())return false;const b=buf[k];if(!b||b===1)return false;const s=ac.createBufferSource();s.buffer=b;s.playbackRate.value=1+(jit==null?.04:jit)*(Math.random()*2-1);
@@ -7613,7 +7614,15 @@ const CAMT=['cam','argus','eye'];
 function camClicks(u){if(!u||u.side!==G.player||!canAct(u)||(G.active===u&&!canDo(u,'destroy')))return [];const dt=destroyTargets(u);
   return G.gadgets.filter(g=>canHitG(u,g)&&dt.some(([a,b])=>a===g.x&&b===g.y)).map(g=>[g.x,g.y]);}
 async function doDestroy(u,x,y){const td=G.gadgets.find(g=>g.x===x&&g.y===y&&remoteDrone(g)&&twCanHit(u,g));if(td){useAct(u,'destroy');await twReceive(u,td);await afterAct(u);return;}const mirror=G.gadgets.find(g=>g.x===x&&g.y===y&&mirCanOpen(u,g));if(mirror)return mirOpen(u,mirror,'destroy');useAct(u,'destroy');const hs=G.gadgets.filter(g=>g.x===x&&g.y===y&&canHitG(u,g));const g=hs.find(g=>g.type==='mat')||hs[0];
-  if(g){g.alive=false;if(g.type!=='clay'&&!g.volcan)SFX.fx('camera');if(g.type==='clay')await clayBoom(g);if(g.volcan)await goyoBurn(g);note(u,'摧毀'+GNAME[g.type]);G.fx={x0:u.x,y0:u.y,x1:x,y1:y,until:performance.now()+400,c:u.side==='A'?COL.atk:COL.def};log(`${nm(u)} 摧毀了${GNAME[g.type]}`,u.side==='A'?'ka':'kd');}
+  if(g){
+    g.alive=false;
+    if(CAMT.includes(g.type)){
+      const gun=Math.random()<.5?'camera-shot-1':'camera-shot-3';
+      if(!SFX.play(gun,1,0))SFX.shot(1);
+      SFX.play('camera',1,0,.16);
+    }else if(g.type!=='clay'&&!g.volcan)SFX.fx('camera');
+    if(g.type==='clay')await clayBoom(g);if(g.volcan)await goyoBurn(g);note(u,'摧毀'+GNAME[g.type]);G.fx={x0:u.x,y0:u.y,x1:x,y1:y,until:performance.now()+400,c:u.side==='A'?COL.atk:COL.def};log(`${nm(u)} 摧毀了${GNAME[g.type]}`,u.side==='A'?'ka':'kd');
+  }
   else{const c=cell(x,y),wall=c.t==='soft';note(u,wall?'打穿軟牆':'破壞路障');destroyCell(x,y);log(wall?`${nm(u)} 打穿了一面軟牆`:`${nm(u)} 破壞了${c.kind==='window'?'窗戶':'門'}路障`,u.side==='A'?'ka':'kd');}
   render();await sleep(G.ai?150:60);await afterAct(u);}
 const chargeTargets=u=>gq(u,'charges')>0?adj4(u.x,u.y).filter(([x,y])=>['soft','bar'].includes(cell(x,y).t)&&!jammed(x,y)):[];
@@ -14672,8 +14681,10 @@ Object.assign(I18X,{
   '電腦版共用裝備箱換上新箱體和道具圖。道具入箱和裝備頁下一步各有專屬音效。':['The desktop equipment case has new gear artwork and distinct sounds for inserting an item and proceeding from equipment.',''],
   '電腦版共用裝備箱只顯示攜帶的裝備。增加時裝備落進凹槽，箱體輕震。':['The desktop equipment case shows only carried gear. Added items drop into the foam slots and gently shake the case.',''],
   '電腦版對戰電腦：低角度地圖近景、無底色格局圖、雙擊幹員入隊，以及隨數量即時亮起的共用裝備箱。':['Desktop PvE now has close low-angle map previews, transparent floor plans, double-click squad selection, and an equipment case that lights up as items are added.',''],
-  '左鍵雙擊加入小隊':['Double-click to add to squad',''],'幹員定位':['Operator role',''],'移動步數':['Movement','']
+  '左鍵雙擊加入小隊':['Double-click to add to squad',''],'幹員定位':['Operator role',''],'移動步數':['Movement',''],
+  '打掉攝影機時會先隨機播放一種槍聲，再接破裂聲。':['Shooting out a camera plays one of two gunshot sounds, followed by the camera breaking.','']
 });
+NEWS[0].v='v265–v272';NEWS[0].i.unshift('打掉攝影機時會先隨機播放一種槍聲，再接破裂聲。');
 I18X['電腦培養頁姓名與職業分開顯示，拉開戰績間距；點姓名可改名，右上學長姐與幹員按鈕文字置中。']=['Desktop training separates the editable name from the class label and adds space before the stats. Click the name to rename; senior and operator button labels are centered.',''];
 I18X['電腦培養頁校準整組縮放與近景構圖，超寬螢幕不再拉出大面積空白；新增拉絲金屬、霧金與煙燻玻璃材質，新兵沿用大廳既有高解析圖。手機與遊戲規則不變。']=['Desktop operator training now scales as one composition, with close-up framing and no oversized gaps on ultrawide screens. New brushed metal, satin gold and smoked glass materials; the recruit reuses existing high-resolution lobby artwork. Mobile and game rules are unchanged.',''];
 Object.assign(I18X,{'電腦選單全面換上銀行實景底圖、斜角金屬面板與光影材質：培養、技能收藏、訓練、商店、作戰檔案、排行榜及任務視窗。人物、技能與遊戲規則沿用原版。':['Desktop training, skills, missions, shop, archive, rankings and task dialog now share cinematic bank environments, angled metal panels, lighting and textures. Existing operators, icons and game rules are preserved.',''],'選擇訓練類別，掌握職業能力、部署與攻堅。':['Choose a training category to learn class abilities, deployment and breaching.',''],'各關卡獎勵與解鎖條件依實際任務顯示。':['Rewards and unlock requirements are shown in each mission briefing.',''],'查看任務':['View missions','']});
