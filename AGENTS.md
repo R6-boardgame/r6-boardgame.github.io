@@ -1,5 +1,7 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v275：手機大廳背景換成使用者給的夕陽軍事基地屋頂 `img/ui/lobby-phone-v275.jpg`（舊的 v266 倉庫圖已刪）。
+
 - v273：手機大廳 `HX` 水平位移（`m_smg` 右移 40px），設 `--hx` 加到 `.lobHero` 的 translateX。
 
 - v271：手機大廳蹲姿圖另外往上移：`HY`（`m_smg` 95px、`f_sn` 45px）設 `--hy` 加到 `.lobHero` 的 bottom。
