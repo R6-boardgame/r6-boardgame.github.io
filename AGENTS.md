@@ -1,5 +1,7 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v273：手機大廳 `HX` 水平位移（`m_smg` 右移 40px），設 `--hx` 加到 `.lobHero` 的 translateX。
+
 - v271：手機大廳蹲姿圖另外往上移：`HY`（`m_smg` 95px、`f_sn` 45px）設 `--hy` 加到 `.lobHero` 的 bottom。
 
 - v270：手機大廳幹員全身置中下移，`.lobHero` bottom 140px（腳藏在戰績／按鈕後面），高度最多 76%；蹲姿圖用 `HSC` 縮小（`m_smg` .56、`f_sn` .66）。新增蹲姿立繪要加進 `HSC`。
