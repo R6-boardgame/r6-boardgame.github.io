@@ -1,5 +1,7 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v283：手機小隊欄 `#lobSq` 切換選單會閃：`lobHTML` 每次產生空的 `#lobSq`（`:empty` 隱藏），之前要等 `setInterval(ptUI,800)` 才填。現在 `lobRender` 結尾直接呼叫 `ptUI()`，同一幀就畫好。
+
 - v282：編輯器「所有頁面的元件」加「培養頁預覽」：選幹員一／二與職業，透過 `pv.ci/pv.cw` 讓遊戲的 `renderCop` 用 `cpPv281(c)` 顯示成該職業（只換顯示的複本，不存檔）。`renderCop` 會設 `html[data-cpw="f_sn"]`（性別_職業，新兵是 recruit）；規則多了 `w` 欄，CSS 前綴 `html[data-cpw=w]`，文字／圖片只在相同 cpw 時套用。在培養頁選元件時預設勾「只改這個職業」。點選時若點到的容器下面有圖片，會優先選那張圖（`deepPick`，因為立繪常是 pointer-events:none）。
 
 - v281：編輯器改名「遊戲畫面編輯器」，多一個「所有頁面的元件」分頁：預覽可切「操作遊戲（換頁）」或「選取元件」，點任何元件可拖曳位置、滾輪縮放、字級、隱藏（手機 `m`／電腦 `d` 分開），文字與圖片兩邊共用（`dev:'*'`）。規則存 `data/ui.json` `{rules:[{sel,dev,x,y,s,fs,hide,text,src,img,lb}]}`，跟 `lobby.json` 同一個 commit 發佈。遊戲端 `<script id="uicfg281">` 的 `uiApply281` 產生 `html body <sel>{translate;scale;font-size;visibility}`（用獨立的 translate/scale 屬性，不蓋掉原本 transform），文字／img src 由 MutationObserver 重套。選擇器由編輯器 `selOf` 從最近的唯一 id 往下組，會略過 on/sel/active 等狀態 class；改版時若改了 id 或 class，使用者的 ui.json 規則會失效。預覽中 `lobcfg280` 只有 `pv.home` 才把畫面拉回大廳、`pv.lock` 才停用點人物。另外 `img/cop/m_hs.webp`、`m_sh.webp` 已去背（白底與地面陰影轉成半透明）。
