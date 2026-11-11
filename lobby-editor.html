@@ -162,6 +162,14 @@ details input{width:100%;background:#0b1117;border:1px solid var(--ln);border-ra
     </div>
   </section>
   <section class="box">
+    <h2>培養頁預覽</h2>
+    <div class="bd">
+      <div class="row"><label>幹員</label><div class="seg" id="cpSlot" style="flex:1"><button data-v="0" class="on">幹員一（女）</button><button data-v="1">幹員二（男）</button></div></div>
+      <div class="row"><label>職業</label><select id="cpCls" style="flex:1;background:#0b1117;border:1px solid var(--ln);border-radius:6px;padding:5px"></select></div>
+      <p class="hint">只影響預覽，不會改到你真正的幹員。先用「操作遊戲」打開培養頁再切換。</p>
+    </div>
+  </section>
+  <section class="box">
     <h2>選到的元件 <small id="uiDevTag"></small></h2>
     <div class="bd">
       <div id="uiNone" class="hint" style="margin:0">還沒選。在預覽上點一下要改的東西。</div>
@@ -172,6 +180,7 @@ details input{width:100%;background:#0b1117;border:1px solid var(--ln);border-ra
         <div class="row"><label>上下</label><input type="range" id="uY" min="-400" max="400" step="1"><input type="number" id="uYn" step="1"><span class="u">px</span></div>
         <div class="row"><label>大小</label><input type="range" id="uS" min="20" max="300" step="1"><input type="number" id="uSn" step="1"><span class="u">%</span></div>
         <div class="row"><label>字級</label><input type="number" id="uFs" min="6" max="120" step="1" placeholder="原本" style="width:80px;text-align:left"><span class="u">px</span><span style="flex:1"></span><button class="btn sm" id="uFsReset">原本字級</button></div>
+        <label class="chk" id="uCwRow"><input type="checkbox" id="uCw"> 只改這個職業（<span id="uCwName"></span>）</label>
         <label class="chk"><input type="checkbox" id="uHide"> 隱藏這個元件</label>
         <div id="uTextRow"><div class="row" style="margin-bottom:4px"><label style="width:auto">文字（手機和電腦都套用）</label><span style="flex:1"></span><button class="btn sm" id="uTextReset">原本文字</button></div><textarea id="uText"></textarea></div>
         <div id="uImgRow" class="row"><label>圖片</label><button class="btn sm" id="uImgUp">換一張圖</button><button class="btn sm" id="uImgReset">原本的圖</button></div>
@@ -242,7 +251,7 @@ const SIZES={m:[[390,844,'iPhone 14／15（390×844）'],[430,932,'iPhone Pro Ma
   d:[[1600,900,'電腦 1600×900'],[1920,1080,'電腦 1920×1080'],[1280,720,'電腦 1280×720'],[1024,768,'平板橫放 1024×768']]};
 const clone=o=>JSON.parse(JSON.stringify(o));
 let DEF=null,PUB=null,CFG=null,PUBSHA=null;
-const S={dev:'m',size:{m:0,d:0},op:'f',drag:'op',ghost:'',lines:true,tab:'lobby',ui:'pick'};
+const S={dev:'m',size:{m:0,d:0},op:'f',drag:'op',ghost:'',lines:true,tab:'lobby',ui:'pick',ci:0,cw:'',cwOnly:true};
 let UI={v:1,rules:[]},PUBUI={v:1,rules:[]},SEL='',goHome=true;
 const sv=(k,v)=>{try{localStorage.setItem('lobEd.'+k,JSON.stringify(v));}catch(e){return false;}return true;};
 const ld=(k,d)=>{try{const v=localStorage.getItem('lobEd.'+k);return v==null?d:JSON.parse(v);}catch(e){return d;}};
@@ -270,7 +279,7 @@ function loadFrame(){ready=false;FW=null;$('#loading').hidden=false;layout();fr.
 fr.addEventListener('load',()=>{const w=fr.contentWindow;let n=0;const wait=()=>{n++;
   if(w.lobRender&&w.render&&w.LOBDEF280&&w.document.readyState==='complete'){FW=w;onFrame();return;}if(n<200)setTimeout(wait,100);};wait();});
 function onFrame(){goHome=true;if(!DEF){DEF=clone(FW.LOBDEF280);boot2();}hookFrame();ready=true;push();setTimeout(push,800);setTimeout(()=>{$('#loading').hidden=true;},300);}
-function push(){if(!FW||!CFG)return;try{FW.postMessage({t:'uicfg281',cfg:UI},location.origin);FW.postMessage({t:'lobcfg280',cfg:CFG,pv:{art:S.op,lock:S.tab==='lobby'&&S.drag!=='none',home:goHome}},location.origin);goHome=false;}catch(e){}requestAnimationFrame(()=>requestAnimationFrame(overlay));}
+function push(){if(!FW||!CFG)return;try{FW.postMessage({t:'uicfg281',cfg:UI},location.origin);FW.postMessage({t:'lobcfg280',cfg:CFG,pv:{art:S.op,lock:S.tab==='lobby'&&S.drag!=='none',home:goHome,ci:S.tab==='ui'?S.ci:null,cw:S.tab==='ui'?S.cw:''}},location.origin);goHome=false;}catch(e){}requestAnimationFrame(()=>requestAnimationFrame(overlay));}
 let pT=0;function pushSoon(){cancelAnimationFrame(pT);pT=requestAnimationFrame(push);}
 
 // guides + ghost drawn inside the iframe so they line up exactly with the game's own CSS
@@ -299,7 +308,7 @@ let HOV=null;
 function hookFrame(){const d=FW.document;let st=null;
   const block=e=>{if(!active())return;e.preventDefault();e.stopPropagation();};
   d.addEventListener('pointerdown',e=>{if(!active())return;block(e);
-    if(S.tab==='ui'){let t=e.target;if(OWN(t))return;if(!t||t===d.documentElement||t===d.body)return;const s0=selOf(t);if(s0!==SEL){SEL=s0;sync();}
+    if(S.tab==='ui'){let t=e.target;if(OWN(t))return;if(!t||t===d.documentElement||t===d.body)return;t=deepPick(t,e.clientX,e.clientY);const s0=selOf(t);if(s0!==SEL){SEL=s0;sync();}
       const r=rget(SEL,pk())||{};st={x:e.clientX,y:e.clientY,id:e.pointerId,ux:+r.x||0,uy:+r.y||0,moved:false};}
     else{const h=d.querySelector('#lobHero');
     st={x:e.clientX,y:e.clientY,id:e.pointerId,op:clone(opv(S.op)),bg:clone(CFG[side()]),hw:h?h.offsetWidth:1,hh:h?h.offsetHeight:1,W:FW.innerWidth,H:FW.innerHeight};}
@@ -331,14 +340,19 @@ function selOf(el){const d=FW.document,parts=[];let e=el;
     parts.unshift(p);e=par;}
   return parts.join(' > ');}
 function qa(sel){if(!FW||!sel)return [];try{return [...FW.document.querySelectorAll(sel)].filter(e=>!OWN(e));}catch(e){return [];}}
+// images often have pointer-events:none, so a click lands on their container; prefer the picture under the pointer
+function deepPick(t,x,y){if(directText(t)!=null)return t;const im=[...t.querySelectorAll('img')].filter(i=>{const r=i.getBoundingClientRect();return r.width&&x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});return im.length?im[im.length-1]:t;}
 function selEl(){return qa(SEL)[0]||null;}
 function directText(e){if(!e)return null;const t=[...e.childNodes].filter(n=>n.nodeType===3&&n.nodeValue.trim());if(t.length)return t.map(n=>n.nodeValue).join('').trim();if(!e.children.length&&/^(INPUT|TEXTAREA|SELECT|IMG|SVG|CANVAS|VIDEO)$/i.test(e.tagName)===false&&e.textContent.trim())return e.textContent.trim();return null;}
 function hasImg(e){if(!e)return false;if(e.tagName==='IMG')return true;const b=FW.getComputedStyle(e).backgroundImage;return /url\(/.test(b||'');}
 function label(e){if(!e)return '';const tx=(e.innerText||e.textContent||e.getAttribute('aria-label')||e.getAttribute('alt')||'').replace(/\s+/g,' ').trim().slice(0,24);
   const kind=e.tagName==='IMG'?'圖片':e.tagName==='BUTTON'||e.getAttribute('role')==='button'?'按鈕':/^(B|I|SMALL|SPAN|P|H\d|STRONG|EM|LABEL)$/.test(e.tagName)?'文字':'區塊';return kind+(tx?'「'+tx+'」':'');}
-function rget(sel,dev,mk){let r=UI.rules.find(r=>r.sel===sel&&r.dev===dev);if(!r&&mk){r={sel,dev};UI.rules.push(r);}return r;}
+const cpwNow=()=>FW&&FW.document.documentElement.dataset.cpw||'';
+const inCop=e=>!!(e&&e.closest&&e.closest('#cop'));
+function curW(){return S.cwOnly&&inCop(selEl())?cpwNow():'';}
+function rget(sel,dev,mk,w){if(w===undefined)w=curW();let r=UI.rules.find(r=>r.sel===sel&&r.dev===dev&&(r.w||'')===w);if(!r&&mk){r={sel,dev};if(w)r.w=w;UI.rules.push(r);}return r;}
 function rclean(){UI.rules=UI.rules.filter(r=>{['x','y'].forEach(k=>{if(!+r[k])delete r[k];});if(r.s!=null&&+r.s===1)delete r.s;if(!r.fs)delete r.fs;if(!r.hide)delete r.hide;if(r.text==null)delete r.text;if(!r.src){delete r.src;delete r.img;}
-  return Object.keys(r).some(k=>!['sel','dev','lb'].includes(k));});}
+  return Object.keys(r).some(k=>!['sel','dev','lb','w'].includes(k));});}
 function rset(dev,patch){if(!SEL)return;const r=rget(SEL,dev,true);if(!r.lb)r.lb=label(selEl());Object.assign(r,patch);rclean();uiChanged();}
 function uiChanged(){if(!sv('uidraft',UI))$('#st').textContent='草稿太大沒辦法自動存，記得發佈';sync();pushSoon();}
 function uiOverlay(){if(!FW||S.tab!=='ui')return;const d=FW.document;let B=d.getElementById('uiBox281');
@@ -373,7 +387,13 @@ $('#uImgUp').onclick=()=>{upTarget='ui';$('#file').click();};
 $('#uImgReset').onclick=()=>rset('*',{src:''});
 $('#uiUp').onclick=()=>{const e=selEl();if(e&&e.parentElement&&e.parentElement!==FW.document.body){SEL=selOf(e.parentElement);sync();uiOverlay();}};
 $('#uiDown').onclick=()=>{const e=selEl();const c=e&&[...e.children].find(c=>!OWN(c));if(c){SEL=selOf(c);sync();uiOverlay();}};
-$('#uiReset').onclick=()=>{UI.rules=UI.rules.filter(r=>r.sel!==SEL);uiChanged();};
+$('#uiReset').onclick=()=>{const w=curW();UI.rules=UI.rules.filter(r=>r.sel!==SEL||(r.w||'')!==w);uiChanged();};
+$('#uCw').onchange=e=>{S.cwOnly=e.target.checked;saveUi();sync();};
+$$('#cpSlot button').forEach(b=>b.onclick=()=>{S.ci=+b.dataset.v;saveUi();sync();push();});
+$('#cpCls').onchange=e=>{S.cw=e.target.value;saveUi();sync();push();};
+const CWN={recruit:'新進人員',smg:'衝鋒槍',hs:'重盾',sh:'機動盾',sg:'散彈',rf:'步槍',sn:'狙擊',mg:'機槍'};
+const cwName=k=>k?(k[0]==='m'?'男・':'女・')+(CWN[k.slice(2)]||k.slice(2)):'';
+$('#cpCls').innerHTML='<option value="">玩家自己的職業</option>'+Object.entries(CWN).map(([k,n])=>`<option value="${k}">${n}</option>`).join('');
 $('#uSelTxt').onchange=e=>{const v=e.target.value.trim();if(!v)return;try{FW.document.querySelector(v);}catch(x){toast('選擇器寫法不對');return;}UI.rules.filter(r=>r.sel===SEL).forEach(r=>r.sel=v);SEL=v;uiChanged();};
 seg('uiMode','ui',()=>{HOV=null;push();});
 seg('tabMode','tab',()=>{HOV=null;if(S.tab==='lobby')goHome=true;push();});
@@ -386,7 +406,7 @@ function fillSizes(){$('#devSize').innerHTML=SIZES[S.dev].map((s,i)=>`<option va
 $('#gLines').onchange=e=>{S.lines=e.target.checked;saveUi();overlay();};
 $('#ghost').onchange=e=>{S.ghost=e.target.value;saveUi();overlay();};
 $('#bReload').onclick=loadFrame;
-const saveUi=()=>sv('ui',{dev:S.dev,size:S.size,op:S.op,drag:S.drag,ghost:S.ghost,lines:S.lines,tab:S.tab,ui:S.ui});
+const saveUi=()=>sv('ui',{dev:S.dev,size:S.size,op:S.op,drag:S.drag,ghost:S.ghost,lines:S.lines,tab:S.tab,ui:S.ui,ci:S.ci,cw:S.cw,cwOnly:S.cwOnly});
 
 function sync(){if(!CFG)return;
   $$('#dragMode button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.drag));$$('#devMode button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.dev));
@@ -405,14 +425,15 @@ function sync(){if(!CFG)return;
 function uiSync(){$$('#tabMode button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.tab));$$('#uiMode button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.ui));
   $('#paneLobby').hidden=S.tab!=='lobby';$('#paneUi').hidden=S.tab!=='ui';$('#uiDevTag').textContent=S.dev==='m'?'正在改手機版':'正在改電腦版';
   if(S.tab==='ui')$('#modeTag').innerHTML=S.ui==='pick'?'點一下 → <b>選取元件</b>，拖曳移動、滾輪縮放':'可以直接操作遊戲換頁';
-  const e=selEl();$('#uiNone').hidden=!!SEL;$('#uiSel').hidden=!SEL;
+  $$('#cpSlot button').forEach(b=>b.classList.toggle('on',+b.dataset.v===S.ci));$('#cpCls').value=S.cw;
+  const e=selEl();$('#uiNone').hidden=!!SEL;$('#uiSel').hidden=!SEL;$('#uCwRow').hidden=!inCop(e);$('#uCw').checked=S.cwOnly;$('#uCwName').textContent=cwName(cpwNow())||'目前顯示的職業';
   if(SEL){const r=rget(SEL,pk())||{},rt=rget(SEL,'*')||{},lb=e?label(e):((r.lb||rt.lb)||'（這一頁沒有這個元件）');
     $('#uiName').innerHTML=esc(lb)+'<small>'+(qa(SEL).length>1?'畫面上有 '+qa(SEL).length+' 個一樣的，會一起改':e?'':'切到它所在的頁面才看得到')+'</small>';
     showUX(+r.x||0);showUY(+r.y||0);showUS(Math.round((r.s!=null?+r.s:1)*100));if(document.activeElement!==$('#uFs'))$('#uFs').value=r.fs||'';$('#uHide').checked=!!r.hide;
     const tx=rt.text!=null?rt.text:directText(e);$('#uTextRow').hidden=tx==null&&rt.text==null;if(document.activeElement!==$('#uText'))$('#uText').value=tx||'';
     $('#uImgRow').hidden=!(rt.src||hasImg(e));$('#uImgReset').disabled=!rt.src;if(document.activeElement!==$('#uSelTxt'))$('#uSelTxt').value=SEL;}
   const g={};UI.rules.forEach(r=>{(g[r.sel]=g[r.sel]||[]).push(r);});const ks=Object.keys(g);$('#uiCount').textContent=ks.length?ks.length+' 個':'';
-  $('#uiList').innerHTML=ks.length?ks.map(k=>{const rs=g[k],lb=(rs.find(r=>r.lb)||{}).lb||k,tg=[...new Set(rs.map(r=>r.dev==='m'?'手機':r.dev==='d'?'電腦':'文字/圖'))].join('・');
+  $('#uiList').innerHTML=ks.length?ks.map(k=>{const rs=g[k],lb=(rs.find(r=>r.lb)||{}).lb||k,tg=[...new Set(rs.map(r=>(r.dev==='m'?'手機':r.dev==='d'?'電腦':'文字/圖')+(r.w?' '+cwName(r.w):'')))].join('・');
     return `<div class="uiItem ${k===SEL?'on':''}" data-s="${esc(k)}"><span>${esc(lb)}</span><i>${tg}</i><b data-x="${esc(k)}" title="還原">✕</b></div>`;}).join(''):'<p class="hint" style="margin:0">還沒有修改。</p>';
   $$('#uiList .uiItem').forEach(el=>el.onclick=ev=>{const x=ev.target.dataset.x;if(x!=null){UI.rules=UI.rules.filter(r=>r.sel!==x);uiChanged();return;}SEL=el.dataset.s;sync();uiOverlay();});}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
