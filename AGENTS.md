@@ -1,5 +1,7 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v280：大廳編輯器 `lobby-editor.html`（不從遊戲連結，直接開網址）。左側上傳／調整手機與電腦背景（位置、放大、暖色光）和每位幹員的大廳圖、位置、大小（手機 px、電腦是圖框 %，兩邊分開存）；中間用 iframe 載入真正的 `index.html?lobbyEdit=1` 預覽，可直接拖曳／滾輪、參考線、疊影對齊。「發佈到遊戲」用使用者貼的 GitHub 金鑰（public_repo，只存在瀏覽器）以 git data API 直接 commit 到 main：`data/lobby.json` 與新圖 `img/ui/lobby/<sha1>.webp`，再輪詢網站直到更新。遊戲端 `<script id="lobcfg280">`：`LOBDEF280` 是預設（等於 v276 的手寫值，原本 `HSC/HY/HX` 已搬進來），啟動時讀 `data/lobby.json`，`lobHero280` 在 `lobRender` 套用；手機背景改由 `.lob.m::after`（z -1、可縮放）畫，原本的 `::before` 暗角疊上漸層。沒有 lobby.json 時畫面和 v279 逐像素相同。手動改大廳背景／幹員位置請改 `data/lobby.json`（或用編輯器），不要再寫死在 CSS。
+
 - v275：手機大廳背景換成使用者給的夕陽軍事基地屋頂 `img/ui/lobby-phone-v275.jpg`（舊的 v266 倉庫圖已刪）。
 - v279：手機排行榜（≤760px）前三名改用 `img.bFull279` 全身立繪（`lbArt`，隱藏 `.bPodium>.bPortrait.opBust250`，仍保留 3 個 `.bPortrait` 給測試）；名次列用 `.bHalf279` 半身放大（92px 寬、圖高 200px 從頭部往下裁）。桌機不變。`m_hs`／`m_sh` 原圖沒有透明背景。
 - v278：小隊收合鈕 `.lobSq .lb` 寬 100%、去掉 focus outline（iOS 點完出現的白邊）；手機 `.pcard` clip-path 改成只切右下角 9px（同 `--cham` 的右下角），不再右側斜邊。

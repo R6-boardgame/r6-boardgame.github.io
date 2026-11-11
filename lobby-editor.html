@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>大廳編輯器</title>
+<link rel="icon" href="i3-32.png">
+<style>
+:root{--bg:#0b0f14;--pn:#121a23;--pn2:#18222d;--ln:#273544;--tx:#e8edf2;--mu:#8a9aab;--ac:#e3aa3e;--ac2:#ffcf6b;--ok:#4fd27a;--bad:#e5534b;--blue:#5aa0e0}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font:14px/1.45 system-ui,-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:340px 1fr;grid-template-rows:auto 1fr;height:100vh}
+header{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:10px 16px;background:#0e141b;border-bottom:1px solid var(--ln);flex-wrap:wrap}
+header h1{font-size:17px;margin:0 8px 0 0;letter-spacing:.04em}
+header .st{color:var(--mu);font-size:13px;margin-right:auto;min-width:0}
+header .st b{color:var(--ac2);font-weight:600}
+.btn{border:1px solid var(--ln);background:var(--pn2);padding:7px 12px;border-radius:6px;white-space:nowrap}
+.btn:hover{border-color:#3d5266}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.pri{background:linear-gradient(180deg,#f0b84a,#d39628);color:#1a1205;border-color:#f3c35e;font-weight:700;padding:7px 18px}
+.btn.sm{padding:4px 9px;font-size:12.5px}
+.btn.on{background:#24384d;border-color:var(--blue);color:#dff0ff}
+aside{overflow:auto;background:var(--pn);border-right:1px solid var(--ln);padding:12px 14px 40px}
+section.box{border:1px solid var(--ln);border-radius:8px;background:#0f161e;margin-bottom:12px}
+section.box>h2{font-size:13.5px;margin:0;padding:9px 12px;border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:8px;letter-spacing:.03em}
+section.box>h2 small{color:var(--mu);font-weight:400;margin-left:auto}
+.bd{padding:10px 12px}
+.seg{display:flex;border:1px solid var(--ln);border-radius:6px;overflow:hidden}
+.seg button{flex:1;border:0;background:transparent;padding:7px 4px;font-size:13px}
+.seg button+button{border-left:1px solid var(--ln)}
+.seg button.on{background:#24384d;color:#dff0ff}
+.row{display:flex;align-items:center;gap:8px;margin:8px 0}
+.row label{width:58px;color:var(--mu);font-size:12.5px;flex:none}
+.row input[type=range]{flex:1;min-width:0;accent-color:var(--ac)}
+.row input[type=number]{width:64px;background:#0b1117;border:1px solid var(--ln);border-radius:5px;padding:3px 5px;text-align:right}
+.row .u{width:18px;color:var(--mu);font-size:12px}
+.bgPrev{display:flex;gap:10px;align-items:center}
+.bgPrev img{width:64px;height:84px;object-fit:cover;border-radius:5px;border:1px solid var(--ln);background:#000}
+.bgPrev .c{display:flex;flex-direction:column;gap:6px;min-width:0}
+.bgPrev .fn{color:var(--mu);font-size:12px;word-break:break-all}
+.ops{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.op{position:relative;border:1px solid var(--ln);border-radius:6px;background:#0b1117;padding:3px 2px 2px;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:11px;color:var(--mu)}
+.op img{width:100%;height:58px;object-fit:contain;object-position:bottom}
+.op.on{border-color:var(--ac);color:var(--tx);background:#1d1a10}
+.op .dot{position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--ac);display:none}
+.op.mod .dot{display:block}
+.op.up .dot{background:var(--ok)}
+.chk{display:flex;align-items:center;gap:7px;margin:6px 0;font-size:13px}
+.chk input{accent-color:var(--ac);width:16px;height:16px}
+.hint{color:var(--mu);font-size:12px;margin:6px 0 0}
+.hint kbd{background:#1d2834;border:1px solid var(--ln);border-radius:3px;padding:0 4px;font-size:11px}
+main{position:relative;overflow:hidden;background:repeating-conic-gradient(#0d131a 0 25%,#0a0f15 0 50%) 0 0/24px 24px;display:flex;flex-direction:column;min-height:0}
+.bar{display:flex;align-items:center;gap:8px;padding:8px 12px;flex-wrap:wrap;background:#0c1218cc;border-bottom:1px solid var(--ln)}
+.bar .sp{flex:1}
+.bar select{background:#0b1117;border:1px solid var(--ln);border-radius:6px;padding:5px 6px}
+.stage{flex:1;position:relative;min-height:0}
+.dev{position:absolute;left:50%;top:50%;transform-origin:0 0;box-shadow:0 0 0 1px #000,0 0 0 9px #1b232c,0 0 0 10px #33414f,0 20px 60px #000c;border-radius:4px;overflow:hidden;background:#000}
+.dev iframe{display:block;border:0;width:100%;height:100%;background:#06090d}
+.loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--mu);font-size:14px;pointer-events:none}
+.modeTag{position:absolute;left:12px;bottom:12px;background:#0c1218e6;border:1px solid var(--ln);border-radius:6px;padding:6px 10px;font-size:12.5px;color:var(--mu);pointer-events:none}
+.modeTag b{color:var(--ac2)}
+dialog{background:var(--pn);color:var(--tx);border:1px solid var(--ln);border-radius:10px;padding:0;width:min(520px,calc(100vw - 32px))}
+dialog::backdrop{background:#000a}
+dialog h3{margin:0;padding:14px 16px;border-bottom:1px solid var(--ln);font-size:15px}
+dialog .bd{padding:14px 16px}
+dialog .ft{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--ln)}
+dialog input[type=password],dialog input[type=text]{width:100%;background:#0b1117;border:1px solid var(--ln);border-radius:6px;padding:8px 10px}
+dialog ol{margin:6px 0 10px;padding-left:20px;color:var(--mu)}
+dialog a{color:var(--ac2)}
+.log{font-size:13px;color:var(--mu);white-space:pre-wrap;background:#0b1117;border:1px solid var(--ln);border-radius:6px;padding:8px 10px;max-height:180px;overflow:auto;margin-top:10px}
+.log .ok{color:var(--ok)}.log .bad{color:var(--bad)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#16212c;border:1px solid var(--ln);padding:9px 16px;border-radius:8px;box-shadow:0 10px 30px #000a;z-index:9;font-size:13.5px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+@media (max-width:820px){
+  .app{grid-template-columns:1fr;grid-template-rows:auto 62vh auto;height:auto;min-height:100vh}
+  main{grid-row:2}
+  aside{grid-row:3;border-right:0;border-top:1px solid var(--ln)}
+  header .st{flex-basis:100%;order:3}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <h1>大廳編輯器</h1>
+  <div class="st" id="st">載入中…</div>
+  <button class="btn sm" id="bRevert" title="丟掉還沒發佈的修改，回到遊戲目前的樣子">還原成已發佈</button>
+  <button class="btn sm" id="bTok" title="設定發佈用的 GitHub 金鑰">⚙ 發佈設定</button>
+  <button class="btn pri" id="bPub">發佈到遊戲</button>
+</header>
+
+<aside>
+  <section class="box">
+    <h2>拖曳畫面時移動 <small>也可用滑桿</small></h2>
+    <div class="bd">
+      <div class="seg" id="dragMode"><button data-v="op" class="on">幹員</button><button data-v="bg">背景</button><button data-v="none">不動（點按鈕看效果）</button></div>
+      <p class="hint">在預覽上直接拖曳；滾輪縮放；方向鍵每次 1px，按住 <kbd>Shift</kbd> 每次 10px。</p>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2 id="bgTitle">手機背景</h2>
+    <div class="bd">
+      <div class="bgPrev"><img id="bgImg" alt=""><div class="c">
+        <div><button class="btn sm" id="bgUp">上傳背景圖</button> <button class="btn sm" id="bgReset">用預設圖</button></div>
+        <div class="fn" id="bgFn"></div></div></div>
+      <div class="row"><label>左右</label><input type="range" id="bgX" min="0" max="100" step="1"><input type="number" id="bgXn" step="1"><span class="u">%</span></div>
+      <div class="row"><label>上下</label><input type="range" id="bgY" min="0" max="100" step="1"><input type="number" id="bgYn" step="1"><span class="u">%</span></div>
+      <div class="row"><label>放大</label><input type="range" id="bgZ" min="100" max="250" step="1"><input type="number" id="bgZn" step="1"><span class="u">%</span></div>
+      <label class="chk" id="warmRow"><input type="checkbox" id="warm"> 幹員加暖色夕陽光（配合夕陽背景）</label>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>幹員圖 <small id="opWhich">手機位置</small></h2>
+    <div class="bd">
+      <div class="ops" id="ops"></div>
+      <p class="hint">點一個幹員，預覽就換成他。<span style="color:var(--ac)">●</span> 有調過位置 <span style="color:var(--ok)">●</span> 換過圖。手機與電腦的位置分開存。</p>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn sm" id="opUp">上傳這位的大廳圖</button>
+        <button class="btn sm" id="opImgReset">用原本的圖</button>
+        <button class="btn sm" id="opReset">位置歸零</button>
+      </div>
+      <div class="row"><label>左右</label><input type="range" id="oX" step="1"><input type="number" id="oXn" step="1"><span class="u" id="oXu">px</span></div>
+      <div class="row"><label>上下</label><input type="range" id="oY" step="1"><input type="number" id="oYn" step="1"><span class="u" id="oYu">px</span></div>
+      <div class="row"><label>大小</label><input type="range" id="oS" min="30" max="160" step="1"><input type="number" id="oSn" step="1"><span class="u">%</span></div>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>對齊輔助</h2>
+    <div class="bd">
+      <label class="chk"><input type="checkbox" id="gLines" checked> 顯示參考線（畫面中線、腳底線、頭頂線）</label>
+      <div class="row"><label>疊影</label><select id="ghost" style="flex:1;background:#0b1117;border:1px solid var(--ln);border-radius:6px;padding:5px"></select></div>
+      <p class="hint">選一位當半透明疊影，可以把這位的腳底或頭頂對齊他。</p>
+    </div>
+  </section>
+</aside>
+
+<main>
+  <div class="bar">
+    <div class="seg" id="devMode" style="width:150px"><button data-v="m" class="on">手機</button><button data-v="d">電腦</button></div>
+    <select id="devSize"></select>
+    <span class="sp"></span>
+    <button class="btn sm" id="bReload" title="重新載入預覽">↻ 重新載入預覽</button>
+  </div>
+  <div class="stage" id="stage">
+    <div class="dev" id="dev"><iframe id="fr" title="遊戲大廳預覽"></iframe></div>
+    <div class="loading" id="loading">預覽載入中…</div>
+    <div class="modeTag" id="modeTag"></div>
+  </div>
+</main>
+</div>
+
+<input type="file" id="file" accept="image/*" hidden>
+
+<dialog id="dTok">
+  <h3>發佈設定</h3>
+  <div class="bd">
+    <p style="margin:0 0 6px">發佈會把設定與圖片存進遊戲網站的 GitHub（<code>r6-boardgame/r6-boardgame.github.io</code>），所以需要一把有寫入權限的金鑰。只要設定一次，金鑰只存在這台電腦的瀏覽器裡。</p>
+    <ol>
+      <li>打開 <a href="https://github.com/settings/tokens/new?scopes=public_repo&amp;description=R6%20lobby%20editor" target="_blank" rel="noopener">GitHub 建立金鑰頁</a>（已幫你勾好 public_repo）</li>
+      <li>Expiration 選 No expiration 或你想要的期限，按最下面 Generate token</li>
+      <li>把 ghp_ 開頭的那串貼到下面</li>
+    </ol>
+    <input type="password" id="tok" placeholder="ghp_…" autocomplete="off">
+    <div class="log" id="tokLog" hidden></div>
+  </div>
+  <div class="ft"><button class="btn" id="tokClear">清除金鑰</button><span style="flex:1"></span><button class="btn" id="tokCancel">取消</button><button class="btn pri" id="tokSave">儲存並測試</button></div>
+</dialog>
+
+<dialog id="dPub">
+  <h3>發佈到遊戲</h3>
+  <div class="bd">
+    <div id="pubSum"></div>
+    <div class="log" id="pubLog" hidden></div>
+  </div>
+  <div class="ft"><button class="btn" id="pubClose">關閉</button><button class="btn pri" id="pubGo">確定發佈</button></div>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+const REPO='r6-boardgame/r6-boardgame.github.io',CFG_PATH='data/lobby.json',IMG_DIR='img/ui/lobby/';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const CLS={smg:'衝鋒槍',hs:'重盾',sh:'機動盾',sg:'散彈',rf:'步槍',sn:'狙擊',mg:'機槍'};
+const OPS=[['f','女・新進'],['m','男・新進']];
+for(const g of ['f','m'])for(const c of ['smg','hs','sh','sg','rf','sn','mg'])OPS.push([g+'_'+c,(g==='f'?'女・':'男・')+CLS[c]]);
+OPS.push(['hero249','電腦版女新進']);
+const opSrc=k=>k==='hero249'?'img/ui/lobby-operator-v249.png':'img/cop/'+k+'.webp';
+const SIZES={m:[[390,844,'iPhone 14／15（390×844）'],[430,932,'iPhone Pro Max（430×932）'],[375,667,'iPhone SE（375×667）'],[360,780,'Android（360×780）']],
+  d:[[1600,900,'電腦 1600×900'],[1920,1080,'電腦 1920×1080'],[1280,720,'電腦 1280×720'],[1024,768,'平板橫放 1024×768']]};
+const clone=o=>JSON.parse(JSON.stringify(o));
+let DEF=null,PUB=null,CFG=null,PUBSHA=null;
+const S={dev:'m',size:{m:0,d:0},op:'f',drag:'op',ghost:'',lines:true};
+const sv=(k,v)=>{try{localStorage.setItem('lobEd.'+k,JSON.stringify(v));}catch(e){return false;}return true;};
+const ld=(k,d)=>{try{const v=localStorage.getItem('lobEd.'+k);return v==null?d:JSON.parse(v);}catch(e){return d;}};
+Object.assign(S,ld('ui',{}));
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),2600);}
+
+// ---------- config helpers ----------
+function full(c){c=c||{};return{v:1,phone:Object.assign({},DEF.phone,c.phone||{}),desk:Object.assign({},DEF.desk,c.desk||{}),ops:clone(c.ops||DEF.ops)};}
+const side=()=>S.dev==='m'?'phone':'desk',pk=()=>S.dev==='m'?'m':'d';
+function opv(k,cfg){const o=(cfg||CFG).ops[k]||{};return Object.assign({x:0,y:0,s:1},o[pk()]||{});}
+function setOp(k,patch){const o=CFG.ops[k]||(CFG.ops[k]={});const v=Object.assign(opv(k),patch);v.x=Math.round(v.x*10)/10;v.y=Math.round(v.y*10)/10;v.s=Math.round(v.s*1000)/1000;
+  if(!v.x&&!v.y&&v.s===1)delete o[pk()];else o[pk()]=v;if(!Object.keys(o).length)delete CFG.ops[k];changed();}
+const same=(a,b)=>JSON.stringify(norm(a))===JSON.stringify(norm(b));
+function norm(c){const f=full(c);const o={};Object.keys(f.ops).sort().forEach(k=>{const e=f.ops[k],r={};['src','m','d'].forEach(x=>{if(e[x]!=null)r[x]=e[x];});if(Object.keys(r).length)o[k]=r;});return{phone:f.phone,desk:f.desk,ops:o};}
+
+// ---------- preview iframe ----------
+const fr=$('#fr');let FW=null,ready=false;
+function devSize(){return SIZES[S.dev][S.size[S.dev]]||SIZES[S.dev][0];}
+function layout(){const [w,h]=devSize(),st=$('#stage'),pad=28,sc=Math.min((st.clientWidth-pad*2)/w,(st.clientHeight-pad*2)/h,1);
+  const d=$('#dev');d.style.width=w+'px';d.style.height=h+'px';d.style.transform=`scale(${sc}) translate(-50%,-50%)`;d.style.left='50%';d.style.top='50%';
+  d.style.transform=`translate(-50%,-50%) scale(${sc})`;d.style.transformOrigin='center';}
+addEventListener('resize',layout);
+function loadFrame(){ready=false;FW=null;$('#loading').hidden=false;layout();fr.src='index.html?lobbyEdit=1&t='+Date.now();}
+fr.addEventListener('load',()=>{const w=fr.contentWindow;let n=0;const wait=()=>{n++;
+  if(w.lobRender&&w.render&&w.LOBDEF280&&w.document.readyState==='complete'){FW=w;onFrame();return;}if(n<200)setTimeout(wait,100);};wait();});
+function onFrame(){if(!DEF){DEF=clone(FW.LOBDEF280);boot2();}hookFrame();ready=true;push();setTimeout(push,800);setTimeout(()=>{$('#loading').hidden=true;},300);}
+function push(){if(!FW||!CFG)return;try{FW.postMessage({t:'lobcfg280',cfg:CFG,pv:{art:S.op}},location.origin);}catch(e){}requestAnimationFrame(()=>requestAnimationFrame(overlay));}
+let pT=0;function pushSoon(){cancelAnimationFrame(pT);pT=requestAnimationFrame(push);}
+
+// guides + ghost drawn inside the iframe so they line up exactly with the game's own CSS
+function overlay(){if(!FW)return;const d=FW.document,lob=d.querySelector('#tlob .lob'),h=d.querySelector('#lobHero');if(!lob||!h)return;
+  let g=d.getElementById('ghost280');
+  if(S.ghost&&S.ghost!==S.op){if(!g){g=h.cloneNode(false);g.id='ghost280';g.removeAttribute('tabindex');g.removeAttribute('role');}
+    if(g.parentNode!==h.parentNode||g.nextSibling!==h)h.parentNode.insertBefore(g,h);
+    const o=CFG.ops[S.ghost]||{},v=opv(S.ghost);g.className=h.className.replace(/\breference249\b/,'')+(S.ghost==='hero249'&&S.dev==='d'?' reference249':'');
+    const src=o.src||opSrc(S.ghost);if(g.getAttribute('src')!==src)g.setAttribute('src',src);
+    g.style.cssText='';g.style.setProperty('--hs',v.s);if(S.dev==='m'){g.style.setProperty('--hy',v.y+'px');g.style.setProperty('--hx',v.x+'px');}else g.style.translate=v.x+'% '+(-v.y)+'%';
+    g.style.opacity='.38';g.style.pointerEvents='none';g.style.filter='grayscale(1) brightness(1.6)';}
+  else if(g)g.remove();
+  let L=d.getElementById('guide280');if(!S.lines){if(L)L.remove();return;}
+  if(!L){L=d.createElement('div');L.id='guide280';L.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:2147483000';d.body.appendChild(L);}
+  const r=h.getBoundingClientRect(),W=FW.innerWidth,H=FW.innerHeight,line=(css,c)=>`<div style="position:absolute;${css};background:${c}"></div>`,lbl=(x,y,t)=>`<div style="position:absolute;left:${x}px;top:${y}px;font:11px system-ui;color:#fff;background:#000a;padding:1px 4px;border-radius:3px">${t}</div>`;
+  // the art's visible box (object-fit:contain inside the img box)
+  let bx=r.left,bw=r.width,by=r.top,bh=r.height;if(h.naturalWidth){const ar=h.naturalWidth/h.naturalHeight;if(bw/bh>ar){const nw=bh*ar;bx+=S.dev==='m'?(bw-nw)/2:(bw-nw);bw=nw;}else{const nh=bw/ar;by+=bh-nh;bh=nh;}}
+  L.innerHTML=line(`left:${W/2-.5}px;top:0;bottom:0;width:1px`,'#5aa0e0aa')+line(`left:0;right:0;top:${by+bh-.5}px;height:1px`,'#4fd27acc')+line(`left:0;right:0;top:${by-.5}px;height:1px`,'#ffcf6b99')
+    +line(`left:${bx+bw/2-.5}px;top:${by}px;height:${bh}px;width:1px;opacity:.6`,'#ffcf6b')+lbl(4,by+bh-18,'腳底 '+Math.round(H-(by+bh))+'px')+lbl(4,by+3,'頭頂 '+Math.round(by)+'px');}
+
+// drag / wheel / keys inside the preview
+function hookFrame(){const d=FW.document;let st=null;
+  const block=e=>{if(S.drag==='none')return;e.preventDefault();e.stopPropagation();};
+  d.addEventListener('pointerdown',e=>{if(S.drag==='none')return;block(e);const h=d.querySelector('#lobHero');
+    st={x:e.clientX,y:e.clientY,id:e.pointerId,op:clone(opv(S.op)),bg:clone(CFG[side()]),hw:h?h.offsetWidth:1,hh:h?h.offsetHeight:1,W:FW.innerWidth,H:FW.innerHeight};
+    try{e.target.setPointerCapture(e.pointerId);}catch(x){}d.documentElement.style.cursor='grabbing';},true);
+  d.addEventListener('pointermove',e=>{if(!st||e.pointerId!==st.id)return;block(e);const dx=e.clientX-st.x,dy=e.clientY-st.y;
+    if(S.drag==='op'){if(S.dev==='m')setOp(S.op,{x:st.op.x+dx,y:st.op.y-dy});else setOp(S.op,{x:st.op.x+dx/st.hw*100,y:st.op.y-dy/st.hh*100});}
+    else if(S.drag==='bg'){const b=CFG[side()],z=(b.bgZ||100)/100;b.bgX=clamp(st.bg.bgX-dx/st.W*100/z,0,100);b.bgY=clamp(st.bg.bgY-dy/st.H*100/z,0,100);b.bgX=Math.round(b.bgX*10)/10;b.bgY=Math.round(b.bgY*10)/10;changed();}},true);
+  const end=e=>{if(!st)return;block(e);st=null;d.documentElement.style.cursor='';};
+  d.addEventListener('pointerup',end,true);d.addEventListener('pointercancel',end,true);
+  ['click','dblclick','mousedown','touchstart','contextmenu'].forEach(t=>d.addEventListener(t,e=>{if(S.drag!=='none'){e.preventDefault();e.stopPropagation();}},{capture:true,passive:false}));
+  d.addEventListener('wheel',e=>{if(S.drag==='none')return;block(e);const f=e.deltaY<0?1:-1;
+    if(S.drag==='op')setOp(S.op,{s:clamp(opv(S.op).s+f*.01,.3,1.6)});else{const b=CFG[side()];b.bgZ=clamp((b.bgZ||100)+f*2,100,250);changed();}},{capture:true,passive:false});
+  d.addEventListener('keydown',keys,true);
+  new FW.MutationObserver(()=>{if(!d.getElementById('guide280')&&S.lines||(S.ghost&&!d.getElementById('ghost280')))requestAnimationFrame(overlay);}).observe(d.body,{childList:true,subtree:true});}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function keys(e){if(!/^Arrow/.test(e.key)||S.drag==='none')return;const t=e.target;if(t&&t.closest&&t.closest('aside')&&/INPUT|SELECT/.test(t.tagName))return;e.preventDefault();
+  const n=e.shiftKey?10:1,dx=e.key==='ArrowLeft'?-n:e.key==='ArrowRight'?n:0,dy=e.key==='ArrowUp'?n:e.key==='ArrowDown'?-n:0;
+  if(S.drag==='op'){const v=opv(S.op),u=S.dev==='m'?1:.2;setOp(S.op,{x:v.x+dx*u,y:v.y+dy*u});}else{const b=CFG[side()];b.bgX=clamp(b.bgX-dx*.5,0,100);b.bgY=clamp(b.bgY+dy*.5,0,100);changed();}}
+addEventListener('keydown',keys);
+
+// ---------- panel ----------
+function bindRange(id,get,set){const r=$('#'+id),n=$('#'+id+'n');const f=v=>{set(+v);};r.addEventListener('input',()=>f(r.value));n.addEventListener('change',()=>f(n.value));return v=>{r.value=v;if(document.activeElement!==n)n.value=v;};}
+const showBgX=bindRange('bgX',null,v=>{CFG[side()].bgX=clamp(v,0,100);changed();});
+const showBgY=bindRange('bgY',null,v=>{CFG[side()].bgY=clamp(v,0,100);changed();});
+const showBgZ=bindRange('bgZ',null,v=>{CFG[side()].bgZ=clamp(v,100,250);changed();});
+const showOX=bindRange('oX',null,v=>setOp(S.op,{x:v}));
+const showOY=bindRange('oY',null,v=>setOp(S.op,{y:v}));
+const showOS=bindRange('oS',null,v=>setOp(S.op,{s:clamp(v,30,160)/100}));
+$('#warm').onchange=e=>{CFG.phone.warm=e.target.checked?1:0;changed();};
+function seg(id,key,fn){$$('#'+id+' button').forEach(b=>b.onclick=()=>{S[key]=b.dataset.v;saveUi();fn&&fn();sync();});}
+seg('dragMode','drag');
+seg('devMode','dev',()=>{fillSizes();if(S.dev==='m'&&S.op==='hero249')S.op='f';loadFrame();});
+$('#devSize').onchange=e=>{S.size[S.dev]=+e.target.value;saveUi();layout();};
+function fillSizes(){$('#devSize').innerHTML=SIZES[S.dev].map((s,i)=>`<option value="${i}">${s[2]}</option>`).join('');$('#devSize').value=S.size[S.dev]||0;}
+$('#gLines').onchange=e=>{S.lines=e.target.checked;saveUi();overlay();};
+$('#ghost').onchange=e=>{S.ghost=e.target.value;saveUi();overlay();};
+$('#bReload').onclick=loadFrame;
+const saveUi=()=>sv('ui',{dev:S.dev,size:S.size,op:S.op,drag:S.drag,ghost:S.ghost,lines:S.lines});
+
+function sync(){if(!CFG)return;
+  $$('#dragMode button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.drag));$$('#devMode button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.dev));
+  const b=CFG[side()];$('#bgTitle').textContent=S.dev==='m'?'手機背景':'電腦背景';$('#bgImg').src=b.bg;$('#bgFn').textContent=b.bg.startsWith('data:')?'新上傳（發佈後才會進遊戲）':b.bg.split('/').pop();
+  showBgX(b.bgX);showBgY(b.bgY);showBgZ(b.bgZ);$('#warmRow').hidden=S.dev!=='m';$('#warm').checked=!!CFG.phone.warm;
+  const v=opv(S.op),m=S.dev==='m';$('#opWhich').textContent=(OPS.find(o=>o[0]===S.op)||[])[1]+' · '+(m?'手機位置':'電腦位置');
+  ['oX','oY'].forEach(id=>{$('#'+id).min=m?-200:-60;$('#'+id).max=m?300:60;$('#'+id).step=m?1:.5;$('#'+id+'n').step=m?1:.5;$('#'+id+'u').textContent=m?'px':'%';});
+  showOX(v.x);showOY(v.y);showOS(Math.round(v.s*100));
+  $('#ops').innerHTML=OPS.filter(([k])=>k!=='hero249'||S.dev==='d').map(([k,n])=>{const o=CFG.ops[k]||{};return `<button class="op ${k===S.op?'on':''} ${o.m||o.d?'mod':''} ${o.src?'up':''}" data-k="${k}" title="${n}"><span class="dot"></span><img src="${o.src||opSrc(k)}" alt="" loading="lazy">${n}</button>`;}).join('');
+  $$('#ops .op').forEach(e=>e.onclick=()=>{S.op=e.dataset.k;if(S.ghost===S.op)S.ghost='';saveUi();sync();push();});
+  $('#ghost').innerHTML='<option value="">不要疊影</option>'+OPS.filter(([k])=>k!==S.op&&(k!=='hero249'||S.dev==='d')).map(([k,n])=>`<option value="${k}">${n}</option>`).join('');$('#ghost').value=S.ghost||'';$('#gLines').checked=S.lines;
+  $('#opImgReset').disabled=!(CFG.ops[S.op]||{}).src;
+  $('#modeTag').innerHTML=S.drag==='op'?'拖曳 → 移動<b>幹員</b>，滾輪縮放':S.drag==='bg'?'拖曳 → 移動<b>背景</b>，滾輪放大':'預覽可以直接點';
+  const dirty=PUB&&!same(CFG,PUB);$('#st').innerHTML=dirty?'<b>有尚未發佈的修改</b>（已自動存草稿）':'跟遊戲目前一樣'+(PUB&&PUB.ts?'（上次發佈 '+new Date(PUB.ts).toLocaleString('zh-TW',{hour12:false})+'）':'');
+  $('#bPub').disabled=!dirty;$('#bRevert').disabled=!dirty;}
+
+function changed(){if(!sv('draft',CFG))$('#st').textContent='草稿太大沒辦法自動存，記得發佈';sync();pushSoon();}
+
+// ---------- uploads ----------
+let upTarget=null;$('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f||!upTarget)return;try{const t=upTarget;toast('處理圖片中…');
+  const url=await shrink(f,t==='bg'?{max:2400,alpha:false}:{max:2000,alpha:true});
+  if(t==='bg'){CFG[side()].bg=url;}else{(CFG.ops[t]||(CFG.ops[t]={})).src=url;}changed();toast('已換上，記得按「發佈到遊戲」');}catch(err){toast('讀不了這張圖：'+(err.message||err));}};
+$('#bgUp').onclick=()=>{upTarget='bg';$('#file').click();};
+$('#opUp').onclick=()=>{upTarget=S.op;$('#file').click();};
+$('#bgReset').onclick=()=>{const b=CFG[side()],d=DEF[side()];b.bg=d.bg;changed();};
+$('#opImgReset').onclick=()=>{const o=CFG.ops[S.op];if(o){delete o.src;if(!Object.keys(o).length)delete CFG.ops[S.op];}changed();};
+$('#opReset').onclick=()=>{const o=CFG.ops[S.op];if(o){delete o[pk()];if(!Object.keys(o).length)delete CFG.ops[S.op];}changed();};
+async function shrink(file,{max,alpha}){const bmp=await createImageBitmap(file);let w=bmp.width,h=bmp.height;const k=Math.min(1,max/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);
+  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');if(!alpha){x.fillStyle='#000';x.fillRect(0,0,w,h);}x.drawImage(bmp,0,0,w,h);
+  const enc=t=>new Promise(r=>c.toBlob(r,t,.88));let b=await enc('image/webp');if(!b||b.type!=='image/webp')b=await enc(alpha?'image/png':'image/jpeg');
+  return await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=rej;fr.readAsDataURL(b);});}
+
+// ---------- GitHub publish ----------
+const tok=()=>ld('tok','');
+async function gh(path,opt){opt=opt||{};const r=await fetch('https://api.github.com/repos/'+REPO+path,{method:opt.method||'GET',cache:'no-store',
+  headers:Object.assign({Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},tok()?{Authorization:'Bearer '+tok()}:{},opt.body?{'Content-Type':'application/json'}:{}),body:opt.body?JSON.stringify(opt.body):undefined});
+  if(!r.ok){let m='';try{m=(await r.json()).message;}catch(e){}const err=new Error(r.status+' '+m);err.status=r.status;throw err;}return r.status===204?null:r.json();}
+function ghErr(e){if(e.status===401)return '金鑰無效或過期，請到「⚙ 發佈設定」重新貼一把';if(e.status===403||e.status===404)return '這把金鑰沒有寫入遊戲網站的權限（需要 public_repo，且你的 GitHub 帳號要能修改 r6-boardgame）';if(e.status===409||e.status===422)return '剛好有別的更新同時進來，請再按一次發佈';return e.message||String(e);}
+$('#bTok').onclick=()=>{$('#tok').value=tok();$('#tokLog').hidden=true;$('#dTok').showModal();};
+$('#tokCancel').onclick=()=>$('#dTok').close();
+$('#tokClear').onclick=()=>{sv('tok','');$('#tok').value='';toast('已清除金鑰');};
+$('#tokSave').onclick=async()=>{const v=$('#tok').value.trim(),lg=$('#tokLog');sv('tok',v);lg.hidden=false;lg.textContent='測試中…';
+  try{const r=await gh('');if(!(r.permissions&&r.permissions.push))throw Object.assign(new Error('no push'),{status:403});lg.innerHTML='<span class="ok">✓ 可以發佈了</span>';setTimeout(()=>$('#dTok').close(),900);}
+  catch(e){lg.innerHTML='<span class="bad">✗ '+ghErr(e)+'</span>';}};
+
+$('#bPub').onclick=()=>{if(!tok()){$('#bTok').click();return;}const n=[];
+  const ups=[CFG.phone.bg,CFG.desk.bg,...Object.values(CFG.ops).map(o=>o.src)].filter(s=>s&&s.startsWith('data:')).length;
+  if(ups)n.push(`上傳 ${ups} 張新圖片`);n.push('手機和電腦大廳的背景、幹員位置換成你現在看到的樣子');
+  $('#pubSum').innerHTML='<p style="margin:0 0 6px">會做這些事：</p><ul style="margin:0;padding-left:20px">'+n.map(x=>'<li>'+x+'</li>').join('')+'</ul><p class="hint">發佈後大約 1～2 分鐘 GitHub 會更新網站，玩家重新整理或下次打開遊戲就會看到。</p>';
+  $('#pubLog').hidden=true;$('#pubGo').disabled=false;$('#pubGo').hidden=false;$('#dPub').showModal();};
+$('#pubClose').onclick=()=>$('#dPub').close();
+$('#pubGo').onclick=publish;
+async function sha1(s){const b=await crypto.subtle.digest('SHA-1',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function publish(){const lg=$('#pubLog'),go=$('#pubGo');go.disabled=true;lg.hidden=false;lg.innerHTML='';const log=(t,c)=>{lg.innerHTML+=(c?`<span class="${c}">${t}</span>`:t)+'\n';lg.scrollTop=1e9;};
+  try{const out=clone(CFG),files=[],seen={};
+    const take=async url=>{if(!url||!url.startsWith('data:'))return url;const m=url.match(/^data:image\/(\w+);base64,(.*)$/);if(!m)throw new Error('圖片格式不對');
+      const ext=m[1]==='jpeg'?'jpg':m[1],path=IMG_DIR+(await sha1(m[2])).slice(0,12)+'.'+ext;if(!seen[path]){seen[path]=1;files.push({path,b64:m[2]});}return path;};
+    out.phone.bg=await take(out.phone.bg);out.desk.bg=await take(out.desk.bg);for(const k in out.ops)if(out.ops[k].src)out.ops[k].src=await take(out.ops[k].src);
+    out.v=1;out.ts=Date.now();
+    log('連線 GitHub…');const ref=await gh('/git/ref/heads/main'),base=await gh('/git/commits/'+ref.object.sha);
+    const tree=[];for(const f of files){log('上傳圖片 '+f.path.split('/').pop()+'（'+Math.round(f.b64.length*.75/1024)+' KB）');const b=await gh('/git/blobs',{method:'POST',body:{content:f.b64,encoding:'base64'}});tree.push({path:f.path,mode:'100644',type:'blob',sha:b.sha});}
+    const json=JSON.stringify(out,null,1)+'\n';const jb=await gh('/git/blobs',{method:'POST',body:{content:json,encoding:'utf-8'}});tree.push({path:CFG_PATH,mode:'100644',type:'blob',sha:jb.sha});
+    log('建立版本…');const t=await gh('/git/trees',{method:'POST',body:{base_tree:base.tree.sha,tree}});
+    const c=await gh('/git/commits',{method:'POST',body:{message:'lobby: publish from lobby editor'+(files.length?` (${files.length} new image${files.length>1?'s':''})`:''),tree:t.sha,parents:[ref.object.sha]}});
+    await gh('/git/refs/heads/main',{method:'PATCH',body:{sha:c.sha}});
+    log('✓ 已存進 GitHub','ok');
+    CFG=out;PUB=clone(out);sv('draft',null);sync();push();
+    log('等網站更新（通常 1～2 分鐘）…');go.hidden=true;
+    const t0=Date.now();while(Date.now()-t0<6*60e3){await new Promise(r=>setTimeout(r,8000));
+      try{const r=await fetch(CFG_PATH+'?t='+Date.now(),{cache:'no-store'});if(r.ok){const j=await r.json();if(j.ts===out.ts){log('✓ 遊戲已更新！玩家重新整理就會看到新大廳','ok');toast('發佈完成');return;}}}catch(e){}}
+    log('GitHub 還在更新網站，晚一點重新整理遊戲就會看到。');}
+  catch(e){log('✗ '+ghErr(e),'bad');go.disabled=false;}}
+
+$('#bRevert').onclick=()=>{if(!confirm('丟掉所有還沒發佈的修改？'))return;CFG=clone(PUB);sv('draft',null);sync();push();};
+
+// ---------- boot ----------
+async function boot2(){let j=null;
+  try{const r=await fetch(CFG_PATH+'?t='+Date.now(),{cache:'no-store'});if(r.ok)j=await r.json();}catch(e){}
+  PUB=full(j);if(j&&j.ts)PUB.ts=j.ts;const dr=ld('draft',null);CFG=dr?full(dr):clone(PUB);if(PUB.ts)CFG.ts=PUB.ts;
+  if(S.dev==='m'&&S.op==='hero249')S.op='f';sync();push();}
+fillSizes();sync();loadFrame();
+</script>
+</body>
+</html>
