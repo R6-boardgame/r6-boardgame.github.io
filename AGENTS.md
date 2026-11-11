@@ -1,5 +1,7 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v281：編輯器改名「遊戲畫面編輯器」，多一個「所有頁面的元件」分頁：預覽可切「操作遊戲（換頁）」或「選取元件」，點任何元件可拖曳位置、滾輪縮放、字級、隱藏（手機 `m`／電腦 `d` 分開），文字與圖片兩邊共用（`dev:'*'`）。規則存 `data/ui.json` `{rules:[{sel,dev,x,y,s,fs,hide,text,src,img,lb}]}`，跟 `lobby.json` 同一個 commit 發佈。遊戲端 `<script id="uicfg281">` 的 `uiApply281` 產生 `html body <sel>{translate;scale;font-size;visibility}`（用獨立的 translate/scale 屬性，不蓋掉原本 transform），文字／img src 由 MutationObserver 重套。選擇器由編輯器 `selOf` 從最近的唯一 id 往下組，會略過 on/sel/active 等狀態 class；改版時若改了 id 或 class，使用者的 ui.json 規則會失效。預覽中 `lobcfg280` 只有 `pv.home` 才把畫面拉回大廳、`pv.lock` 才停用點人物。另外 `img/cop/m_hs.webp`、`m_sh.webp` 已去背（白底與地面陰影轉成半透明）。
+
 - v280：大廳編輯器 `lobby-editor.html`（不從遊戲連結，直接開網址）。左側上傳／調整手機與電腦背景（位置、放大、暖色光）和每位幹員的大廳圖、位置、大小（手機 px、電腦是圖框 %，兩邊分開存）；中間用 iframe 載入真正的 `index.html?lobbyEdit=1` 預覽，可直接拖曳／滾輪、參考線、疊影對齊。「發佈到遊戲」用使用者貼的 GitHub 金鑰（public_repo，只存在瀏覽器）以 git data API 直接 commit 到 main：`data/lobby.json` 與新圖 `img/ui/lobby/<sha1>.webp`，再輪詢網站直到更新。遊戲端 `<script id="lobcfg280">`：`LOBDEF280` 是預設（等於 v276 的手寫值，原本 `HSC/HY/HX` 已搬進來），啟動時讀 `data/lobby.json`，`lobHero280` 在 `lobRender` 套用；手機背景改由 `.lob.m::after`（z -1、可縮放）畫，原本的 `::before` 暗角疊上漸層。沒有 lobby.json 時畫面和 v279 逐像素相同。手動改大廳背景／幹員位置請改 `data/lobby.json`（或用編輯器），不要再寫死在 CSS。
 
 - v275：手機大廳背景換成使用者給的夕陽軍事基地屋頂 `img/ui/lobby-phone-v275.jpg`（舊的 v266 倉庫圖已刪）。

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>大廳編輯器</title>
+<title>遊戲畫面編輯器</title>
 <link rel="icon" href="i3-32.png">
 <style>
 :root{--bg:#0b0f14;--pn:#121a23;--pn2:#18222d;--ln:#273544;--tx:#e8edf2;--mu:#8a9aab;--ac:#e3aa3e;--ac2:#ffcf6b;--ok:#4fd27a;--bad:#e5534b;--blue:#5aa0e0}
@@ -73,6 +73,16 @@ dialog ol{margin:6px 0 10px;padding-left:20px;color:var(--mu)}
 dialog a{color:var(--ac2)}
 .log{font-size:13px;color:var(--mu);white-space:pre-wrap;background:#0b1117;border:1px solid var(--ln);border-radius:6px;padding:8px 10px;max-height:180px;overflow:auto;margin-top:10px}
 .log .ok{color:var(--ok)}.log .bad{color:var(--bad)}
+ .uiName{font-size:13px;background:#0b1117;border:1px solid var(--ln);border-radius:6px;padding:6px 8px;word-break:break-all}
+.uiName small{display:block;color:var(--mu);font-size:11.5px;margin-top:2px}
+textarea{width:100%;min-height:54px;background:#0b1117;border:1px solid var(--ln);border-radius:6px;padding:6px 8px;color:inherit;font:inherit;resize:vertical}
+.uiItem{display:flex;align-items:center;gap:6px;padding:5px 6px;border:1px solid var(--ln);border-radius:6px;margin-bottom:5px;background:#0b1117;font-size:12.5px;cursor:pointer}
+.uiItem.on{border-color:var(--ac)}
+.uiItem span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uiItem i{font-style:normal;color:var(--mu);font-size:11px}
+.uiItem b{font-weight:400;color:var(--bad);padding:0 4px}
+details summary{cursor:pointer;color:var(--mu);font-size:12.5px;margin-top:8px}
+details input{width:100%;background:#0b1117;border:1px solid var(--ln);border-radius:6px;padding:6px 8px;margin-top:6px;font:12px ui-monospace,Menlo,monospace}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#16212c;border:1px solid var(--ln);padding:9px 16px;border-radius:8px;box-shadow:0 10px 30px #000a;z-index:9;font-size:13.5px;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.on{opacity:1}
 @media (max-width:820px){
@@ -86,7 +96,7 @@ dialog a{color:var(--ac2)}
 <body>
 <div class="app">
 <header>
-  <h1>大廳編輯器</h1>
+  <h1>遊戲畫面編輯器</h1>
   <div class="st" id="st">載入中…</div>
   <button class="btn sm" id="bRevert" title="丟掉還沒發佈的修改，回到遊戲目前的樣子">還原成已發佈</button>
   <button class="btn sm" id="bTok" title="設定發佈用的 GitHub 金鑰">⚙ 發佈設定</button>
@@ -94,6 +104,8 @@ dialog a{color:var(--ac2)}
 </header>
 
 <aside>
+  <div class="seg" id="tabMode" style="margin-bottom:12px"><button data-v="lobby" class="on">大廳背景與幹員</button><button data-v="ui">所有頁面的元件</button></div>
+  <div id="paneLobby">
   <section class="box">
     <h2>拖曳畫面時移動 <small>也可用滑桿</small></h2>
     <div class="bd">
@@ -139,6 +151,39 @@ dialog a{color:var(--ac2)}
       <p class="hint">選一位當半透明疊影，可以把這位的腳底或頭頂對齊他。</p>
     </div>
   </section>
+  </div>
+
+  <div id="paneUi" hidden>
+  <section class="box">
+    <h2>點預覽畫面時</h2>
+    <div class="bd">
+      <div class="seg" id="uiMode"><button data-v="pick" class="on">選取元件</button><button data-v="play">操作遊戲（換頁）</button></div>
+      <p class="hint">先切到「操作遊戲」，在預覽裡點到你要改的頁面；再切回「選取元件」，點畫面上任何按鈕、文字、圖片就能改。選好後可直接拖曳移動、滾輪調大小，方向鍵微調。</p>
+    </div>
+  </section>
+  <section class="box">
+    <h2>選到的元件 <small id="uiDevTag"></small></h2>
+    <div class="bd">
+      <div id="uiNone" class="hint" style="margin:0">還沒選。在預覽上點一下要改的東西。</div>
+      <div id="uiSel" hidden>
+        <div class="uiName" id="uiName"></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 2px"><button class="btn sm" id="uiUp" title="改選包住它的那一層（例如整個按鈕）">選外層</button><button class="btn sm" id="uiDown" title="改選裡面的第一個東西">選內層</button><button class="btn sm" id="uiReset">這個元件全部還原</button></div>
+        <div class="row"><label>左右</label><input type="range" id="uX" min="-400" max="400" step="1"><input type="number" id="uXn" step="1"><span class="u">px</span></div>
+        <div class="row"><label>上下</label><input type="range" id="uY" min="-400" max="400" step="1"><input type="number" id="uYn" step="1"><span class="u">px</span></div>
+        <div class="row"><label>大小</label><input type="range" id="uS" min="20" max="300" step="1"><input type="number" id="uSn" step="1"><span class="u">%</span></div>
+        <div class="row"><label>字級</label><input type="number" id="uFs" min="6" max="120" step="1" placeholder="原本" style="width:80px;text-align:left"><span class="u">px</span><span style="flex:1"></span><button class="btn sm" id="uFsReset">原本字級</button></div>
+        <label class="chk"><input type="checkbox" id="uHide"> 隱藏這個元件</label>
+        <div id="uTextRow"><div class="row" style="margin-bottom:4px"><label style="width:auto">文字（手機和電腦都套用）</label><span style="flex:1"></span><button class="btn sm" id="uTextReset">原本文字</button></div><textarea id="uText"></textarea></div>
+        <div id="uImgRow" class="row"><label>圖片</label><button class="btn sm" id="uImgUp">換一張圖</button><button class="btn sm" id="uImgReset">原本的圖</button></div>
+        <details><summary>進階：用來找這個元件的選擇器</summary><input id="uSelTxt" spellcheck="false"><p class="hint">改了會套用到所有符合的元件。不懂可以不用管。</p></details>
+      </div>
+    </div>
+  </section>
+  <section class="box">
+    <h2>已修改的元件 <small id="uiCount"></small></h2>
+    <div class="bd"><div id="uiList"></div><p class="hint">位置、大小、字級、隱藏是手機和電腦分開存；文字和圖片兩邊一起。會變動的文字（名字、分數）改了就會固定成你寫的字，請小心。</p></div>
+  </section>
+  </div>
 </aside>
 
 <main>
@@ -186,7 +231,7 @@ dialog a{color:var(--ac2)}
 
 <script>
 'use strict';
-const REPO='r6-boardgame/r6-boardgame.github.io',CFG_PATH='data/lobby.json',IMG_DIR='img/ui/lobby/';
+const REPO='r6-boardgame/r6-boardgame.github.io',CFG_PATH='data/lobby.json',UI_PATH='data/ui.json',IMG_DIR='img/ui/lobby/';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const CLS={smg:'衝鋒槍',hs:'重盾',sh:'機動盾',sg:'散彈',rf:'步槍',sn:'狙擊',mg:'機槍'};
 const OPS=[['f','女・新進'],['m','男・新進']];
@@ -197,7 +242,8 @@ const SIZES={m:[[390,844,'iPhone 14／15（390×844）'],[430,932,'iPhone Pro Ma
   d:[[1600,900,'電腦 1600×900'],[1920,1080,'電腦 1920×1080'],[1280,720,'電腦 1280×720'],[1024,768,'平板橫放 1024×768']]};
 const clone=o=>JSON.parse(JSON.stringify(o));
 let DEF=null,PUB=null,CFG=null,PUBSHA=null;
-const S={dev:'m',size:{m:0,d:0},op:'f',drag:'op',ghost:'',lines:true};
+const S={dev:'m',size:{m:0,d:0},op:'f',drag:'op',ghost:'',lines:true,tab:'lobby',ui:'pick'};
+let UI={v:1,rules:[]},PUBUI={v:1,rules:[]},SEL='',goHome=true;
 const sv=(k,v)=>{try{localStorage.setItem('lobEd.'+k,JSON.stringify(v));}catch(e){return false;}return true;};
 const ld=(k,d)=>{try{const v=localStorage.getItem('lobEd.'+k);return v==null?d:JSON.parse(v);}catch(e){return d;}};
 Object.assign(S,ld('ui',{}));
@@ -210,6 +256,7 @@ function opv(k,cfg){const o=(cfg||CFG).ops[k]||{};return Object.assign({x:0,y:0,
 function setOp(k,patch){const o=CFG.ops[k]||(CFG.ops[k]={});const v=Object.assign(opv(k),patch);v.x=Math.round(v.x*10)/10;v.y=Math.round(v.y*10)/10;v.s=Math.round(v.s*1000)/1000;
   if(!v.x&&!v.y&&v.s===1)delete o[pk()];else o[pk()]=v;if(!Object.keys(o).length)delete CFG.ops[k];changed();}
 const same=(a,b)=>JSON.stringify(norm(a))===JSON.stringify(norm(b));
+function uiSame(){const n=u=>JSON.stringify((u.rules||[]).map(r=>{const o={};Object.keys(r).sort().forEach(k=>{if(k!=='lb')o[k]=r[k];});return o;}));return n(UI)===n(PUBUI);}
 function norm(c){const f=full(c);const o={};Object.keys(f.ops).sort().forEach(k=>{const e=f.ops[k],r={};['src','m','d'].forEach(x=>{if(e[x]!=null)r[x]=e[x];});if(Object.keys(r).length)o[k]=r;});return{phone:f.phone,desk:f.desk,ops:o};}
 
 // ---------- preview iframe ----------
@@ -222,12 +269,13 @@ addEventListener('resize',layout);
 function loadFrame(){ready=false;FW=null;$('#loading').hidden=false;layout();fr.src='index.html?lobbyEdit=1&t='+Date.now();}
 fr.addEventListener('load',()=>{const w=fr.contentWindow;let n=0;const wait=()=>{n++;
   if(w.lobRender&&w.render&&w.LOBDEF280&&w.document.readyState==='complete'){FW=w;onFrame();return;}if(n<200)setTimeout(wait,100);};wait();});
-function onFrame(){if(!DEF){DEF=clone(FW.LOBDEF280);boot2();}hookFrame();ready=true;push();setTimeout(push,800);setTimeout(()=>{$('#loading').hidden=true;},300);}
-function push(){if(!FW||!CFG)return;try{FW.postMessage({t:'lobcfg280',cfg:CFG,pv:{art:S.op}},location.origin);}catch(e){}requestAnimationFrame(()=>requestAnimationFrame(overlay));}
+function onFrame(){goHome=true;if(!DEF){DEF=clone(FW.LOBDEF280);boot2();}hookFrame();ready=true;push();setTimeout(push,800);setTimeout(()=>{$('#loading').hidden=true;},300);}
+function push(){if(!FW||!CFG)return;try{FW.postMessage({t:'uicfg281',cfg:UI},location.origin);FW.postMessage({t:'lobcfg280',cfg:CFG,pv:{art:S.op,lock:S.tab==='lobby'&&S.drag!=='none',home:goHome}},location.origin);goHome=false;}catch(e){}requestAnimationFrame(()=>requestAnimationFrame(overlay));}
 let pT=0;function pushSoon(){cancelAnimationFrame(pT);pT=requestAnimationFrame(push);}
 
 // guides + ghost drawn inside the iframe so they line up exactly with the game's own CSS
-function overlay(){if(!FW)return;const d=FW.document,lob=d.querySelector('#tlob .lob'),h=d.querySelector('#lobHero');if(!lob||!h)return;
+function overlay(){if(!FW)return;const d=FW.document;if(S.tab==='ui'){['ghost280','guide280'].forEach(i=>{const e=d.getElementById(i);if(e)e.remove();});uiOverlay();return;}{const b=d.getElementById('uiBox281');if(b)b.remove();}
+  const lob=d.querySelector('#tlob .lob'),h=d.querySelector('#lobHero');if(!lob||!h)return;
   let g=d.getElementById('ghost280');
   if(S.ghost&&S.ghost!==S.op){if(!g){g=h.cloneNode(false);g.id='ghost280';g.removeAttribute('tabindex');g.removeAttribute('role');}
     if(g.parentNode!==h.parentNode||g.nextSibling!==h)h.parentNode.insertBefore(g,h);
@@ -245,24 +293,64 @@ function overlay(){if(!FW)return;const d=FW.document,lob=d.querySelector('#tlob 
     +line(`left:${bx+bw/2-.5}px;top:${by}px;height:${bh}px;width:1px;opacity:.6`,'#ffcf6b')+lbl(4,by+bh-18,'腳底 '+Math.round(H-(by+bh))+'px')+lbl(4,by+3,'頭頂 '+Math.round(by)+'px');}
 
 // drag / wheel / keys inside the preview
+const OWN=e=>e&&e.closest&&e.closest('#uiBox281,#guide280,#ghost280');
+const lobOn=()=>S.tab==='lobby'&&S.drag!=='none',uiOn=()=>S.tab==='ui'&&S.ui==='pick',active=()=>lobOn()||uiOn();
+let HOV=null;
 function hookFrame(){const d=FW.document;let st=null;
-  const block=e=>{if(S.drag==='none')return;e.preventDefault();e.stopPropagation();};
-  d.addEventListener('pointerdown',e=>{if(S.drag==='none')return;block(e);const h=d.querySelector('#lobHero');
-    st={x:e.clientX,y:e.clientY,id:e.pointerId,op:clone(opv(S.op)),bg:clone(CFG[side()]),hw:h?h.offsetWidth:1,hh:h?h.offsetHeight:1,W:FW.innerWidth,H:FW.innerHeight};
+  const block=e=>{if(!active())return;e.preventDefault();e.stopPropagation();};
+  d.addEventListener('pointerdown',e=>{if(!active())return;block(e);
+    if(S.tab==='ui'){let t=e.target;if(OWN(t))return;if(!t||t===d.documentElement||t===d.body)return;const s0=selOf(t);if(s0!==SEL){SEL=s0;sync();}
+      const r=rget(SEL,pk())||{};st={x:e.clientX,y:e.clientY,id:e.pointerId,ux:+r.x||0,uy:+r.y||0,moved:false};}
+    else{const h=d.querySelector('#lobHero');
+    st={x:e.clientX,y:e.clientY,id:e.pointerId,op:clone(opv(S.op)),bg:clone(CFG[side()]),hw:h?h.offsetWidth:1,hh:h?h.offsetHeight:1,W:FW.innerWidth,H:FW.innerHeight};}
     try{e.target.setPointerCapture(e.pointerId);}catch(x){}d.documentElement.style.cursor='grabbing';},true);
-  d.addEventListener('pointermove',e=>{if(!st||e.pointerId!==st.id)return;block(e);const dx=e.clientX-st.x,dy=e.clientY-st.y;
+  d.addEventListener('pointermove',e=>{
+    if(!st){if(uiOn()){const t=e.target;HOV=OWN(t)?HOV:t;uiOverlay();}return;}
+    if(e.pointerId!==st.id)return;block(e);const dx=e.clientX-st.x,dy=e.clientY-st.y;
+    if(S.tab==='ui'){if(!st.moved&&Math.abs(dx)+Math.abs(dy)<4)return;st.moved=true;rset(pk(),{x:Math.round(st.ux+dx),y:Math.round(st.uy+dy)});return;}
     if(S.drag==='op'){if(S.dev==='m')setOp(S.op,{x:st.op.x+dx,y:st.op.y-dy});else setOp(S.op,{x:st.op.x+dx/st.hw*100,y:st.op.y-dy/st.hh*100});}
     else if(S.drag==='bg'){const b=CFG[side()],z=(b.bgZ||100)/100;b.bgX=clamp(st.bg.bgX-dx/st.W*100/z,0,100);b.bgY=clamp(st.bg.bgY-dy/st.H*100/z,0,100);b.bgX=Math.round(b.bgX*10)/10;b.bgY=Math.round(b.bgY*10)/10;changed();}},true);
   const end=e=>{if(!st)return;block(e);st=null;d.documentElement.style.cursor='';};
   d.addEventListener('pointerup',end,true);d.addEventListener('pointercancel',end,true);
-  ['click','dblclick','mousedown','touchstart','contextmenu'].forEach(t=>d.addEventListener(t,e=>{if(S.drag!=='none'){e.preventDefault();e.stopPropagation();}},{capture:true,passive:false}));
-  d.addEventListener('wheel',e=>{if(S.drag==='none')return;block(e);const f=e.deltaY<0?1:-1;
+  d.addEventListener('pointerleave',()=>{HOV=null;uiOverlay();},true);
+  ['click','dblclick','mousedown','mouseup','touchstart','touchend','contextmenu'].forEach(t=>d.addEventListener(t,e=>{if(active()){e.preventDefault();e.stopPropagation();}},{capture:true,passive:false}));
+  d.addEventListener('wheel',e=>{if(!active())return;block(e);const f=e.deltaY<0?1:-1;
+    if(S.tab==='ui'){if(!SEL)return;const r=rget(SEL,pk())||{};rset(pk(),{s:clamp(Math.round(((r.s!=null?+r.s:1)+f*.02)*100)/100,.2,3)});return;}
     if(S.drag==='op')setOp(S.op,{s:clamp(opv(S.op).s+f*.01,.3,1.6)});else{const b=CFG[side()];b.bgZ=clamp((b.bgZ||100)+f*2,100,250);changed();}},{capture:true,passive:false});
   d.addEventListener('keydown',keys,true);
-  new FW.MutationObserver(()=>{if(!d.getElementById('guide280')&&S.lines||(S.ghost&&!d.getElementById('ghost280')))requestAnimationFrame(overlay);}).observe(d.body,{childList:true,subtree:true});}
+  new FW.MutationObserver(()=>{if(S.tab==='lobby'&&(!d.getElementById('guide280')&&S.lines||(S.ghost&&!d.getElementById('ghost280'))))requestAnimationFrame(overlay);}).observe(d.body,{childList:true,subtree:true});}
+setInterval(()=>{if(S.tab==='ui')uiOverlay();},300);
+
+// ---------- every-page element editing ----------
+const STATECLS=/^(on|off|sel|selected|active|hover|focus|show|shown|hide|hidden|open|opened|mini|busy|dis|disabled|cur|now|lock|locked|lk|new|hot|pick|picked|chosen|done|ok|bad|err|win|lose|out|in|up|down|anim|flash|pulse|glow|fade|ready|wait|empty|full|mod)$/;
+function selOf(el){const d=FW.document,parts=[];let e=el;
+  while(e&&e.nodeType===1&&e!==d.body&&e!==d.documentElement){
+    if(e.id&&/^[A-Za-z][\w-]*$/.test(e.id)&&!/^(uiBox281|guide280|ghost280)$/.test(e.id)&&d.querySelectorAll('#'+e.id).length===1){parts.unshift('#'+e.id);break;}
+    let p=e.tagName.toLowerCase();const cl=[...e.classList].filter(c=>/^[A-Za-z_][\w-]*$/.test(c)&&!STATECLS.test(c));if(cl.length)p+='.'+cl.slice(0,3).join('.');
+    const par=e.parentElement;if(par){const same=[...par.children].filter(c=>{try{return c.matches(p);}catch(x){return false;}});if(same.length>1)p+=`:nth-child(${[...par.children].indexOf(e)+1})`;}
+    parts.unshift(p);e=par;}
+  return parts.join(' > ');}
+function qa(sel){if(!FW||!sel)return [];try{return [...FW.document.querySelectorAll(sel)].filter(e=>!OWN(e));}catch(e){return [];}}
+function selEl(){return qa(SEL)[0]||null;}
+function directText(e){if(!e)return null;const t=[...e.childNodes].filter(n=>n.nodeType===3&&n.nodeValue.trim());if(t.length)return t.map(n=>n.nodeValue).join('').trim();if(!e.children.length&&/^(INPUT|TEXTAREA|SELECT|IMG|SVG|CANVAS|VIDEO)$/i.test(e.tagName)===false&&e.textContent.trim())return e.textContent.trim();return null;}
+function hasImg(e){if(!e)return false;if(e.tagName==='IMG')return true;const b=FW.getComputedStyle(e).backgroundImage;return /url\(/.test(b||'');}
+function label(e){if(!e)return '';const tx=(e.innerText||e.textContent||e.getAttribute('aria-label')||e.getAttribute('alt')||'').replace(/\s+/g,' ').trim().slice(0,24);
+  const kind=e.tagName==='IMG'?'圖片':e.tagName==='BUTTON'||e.getAttribute('role')==='button'?'按鈕':/^(B|I|SMALL|SPAN|P|H\d|STRONG|EM|LABEL)$/.test(e.tagName)?'文字':'區塊';return kind+(tx?'「'+tx+'」':'');}
+function rget(sel,dev,mk){let r=UI.rules.find(r=>r.sel===sel&&r.dev===dev);if(!r&&mk){r={sel,dev};UI.rules.push(r);}return r;}
+function rclean(){UI.rules=UI.rules.filter(r=>{['x','y'].forEach(k=>{if(!+r[k])delete r[k];});if(r.s!=null&&+r.s===1)delete r.s;if(!r.fs)delete r.fs;if(!r.hide)delete r.hide;if(r.text==null)delete r.text;if(!r.src){delete r.src;delete r.img;}
+  return Object.keys(r).some(k=>!['sel','dev','lb'].includes(k));});}
+function rset(dev,patch){if(!SEL)return;const r=rget(SEL,dev,true);if(!r.lb)r.lb=label(selEl());Object.assign(r,patch);rclean();uiChanged();}
+function uiChanged(){if(!sv('uidraft',UI))$('#st').textContent='草稿太大沒辦法自動存，記得發佈';sync();pushSoon();}
+function uiOverlay(){if(!FW||S.tab!=='ui')return;const d=FW.document;let B=d.getElementById('uiBox281');
+  if(!B){B=d.createElement('div');B.id='uiBox281';B.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:2147483000';d.body.appendChild(B);}else if(B.parentNode!==d.body||B.nextSibling)d.body.appendChild(B);
+  const box=(r,css)=>`<div style="position:absolute;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;${css}"></div>`;let h='';
+  if(S.ui==='pick'&&HOV&&HOV.isConnected&&HOV!==d.body&&HOV!==d.documentElement){const r=HOV.getBoundingClientRect();h+=box(r,'outline:1px dashed #5aa0e0;background:#5aa0e01a');}
+  qa(SEL).slice(0,40).forEach((e,i)=>{const r=e.getBoundingClientRect();if(r.width||r.height)h+=box(r,`outline:2px solid ${i?'#e3aa3eaa':'#ffcf6b'};outline-offset:1px`);});
+  if(B.innerHTML!==h)B.innerHTML=h;}
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-function keys(e){if(!/^Arrow/.test(e.key)||S.drag==='none')return;const t=e.target;if(t&&t.closest&&t.closest('aside')&&/INPUT|SELECT/.test(t.tagName))return;e.preventDefault();
+function keys(e){if(!/^Arrow/.test(e.key)||!active())return;const t=e.target;if(t&&/INPUT|SELECT|TEXTAREA/.test(t.tagName))return;e.preventDefault();
   const n=e.shiftKey?10:1,dx=e.key==='ArrowLeft'?-n:e.key==='ArrowRight'?n:0,dy=e.key==='ArrowUp'?n:e.key==='ArrowDown'?-n:0;
+  if(S.tab==='ui'){if(!SEL)return;const r=rget(SEL,pk())||{};rset(pk(),{x:(+r.x||0)+dx,y:(+r.y||0)-dy});return;}
   if(S.drag==='op'){const v=opv(S.op),u=S.dev==='m'?1:.2;setOp(S.op,{x:v.x+dx*u,y:v.y+dy*u});}else{const b=CFG[side()];b.bgX=clamp(b.bgX-dx*.5,0,100);b.bgY=clamp(b.bgY+dy*.5,0,100);changed();}}
 addEventListener('keydown',keys);
 
@@ -274,16 +362,31 @@ const showBgZ=bindRange('bgZ',null,v=>{CFG[side()].bgZ=clamp(v,100,250);changed(
 const showOX=bindRange('oX',null,v=>setOp(S.op,{x:v}));
 const showOY=bindRange('oY',null,v=>setOp(S.op,{y:v}));
 const showOS=bindRange('oS',null,v=>setOp(S.op,{s:clamp(v,30,160)/100}));
+const showUX=bindRange('uX',null,v=>rset(pk(),{x:Math.round(v)}));
+const showUY=bindRange('uY',null,v=>rset(pk(),{y:Math.round(v)}));
+const showUS=bindRange('uS',null,v=>rset(pk(),{s:clamp(v,20,300)/100}));
+$('#uFs').onchange=e=>rset(pk(),{fs:+e.target.value||0});$('#uFsReset').onclick=()=>rset(pk(),{fs:0});
+$('#uHide').onchange=e=>rset(pk(),{hide:e.target.checked?1:0});
+$('#uText').oninput=e=>rset('*',{text:e.target.value});
+$('#uTextReset').onclick=()=>{const r=rget(SEL,'*');if(r){delete r.text;rclean();uiChanged();}};
+$('#uImgUp').onclick=()=>{upTarget='ui';$('#file').click();};
+$('#uImgReset').onclick=()=>rset('*',{src:''});
+$('#uiUp').onclick=()=>{const e=selEl();if(e&&e.parentElement&&e.parentElement!==FW.document.body){SEL=selOf(e.parentElement);sync();uiOverlay();}};
+$('#uiDown').onclick=()=>{const e=selEl();const c=e&&[...e.children].find(c=>!OWN(c));if(c){SEL=selOf(c);sync();uiOverlay();}};
+$('#uiReset').onclick=()=>{UI.rules=UI.rules.filter(r=>r.sel!==SEL);uiChanged();};
+$('#uSelTxt').onchange=e=>{const v=e.target.value.trim();if(!v)return;try{FW.document.querySelector(v);}catch(x){toast('選擇器寫法不對');return;}UI.rules.filter(r=>r.sel===SEL).forEach(r=>r.sel=v);SEL=v;uiChanged();};
+seg('uiMode','ui',()=>{HOV=null;push();});
+seg('tabMode','tab',()=>{HOV=null;if(S.tab==='lobby')goHome=true;push();});
 $('#warm').onchange=e=>{CFG.phone.warm=e.target.checked?1:0;changed();};
 function seg(id,key,fn){$$('#'+id+' button').forEach(b=>b.onclick=()=>{S[key]=b.dataset.v;saveUi();fn&&fn();sync();});}
-seg('dragMode','drag');
+seg('dragMode','drag',()=>push());
 seg('devMode','dev',()=>{fillSizes();if(S.dev==='m'&&S.op==='hero249')S.op='f';loadFrame();});
 $('#devSize').onchange=e=>{S.size[S.dev]=+e.target.value;saveUi();layout();};
 function fillSizes(){$('#devSize').innerHTML=SIZES[S.dev].map((s,i)=>`<option value="${i}">${s[2]}</option>`).join('');$('#devSize').value=S.size[S.dev]||0;}
 $('#gLines').onchange=e=>{S.lines=e.target.checked;saveUi();overlay();};
 $('#ghost').onchange=e=>{S.ghost=e.target.value;saveUi();overlay();};
 $('#bReload').onclick=loadFrame;
-const saveUi=()=>sv('ui',{dev:S.dev,size:S.size,op:S.op,drag:S.drag,ghost:S.ghost,lines:S.lines});
+const saveUi=()=>sv('ui',{dev:S.dev,size:S.size,op:S.op,drag:S.drag,ghost:S.ghost,lines:S.lines,tab:S.tab,ui:S.ui});
 
 function sync(){if(!CFG)return;
   $$('#dragMode button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.drag));$$('#devMode button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.dev));
@@ -297,15 +400,29 @@ function sync(){if(!CFG)return;
   $('#ghost').innerHTML='<option value="">不要疊影</option>'+OPS.filter(([k])=>k!==S.op&&(k!=='hero249'||S.dev==='d')).map(([k,n])=>`<option value="${k}">${n}</option>`).join('');$('#ghost').value=S.ghost||'';$('#gLines').checked=S.lines;
   $('#opImgReset').disabled=!(CFG.ops[S.op]||{}).src;
   $('#modeTag').innerHTML=S.drag==='op'?'拖曳 → 移動<b>幹員</b>，滾輪縮放':S.drag==='bg'?'拖曳 → 移動<b>背景</b>，滾輪放大':'預覽可以直接點';
-  const dirty=PUB&&!same(CFG,PUB);$('#st').innerHTML=dirty?'<b>有尚未發佈的修改</b>（已自動存草稿）':'跟遊戲目前一樣'+(PUB&&PUB.ts?'（上次發佈 '+new Date(PUB.ts).toLocaleString('zh-TW',{hour12:false})+'）':'');
-  $('#bPub').disabled=!dirty;$('#bRevert').disabled=!dirty;}
+  const dirty=PUB&&(!same(CFG,PUB)||!uiSame());$('#st').innerHTML=dirty?'<b>有尚未發佈的修改</b>（已自動存草稿）':'跟遊戲目前一樣'+(PUB&&PUB.ts?'（上次發佈 '+new Date(PUB.ts).toLocaleString('zh-TW',{hour12:false})+'）':'');
+  $('#bPub').disabled=!dirty;$('#bRevert').disabled=!dirty;uiSync();}
+function uiSync(){$$('#tabMode button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.tab));$$('#uiMode button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.ui));
+  $('#paneLobby').hidden=S.tab!=='lobby';$('#paneUi').hidden=S.tab!=='ui';$('#uiDevTag').textContent=S.dev==='m'?'正在改手機版':'正在改電腦版';
+  if(S.tab==='ui')$('#modeTag').innerHTML=S.ui==='pick'?'點一下 → <b>選取元件</b>，拖曳移動、滾輪縮放':'可以直接操作遊戲換頁';
+  const e=selEl();$('#uiNone').hidden=!!SEL;$('#uiSel').hidden=!SEL;
+  if(SEL){const r=rget(SEL,pk())||{},rt=rget(SEL,'*')||{},lb=e?label(e):((r.lb||rt.lb)||'（這一頁沒有這個元件）');
+    $('#uiName').innerHTML=esc(lb)+'<small>'+(qa(SEL).length>1?'畫面上有 '+qa(SEL).length+' 個一樣的，會一起改':e?'':'切到它所在的頁面才看得到')+'</small>';
+    showUX(+r.x||0);showUY(+r.y||0);showUS(Math.round((r.s!=null?+r.s:1)*100));if(document.activeElement!==$('#uFs'))$('#uFs').value=r.fs||'';$('#uHide').checked=!!r.hide;
+    const tx=rt.text!=null?rt.text:directText(e);$('#uTextRow').hidden=tx==null&&rt.text==null;if(document.activeElement!==$('#uText'))$('#uText').value=tx||'';
+    $('#uImgRow').hidden=!(rt.src||hasImg(e));$('#uImgReset').disabled=!rt.src;if(document.activeElement!==$('#uSelTxt'))$('#uSelTxt').value=SEL;}
+  const g={};UI.rules.forEach(r=>{(g[r.sel]=g[r.sel]||[]).push(r);});const ks=Object.keys(g);$('#uiCount').textContent=ks.length?ks.length+' 個':'';
+  $('#uiList').innerHTML=ks.length?ks.map(k=>{const rs=g[k],lb=(rs.find(r=>r.lb)||{}).lb||k,tg=[...new Set(rs.map(r=>r.dev==='m'?'手機':r.dev==='d'?'電腦':'文字/圖'))].join('・');
+    return `<div class="uiItem ${k===SEL?'on':''}" data-s="${esc(k)}"><span>${esc(lb)}</span><i>${tg}</i><b data-x="${esc(k)}" title="還原">✕</b></div>`;}).join(''):'<p class="hint" style="margin:0">還沒有修改。</p>';
+  $$('#uiList .uiItem').forEach(el=>el.onclick=ev=>{const x=ev.target.dataset.x;if(x!=null){UI.rules=UI.rules.filter(r=>r.sel!==x);uiChanged();return;}SEL=el.dataset.s;sync();uiOverlay();});}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 function changed(){if(!sv('draft',CFG))$('#st').textContent='草稿太大沒辦法自動存，記得發佈';sync();pushSoon();}
 
 // ---------- uploads ----------
 let upTarget=null;$('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f||!upTarget)return;try{const t=upTarget;toast('處理圖片中…');
   const url=await shrink(f,t==='bg'?{max:2400,alpha:false}:{max:2000,alpha:true});
-  if(t==='bg'){CFG[side()].bg=url;}else{(CFG.ops[t]||(CFG.ops[t]={})).src=url;}changed();toast('已換上，記得按「發佈到遊戲」');}catch(err){toast('讀不了這張圖：'+(err.message||err));}};
+  if(t==='ui'){const e=selEl();rset('*',{src:url,img:e&&e.tagName==='IMG'?1:0});}else{if(t==='bg'){CFG[side()].bg=url;}else{(CFG.ops[t]||(CFG.ops[t]={})).src=url;}changed();}toast('已換上，記得按「發佈到遊戲」');}catch(err){toast('讀不了這張圖：'+(err.message||err));}};
 $('#bgUp').onclick=()=>{upTarget='bg';$('#file').click();};
 $('#opUp').onclick=()=>{upTarget=S.op;$('#file').click();};
 $('#bgReset').onclick=()=>{const b=CFG[side()],d=DEF[side()];b.bg=d.bg;changed();};
@@ -330,8 +447,8 @@ $('#tokSave').onclick=async()=>{const v=$('#tok').value.trim(),lg=$('#tokLog');s
   catch(e){lg.innerHTML='<span class="bad">✗ '+ghErr(e)+'</span>';}};
 
 $('#bPub').onclick=()=>{if(!tok()){$('#bTok').click();return;}const n=[];
-  const ups=[CFG.phone.bg,CFG.desk.bg,...Object.values(CFG.ops).map(o=>o.src)].filter(s=>s&&s.startsWith('data:')).length;
-  if(ups)n.push(`上傳 ${ups} 張新圖片`);n.push('手機和電腦大廳的背景、幹員位置換成你現在看到的樣子');
+  const ups=[CFG.phone.bg,CFG.desk.bg,...Object.values(CFG.ops).map(o=>o.src),...UI.rules.map(r=>r.src)].filter(s=>s&&s.startsWith('data:')).length;
+  if(ups)n.push(`上傳 ${ups} 張新圖片`);if(!same(CFG,PUB))n.push('手機和電腦大廳的背景、幹員位置換成你現在看到的樣子');if(!uiSame())n.push(`套用 ${new Set(UI.rules.map(r=>r.sel)).size} 個元件的修改（位置、大小、文字、圖片）`);
   $('#pubSum').innerHTML='<p style="margin:0 0 6px">會做這些事：</p><ul style="margin:0;padding-left:20px">'+n.map(x=>'<li>'+x+'</li>').join('')+'</ul><p class="hint">發佈後大約 1～2 分鐘 GitHub 會更新網站，玩家重新整理或下次打開遊戲就會看到。</p>';
   $('#pubLog').hidden=true;$('#pubGo').disabled=false;$('#pubGo').hidden=false;$('#dPub').showModal();};
 $('#pubClose').onclick=()=>$('#dPub').close();
@@ -342,27 +459,30 @@ async function publish(){const lg=$('#pubLog'),go=$('#pubGo');go.disabled=true;l
     const take=async url=>{if(!url||!url.startsWith('data:'))return url;const m=url.match(/^data:image\/(\w+);base64,(.*)$/);if(!m)throw new Error('圖片格式不對');
       const ext=m[1]==='jpeg'?'jpg':m[1],path=IMG_DIR+(await sha1(m[2])).slice(0,12)+'.'+ext;if(!seen[path]){seen[path]=1;files.push({path,b64:m[2]});}return path;};
     out.phone.bg=await take(out.phone.bg);out.desk.bg=await take(out.desk.bg);for(const k in out.ops)if(out.ops[k].src)out.ops[k].src=await take(out.ops[k].src);
-    out.v=1;out.ts=Date.now();
+    out.v=1;out.ts=Date.now();const uo=clone(UI);for(const r of uo.rules)if(r.src)r.src=await take(r.src);uo.v=1;uo.ts=out.ts;
     log('連線 GitHub…');const ref=await gh('/git/ref/heads/main'),base=await gh('/git/commits/'+ref.object.sha);
     const tree=[];for(const f of files){log('上傳圖片 '+f.path.split('/').pop()+'（'+Math.round(f.b64.length*.75/1024)+' KB）');const b=await gh('/git/blobs',{method:'POST',body:{content:f.b64,encoding:'base64'}});tree.push({path:f.path,mode:'100644',type:'blob',sha:b.sha});}
     const json=JSON.stringify(out,null,1)+'\n';const jb=await gh('/git/blobs',{method:'POST',body:{content:json,encoding:'utf-8'}});tree.push({path:CFG_PATH,mode:'100644',type:'blob',sha:jb.sha});
+    const ub=await gh('/git/blobs',{method:'POST',body:{content:JSON.stringify(uo,null,1)+'\n',encoding:'utf-8'}});tree.push({path:UI_PATH,mode:'100644',type:'blob',sha:ub.sha});
     log('建立版本…');const t=await gh('/git/trees',{method:'POST',body:{base_tree:base.tree.sha,tree}});
-    const c=await gh('/git/commits',{method:'POST',body:{message:'lobby: publish from lobby editor'+(files.length?` (${files.length} new image${files.length>1?'s':''})`:''),tree:t.sha,parents:[ref.object.sha]}});
+    const c=await gh('/git/commits',{method:'POST',body:{message:'ui: publish from editor'+(files.length?` (${files.length} new image${files.length>1?'s':''})`:''),tree:t.sha,parents:[ref.object.sha]}});
     await gh('/git/refs/heads/main',{method:'PATCH',body:{sha:c.sha}});
     log('✓ 已存進 GitHub','ok');
-    CFG=out;PUB=clone(out);sv('draft',null);sync();push();
+    CFG=out;PUB=clone(out);UI=uo;PUBUI=clone(uo);sv('draft',null);sv('uidraft',null);sync();push();
     log('等網站更新（通常 1～2 分鐘）…');go.hidden=true;
     const t0=Date.now();while(Date.now()-t0<6*60e3){await new Promise(r=>setTimeout(r,8000));
       try{const r=await fetch(CFG_PATH+'?t='+Date.now(),{cache:'no-store'});if(r.ok){const j=await r.json();if(j.ts===out.ts){log('✓ 遊戲已更新！玩家重新整理就會看到新大廳','ok');toast('發佈完成');return;}}}catch(e){}}
     log('GitHub 還在更新網站，晚一點重新整理遊戲就會看到。');}
   catch(e){log('✗ '+ghErr(e),'bad');go.disabled=false;}}
 
-$('#bRevert').onclick=()=>{if(!confirm('丟掉所有還沒發佈的修改？'))return;CFG=clone(PUB);sv('draft',null);sync();push();};
+$('#bRevert').onclick=()=>{if(!confirm('丟掉所有還沒發佈的修改？'))return;CFG=clone(PUB);UI=clone(PUBUI);sv('draft',null);sv('uidraft',null);sync();push();};
 
 // ---------- boot ----------
 async function boot2(){let j=null;
   try{const r=await fetch(CFG_PATH+'?t='+Date.now(),{cache:'no-store'});if(r.ok)j=await r.json();}catch(e){}
   PUB=full(j);if(j&&j.ts)PUB.ts=j.ts;const dr=ld('draft',null);CFG=dr?full(dr):clone(PUB);if(PUB.ts)CFG.ts=PUB.ts;
+  try{const r=await fetch(UI_PATH+'?t='+Date.now(),{cache:'no-store'});if(r.ok){const u=await r.json();if(u&&Array.isArray(u.rules))PUBUI=u;}}catch(e){}
+  const ud=ld('uidraft',null);UI=ud&&Array.isArray(ud.rules)?ud:clone(PUBUI);
   if(S.dev==='m'&&S.op==='hero249')S.op='f';sync();push();}
 fillSizes();sync();loadFrame();
 </script>

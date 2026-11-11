@@ -159,14 +159,14 @@ html #tlob .lob.m::before{background:linear-gradient(180deg,rgba(0,0,0,.35),rgba
 html #tlob .lob.m::after{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:${u(p.bg)} ${n(p.bgX,50)}% ${n(p.bgY,50)}%/cover no-repeat;transform:scale(${n(p.bgZ,100)/100});transform-origin:${n(p.bgX,50)}% ${n(p.bgY,50)}%}
 html #tlob .cinema248 .lcBackdrop248{background:linear-gradient(0deg,#0a131b80,transparent 45%),${u(k.bg)} ${n(k.bgX,50)}% ${n(k.bgY,50)}%/cover no-repeat;transform:scale(${n(k.bgZ,100)/100});transform-origin:${n(k.bgX,50)}% ${n(k.bgY,50)}%}`;
   if(!p.warm)s+=`\nhtml #tlob .m .lobHero{filter:drop-shadow(0 0 24px rgba(0,0,0,.8))}`;
-  if(LOBPV)s+=`\n#boot,#login,#lgate,#tuOverlay,#gnav,.toast{display:none!important}\n#tlob .lob *{cursor:inherit!important}\nhtml.lobEdit280 #tlob{cursor:grab}`;
+  if(LOBPV)s+=`\n#boot,#login,#lgate,#tuOverlay{display:none!important}\n#tlob .lob *{cursor:inherit!important}\nhtml.lobEdit280 #tlob{cursor:grab}`;
   let el=document.getElementById('lobcfgCss280');if(!el){el=document.createElement('style');el.id='lobcfgCss280';}document.head.appendChild(el);el.textContent=s;}
 // called by lobRender for the lobby hero image
 function lobHero280(h,mob){const c=lobCfg280();let k=lobKey280(h.getAttribute('src'));if(LOBPV&&LOBPV.art){k=LOBPV.art;h.setAttribute('src',k==='hero249'?'img/ui/lobby-operator-v249.png':'img/cop/'+k+'.webp');}
   const o=c.ops[k]||{},v=Object.assign({x:0,y:0,s:1},(mob?o.m:o.d)||{});if(o.src)h.setAttribute('src',o.src);
   h.dataset.k280=k;h.style.setProperty('--hs',v.s);
   if(mob){h.style.setProperty('--hy',v.y+'px');h.style.setProperty('--hx',v.x+'px');}else h.style.translate=v.x+'% '+(-v.y)+'%';
-  if(LOBPV){h.onclick=null;h.onkeydown=null;}}
+  if(LOBPV&&LOBPV.lock){h.onclick=null;h.onkeydown=null;}}
 (function(){
   try{if(window.parent!==window&&new URLSearchParams(location.search).has('lobbyEdit')){LOBPV={};document.documentElement.classList.add('lobEdit280');}}catch(e){}
   const apply=()=>{lobCss280();try{if(typeof lobRender==='function'&&typeof SCREEN!=='undefined'&&SCREEN==='title')lobRender();}catch(e){}};
@@ -174,7 +174,30 @@ function lobHero280(h,mob){const c=lobCfg280();let k=lobKey280(h.getAttribute('s
   if(!LOBPV)fetch('data/lobby.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&typeof j==='object'){LOBCFG=j;apply();}}).catch(()=>{});
   addEventListener('message',e=>{if(!LOBPV||e.origin!==location.origin||!e.data||e.data.t!=='lobcfg280')return;
     LOBCFG=e.data.cfg||null;LOBPV=e.data.pv||{};
-    try{if(typeof G!=='undefined'&&typeof SCREEN!=='undefined'&&SCREEN!=='title'){G=null;SCREEN='title';render();}}catch(x){}apply();});
+    if(LOBPV.home)try{if(typeof G!=='undefined'&&typeof SCREEN!=='undefined'&&SCREEN!=='title'){G=null;SCREEN='title';render();}}catch(x){}apply();});
+})();
+</script>
+<script id="uicfg281">
+// v281: per-element UI overrides for every page (position / size / font size / hide / text / image), written by lobby-editor.html into data/ui.json.
+// Each rule: {sel, dev:'m'|'d'|'*', x, y (px), s (scale), fs (px), hide, text, src}. 'm' = phone layout (≤760px), 'd' = desktop.
+var UICFG=null;
+function uiApply281(){const R=(UICFG&&UICFG.rules)||[],q=s=>{try{return document.querySelectorAll(s);}catch(e){return [];}},u=s=>'url("'+String(s).replace(/["\\\n]/g,'')+'")';
+  const css={m:[],d:[],'*':[]};
+  R.forEach(r=>{if(!r||!r.sel)return;const p=[];if(r.x||r.y)p.push(`translate:${+r.x||0}px ${+r.y||0}px!important`);if(r.s!=null&&+r.s!==1)p.push(`scale:${+r.s}!important`);
+    if(r.fs)p.push(`font-size:${+r.fs}px!important`);if(r.hide)p.push('visibility:hidden!important');if(r.src&&!r.img)p.push(`background-image:${u(r.src)}!important`);
+    if(p.length)(css[r.dev]||css['*']).push(`html body ${r.sel}{${p.join(';')}}`);});
+  const s=css['*'].join('\n')+`\n@media (max-width:760px){\n${css.m.join('\n')}\n}\n@media (min-width:761px){\n${css.d.join('\n')}\n}`;
+  let el=document.getElementById('uicfgCss281');if(!el){el=document.createElement('style');el.id='uicfgCss281';}if(el.parentNode!==document.head||el.nextSibling)document.head.appendChild(el);if(el.textContent!==s)el.textContent=s;
+  const mob=matchMedia('(max-width:760px)').matches;
+  R.forEach(r=>{if(!r||!r.sel||(r.dev==='m'&&!mob)||(r.dev==='d'&&mob))return;
+    if(r.text!=null)q(r.sel).forEach(e=>{const t=[...e.childNodes].filter(n=>n.nodeType===3&&n.nodeValue.trim());if(t.length){if(t[0].nodeValue!==r.text)t[0].nodeValue=r.text;t.slice(1).forEach(n=>{if(n.nodeValue)n.nodeValue='';});}else if(!e.children.length&&e.textContent!==r.text)e.textContent=r.text;});
+    if(r.src&&r.img)q(r.sel).forEach(e=>{if(e.tagName==='IMG'&&e.getAttribute('src')!==r.src){e.setAttribute('src',r.src);e.removeAttribute('srcset');}});});}
+(function(){let pend=0;const soon=()=>{if(pend)return;pend=requestAnimationFrame(()=>{pend=0;try{uiApply281();}catch(e){}});};
+  const start=()=>{new MutationObserver(m=>{if(UICFG&&UICFG.rules&&UICFG.rules.some(r=>r.text!=null||r.img))soon();}).observe(document.body,{childList:true,subtree:true,characterData:true});addEventListener('resize',soon);soon();};
+  if(document.body)start();else addEventListener('DOMContentLoaded',start);
+  let edit=false;try{edit=window.parent!==window&&new URLSearchParams(location.search).has('lobbyEdit');}catch(e){}
+  if(!edit)fetch('data/ui.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&typeof j==='object'){UICFG=j;soon();}}).catch(()=>{});
+  addEventListener('message',e=>{if(!edit||e.origin!==location.origin||!e.data||e.data.t!=='uicfg281')return;UICFG=e.data.cfg||null;soon();});
 })();
 </script>
 <style id="lobCss">
@@ -12078,7 +12101,7 @@ function lobRender(){const t=$('#title');if(!t)return;let el=$('#tlob');if(!el){
   el.querySelectorAll('[data-libf]').forEach(b=>b.onclick=()=>{LIBF=b.dataset.libf;lobRender();});
   el.querySelectorAll('[data-libop]').forEach(b=>b.onclick=()=>{const k=b.dataset.libop;openOpSelect(OPC[k].side,null,true);OSEL.cur=k;renderOpSelect();});
   el.querySelectorAll('[data-lob]').forEach(b=>b.onclick=e=>{e.stopPropagation();LOBI=(LOBI+2+(+b.dataset.lob))%2;try{localStorage.setItem('r6bg.lobi',LOBI);}catch(x){}lobRender();});
-  const h=$('#lobHero');if(h)lobHero280(h,lobMob());if(h&&!LOBPV){h.onclick=()=>{CP.i=LOBI;NETMSG='';openCop();};h.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();h.click();}};}
+  const h=$('#lobHero');if(h)lobHero280(h,lobMob());if(h&&!(LOBPV&&LOBPV.lock)){h.onclick=()=>{CP.i=LOBI;NETMSG='';openCop();};h.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();h.click();}};}
   const go=(id,fn)=>{const b=el.querySelector('#'+id);if(b){b.onclick=fn;if(b.tagName!=='BUTTON')b.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')fn();};}};
   go('t-train',()=>{trnTop();SCREEN='train';NETMSG='';renderTitle();});go('t-train2',()=>{trnTop();SCREEN='train';NETMSG='';renderTitle();});go('t-board',()=>{if(el.querySelector('.cinema248'))LB.tab=LOBBY249.tab;SCREEN='board';NETMSG='';lbLoad(true);renderTitle();});
   go('t-pve',()=>{['A','D'].forEach(s=>{cfg.picks[s]=cfg.picks[s].filter(owned);});SCREEN='setup';WZ.step=0;WZ.seen=0;render();});go('t-rank',()=>{NETMSG='';rankQueue();});
