@@ -1,5 +1,7 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v285：重裝 PWA（刪桌面圖示）後重新登入，培養幹員 `ECO.cop` 和學長姐 `ECO.alum` 消失。原因：新裝置開機就因每日任務 `ecoSave()` 把空白 ECO 的 `ts` 設成現在，`gaMerge` 以為本機較新而保留空白，接著 `gaPush(true)` 把雲端蓋掉。現在第一次綁定（`r6bg.glink` 不符）一律以雲端為底；`cop` 每格用 `copPick285`：`gen` 大的勝，同 `gen` 取進度（k+sv+e）多的，同進度才看哪邊較新；`alum` 兩邊聯集（`alumMerge285`，鍵 ts_i）。登入後 `gaAlumRescue285` 從排行榜 `board/<uid>_fallen_*`（這些列不會被刪）補回學長姐（殺手名稱與評級沒有記在排行榜，顯示「陣亡」與 N）。回歸：`tests/reinstall-keeps-operators-v285.cjs`。Firestore `users/<uid>` 是整份覆寫，沒有歷史版本；雲端被蓋掉的現役幹員無法從伺服器救回，除非其他裝置（同帳號）還留著舊的本機存檔，該裝置下次開啟會依上面規則把它推回雲端。
+
 - v283：手機小隊欄 `#lobSq` 切換選單會閃：`lobHTML` 每次產生空的 `#lobSq`（`:empty` 隱藏），之前要等 `setInterval(ptUI,800)` 才填。現在 `lobRender` 結尾直接呼叫 `ptUI()`，同一幀就畫好。
 
 - v282：編輯器「所有頁面的元件」加「培養頁預覽」：選幹員一／二與職業，透過 `pv.ci/pv.cw` 讓遊戲的 `renderCop` 用 `cpPv281(c)` 顯示成該職業（只換顯示的複本，不存檔）。`renderCop` 會設 `html[data-cpw="f_sn"]`（性別_職業，新兵是 recruit）；規則多了 `w` 欄，CSS 前綴 `html[data-cpw=w]`，文字／圖片只在相同 cpw 時套用。在培養頁選元件時預設勾「只改這個職業」。點選時若點到的容器下面有圖片，會優先選那張圖（`deepPick`，因為立繪常是 pointer-events:none）。
