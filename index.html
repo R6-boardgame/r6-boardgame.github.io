@@ -13339,14 +13339,23 @@ var GA={u:null,busy:false,ok:false,err:''};let gaT=0;
 // v106: Firestore refuses nested arrays (custom operator dice are arrays of arrays), so the economy travels as one JSON string
 function gaPack(){const {nick,avatar,usePhoto}=ME;return JSON.parse(JSON.stringify({v:2,ts:Date.now(),ecoJ:JSON.stringify(ECO),got:AS.got,n:AS.n,fr:FR.list.slice(0,200),prof:{nick,avatar,usePhoto:!!usePhoto}}));}
 function gaPush(now){if(!GA||!GA.u||!GA.ok||!window.R6FB)return;clearTimeout(gaT);gaT=setTimeout(()=>{R6FB.save(gaPack()).then(()=>{if(GA.err){GA.err='';try{renderSettings();}catch(x){}}}).catch(e=>{console.warn('cloud save',e);GA.err='雲端存檔失敗，稍後會再試。';try{renderSettings();}catch(x){}clearTimeout(gaT);gaT=setTimeout(()=>gaPush(true),30000);});},now?0:1500);}
-// first link on this device: keep the better of both; afterwards the newer save wins, but owned operators and mastery never go backwards
-function gaMerge(d,first){let e=d.eco||{};if(d.ecoJ)try{e=JSON.parse(d.ecoJ)||{};}catch(x){}const newer=(e.ts||0)>(ECO.ts||0),lrn=ECO.rn|0,lsk=(ECO.sk||[]).slice(),lown=ECO.own.slice(),lmx=Object.assign({},ECO.mx),ltut=ECO.tut|0,lttl=ECO.title;
+// v285: the cloud is the source of truth for trained operators (cop) and fallen seniors (alum). A fresh install (deleted home-screen icon,
+// cleared Safari data) saves its blank daily-task state at boot, so its ECO.ts looked "newer" than the cloud and the blank operators
+// overwrote the account. Now: on first link the cloud save is the base; trained operators keep the later generation, or within one
+// generation the one with more progress (kills / survived / earned points never go down); seniors are the union of both lists.
+const copProg285=c=>c?(c.k|0)+(c.sv|0)+(c.e|0)+(c.w?1:0)+(c.nm&&c.nm!=='新進人員'?1:0):-1;
+function copPick285(a,b,preferA){if(!a)return b||null;if(!b)return a;const ga=a.gen|0,gb=b.gen|0;if(ga!==gb)return ga>gb?a:b;
+  const pa=copProg285(a),pb=copProg285(b);if(pa!==pb)return pa>pb?a:b;return preferA?a:b;}
+function alumKey285(a){return (a&&a.ts||0)+'_'+(a&&a.i|0);}
+function alumMerge285(A,B){const m=new Map();[...(Array.isArray(A)?A:[]),...(Array.isArray(B)?B:[])].forEach(a=>{if(a&&a.nm&&!m.has(alumKey285(a)))m.set(alumKey285(a),a);});
+  return [...m.values()].sort((x,y)=>(x.ts||0)-(y.ts||0)).slice(-100);}
+function gaMerge(d,first){let e=d.eco||{};if(d.ecoJ)try{e=JSON.parse(d.ecoJ)||{};}catch(x){}const newer=first||(e.ts||0)>(ECO.ts||0),lrn=ECO.rn|0,lsk=(ECO.sk||[]).slice(),lown=ECO.own.slice(),lmx=Object.assign({},ECO.mx),ltut=ECO.tut|0,lttl=ECO.title,
+    lcop=Array.isArray(ECO.cop)?ECO.cop.slice():[],lalum=Array.isArray(ECO.alum)?ECO.alum.slice():[];
   if(newer)Object.assign(ECO,e);
   ECO.own=[...new Set([...(e.own||[]),...lown])];ECO.sk=[...new Set([...(e.sk||[]),...lsk])];ECO.mx=Object.assign({},e.mx||{});for(const k in lmx)ECO.mx[k]=Math.max(ECO.mx[k]|0,lmx[k]|0);
   ECO.tut=Math.max(ltut,e.tut|0);if(first)ECO.rn=Math.max(lrn,e.rn|0);if(!ECO.title)ECO.title=lttl||e.title||'';
-  for(const k in d.got||{})if(!AS.got[k])AS.got[k]=d.got[k];for(const k in d.n||{})AS.n[k]=Math.max(AS.n[k]|0,d.n[k]|0);
-  (d.fr||[]).forEach(f=>{if(f&&f.id&&!FR.list.some(x=>x.id===f.id))FR.list.push(f);});
-  const p=d.prof||{};if(!ME.nick&&p.nick)ME.nick=p.nick;if(newer&&p.avatar){ME.avatar=p.avatar;ME.usePhoto=!!p.usePhoto;}
+  const rc=Array.isArray(e.cop)?e.cop:[];if(rc.length||lcop.length)ECO.cop=[0,1].map(i=>copPick285(lcop[i],rc[i],!newer));
+  ECO.alum=alumMerge285(e.alum,lalum);
   try{localStorage.setItem(EKEY,JSON.stringify(ECO));localStorage.setItem(AKEY,JSON.stringify(AS));localStorage.setItem(FKEY,JSON.stringify(FR));}catch(x){}}
 // v197: each Google account is its own game account. The progress kept in this browser belongs to the account in r6bg.glink;
 // signing out, or signing in with a different account, wipes it and reloads so nothing carries over to the next account.
@@ -13364,9 +13373,17 @@ async function gaOn(u){const prev=GA.u;GA.u=u;GA.ok=false;GA.err='';
     // clean up accounts that already received another account's progress before v197 (the owner-only renown gift is the tell)
     if(d&&!gaOwner(u)){let e={};try{e=d.ecoJ?JSON.parse(d.ecoJ)||{}:(d.eco||{});}catch(x){}if(e.g58){if(ECO.g58){gaWipe();location.reload();return;}d=null;}}
     if(d)gaMerge(d,first);if(gaOwner(u)&&!ECO.g58){ECO.g58=1;ECO.rn=(ECO.rn|0)+999999;ecoSave();}GA.ok=true;try{localStorage.setItem('r6bg.glink',u.uid);}catch(x){}
-    ME.mode='account';saveMe();gaPush(true);acctLoad().then(re);}
+    ME.mode='account';saveMe();gaPush(true);acctLoad().then(re);gaAlumRescue285();}
   catch(e){const c=(e&&e.code)||'';GA.err=/permission/.test(c)?'雲端存檔被拒絕：資料庫規則還沒設定好。':'讀不到雲端存檔，請檢查網路後重新登入。';}
   GA.busy=false;renderPlayer();renderSettings();if(SCREEN==='title'||SCREEN==='task')renderTitle();lgState();}
+// v285: fallen seniors are also published to the shared leaderboard (board/<uid>_fallen_<ts>_<slot>), and those rows are never deleted,
+// so an account whose save lost them gets them back from there
+async function gaAlumRescue285(){try{if(!window.claude||!claude.use||!GA.ok)return;const u=await claude.use('user'),me=u&&await u.id();if(!me||!/^g/.test(me))return;
+  const db=await claude.use('db');if(!db)return;const s=await db.collection('board').get(),pre=me+'_fallen_',got=[];
+  s.docs.forEach(x=>{if(!x.id.startsWith(pre))return;const r=x.data();if(!r||!r.nm||r.dead!==true)return;
+    got.push({i:r.i|0,w:r.w||null,nm:r.nm,k:r.k|0,sv:r.sv|0,by:'',ts:r.ts||+(x.id.slice(pre.length).split('_')[0])||0});});
+  if(!got.length)return;const before=(ECO.alum||[]).length,next=alumMerge285(ECO.alum,got);if(next.length===before)return;
+  ECO.alum=next;ecoSave();if($('#copAl')&&!$('#copAl').hidden)openAlum();}catch(e){console.warn('alum rescue',e);}}
 function gaHTML(){const u=GA.u,err=GA.err?`<p class="terr">${esc(GA.err)}</p>`:'';
   if(u)return `<p class="pshint">已綁定 Google：<b>${esc(u.name||u.email)}</b>${u.name&&u.email?` · ${esc(u.email)}`:''}</p><p class="pshint">${GA.busy?'正在讀取雲端存檔…':'聲望、幹員、熟練度、成就和好友會自動存到雲端，換裝置登入同一個 Google 帳號就能接著玩。'}</p>${err}<div class="psrow"><button id="psGout">登出 Google</button></div>`;
   return `<p class="pshint">目前是訪客，進度只存在這台裝置上。用 Google 登入後，進度會存到雲端，換裝置也能接著玩。</p>${err}<div class="pslogin"><button class="primary" id="psGoogle"${GA.busy?' disabled':''}><span class="lgico g">G</span>${GA.busy?'登入中…':'使用 Google 登入'}</button><button class="on" disabled><span class="lgico">訪</span>訪客（目前）</button></div>`;}
@@ -14780,7 +14797,7 @@ Object.assign(I18X,{'電腦選單全面換上銀行實景底圖、斜角金屬�
 I18X['排行榜改為半身視窗，保留頭部與武器；任務改為覆蓋視窗，電腦培養頁與技能收藏改為雙欄，縮小訓練圖片並統一選單返回位置。']=['Leaderboard bust portraits preserve heads and weapons; missions open in a dialog, desktop training and skill collection use two columns, training artwork is smaller, and menu back controls share one position.',''];
 Object.assign(I18X,{'存活場次':['Matches survived',''],'幹員資訊':['Operator information',''],'電腦版大廳改為沉浸式主選單：左側對戰入口、右側幹員與擊殺／存活場次，下方展示排行榜；保留愛心贊助與回報圖示。':['Cinematic desktop lobby: play menu on the left, operator with kills and matches survived on the right, leaderboard below; support and feedback icons retained.','']});
 I18X['電腦版戰術介面：左側小隊、右側行動／道具／情報，彩色攻擊骰數量、滾輪選角與完整鍵盤快捷操作；特殊按鈕改用 Z。']=['Desktop tactical workspace: squad rail, Action/Gear/Intel tabs, color-coded dice counts, wheel selection and keyboard shortcuts; Z for special controls.',''];
-NEWS[0].v='v265–v284';NEWS[0].i.unshift('手機主畫面換上金線棋盤圖示。遊戲畫面編輯器也有自己的圖示。');
+NEWS[0].v='v265–v284';NEWS[0].i.unshift('手機主畫面換上金線棋盤圖示。遊戲畫面編輯器也有自己的圖示。');NEWS[0].i.unshift('修正刪掉手機桌面圖示重裝、重新登入後，培養幹員和學長姐不見的問題：現在以帳號雲端存檔為準；學長姐也會從排行榜的陣亡紀錄找回來。');
 I18X['手機主畫面換上金線棋盤圖示。遊戲畫面編輯器也有自己的圖示。']=['The game has a new gold-grid home-screen icon, and the UI editor has its own icon.',''];
 // ---------- round clocks: each squad gets (time per Operator x Operators in play) per round, shared by its two activation phases ----------
 const CLK_SVG={A:'<svg viewBox="0 0 48 48"><path d="M8 6l3-2 15 15-3 3zM40 6l-3-2-15 15 3 3z" opacity=".0"/><path d="M6 4h6l18 18-3 3L6 10zM42 4h-6L18 22l3 3L42 10zM14 30l4 4-6 6 2 2-3 3-2-2-3 3-2-2 3-3-2-2 3-3 2 2zm20 0l-4 4 6 6-2 2 3 3 2-2 3 3 2-2-3-3 2-2-3-3-2 2zM16 26l6 6-3 3-6-6zm16 0l-6 6 3 3 6-6z"/></svg>',
