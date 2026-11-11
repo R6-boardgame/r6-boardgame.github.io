@@ -174,6 +174,7 @@ function lobHero280(h,mob){const c=lobCfg280();let k=lobKey280(h.getAttribute('s
   if(!LOBPV)fetch('data/lobby.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&typeof j==='object'){LOBCFG=j;apply();}}).catch(()=>{});
   addEventListener('message',e=>{if(!LOBPV||e.origin!==location.origin||!e.data||e.data.t!=='lobcfg280')return;
     LOBCFG=e.data.cfg||null;LOBPV=e.data.pv||{};
+    try{if(typeof CP!=='undefined'&&typeof renderCop==='function'){if(LOBPV.ci!=null&&CP.i!==LOBPV.ci){CP.i=LOBPV.ci;CP.edit=false;copDraft();}const k=JSON.stringify([LOBPV.ci,LOBPV.cw]);if(k!==window.__cpPvK){window.__cpPvK=k;renderCop();}}}catch(x){}
     if(LOBPV.home)try{if(typeof G!=='undefined'&&typeof SCREEN!=='undefined'&&SCREEN!=='title'){G=null;SCREEN='title';render();}}catch(x){}apply();});
 })();
 </script>
@@ -181,15 +182,17 @@ function lobHero280(h,mob){const c=lobCfg280();let k=lobKey280(h.getAttribute('s
 // v281: per-element UI overrides for every page (position / size / font size / hide / text / image), written by lobby-editor.html into data/ui.json.
 // Each rule: {sel, dev:'m'|'d'|'*', x, y (px), s (scale), fs (px), hide, text, src}. 'm' = phone layout (≤760px), 'd' = desktop.
 var UICFG=null;
+// v282: the editor can preview the training page as any class (display only, never saved); rules with w apply only while that gender_class is shown there
+function cpPv281(c){return typeof LOBPV!=='undefined'&&LOBPV&&LOBPV.cw?Object.assign({},c,{w:LOBPV.cw==='recruit'?'':LOBPV.cw}):c;}
 function uiApply281(){const R=(UICFG&&UICFG.rules)||[],q=s=>{try{return document.querySelectorAll(s);}catch(e){return [];}},u=s=>'url("'+String(s).replace(/["\\\n]/g,'')+'")';
   const css={m:[],d:[],'*':[]};
   R.forEach(r=>{if(!r||!r.sel)return;const p=[];if(r.x||r.y)p.push(`translate:${+r.x||0}px ${+r.y||0}px!important`);if(r.s!=null&&+r.s!==1)p.push(`scale:${+r.s}!important`);
     if(r.fs)p.push(`font-size:${+r.fs}px!important`);if(r.hide)p.push('visibility:hidden!important');if(r.src&&!r.img)p.push(`background-image:${u(r.src)}!important`);
-    if(p.length)(css[r.dev]||css['*']).push(`html body ${r.sel}{${p.join(';')}}`);});
+    if(p.length)(css[r.dev]||css['*']).push(`html${r.w?`[data-cpw="${String(r.w).replace(/[^a-z_]/g,'')}"]`:''} body ${r.sel}{${p.join(';')}}`);});
   const s=css['*'].join('\n')+`\n@media (max-width:760px){\n${css.m.join('\n')}\n}\n@media (min-width:761px){\n${css.d.join('\n')}\n}`;
   let el=document.getElementById('uicfgCss281');if(!el){el=document.createElement('style');el.id='uicfgCss281';}if(el.parentNode!==document.head||el.nextSibling)document.head.appendChild(el);if(el.textContent!==s)el.textContent=s;
   const mob=matchMedia('(max-width:760px)').matches;
-  R.forEach(r=>{if(!r||!r.sel||(r.dev==='m'&&!mob)||(r.dev==='d'&&mob))return;
+  const cw=document.documentElement.dataset.cpw;R.forEach(r=>{if(!r||!r.sel||(r.dev==='m'&&!mob)||(r.dev==='d'&&mob)||(r.w&&r.w!==cw))return;
     if(r.text!=null)q(r.sel).forEach(e=>{const t=[...e.childNodes].filter(n=>n.nodeType===3&&n.nodeValue.trim());if(t.length){if(t[0].nodeValue!==r.text)t[0].nodeValue=r.text;t.slice(1).forEach(n=>{if(n.nodeValue)n.nodeValue='';});}else if(!e.children.length&&e.textContent!==r.text)e.textContent=r.text;});
     if(r.src&&r.img)q(r.sel).forEach(e=>{if(e.tagName==='IMG'&&e.getAttribute('src')!==r.src){e.setAttribute('src',r.src);e.removeAttribute('srcset');}});});}
 (function(){let pend=0;const soon=()=>{if(pend)return;pend=requestAnimationFrame(()=>{pend=0;try{uiApply281();}catch(e){}});};
@@ -14321,7 +14324,7 @@ function cpRows(){const d=CP.dr,c=copAll()[CP.i],st=copStat(d),left=copLeft(d),n
   return h;}
 function copScale252(){const e=$('#cop');if(e)e.style.setProperty('--cpScale252',Math.min(innerWidth/1600,innerHeight/1000));}
 addEventListener('resize',copScale252);
-function renderCop(){const el=$('#cop');if(!el||el.hidden)return;copScale252();const cs=copAll(),c=cs[CP.i];if(!CP.dr)copDraft();const d=CP.dr,sc=copScore(d),left=copLeft(d),tot=copTot(d),pend=cpPend();
+function renderCop(){const el=$('#cop');if(!el||el.hidden)return;copScale252();const cs=copAll(),c=cpPv281(cs[CP.i]);document.documentElement.dataset.cpw=(CP.i?'m':'f')+'_'+(c.w||'recruit');if(!CP.dr)copDraft();const d=CP.dr,sc=copScore(d),left=copLeft(d),tot=copTot(d),pend=cpPend();
   const slot=k=>k?`<span class="cpGi">${WZI[k]||''}</span>`:'+';
   const sk=c.sk&&skillOwned(c,c.sk)?c.sk:null,skNo=sk&&!skFit(c,sk);
   el.innerHTML=`<div class="cpBox">
