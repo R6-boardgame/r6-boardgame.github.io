@@ -9794,9 +9794,9 @@ echo:(u,x,y,s)=>droneLike(u,x,y,async room=>{const R=new Set(room.map(([a,b])=>b
  jackal:async(u,x,y,s)=>{const near=alive('D').filter(d=>d.x>=0&&d.spotted>0&&cheb(u.x,u.y,d.x,d.y)<=3&&!inSight(u,d))[0];
    if(near){log(`${nm(u)} 順著腳印隔牆開火`,s);SHOTP=2;try{await shootUnit(u,near);}finally{SHOTP=null;}return;}
    const t=alive('D').filter(d=>d.x>=0&&!d.spotted&&!NOLOC.has(d.op)).sort((a,b)=>cheb(u.x,u.y,a.x,a.y)-cheb(u.x,u.y,b.x,b.y))[0];
-   if(t){locU(t);log(`${nm(u)} 追蹤腳印，標記了 ${nm(t)}`,s);}else log(`${nm(u)} 沒有找到新的腳印`,s);},
+   if(t){locU(t);log(`${nm(u)} 追蹤腳印，標記了 ${nm(t)}`,s);await fxEv({k:'mark286',uid:t.id,side:u.side});}else log(`${nm(u)} 沒有找到新的腳印`,s);},
  dokkaebi:async(u,x,y,s)=>{const t=alive('D').filter(d=>d.x>=0&&!d.spotted&&!NOLOC.has(d.op)).sort((a,b)=>cheb(u.x,u.y,a.x,a.y)-cheb(u.x,u.y,b.x,b.y))[0];
-   if(t){locU(t);SFX.alert();log(`${nm(u)} 的邏輯炸彈讓 ${nm(t)} 的手機響了`,s);}else log(`${nm(u)} 的邏輯炸彈沒有找到新目標`,s);},
+   if(t){locU(t);SFX.alert();log(`${nm(u)} 的邏輯炸彈讓 ${nm(t)} 的手機響了`,s);await fxEv({k:'mark286',uid:t.id,side:u.side});}else log(`${nm(u)} 的邏輯炸彈沒有找到新目標`,s);},
  buck:async(u,x,y,s)=>{destroyCell(x,y);log(`${nm(u)} 用萬能鑰匙轟開了缺口`,s);},
  hibana:async(u,x,y,s)=>{if(await catchThrow(u,x,y))return;destroyCell(x,y);await blastDestroy(x,y,3);log(`${nm(u)} 的 X-KAIROS 炸開了牆面`,s);},
  ace:async(u,x,y,s)=>{if(await catchThrow(u,x,y))return;destroyCell(x,y);await blastDestroy(x,y,3);log(`${nm(u)} 的 S.E.L.M.A. 炸開了牆面`,s);},
@@ -11806,7 +11806,7 @@ function update3D(){
   const dg=R3.dynG;while(dg.children.length)dg.remove(dg.children[0]);
   for(const g of G.gadgets){if(!g.alive||g.type==='prisma')continue;if(!G.over&&!gadgetVisibleTo(g,G.player))continue;const gm3=gadget3D(g);if(CAMT.includes(g.type)||g.wall||g.type==='mirror'||g.own==='twitch')gm3.userData.cell=[g.x,g.y];dg.add(gm3);}
   aruniGates246(dg);
-  if(G.phase==='play'&&!G.over){for(const u of G.units)if(u.alive&&u.x>=0&&u.side!==G.player&&u.spotted>0&&!smokeAt(u.x,u.y)&&!vis.has(u.id))dg.add(pin3D(u.x,u.y));
+  if(G.phase==='play'&&!G.over){for(const u of G.units)if(u.alive&&u.x>=0&&u.side!==G.player&&u.spotted>0&&!smokeAt(u.x,u.y)&&!vis.has(u.id)&&!(R3.cineShow&&R3.cineShow.has(u.id)))dg.add(pin3D(u.x,u.y));
     if(G.player==='D')for(const k of G.decoys||[])if(k.alive)dg.add(token3D(k.x,k.y,true));
     for(const h of heatPins())dg.add(pin3D(h.x,h.y));}
   if(G.mode==='twface'&&twSelected())dg.add(owArrows(twSelected(),[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]));else if(G.mirPend)dg.add(owArrows(G.mirPend,G.mirPend.dirs));else if(G.mode==='cdir'&&cdirG())dg.add(owArrows(cdirG(),[[1,0],[-1,0],[0,1],[0,-1]]));else if(G.mode==='pdir'&&pdirG())dg.add(owArrows(pdirG(),[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]));else if((G.mode==='owdir'||G.mode==='owq'||G.mode==='heat'||G.mode==='bash'||G.mode==='mgscan'||G.mode==='face')&&G.sel&&G.sel.x>=0&&G.phase==='play')dg.add(owArrows(G.mode==='owq'?owqActor(G.sel):G.sel,G.mode==='face'||G.mode==='owdir'||G.mode==='owq'?[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]:null));else R3.owA=null;
@@ -14592,6 +14592,23 @@ function breachFX246(e){return new Promise(resolve=>{if(!R3||!R3.fxG||!window.TH
   const ms=e.ms||1900,t0=performance.now();let done=false;const fin=()=>{if(done)return;done=true;R3.fxG.remove(g);resolve();};const timer=setTimeout(fin,ms+150);(R3.fx2||(R3.fx2=[])).push(()=>{if(done)return false;const age=performance.now()-t0,q=Math.min(1,Math.max(0,(age-300)/(ms-300)));if(e.mode==='hibana')g.position.copy(start).lerp(target,Math.min(1,age/280));for(let i=0;i<sparks.length;i++){const p=sparks[i];p.visible=age>300;if(e.mode==='thermite'){const t=((q-i*.006+1)%1)*4;let x,y;if(t<1){x=-.245+t*.49;y=.34;}else if(t<2){x=.245;y=.34-(t-1)*.68;}else if(t<3){x=.245-(t-2)*.49;y=-.34;}else{x=-.245;y=-.34+(t-3)*.68;}p.position.set(x+Math.sin(age*.03+i)*.012,y+Math.cos(age*.02+i)*.012,.06+(i%3)*.012);}else{const k=i%6;p.position.set((k%3-1)*.18+Math.sin(age*.04+i)*.035,(Math.floor(k/3)-.5)*.18+Math.cos(age*.03+i)*.035,.035+(i%3)*.018);}p.scale.setScalar(.006+(i%4)*.002);}if(age>=ms){clearTimeout(timer);fin();return false;}return true;});
   try{SFX.fx('fire');}catch(err){} });}
 {const base=fxPlay;fxPlay=function(e){if(e.k==='breach246')return breachFX246(e);return base(e);};}
+// v286: Jackal (Eyenox) / Dokkaebi (Logic Bomb) mark an operator: the camera closes in on the marked operator's face, holds, then flies back to the old view.
+// Goes through fxEv so the other player in an online game sees the same close-up (fxSync -> fxPlay).
+async function markCine286(e){try{if(!R3||!R3.figs||!R3.camera||!G||G.over||G.tut2||!CINE.on||document.hidden||document.body.dataset.scr!=='game')return false;
+  if(e.ts&&Math.abs(Date.now()-e.ts)>15000)return false;
+  const u=G.units.find(t=>t.id===e.uid);if(!u||!u.alive||u.x<0)return false;
+  const c=R3.controls,cam=R3.camera,V3=THREE.Vector3,own=!R3.cineSave;
+  if(own)R3.cineSave=evCamOff()||{p:(R3.camGoal?R3.camGoal.p:cam.position).clone(),t:(R3.camGoal?R3.camGoal.t:c.target).clone()};
+  R3.cineShow=new Set([...(R3.cineShow||[]),u.id]);try{update3D();}catch(x){}
+  const f=R3.figs[u.id];if(!f||!f.grp){if(own)shotCamEnd();return false;}
+  const S=new V3(cwx(u.x,u.y),0,cwz(u.x,u.y)),fd=new V3((u.fd&&u.fd[0])||0,0,(u.fd&&u.fd[1])||0);if(fd.lengthSq()<1e-4){fd.copy(cam.position).sub(S);fd.y=0;if(fd.lengthSq()<1e-4)fd.set(0,0,1);}fd.normalize();
+  const right=new V3(-fd.z,0,fd.x),dd=cam.aspect<1?3.4:2.6,look=S.clone().setY(.85),p=S.clone().addScaledVector(fd,dd).addScaledVector(right,dd*.25);p.y=1.55;
+  const tc=new THREE.PerspectiveCamera(cam.fov,cam.aspect,.1,100);tc.position.copy(p);tc.lookAt(look);tc.updateMatrixWorld();
+  cineClear(p,tc,.8,[.05,.3,.6,.9,1.2].map(y=>S.clone().setY(y)));
+  R3.cine=true;R3.cineGoal={p,t:look};flyTo(p,look);
+  try{skillFX({k:'pulse245',x:u.x,y:u.y,side:e.side,color:0xff3b30,radius:1});}catch(x){}
+  await sleep(1700);if(own&&R3.cineGoal&&R3.cineGoal.p===p)shotCamEnd();return true;}catch(x){try{shotCamEnd();}catch(y){}return false;}}
+{const base=fxPlay;fxPlay=function(e){if(e.k==='mark286')return markCine286(e);return base(e);};}
 async function timedBreach246(u,x,y,mode){const face=breachFace246(u,x,y);render();await fxEv({k:'breach246',mode,x,y,ux:u.x,uy:u.y,...face,ms:mode==='hibana'?1850:2100,side:u.side});}
 UG.hibana=async(u,x,y,s)=>{if(await catchThrow(u,x,y))return;await timedBreach246(u,x,y,'hibana');destroyCell(x,y);await blastDestroy(x,y,3);log(`${nm(u)} 的 X-KAIROS 炸開了牆面`,s);};
 UG.thermite=async(u,x,y,s)=>{await timedBreach246(u,x,y,'thermite');destroyCell(x,y);log(`${nm(u)} 的放熱炸藥炸穿牆面`,s);for(const a of G.units.filter(a=>a.alive&&cheb(a.x,a.y,x,y)===1))await damage(a,1,'放熱炸藥');};
