@@ -16,6 +16,12 @@ try{for(const [w,h,tag] of [[390,844,'phone'],[1440,900,'desktop']]){
     return {card:!!box.querySelector('.pc289 .pcArt'),ttl,dupe:new Set(ttl).size!==ttl.length,avScroll,avRows:h1,
       okInside:ok.right<=bx.right+1&&ok.width>40,themes:q('[data-cth]').length,vol:!!document.querySelector('#psMv')&&!!document.querySelector('#psSv')};});
   console.log(tag,JSON.stringify(r));
+  // v292: trophies replace win rate, no top-right trophy; LvMax label; Lv3 title; LvMax gives the skill to custom operators
+  const v2=await page.evaluate(()=>{const b=OPBASE.find(x=>!x.startsWith('recruit_')&&copSkills().includes(x));ECO.mx[b]=MXT[2];const t3=OPBASE.filter(x=>mxLv(ECO.mx[x]||0)>=3).length;const own3=skHas(b);ECO.mx[b]=MXT[4];
+    const card=document.querySelector('.ps289 .pc289');return {rank:!!card.querySelector('.pcRank'),stats:[...card.querySelectorAll('.pcSt span')].map(x=>x.textContent),max:mxLvT(5),lv4:mxLvT(4),own3,own5:skHas(b),
+      mains:[...document.querySelectorAll('.pcMains small')].map(x=>x.textContent)};});
+  console.log(tag,JSON.stringify(v2));
+  assert(!v2.rank);assert.deepEqual(v2.stats,['聲望','獎盃','成就']);assert.equal(v2.max,'LvMax');assert.equal(v2.lv4,'Lv4');assert(!v2.own3);assert(v2.own5);
   assert(r.card);assert(!r.dupe,'titles listed once');assert(r.avScroll,'avatars scroll sideways');assert(r.avRows<130,'avatar strip keeps two rows');assert(r.okInside,'save button not clipped');assert.equal(r.themes,4);assert(r.vol);
   await page.screenshot({path:`${DIR}/player-card-v289-settings-${tag}.png`});
   // volume slider changes the bus level and survives a reload of the setting

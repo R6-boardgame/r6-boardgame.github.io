@@ -12975,7 +12975,7 @@ function avSrc289(k,ph){if(k==='__photo')return ph||'img/cop/f.webp';if(/^cop:/.
 function artSrc289(k,m){if(/^cop:/.test(k||'')){const c=copAv(k);if(c)return c.art;}const b=String(k||'').replace(/^(art|pic):/,'');
   if(OPC[b]&&FACEM[artBase(b)])return 'img/face/'+artBase(b)+'.webp';const t=(m||[]).find(x=>OPC[x[0]]&&FACEM[artBase(x[0])]);return t?'img/face/'+artBase(t[0])+'.webp':COPART[0];}
 function mains289(){const n=new Set();return OPBASE.filter(b=>(ECO.mx[b]||0)>0&&OPC[b]).sort((a,b)=>(ECO.mx[b]||0)-(ECO.mx[a]||0)).filter(b=>!n.has(OPC[b].name)&&n.add(OPC[b].name)).slice(0,3).map(b=>[b,mxLv(ECO.mx[b]||0)]);}
-function ttl289(){return ECO.title&&OPC[ECO.title]&&mxLv(ECO.mx[ECO.title]||0)>=5?mxTitle(ECO.title):'';}
+function ttl289(){return ECO.title&&OPC[ECO.title]&&mxLv(ECO.mx[ECO.title]||0)>=3?mxTitle(ECO.title):'';}
 function myCard289(){const ph=ME.usePhoto&&ME.acct&&ME.acct.photo?ME.acct.photo:'';
   return {n:meName(),t:ttl289(),av:ph?'__photo':ME.avatar,ph,th:cthOk289(ME.cth||'')?(ME.cth||''):'',rn:Math.round(ECO.rn||0),a:achCount(),r:trN(),w:ME.w|0,l:ME.l|0,m:mains289()};}
 // someone on an older version only has a name and their best custom operator
@@ -12984,13 +12984,13 @@ function oldCard289(d){const b=d&&d.best,i=b?b.i|0:0,w=b&&b.w?b.w:'';return {n:(
 const TROPHY289='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v5.5a5 5 0 0 1-10 0z" fill="#f1c255"/><path d="M7 5H4v1.5A3.5 3.5 0 0 0 7.5 10M17 5h3v1.5A3.5 3.5 0 0 1 16.5 10" fill="none" stroke="#f1c255" stroke-width="1.6"/><path d="M10.6 13.2h2.8l.6 4h-4z" fill="#f1c255"/><path d="M7.5 21h9l-.8-3.6H8.3z" fill="#f1c255"/></svg>';
 function cardHTML289(c,code){c=c||{};const th=['blue','orange','black'].includes(c.th)?c.th:'';
   const no=String(code||'').split('').reduce((h,ch)=>(h*31+ch.charCodeAt(0))%10000,7),wl=(c.w|0)+(c.l|0);
-  const st=c.old?'':`<div class="pcSt"><div><b>${c.rn==null?'—':fmtN(c.rn)}</b><span>聲望</span></div><div><b>${wl?Math.round((c.w|0)/wl*100)+'%':'—'}</b><span>勝率</span></div><div><b>${c.a==null?'—':c.a}</b><span>成就</span></div></div>`;
+  const st=c.old?'':`<div class="pcSt"><div><b>${c.rn==null?'—':fmtN(c.rn)}</b><span>聲望</span></div><div><b>${c.r==null?'—':fmtN(c.r)}</b><span>獎盃</span></div><div><b>${c.a==null?'—':c.a}</b><span>成就</span></div></div>`;
   return `<div class="pc289 ${th}"><div class="pcTex"></div><div class="pcBand"></div><div class="pcBand2"></div><img class="pcArt" src="${esc(artSrc289(c.av,c.m))}" alt=""><div class="pcShade"></div>
-  <div class="pcIn"><div class="pcTop"><div class="pcKick">OPERATOR CARD<span>No. ${String(no).padStart(4,'0')}</span></div><div class="pcRank">${TROPHY289}<b>${c.r==null?'—':fmtN(c.r)}</b><span>獎盃</span></div></div>
+  <div class="pcIn"><div class="pcTop"><div class="pcKick">OPERATOR CARD<span>No. ${String(no).padStart(4,'0')}</span></div></div>
   <div class="pcWho"><div class="pcAv"><img src="${esc(avSrc289(c.av,c.ph))}" alt=""></div><div class="pcNm">${c.t?`<span class="pcTtl">${esc(c.t)}</span>`:''}<b>${esc(c.n||'玩家')}</b></div></div>${st}</div>
   ${code?`<div class="pcCode">FRIEND CODE<b>${esc(code)}</b><i>${'<u></u>'.repeat(16)}</i></div>`:''}<div class="pcHz"></div><div class="pcFoil"></div><div class="pcEdge"></div></div>`;}
 function mainsHTML289(m){m=(m||[]).filter(x=>OPC[x[0]]);if(!m.length)return '';
-  return `<div class="pcMains"><h4>常用幹員</h4><div>${m.map(([b,lv])=>`<span><img src="${FACEM[artBase(b)]?opPic(b):opIcon(b)}" alt=""><b>${esc(OPC[b].name)}</b><small>Lv${lv|0}</small></span>`).join('')}</div></div>`;}
+  return `<div class="pcMains"><h4>常用幹員</h4><div>${m.map(([b,lv])=>`<span><img src="${FACEM[artBase(b)]?opPic(b):opIcon(b)}" alt=""><b>${esc(OPC[b].name)}</b><small>${mxLvT(lv|0)}</small></span>`).join('')}</div></div>`;}
 // tap the opponent's name after a match
 async function openCard289(id,name){if(!id)return;const code=frCode(id);let el=tsDlg('card289','玩家名片','<div class="psbox"><button class="tsX" aria-label="關閉">✕</button></div>');
   const draw=d=>{const c=d&&d.c?d.c:oldCard289(d||{n:name}),fr=isFriend(id),out=frOut(id);
@@ -13002,18 +13002,18 @@ async function openCard289(id,name){if(!id)return;const code=frCode(id);let el=t
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.anPN[data-oc]');if(b)openCard289(b.dataset.oc,b.textContent);});
 function volHTML289(id,ic,label,v){const n=Math.round(v*100);return `<div class="psVol"><div class="ln"><b>${ic} ${label}</b><output>${n}</output></div><div class="vb">${Array.from({length:12},(_,i)=>`<i class="${i<Math.round(n/100*12)?'f':''}" style="height:${30+i*6}%"></i>`).join('')}<input type="range" id="${id}" min="0" max="100" step="5" value="${n}" aria-label="${label}音量"></div></div>`;}
 function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;const acct=ME.mode==='account'&&ME.acct;const _rs=scrollSnap(el);
-  const avl=[];OPBASE.forEach(b=>{const lv=mxLv(ECO.mx[b]||0);if(b.startsWith('recruit_')||lv>=1||ME.avatar===b)avl.push([b,opIcon(b),OPC[b].name]);if(lv>=3||ME.avatar==='art:'+b)avl.push(['art:'+b,opArt(b)||opIcon(b),OPC[b].name+' 半身像']);});
+  const avl=[];OPBASE.forEach(b=>{const lv=mxLv(ECO.mx[b]||0);if(b.startsWith('recruit_')||owned(b)||lv>=1||ME.avatar===b)avl.push([b,opIcon(b),OPC[b].name]);if(lv>=2||ME.avatar==='art:'+b)avl.push(['art:'+b,opArt(b)||opIcon(b),OPC[b].name+' 半身像']);});
   {const wu=copWU();copAll().forEach((c,i)=>{avl.push(['cop:'+i,copAv('cop:'+i).av,`${COPN[i]} ${c.nm}`]);for(const w of WORD)if(wu.has(i+':'+w))avl.push([`cop:${i}:${w}`,copAv(`cop:${i}:${w}`).av,`${COPN[i]} ${WPN[w].t}`,w]);});}
-  OPBASE.forEach(b=>{if(!b.startsWith('recruit_')&&FACEM[artBase(b)]&&(owned(b)||ME.avatar==='pic:'+b))avl.push(['pic:'+b,opPic(b),OPC[b].name+' 照片']);});
+  OPBASE.forEach(b=>{if(!b.startsWith('recruit_')&&FACEM[artBase(b)]&&(mxLv(ECO.mx[b]||0)>=2||ME.avatar==='pic:'+b))avl.push(['pic:'+b,opPic(b),OPC[b].name+' 照片']);});
   const avs=(acct&&ME.acct.photo?`<button class="avb ${ME.usePhoto?'on':''}" data-av="__photo" title="帳號照片"><img src="${ME.acct.photo}" alt="帳號照片"></button>`:'')+avl.map(([k,src,n,w])=>`<button class="avb ${!ME.usePhoto&&ME.avatar===k?'on':''} ${k.startsWith('art:')?'art':''} ${k.startsWith('cop:')?'cop':''} ${k.startsWith('pic:')?'pic':''}" data-av="${k}" title="${esc(n)}"><img src="${src}" alt="${esc(n)}">${w?`<i class="avW">${WPN[w].ic}</i>`:''}</button>`).join('');
   // the two Recruits share one title text, so list each title once
-  const seen=new Set(),ttls=OPBASE.filter(b=>mxLv(ECO.mx[b]||0)>=5).filter(b=>{const t=mxTitle(b);if(seen.has(t))return false;seen.add(t);return true;}),curT=ttl289();
+  const seen=new Set(),ttls=OPBASE.filter(b=>mxLv(ECO.mx[b]||0)>=3).filter(b=>{const t=mxTitle(b);if(seen.has(t))return false;seen.add(t);return true;}),curT=ttl289();
   const ths=CTH289.map(([k,n])=>{const ok=cthOk289(k);return `<button class="pcTh ${k||'gold'} ${(ME.cth||'')===k?'on':''}" data-cth="${k}" ${ok?'':'disabled'} title="${ok?n:'成就達 30 個解鎖'}"><i></i>${n}${ok?'':' 🔒'}</button>`;}).join('');
   const card=`<section class="psCard">${cardHTML289(myCard289(),FRP.code)}<div class="psEdit"><button id="psRen"><b>✎</b>改名</button><button id="psCode" ${FRP.code?'':'disabled'}><b>⧉</b>${FRP.code?'複製好友代碼':'好友代碼讀取中'}</button></div>
     ${PS289.edit?`<div class="psrow psNm"><input id="psNick" maxlength="16" value="${esc(ME.nick)}" placeholder="${esc(acct&&ME.acct.name?ME.acct.name:ME.guest)}"><button id="psNickOk">儲存</button></div>`:''}</section>`;
   const sBg=`<section><h4>名片背景</h4><div class="hs289 ths">${ths}</div>${cthOk289('black')?'':'<p class="pshint">黑曜：成就達 30 個解鎖</p>'}</section>`;
-  const sTt=`<section><h4>稱號</h4>${ttls.length?`<div class="hs289 tts"><button class="ttl ${!curT?'on':''}" data-ttl="">不顯示</button>${ttls.map(b=>`<button class="ttl ${curT===mxTitle(b)?'on':''}" data-ttl="${b}">${esc(mxTitle(b))}</button>`).join('')}</div>`:'<p class="pshint">幹員熟練度 Lv5 解鎖稱號。</p>'}</section>`;
-  const sAv=`<section><h4>頭像</h4><div class="hs289 avs">${avs}</div><p class="pshint">名片右邊的立繪跟著頭像的幹員。熟練度 Lv1 解鎖頭像、Lv3 半身像、Lv5 稱號；已擁有的幹員可用照片，培養幹員轉職過的職業也能當頭像。</p></section>`;
+  const sTt=`<section><h4>稱號</h4>${ttls.length?`<div class="hs289 tts"><button class="ttl ${!curT?'on':''}" data-ttl="">不顯示</button>${ttls.map(b=>`<button class="ttl ${curT===mxTitle(b)?'on':''}" data-ttl="${b}">${esc(mxTitle(b))}</button>`).join('')}</div>`:'<p class="pshint">幹員熟練度 Lv3 解鎖稱號。</p>'}</section>`;
+  const sAv=`<section><h4>頭像</h4><div class="hs289 avs">${avs}</div><p class="pshint">名片右邊的立繪跟著頭像的幹員。擁有幹員就有圖示；熟練度 Lv2 解鎖頭像、Lv3 稱號、LvMax 角色技能（培養幹員可裝備）。培養幹員轉職過的職業也能當頭像。</p></section>`;
   const sSnd=`<section><h4>聲音</h4><div class="psMix">${volHTML289('psMv','🎵','音樂',SFX.mOn?SFX.mvol:0)}${volHTML289('psSv','🔊','音效',SFX.on?SFX.vol:0)}</div></section>`;
   const sGame=`<section><h4>遊戲</h4><div class="psOpts"><div><span>射擊特寫</span><button class="psTg ${CINE.on?'on':''}" id="psCine" aria-label="射擊特寫"></button></div><div><span>🌐</span>${langSelect('psLang')}</div></div></section>`;
   const sAcc=`<section><h4>登入的帳號</h4><div class="psAcc">${window.R6FB?gaHTML():acct?`<p class="pshint">已用 線上身分登入。</p><div class="psrow"><button id="psLogout">改用訪客身分</button></div>`:
@@ -13704,9 +13704,13 @@ const tkClaimable=()=>{ecoRoll();return ECO.dt.filter(id=>!ECO.dc.includes(id)&&
 // mastery: every match with an operator earns that operator experience
 const MXT=[100,600,1500,3000,5000];
 const mxLv=xp=>MXT.filter(v=>xp>=v).length;
-const mxTitle=b=>`${OPC[b].name} 專家`;
+const mxTitle=b=>TTLX[b]||`${OPC[b].name} 專家`;
 function mxInfo(b){const xp=ECO.mx[b]||0,lv=mxLv(xp),nx=MXT[lv];return {xp,lv,nx,pct:nx?Math.round(100*(xp-(MXT[lv-1]||0))/(nx-(MXT[lv-1]||0))):100};}
-const MXREW=['','解鎖頭像','','解鎖半身像頭像','','解鎖稱號'];
+// v292: own an operator -> icon avatar; Lv2 photo + half-body avatars; Lv3 title; Lv5 (max) the operator's skill for custom operators
+const MXREW=['','','解鎖頭像','解鎖稱號','','解鎖角色技能（培養幹員可裝備）'];
+const mxLvT=lv=>lv>=MXT.length?'LvMax':'Lv'+lv;
+// operator titles; an entry here replaces the default "<name> 專家" (the owner edits these in a sheet)
+const TTLX={};
 function ecoAdd(n){ECO.rn=Math.max(0,(ECO.rn|0)+n);}
 // called once per finished match; returns the lines shown on the result banner
 function ecoGame(w){if(!G||G._eco)return G&&G._eco;ecoRoll();const P=G.player,win=w===P,lines=[];let earn=0;
@@ -13730,7 +13734,7 @@ function ecoGame(w){if(!G||G._eco)return G&&G._eco;ecoRoll();const P=G.player,wi
     const ups=[];mine.forEach(u=>{const b=OPC[unitOp(u)]?OPC[unitOp(u)].base:unitOp(u);if(!OPC[b])return;const q=ST(u),l0=mxLv(ECO.mx[b]||0);
       ECO.mx[b]=(ECO.mx[b]||0)+100+(win?60:0)+(q.k||0)*25+(q.gad||0)*10;const l1=mxLv(ECO.mx[b]);
       if(l1>l0)ups.push([OPC[b].name,l1]);});
-    if(ups.length){lines.push([`熟練度升級：${ups.map(([n,l])=>n+' Lv'+l).join('、')}`,0]);const rw=[...new Set(ups.map(u=>MXREW[u[1]]).filter(Boolean))];try{achToastMsg(ups.length>1?`${ups.length} 名幹員熟練度升級`:`${ups[0][0]} 熟練度 Lv${ups[0][1]}`,rw.length?rw.join('、')+'（到設定查看）':'繼續使用這些幹員來升級');}catch(e){}}}
+    if(ups.length){lines.push([`熟練度升級：${ups.map(([n,l])=>n+' '+mxLvT(l)).join('、')}`,0]);const rw=[...new Set(ups.map(u=>MXREW[u[1]]).filter(Boolean))];try{achToastMsg(ups.length>1?`${ups.length} 名幹員熟練度升級`:`${ups[0][0]} 熟練度 ${mxLvT(ups[0][1])}`,rw.length?rw.join('、')+'（到設定查看）':'繼續使用這些幹員來升級');}catch(e){}}}
   try{copEnd(lines);}catch(e){console.warn(e);}
   ecoAdd(earn);ecoSave();G._eco={earn,lines,bonus:G._bonus||[]};try{renderPlayer();}catch(e){}return G._eco;}
 function ecoBanner(){const b=$('#banner');if(!b||b.hidden||!G||!G._eco||b.querySelector('.ecoRes'))return;const e=G._eco;if(!e.lines.length)return;
@@ -13886,7 +13890,7 @@ function buyOp(b,after){const c=OPC[b];if(!c||owned(b))return after&&after();let
   el.onclick=e=>{if(e.target===el)el.hidden=true;};$('#bdNo').onclick=()=>{el.hidden=true;};
   $('#bdYes').onclick=()=>{if(ECO.rn<OPPRICE)return;ECO.rn-=OPPRICE;if(!ECO.own.includes(c.base))ECO.own.push(c.base);ecoSave();el.hidden=true;try{SFX.alert();}catch(e){}
     try{achToastMsg(`已解鎖 ${c.name}`,'現在可以帶他出戰了');}catch(e){}try{renderPlayer();}catch(e){}if(after)after();};}
-function ecoTag(){const t=ECO.title&&OPC[ECO.title]&&mxLv(ECO.mx[ECO.title]||0)>=5?mxTitle(ECO.title):'';return `<span class="ptag">${RNI}<b>${fmtN(ECO.rn)}</b>${t?`<em>${esc(t)}</em>`:''}</span>`;}
+function ecoTag(){const t=ECO.title&&OPC[ECO.title]&&mxLv(ECO.mx[ECO.title]||0)>=3?mxTitle(ECO.title):'';return `<span class="ptag">${RNI}<b>${fmtN(ECO.rn)}</b>${t?`<em>${esc(t)}</em>`:''}</span>`;}
 {const base=renderPlayer;renderPlayer=function(){base();const b=$('#t-task');if(b)b.onclick=openTask250;};}
 function menuRoute250(forKey=false){const vis=id=>{const e=document.getElementById(id);return e&&!e.hidden&&getComputedStyle(e).display!=='none';},click=id=>()=>document.getElementById(id)?.click();
  if((!forKey&&!matchMedia('(min-width:1000px) and (min-height:620px)').matches)||!preGame())return null;
@@ -13975,7 +13979,7 @@ function shopLayout(){const stg=$('#shStage'),g=$('#shGrid');if(!stg||!g)return;
 function renderShopDet(){const el=$('#shDet');if(!el)return;const b=SHOP.sel;if(!b){el.hidden=true;el.innerHTML='';return;}
   if(SHOP.side==='S')return skDet(el,b);
   const c=OPC[b],own=owned(b),play=opPlayable(b),ok=ECO.rn>=OPPRICE,fx=(typeof GDX!=='undefined'&&GDX[b])?GDX[b][0]:'',m=mxInfo(b);
-  const cta=own?`<div class="shCta own"><span class="shOwn"><i class="shOk">✓</i>已擁有</span><span class="shNote">熟練度 Lv${m.lv} · 可以在對戰中選他</span></div>`
+  const cta=own?`<div class="shCta own"><span class="shOwn"><i class="shOk">✓</i>已擁有</span><span class="shNote">熟練度 ${mxLvT(m.lv)} · 可以在對戰中選他</span></div>`
     :!play?`<div class="shCta"><button class="shBuy" disabled>即將開放</button><span class="shNote">這名幹員的能力還在製作中</span></div>`
     :`<div class="shCta"><div class="shPrice">${RNI}<b>${fmtN(OPPRICE)}</b></div><button class="shBuy" id="shBuy" ${ok?'':'disabled'}>${ok?'購買':'聲望不足'}</button><span class="shNote">${ok?`購買後剩 ${fmtN(ECO.rn-OPPRICE)}`:`還差 ${fmtN(OPPRICE-ECO.rn)}，完成每日、每週任務最快`}</span></div>`;
   el.hidden=false;el.dataset.side=c.side;
@@ -14180,7 +14184,7 @@ const hexDice=list=>list.length?list.map(d=>`<i class="hexd ${d[0]}"></i>`).join
 const DZN={Y:'輕',O:'中',R:'重'};
 const OSEL={side:'A',cur:null,en:false,cat:'all',faction:'all'};
 const opCat=c=>/破|突破|硬破|爆破/.test(c.zh.role||'')?'breach':/情報|偵|追蹤|反情報/.test(c.zh.role||'')?'intel':/醫|支援|盾|增益/.test(c.zh.role||'')?'support':/陷阱|封鎖|控制|拖延|反進攻/.test(c.zh.role||'')?'control':'combat';
-function osEco(c){const b=c.base,m=mxInfo(b),ok=ECO.rn>=OPPRICE;return `<div class="osEco">${OSEL.shop?(owned(b)?'<span class="osOwn">已擁有</span>':`<button class="primary" id="osBuy" ${ok?'':'disabled'}>購買 ${RNI}${fmtN(OPPRICE)}</button>${ok?'':`<small class="osNeed">聲望不足，還差 ${fmtN(OPPRICE-ECO.rn)}</small>`}`):''}<span class="osMx"><b>熟練度 Lv${m.lv}</b><span class="tkBar"><i style="width:${m.pct}%"></i></span><small>${m.nx?`${fmtN(m.xp)}/${fmtN(m.nx)}${MXREW[m.lv+1]?' · 下一級'+MXREW[m.lv+1]:MXREW[m.lv+2]?' · Lv'+(m.lv+2)+MXREW[m.lv+2]:''}`:'已滿級'}</small></span></div>`;}
+function osEco(c){const b=c.base,m=mxInfo(b),ok=ECO.rn>=OPPRICE;return `<div class="osEco">${OSEL.shop?(owned(b)?'<span class="osOwn">已擁有</span>':`<button class="primary" id="osBuy" ${ok?'':'disabled'}>購買 ${RNI}${fmtN(OPPRICE)}</button>${ok?'':`<small class="osNeed">聲望不足，還差 ${fmtN(OPPRICE-ECO.rn)}</small>`}`):''}<span class="osMx"><b>熟練度 ${mxLvT(m.lv)}</b><span class="tkBar"><i style="width:${m.pct}%"></i></span><small>${m.nx?`${fmtN(m.xp)}/${fmtN(m.nx)}${MXREW[m.lv+1]?' · 下一級'+MXREW[m.lv+1]:MXREW[m.lv+2]?' · '+mxLvT(m.lv+2)+MXREW[m.lv+2]:''}`:'已滿級'}</small></span></div>`;}
 function cardText(c){if(c.base==='lion')return ME.lang==='en'?'Mark enemies who changed spaces during the previous phase. Position markers last until this phase ends; identities remain hidden.':OPS.lion.gd;if(ME.lang==='en'&&c.g&&c.g.ab&&c.g.ab.length)return c.g.ab.map(a=>`${a.k==='PASSIVE'?'':`<em>[${a.k}${a.t?' · '+esc(a.t):''}]</em> `}${esc(a.x).replace(/\[(\w+):(\w+)\]/g,'[$2 $1]')}`).join('<br>').replace(/[^.]*lean[^.]*\.?/gi,'');let zh=c.zh.x||'';zh=zh.replace(/[^。\n]*探身[^。\n]*[。\n]?/g,'').replace(/〔(?:橙色|黃色|紅色)(破壞)〕/g,'〔$1〕');return zh.replace(/〔([^〕]+)〕/g,'<em>〔$1〕</em>');}
 function openOpSelect(side,onDone,browse){OSEL.side=side;OSEL.done=onDone;OSEL.browse=!!browse;OSEL.shop=browse==='shop';OSEL.cat='all';OSEL.faction='all';OSEL.cur=cfg.picks[side][0]||OPBASE.find(b=>OPC[b].side===side);let el=$('#opsel');
   if(!el){el=document.createElement('div');el.id='opsel';el.className='opsel';document.body.appendChild(el);}el.hidden=false;renderOpSelect(true);}
@@ -14297,7 +14301,9 @@ const classKey=w=>'cls:'+w;
 const classOf=k=>typeof k==='string'&&k.startsWith('cls:')&&CSK[k.slice(4)]?k.slice(4):null;
 const classEquipped=c=>!!c.w&&c.sk===classKey(c.w);
 const hasClassSkill=u=>!!u.w&&u.clsSkill===u.w;
-const skillOwned=(c,k)=>classOf(k)?classOf(k)===c.w:ECO.sk.includes(k);
+// v292: an operator at mastery LvMax gives custom operators its skill for free
+function skHas(k){return ECO.sk.includes(k)||(typeof mxLv==="function"&&mxLv((ECO.mx||{})[k]||0)>=MXT.length);}
+const skillOwned=(c,k)=>classOf(k)?classOf(k)===c.w:skHas(k);
 const skillIcon=(k,fill=false)=>{const w=classOf(k);if(!w)return `<img src="${opIcon(k)}" alt="">`;let ic=WPN[w].ic;if(fill){const b=CLASS_ART_BOX[w],h=400*b[3]/b[2];ic=ic.replace('viewBox="0 0 400 400"',`viewBox="0 ${(400-h)/2} 400 ${h}"`);}return `<span class="cpGi">${ic}</span>`;};
 const WORD=['hs','sh','mg','sg','rf','sn','smg'],WART={hs:1,sh:1,rf:1,sn:1,sg:1,mg:1,smg:1},RANKD={R:3,O:2,Y:1};
 const bMax=(c,b)=>{const l=WPN[c.w]&&WPN[c.w].lim&&WPN[c.w].lim[b];return Math.min(c.w==='mg'?3:4,l?l.max:4);};
@@ -14328,7 +14334,7 @@ const skFit=(c,b)=>classOf(b)?classOf(b)===c.w:!SKCLS[b]||c.w===SKCLS[b];
 let SKL=null;function copSkills(){if(!SKL)SKL=OPBASE.filter(b=>SCRIPTED.has(b)&&!NOBTN.has(b)&&!SKSKIP.has(b)).filter(b=>{ensureOp(b);return OPS[b].g&&OPS[b].ch>0;});return SKL;}
 const skName=b=>classOf(b)?CSK[classOf(b)].n:(OPC[b]&&OPC[b].zh.g)||OPS[b].g;
 const skText=b=>classOf(b)?CSK[classOf(b)].d:(typeof GDX!=='undefined'&&GDX[b])?GDX[b][0]:(OPS[b].gd||'');
-function copSkOn(c,side){const k=c.sk;if(!k||!ECO.sk.includes(k)||!OPC[k]||!skFit(c,k))return null;ensureOp(k);return k;}
+function copSkOn(c,side){const k=c.sk;if(!k||!skHas(k)||!OPC[k]||!skFit(c,k))return null;ensureOp(k);return k;}
 // game hooks: PvE gets the trained numbers on the recruit cards, online games keep the printed cards
 const COPDEF={};
 function copPrep(on){copAll();for(const s of ['a','d'])['rifle','shotgun'].forEach((w,i)=>{const id=`recruit_${s}_${w}`,side=s==='a'?'A':'D';if(!OPC[id])return;ensureOp(id);
@@ -14518,7 +14524,7 @@ function cpSkillPage(){const c=copAll()[CP.i],L=[...(c.w?[classKey(c.w)]:[]),...
     <div class="cpFoot">${sel&&own(sel)?`<button class="cpBtn g" id="cpSkOff" ${c.sk?'':'disabled'}>卸下</button><button class="cpBtn p" id="cpSkEq" ${c.sk===sel||!skFit(c,sel)?'disabled':''}>${!skFit(c,sel)?'職業不符':c.sk===sel?'裝備中':'裝備'}</button>`
       :`<button class="cpBtn g" id="cpSkShop">前往商店</button><button class="cpBtn p" id="cpSkBuy" ${sel&&ECO.rn>=SKPRICE?'':'disabled'}>${sel?(ECO.rn>=SKPRICE?`購買 ${fmtN(SKPRICE)} 聲望`:'聲望不足'):'選一個技能'}</button>`}</div></div>`;}
 function skUse(b,full){if(classOf(b)){const k=classOf(b);return CSK[k].ap+' · '+(k==='hs'?'自由切換':'每回合 1 次');}const n=OPS[b].ch,u=n>50?(full?'次數無限':'無限次'):`${full?'每場 ':''}${n} 次`;return `${u} · 1 行動${full?'點':''}${full&&setupGadget(b)?'（佈防時免費）':''}`;}
-function skBuy(b){if(!b||ECO.sk.includes(b)||ECO.rn<SKPRICE)return false;ECO.rn-=SKPRICE;ECO.sk.push(b);ecoSave();try{SFX.buy();}catch(e){}try{renderPlayer();}catch(e){}return true;}
+function skBuy(b){if(!b||skHas(b)||ECO.rn<SKPRICE)return false;ECO.rn-=SKPRICE;ECO.sk.push(b);ecoSave();try{SFX.buy();}catch(e){}try{renderPlayer();}catch(e){}return true;}
 function cpSave(f){const cs=copAll(),c=cs[CP.i];f(c);f(CP.dr);ecoSave();renderCop();}
 function cpBind(el){const q=s=>el.querySelector(s),on=(s,f)=>{const b=q(s);if(b)b.onclick=f;},d=CP.dr,c=copAll()[CP.i],push=(k,v)=>(CP.st[k]=CP.st[k]||[]).push(cpCopy(v)),left=()=>copLeft(d);
   on('#cpBack',closeCop);on('#cpAlB',openAlum);
@@ -14558,10 +14564,10 @@ function cpBind(el){const q=s=>el.querySelector(s),on=(s,f)=>{const b=q(s);if(b)
   on('#cpSkBuy',()=>{if(skBuy(CP.skSel)){achToastMsg(`已購買技能 ${skName(CP.skSel)}`,'按「裝備」就能帶上');renderCop();}});
   on('#cpSkShop',()=>{SHOP.sel=null;openShop('S');});}
 // shop: 技能 tab
-const skList=()=>copSkills().filter(b=>SHOP.filter==='all'||!ECO.sk.includes(b)).map((b,i)=>[b,i]).sort((x,y)=>ECO.sk.includes(x[0])-ECO.sk.includes(y[0])||x[1]-y[1]).map(x=>x[0]);
-function skCard(b){const own=ECO.sk.includes(b);return `<button class="shC shK ${own?'own':'buy'} ${OPC[b].side}" data-sb="${b}" aria-label="${esc(skName(b))}"><i class="sd ${OPC[b].side}"></i><span class="shKIc"><img src="${opIcon(b)}" alt=""></span>
+const skList=()=>copSkills().filter(b=>SHOP.filter==='all'||!skHas(b)).map((b,i)=>[b,i]).sort((x,y)=>skHas(x[0])-skHas(y[0])||x[1]-y[1]).map(x=>x[0]);
+function skCard(b){const own=skHas(b);return `<button class="shC shK ${own?'own':'buy'} ${OPC[b].side}" data-sb="${b}" aria-label="${esc(skName(b))}"><i class="sd ${OPC[b].side}"></i><span class="shKIc"><img src="${opIcon(b)}" alt=""></span>
   <span class="shKNm">${esc(skName(b))}</span><span class="shKOp">${esc(OPC[b].name)}${SKCLS[b]?` · 限${WPN[SKCLS[b]].t}`:''}</span><span class="shKUse">${skUse(b)}</span><span class="shTag">${own?'<i class="shOk">✓</i>已擁有':`${RNI}${fmtN(SKPRICE)}`}</span></button>`;}
-function skDet(el,b){const own=ECO.sk.includes(b),ok=ECO.rn>=SKPRICE,n=OPS[b].ch,sd=OPC[b].side;el.hidden=false;el.dataset.side='S';
+function skDet(el,b){const own=skHas(b),ok=ECO.rn>=SKPRICE,n=OPS[b].ch,sd=OPC[b].side;el.hidden=false;el.dataset.side='S';
   const tags=[n>50?'次數無限':`每場 ${n} 次`,'1 行動點',...(setupGadget(b)?['佈防時免費']:[])].map(t=>`<span>${t}</span>`).join('')+(SKCLS[b]?`<span class="w">限${WPN[SKCLS[b]].t}</span>`:'');
   const txt=String(skText(b)).split(/(?=〔)/).map(t=>{const m=t.match(/^〔(.+?)〕\s*(.*)$/s);return m?`<p><b>${m[1]}</b>${m[2]}</p>`:`<p>${t}</p>`;}).join('');
   el.innerHTML=`<div class="shDBox shKD ${sd}" role="dialog" aria-label="${esc(skName(b))}"><button class="shX" id="shX" aria-label="關閉">✕</button>
@@ -14943,6 +14949,7 @@ NEWS[0].v='v265–v284';NEWS[0].i.unshift('手機主畫面換上金線棋盤圖�
 NEWS.unshift({d:'2026-11-12',v:'v289',i:['玩家設定改成「我的名片」：名片上有立繪、獎盃數、稱號、聲望、勝率、成就和好友代碼，背景可選四種顏色（黑曜需成就 30 個）。名片背景、稱號、頭像都改成左右滑。','音樂和音效可以調音量。','輸入好友代碼會先看到對方名片再送出申請；點好友、或對戰結束後點對手名字，也能看名片。','修正名稱「儲存」按鈕被切掉、稱號 Recruit 專家重複出現。']});
 NEWS.unshift({d:'2026-11-12',v:'v290',i:['線上對戰改成獎盃制：拿掉段位，勝利 +30 獎盃、落敗 −20 獎盃（不會低於 0）。大廳「線上對戰」、配對 VS 畫面和結算都會顯示獎盃數。']});I18X['線上對戰改成獎盃制：拿掉段位，勝利 +30 獎盃、落敗 −20 獎盃（不會低於 0）。大廳「線上對戰」、配對 VS 畫面和結算都會顯示獎盃數。']=['Online matches now use trophies instead of ranks: win +30, lose −20 (never below 0). Trophies show on the lobby Online match button, the VS screen and the results.','オンライン対戦はランクの代わりにトロフィー制に：勝利 +30、敗北 −20（0 未満にならない）。ロビー、VS 画面、リザルトに表示。'];
 NEWS.unshift({d:'2026-11-12',v:'v291',i:['名片上的幹員立繪不再切到頭。']});
+NEWS.unshift({d:'2026-11-12',v:'v292',i:['名片上的「勝率」改成獎盃數，右上角不再另外顯示獎盃。','熟練度滿級顯示 LvMax。解鎖改成：擁有幹員就有圖示頭像、Lv2 解鎖頭像與半身像、Lv3 解鎖稱號、LvMax 解鎖該幹員技能給培養幹員裝備（不用再花聲望買）。']});
 I18X['手機主畫面換上金線棋盤圖示。遊戲畫面編輯器也有自己的圖示。']=['The game has a new gold-grid home-screen icon, and the UI editor has its own icon.',''];
 // ---------- round clocks: each squad gets (time per Operator x Operators in play) per round, shared by its two activation phases ----------
 const CLK_SVG={A:'<svg viewBox="0 0 48 48"><path d="M8 6l3-2 15 15-3 3zM40 6l-3-2-15 15 3 3z" opacity=".0"/><path d="M6 4h6l18 18-3 3L6 10zM42 4h-6L18 22l3 3L42 10zM14 30l4 4-6 6 2 2-3 3-2-2-3 3-2-2 3-3-2-2 3-3 2 2zm20 0l-4 4 6 6-2 2 3 3 2-2 3 3 2-2-3-3 2-2-3-3-2 2zM16 26l6 6-3 3-6-6zm16 0l-6 6 3 3 6-6z"/></svg>',
