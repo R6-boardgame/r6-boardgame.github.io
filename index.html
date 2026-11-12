@@ -2730,6 +2730,74 @@ html body button.tk:not(.done):hover,html body button.tk:not(.done):focus{border
 .ecoRes i{font-style:normal;color:#ffd84a;font-family:var(--mono)}
 .psrow.wrap{flex-wrap:wrap}
 .ttl{font-size:12px;padding:5px 9px}.ttl.on{border-color:var(--accent);color:var(--accent)}
+/* v289: player card + settings layout (rows of backgrounds / titles / avatars scroll sideways) */
+.pc289{--t1:#e3aa3e;--t2:#7a4f12;--t3:#1a140a;--ch:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);position:relative;width:100%;aspect-ratio:1.6;clip-path:var(--ch);overflow:hidden;isolation:isolate;container-type:inline-size;flex:none;color:#fff;
+  background:radial-gradient(120% 90% at 78% 30%,color-mix(in srgb,var(--t2) 70%,transparent),transparent 60%),linear-gradient(135deg,#141b22 0%,var(--t3) 100%)}
+.pc289.blue{--t1:#4aa8e2;--t2:#13406a;--t3:#0a1520}.pc289.orange{--t1:#ef7f3e;--t2:#6e2c0c;--t3:#1c0e07}.pc289.black{--t1:#d9d9d9;--t2:#3a3a3a;--t3:#070707}
+.pc289 .pcTex{position:absolute;inset:0;opacity:.13;z-index:-1;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='48' viewBox='0 0 28 48'%3E%3Cpath d='M14 0l14 8v16L14 32 0 24V8z M14 32l14 8v16 M14 32L0 40' fill='none' stroke='white' stroke-width='1'/%3E%3C/svg%3E");background-size:22px 38px;-webkit-mask:linear-gradient(100deg,#000 0%,transparent 55%);mask:linear-gradient(100deg,#000 0%,transparent 55%)}
+.pc289 .pcBand{position:absolute;left:44%;top:-20%;width:34%;height:150%;transform:skewX(-18deg);background:linear-gradient(180deg,color-mix(in srgb,var(--t1) 34%,transparent),color-mix(in srgb,var(--t1) 6%,transparent));z-index:-1}
+.pc289 .pcBand2{position:absolute;left:82%;top:-20%;width:5%;height:150%;transform:skewX(-18deg);background:var(--t1);opacity:.55;z-index:-1}
+.pc289 .pcHz{position:absolute;left:0;right:0;bottom:0;height:2.4cqw;background:repeating-linear-gradient(-45deg,var(--t1) 0 1.2cqw,transparent 1.2cqw 2.4cqw);opacity:.85;z-index:2}
+.pc289 .pcArt{position:absolute;right:-2%;bottom:2.4cqw;height:112%;max-width:70%;object-fit:contain;object-position:right bottom;filter:drop-shadow(0 0 3cqw color-mix(in srgb,var(--t1) 45%,transparent));z-index:0}
+.pc289 .pcShade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,9,12,.92) 0%,rgba(6,9,12,.55) 38%,transparent 62%),linear-gradient(0deg,rgba(6,9,12,.85) 0%,transparent 40%);z-index:0}
+.pc289 .pcFoil{position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.10) 42%,rgba(140,220,255,.08) 46%,rgba(255,200,120,.08) 50%,transparent 60%);mix-blend-mode:screen}
+.pc289 .pcEdge{position:absolute;inset:0;z-index:4;pointer-events:none;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--t1) 55%,transparent)}
+.pc289 .pcIn{position:absolute;inset:0;z-index:2;padding:4.6cqw 5cqw 5.6cqw;display:flex;flex-direction:column}
+.pc289 .pcTop{display:flex;justify-content:space-between;align-items:flex-start}
+.pc289 .pcKick{font-family:var(--mono);font-size:2.3cqw;letter-spacing:.3em;color:var(--t1);line-height:1.5}.pc289 .pcKick span{display:block;color:rgba(255,255,255,.45);letter-spacing:.2em}
+.pc289 .pcRank{display:flex;flex-direction:column;align-items:center;gap:.4cqw;margin-right:-1cqw}
+.pc289 .pcRank svg{width:10cqw;height:10cqw;filter:drop-shadow(0 0 2cqw rgba(255,210,90,.5))}
+.pc289 .pcRank b{font-family:var(--display);font-size:5cqw;line-height:1;color:#ffd77a;text-shadow:0 1px 4px #000}.pc289 .pcRank span{font-size:2.1cqw;letter-spacing:.2em;color:rgba(255,255,255,.6)}
+.pc289 .pcWho{margin-top:auto;display:flex;align-items:flex-end;gap:3cqw;min-width:0;max-width:72%}
+.pc289 .pcAv{width:15cqw;height:15cqw;flex:none;border:.5cqw solid var(--t1);background:#0d1318;box-shadow:0 1cqw 3cqw rgba(0,0,0,.6)}
+.pc289 .pcAv img{width:100%;height:100%;object-fit:cover;object-position:50% 12%;display:block}
+.pc289 .pcNm{display:flex;flex-direction:column;gap:1.2cqw;min-width:0}
+.pc289 .pcTtl{align-self:flex-start;font-family:var(--display);font-weight:700;font-size:3cqw;letter-spacing:.1em;color:#120d04;background:var(--t1);padding:.2cqw 2cqw .2cqw 1.6cqw;clip-path:polygon(0 0,100% 0,calc(100% - 1.4cqw) 100%,0 100%);white-space:nowrap}
+.pc289 .pcNm b{font-family:var(--display);font-weight:900;font-size:8.6cqw;line-height:1.02;text-shadow:0 .6cqw 2cqw rgba(0,0,0,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc289 .pcSt{display:flex;margin-top:3.4cqw;border-top:1px solid rgba(255,255,255,.14);padding-top:2cqw;max-width:62%}
+.pc289 .pcSt div{flex:1;display:flex;flex-direction:column;padding-right:2cqw}.pc289 .pcSt div+div{border-left:1px solid rgba(255,255,255,.14);padding-left:2.4cqw}
+.pc289 .pcSt b{font-family:var(--display);font-size:4.6cqw;line-height:1;font-weight:700}.pc289 .pcSt span{font-size:2.2cqw;color:rgba(255,255,255,.6);letter-spacing:.1em;margin-top:.6cqw}
+.pc289 .pcCode{position:absolute;right:4cqw;bottom:4.6cqw;z-index:2;text-align:right;font-family:var(--mono);font-size:2.2cqw;letter-spacing:.2em;color:rgba(255,255,255,.7);text-shadow:0 1px 3px #000}
+.pc289 .pcCode b{display:block;font-size:3.4cqw;color:#fff;letter-spacing:.24em}
+.pc289 .pcCode i{display:flex;gap:.35cqw;height:3cqw;justify-content:flex-end;margin-top:.8cqw}.pc289 .pcCode u{width:.4cqw;background:rgba(255,255,255,.7)}.pc289 .pcCode u:nth-child(3n){width:.9cqw}.pc289 .pcCode u:nth-child(5n){width:.2cqw}
+.pcMains h4{margin:0 0 8px;font-size:12.5px;letter-spacing:.14em;color:var(--accent)}
+.pcMains>div{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pcMains span{display:flex;flex-direction:column;align-items:center;gap:3px;border:1px solid #26333f;background:#111920;padding:8px 4px;min-width:0}
+.pcMains img{width:52px;height:52px;object-fit:cover;object-position:50% 12%;background:#0b1117}
+.pcMains b{font-size:13px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pcMains small{color:var(--accent);font-family:var(--mono);font-size:11px}
+.pcDlg{gap:12px}.pcBtns{display:flex;gap:8px}.pcBtns button{flex:1;padding:12px;font-weight:700}
+.anPN[data-oc]{cursor:pointer;text-decoration:underline dotted 1px;text-underline-offset:3px}
+.frFound289{display:flex;flex-direction:column;gap:10px;margin:4px 0 12px}.frOkF{margin:0;font-size:12px;color:#5fc27d;letter-spacing:.08em}
+.frSend289{text-align:center;background:#f0b43c;border:0;color:#1a120a;padding:12px;font-weight:900;letter-spacing:.14em;font-size:15px;cursor:pointer}.frSend289:disabled{opacity:.5}
+.fpeek .pc289{margin-top:2px}
+/* settings */
+.psbox.ps289{width:min(560px,100%);gap:16px}
+.ps289 .psCols,.ps289 .psC1,.ps289 .psC2{display:flex;flex-direction:column;gap:18px;min-width:0}
+.ps289 section{min-width:0}
+.ps289 .psEdit{display:flex;gap:8px;margin-top:10px}.ps289 .psEdit button{flex:1;border:1px solid #33475a;background:#111920;padding:9px;font-size:13px}.ps289 .psEdit b{color:var(--accent);margin-right:5px}
+.ps289 .psNm{margin:10px 0 0}.ps289 .psNm input{min-width:0;font-size:16px}.ps289 .psNm button{flex:none;white-space:nowrap;padding:8px 16px}
+.hs289{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;touch-action:pan-x pan-y;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:2px 2px 6px;scrollbar-width:thin}
+.hs289>*{flex:none;scroll-snap-align:start}
+html.pg .hs289{touch-action:pan-x pan-y}
+.hs289.avs{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,56px);grid-auto-columns:56px;gap:6px}
+.hs289.tts .ttl{white-space:nowrap;font-size:13px;padding:7px 12px}
+.hs289.tts .ttl.on{background:var(--accent);color:#111;font-weight:700}
+.pcTh{width:88px;padding:4px;background:#111920;border:1px solid #2a3a48;font-size:12px;color:#93a4b4;text-align:center}
+.pcTh i{display:block;aspect-ratio:1.6;margin-bottom:4px;clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px)}
+.pcTh.gold i{background:linear-gradient(135deg,#141b22,#7a4f12)}.pcTh.blue i{background:linear-gradient(135deg,#0a1520,#13406a)}.pcTh.orange i{background:linear-gradient(135deg,#1c0e07,#6e2c0c)}.pcTh.black i{background:linear-gradient(135deg,#070707,#3a3a3a)}
+.ps289 .pcTh.on{background:#111920;border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 1px var(--accent)}.pcTh:disabled{opacity:.5}
+.psMix{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.psVol{border:1px solid #26333f;background:#111920;padding:12px;display:flex;flex-direction:column;gap:10px}
+.psVol .ln{display:flex;justify-content:space-between;align-items:center}.psVol output{font-family:var(--display);font-size:22px;color:var(--accent);line-height:1}
+.psVol .vb{position:relative;display:flex;gap:3px;align-items:flex-end;height:28px}.psVol .vb i{flex:1;background:#26333f}.psVol .vb i.f{background:var(--accent)}
+.psVol input{position:absolute;inset:-8px 0;width:100%;height:calc(100% + 16px);margin:0;opacity:0;cursor:pointer;touch-action:pan-y}
+.psOpts{display:grid;grid-template-columns:1fr 1fr;gap:10px}.psOpts>div{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #26333f;background:#111920;padding:8px 12px;min-width:0}
+.psOpts select{min-width:0;max-width:100%}
+.psTg{width:42px;height:24px;border-radius:12px;background:#33414e;position:relative;border:0;padding:0;flex:none}.psTg::after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#cfd8df;transition:left .15s}
+.psTg.on{background:#5fc27d}.psTg.on::after{left:21px;background:#fff}
+.ps289 .psAcc{border:1px solid #26333f;background:#111920;padding:12px}.ps289 .psAcc .pshint:first-child{margin-top:0}.ps289 .psAF{margin-top:10px}.ps289 .psAF button{flex:1}
+#psGout{border:1px solid rgba(232,87,78,.6);color:#e8574e;background:rgba(232,87,78,.06);font-weight:700}
+@media (min-width:900px) and (min-height:560px){.psbox.ps289{width:min(1000px,100%)}.ps289 .psCols{display:grid;grid-template-columns:1.1fr 1fr;gap:20px 24px;align-items:start}.hs289.avs{grid-auto-columns:52px;grid-template-rows:repeat(2,52px)}}
 .pav,.avb img{object-position:50% 12%}
 #title[data-s="task"]{grid-template-columns:1fr!important;align-content:center!important}
 #title[data-s="task"] .tlogo{display:none}
@@ -7196,11 +7264,11 @@ const nm=u=>pub(u)?`<b class="${u.side==='A'?'a':'d'}">${u.nmz||OPS[u.op].name}<
 // ---------- sound: everything is synthesised with Web Audio, so no files to load ----------
 const SFX=(()=>{
   let ac=null,out=null,fxBus=null,muBus=null,noiseBuf=null,mus=null,last={};
-  let on=true,mOn=true;try{on=localStorage.getItem('r6snd')!=='0';mOn=localStorage.getItem('r6mus')!=='0';}catch(e){}
+  let on=true,mOn=true,vol=1,mvol=1;try{on=localStorage.getItem('r6snd')!=='0';mOn=localStorage.getItem('r6mus')!=='0';const a=localStorage.getItem('r6vol289'),b=localStorage.getItem('r6mvol289');if(a!=null)vol=Math.max(.05,Math.min(1,+a||1));if(b!=null)mvol=Math.max(.05,Math.min(1,+b||1));}catch(e){}
   function init(){if(ac){if(ac.state!=='running'){try{const p=ac.resume();p&&p.catch&&p.catch(()=>{});}catch(e){}unlockTap();}return;}const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
     try{ac=new AC();}catch(e){ac=null;return;}
     out=ac.createDynamicsCompressor();out.threshold.value=-14;out.ratio.value=4;out.connect(ac.destination);
-    fxBus=ac.createGain();fxBus.gain.value=on?.9:0;fxBus.connect(out);muBus=ac.createGain();muBus.gain.value=mOn?.32:0;muBus.connect(out);
+    fxBus=ac.createGain();fxBus.gain.value=on?.9*vol:0;fxBus.connect(out);muBus=ac.createGain();muBus.gain.value=mOn?.32*mvol:0;muBus.connect(out);
     unlockTap();decodeAll();noiseBuf=ac.createBuffer(1,ac.sampleRate*1.5,ac.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
   const ok=()=>ac&&on&&ac.state==='running';
   // v175: iOS only unlocks audio from a real gesture end (touchend/click), and needs a sound started inside it
@@ -7267,8 +7335,11 @@ const SFX=(()=>{
     deploy(){if(!ok()||!gate('dep',120))return;play('deploy'+(1+Math.floor(Math.random()*3)));},
     get on(){return on;},
     get mOn(){return mOn;},
-    toggle(){on=!on;try{localStorage.setItem('r6snd',on?'1':'0');}catch(e){}init();if(ac)fxBus.gain.value=on?.9:0;return on;},
-    toggleMusic(){mOn=!mOn;if(!mOn)setTimeout(()=>{try{achGive('quiet');}catch(e){}},0);try{localStorage.setItem('r6mus',mOn?'1':'0');}catch(e){}init();if(ac){muBus.gain.value=mOn?.32:0;if(!mOn&&mus){mus.lvl=0;mus.g.gain.value=0;}}return mOn;},
+    toggle(){on=!on;try{localStorage.setItem('r6snd',on?'1':'0');}catch(e){}init();if(ac)fxBus.gain.value=on?.9*vol:0;return on;},
+    get vol(){return vol;},get mvol(){return mvol;},
+    setVol(v){if(v>0){vol=Math.min(1,v);try{localStorage.setItem('r6vol289',vol);}catch(e){}}if(ac&&on)fxBus.gain.value=.9*vol;},
+    setMVol(v){if(v>0){mvol=Math.min(1,v);try{localStorage.setItem('r6mvol289',mvol);}catch(e){}}if(ac&&mOn)muBus.gain.value=.32*mvol;},
+    toggleMusic(){mOn=!mOn;if(!mOn)setTimeout(()=>{try{achGive('quiet');}catch(e){}},0);try{localStorage.setItem('r6mus',mOn?'1':'0');}catch(e){}init();if(ac){muBus.gain.value=mOn?.32*mvol:0;if(!mOn&&mus){mus.lvl=0;mus.g.gain.value=0;}}return mOn;},
     init};
   // browsers only allow sound after a tap or key press
   ['pointerdown','keydown','touchstart','touchend','pointerup','click'].forEach(e=>addEventListener(e,()=>init(),{capture:true,passive:true}));
@@ -9322,7 +9393,7 @@ function frTap(b){const o=G&&G.net&&NET&&NET.opp;
 function anCap(side){const mine=side===G.player,o=G.net&&NET&&NET.opp;
   const nm=mine?(G.coop?`${meName()}、${coopMateName()}`:meName()):(G.coop?'電腦':G.bot?G.bot.name:G.net?(o?o.name:'對手'):'電腦');
   const fr=mine||G.coop?'':(o&&isFriend(o.id)?`<button class="anFr ok" aria-label="已是好友">${SVG_FR.ok}<em>已加好友</em></button>`:o&&frOut(o.id)?`<button class="anFr ok" aria-label="已送出好友申請">${SVG_FR.ok}<em>已申請</em></button>`:`<button class="anFr${o?'':' off'}" aria-label="加好友">${SVG_FR.add}<em>加好友</em></button>`);
-  return `<caption><span class="anSide">${side==='A'?'進攻方':'防守方'}</span><b class="anPN">${esc(nm)}</b>${mine?'<i class="me">你</i>':''}${fr}</caption>`;}
+  return `<caption><span class="anSide">${side==='A'?'進攻方':'防守方'}</span><b class="anPN"${!mine&&!G.coop&&o&&o.id?` data-oc="${esc(o.id)}" role="button" title="看名片"`:''}>${esc(nm)}</b>${mine?'<i class="me">你</i>':''}${fr}</caption>`;}
 // v193: friend codes + public profile (prof/<CODE>: name and the strongest custom operator), add by code, tap a friend to see their best operator
 const FRC_A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function frCode(id){let h=2166136261;for(const ch of String(id||''))h=Math.imul(h^ch.charCodeAt(0),16777619)>>>0;let s='';for(let i=0;i<6;i++){s+=FRC_A[h&31];h=(h>>>5)|((i*7+3)<<27);h>>>=0;}return s;}
@@ -9331,7 +9402,7 @@ async function frMyId(){try{if(!window.claude||!claude.use)return null;const u=a
 function frBest(){const L=copAll().map((c,i)=>({c,i,s:copScore(c)}));L.sort((a,b)=>b.s.sc-a.s.sc||(b.c.k|0)-(a.c.k|0)||(b.c.sv|0)-(a.c.sv|0));const b=L[0];
   return {nm:lobNm(b.c,b.i),i:b.i,w:b.c.w&&WART[b.c.w]?b.c.w:'',k:b.c.k|0,sv:b.c.sv|0,sc:b.s.sc,rk:b.s.rk};}
 async function profPush(){try{const id=await frMyId();if(!id)return;const code=frCode(id);FRP.id=id;if(FRP.code!==code){FRP.code=code;setTimeout(invListen,0);setTimeout(frReqListen,0);const el=$('#achp');if(el&&ACHV.tab!=='ach')renderAch();}
-  const d={id,n:meName(),best:frBest()},sig=JSON.stringify(d);if(sig===FRP.sig)return;const db=await claude.use('db');if(!db)return;FRP.sig=sig;await db.doc('prof/'+code).set(Object.assign(d,{ts:Date.now()}));}catch(e){}}
+  let c=null;try{c=myCard289();}catch(e){}const d={id,n:meName(),best:frBest(),c},sig=JSON.stringify(d);if(sig===FRP.sig)return;const db=await claude.use('db');if(!db)return;FRP.sig=sig;await db.doc('prof/'+code).set(Object.assign(d,{ts:Date.now()}));}catch(e){}}
 async function profGet(code){try{if(!window.claude||!claude.use)return null;const db=await claude.use('db');if(!db)return null;const s=await db.doc('prof/'+code).get();const d=s.exists&&s.data();return d&&d.id?d:null;}catch(e){return null;}}
 async function frAddCode(raw){const code=String(raw||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(FRP.busy)return;
   const say=m=>{FRP.msg=m;renderAch();};
@@ -9343,11 +9414,13 @@ async function frAddCode(raw){const code=String(raw||'').toUpperCase().replace(/
   FRP.cache[d.id]=d;
   if(isFriend(d.id)){const f=FR.list.find(x=>x.id===d.id);if(f&&d.n){f.name=d.n;frSave();}return say(`${d.n||'對方'} 已經是你的好友`);}
   if(frOut(d.id))return say(`已經申請過了，等待 ${d.n||'對方'} 同意`);
-  FRP.busy=true;await frReqSend({id:d.id,code,n:d.n||'玩家'},m=>{FRP.msg=m;});FRP.busy=false;const i=$('#frIn');if(i)i.value='';renderAch();}
+  FRP.found=Object.assign({code},d);say('');}
+async function frSendFound289(){const d=FRP.found;if(!d||FRP.busy)return;FRP.busy=true;await frReqSend({id:d.id,code:d.code,n:d.n||'玩家'},m=>{FRP.msg=m;});FRP.busy=false;FRP.found=null;const i=$('#frIn');if(i)i.value='';renderAch();}
 function frPeek(id){FRP.peek=id;renderAch();const f=FR.list.find(x=>x.id===id),code=(f&&f.code)||frCode(id);
   profGet(code).then(d=>{if(d){FRP.cache[id]=d;if(f&&d.n&&f.name!==d.n){f.name=d.n;frSave();}}else if(!FRP.cache[id])FRP.cache[id]={none:1};if(FRP.peek===id)renderAch();});}
 function frPeekHTML(){const id=FRP.peek,f=FR.list.find(x=>x.id===id)||{name:'玩家',w:0,l:0},d=FRP.cache[id],b=d&&d.best,code=(f.code)||frCode(id);
-  let main;if(!d)main='<p class="frE">讀取中…</p>';else if(!b)main='<p class="frE">對方還沒有公開資料，等他開一次遊戲大廳就會出現。</p>';
+  let main;if(!d)main='<p class="frE">讀取中…</p>';else if(!b&&!d.c)main='<p class="frE">對方還沒有公開資料，等他開一次遊戲大廳就會出現。</p>';
+  else if(d.c)main=cardHTML289(d.c,code)+mainsHTML289(d.c.m);
   else{const img=`img/av/cop_${b.i?'m':'f'}${b.w?'_'+b.w:''}.webp`;
     main=`<div class="fpOp"><img src="${img}" alt=""><div><small>最強培養幹員</small><b>${esc(b.nm)}</b>${b.rk?`<i class="fpRk" style="--rk:${RKC[b.rk]||'#8b9cad'}">${b.rk}</i>`:''}</div></div>${lobKD(b.sv,b.k)}`;}
   return `<div class="fpeek"><div class="fpTop"><button class="fpBack" aria-label="返回">‹</button><b>${esc((d&&d.n)||f.name)}</b><span class="fpCode">${code}</span></div>${main}<p class="fpWL">和你對戰 ${f.w|0} 勝 ${f.l|0} 敗</p></div>`;}
@@ -9391,8 +9464,8 @@ async function frCancel(id){const o=(FR.out||[]).find(x=>x.id===id);if(!o)return
   const db=await ptDb();if(db&&FRP.code)try{await db.doc('freq/'+o.code+'/'+FRP.code).delete();}catch(e){}}
 function frReqHTML(){const inc=Object.values(FRQ.inc).sort((a,b)=>(b.ts|0)-(a.ts|0)),out=(FR.out||[]).slice().sort((a,b)=>b.ts-a.ts),rec=FR.recent.filter(r=>!isFriend(r.id)&&!frOut(r.id)).slice(0,3);
   return `<div class="frMe"><span>我的好友代碼</span><b>${FRP.code||'…'}</b><button class="frCp" ${FRP.code?'':'disabled'}>複製</button></div>
-    <form class="frAddC"><input id="frIn" maxlength="8" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="輸入對方的好友代碼"><button type="submit" ${FRP.busy?'disabled':''}>送出申請</button></form>${FRP.msg?`<p class="frMsg">${esc(FRP.msg)}</p>`:''}
-    <div class="frScr"><h5 class="frSec"><span>收到的申請</span><em>${inc.length}</em></h5><div class="frl">${inc.length?inc.map(d=>`<div class="fri"><b>${esc(d.n||'玩家')}</b><span class="frCd">${esc(d.code)}</span><button class="frOk" data-acc="${esc(d.code)}">同意</button><button class="frx" data-dec="${esc(d.code)}">拒絕</button></div>`).join(''):'<p class="frE">目前沒有人申請加你。</p>'}</div>
+    <form class="frAddC"><input id="frIn" maxlength="8" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="輸入對方的好友代碼"><button type="submit" ${FRP.busy?'disabled':''}>搜尋</button></form>${FRP.msg?`<p class="frMsg">${esc(FRP.msg)}</p>`:''}
+    <div class="frScr">${FRP.found?`<div class="frFound289"><p class="frOkF">● 找到玩家</p>${cardHTML289(FRP.found.c||oldCard289(FRP.found),FRP.found.code)}${mainsHTML289(FRP.found.c&&FRP.found.c.m)}<button class="frSend289" id="frSend" ${FRP.busy?'disabled':''}>送出好友申請</button></div>`:''}<h5 class="frSec"><span>收到的申請</span><em>${inc.length}</em></h5><div class="frl">${inc.length?inc.map(d=>`<div class="fri"><b>${esc(d.n||'玩家')}</b><span class="frCd">${esc(d.code)}</span><button class="frOk" data-acc="${esc(d.code)}">同意</button><button class="frx" data-dec="${esc(d.code)}">拒絕</button></div>`).join(''):'<p class="frE">目前沒有人申請加你。</p>'}</div>
     <h5 class="frSec"><span>等待對方同意</span><em>${out.length}</em></h5><div class="frl">${out.length?out.map(o=>`<div class="fri"><b>${esc(o.name)}</b><span class="frCd">${esc(o.code||'')}</span><span class="frWt">等待中</span><button class="frx" data-can="${esc(o.id)}">取消</button></div>`).join(''):'<p class="frE">沒有等待中的申請。輸入對方的好友代碼送出申請，對方同意後就會出現在好友名單。</p>'}</div>
     ${rec.length?`<div class="frrec"><small>最近對手</small>${rec.map(r=>`<button class="anFr" data-addr="${esc(r.id)}">${SVG_FR.add}<em>${esc(r.name)}</em></button>`).join('')}</div>`:''}</div>`;}
 // ---- achievements ----
@@ -9545,7 +9618,7 @@ function achBadge(a){if(a.img)return `<img class="bdS" src="${a.img}" alt="" sty
   return `<svg class="bdS" viewBox="0 0 80 80" style="width:${ACHV.bw}px;height:${ACHV.bw}px"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}"/><stop offset="1" stop-color="#1b2530"/></linearGradient></defs>
     <path d="${S}" fill="url(#${id})" stroke="#e9d9a6" stroke-width="3" stroke-linejoin="round"/><path d="${S}" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="1" transform="translate(40 40) scale(.8) translate(-40 -40)"/>
     <text x="40" y="${a.sh===3?50:51}" text-anchor="middle" font-size="${a.sh===3?24:30}">${a.ic}</text></svg>`;}
-function openAch(tab){ACHV.st=0;if((tab||'ach')==='ach'){AS.n.opens=(AS.n.opens||0)+1;achSave();if(ACH.filter(x=>x.id!=='hunter'&&AS.got[x.id]).length>=10)setTimeout(()=>achGive('hunter'),0);}if(tab==='fr'&&frIncN())tab='req';ACHV.tab=tab||'ach';ACHV.sel=null;ACHV.pg=0;FRP.peek=null;FRP.msg='';profPush();let el=$('#achp');if(!el){el=document.createElement('div');el.id='achp';el.setAttribute('role','dialog');document.body.appendChild(el);el.addEventListener('click',e=>{if(e.target===el)el.remove();});}el.setAttribute('aria-label',ACHV.tab==='ach'?'成就':'好友');renderAch();}
+function openAch(tab){ACHV.st=0;if((tab||'ach')==='ach'){AS.n.opens=(AS.n.opens||0)+1;achSave();if(ACH.filter(x=>x.id!=='hunter'&&AS.got[x.id]).length>=10)setTimeout(()=>achGive('hunter'),0);}if(tab==='fr'&&frIncN())tab='req';ACHV.tab=tab||'ach';ACHV.sel=null;ACHV.pg=0;FRP.peek=null;FRP.msg='';FRP.found=null;profPush();let el=$('#achp');if(!el){el=document.createElement('div');el.id='achp';el.setAttribute('role','dialog');document.body.appendChild(el);el.addEventListener('click',e=>{if(e.target===el)el.remove();});}el.setAttribute('aria-label',ACHV.tab==='ach'?'成就':'好友');renderAch();}
 function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body='';
   if(T==='ach'){const a=ACHM[ACHV.sel];achPer();
     const card=x=>{const [v,g]=achProg(x),got=!!AS.got[x.id];return `<button class="bd ${got?'got':''} ${ACHV.sel===x.id?'sel':''}" data-a="${x.id}">${achBadge(x)}${got?'':`<i class="bdL">${SVG_LOCK}</i>`}<b>${x.n}</b><span class="bdP"><i><u style="width:${Math.round(v/g*100)}%"></u></i>${v}/${g}</span></button>`;};
@@ -9561,7 +9634,7 @@ function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body
   const nIn=frIncN(),head=T==='ach'?`<b class="achT">🏆 成就 <em>${achCount()}/${ACH.length}</em></b>`:`<div class="seg"><button class="${T==='req'?'on':''}" data-t="req">申請好友${nIn?` <i class="frDot">${nIn}</i>`:''}</button><button class="${T==='fr'?'on':''}" data-t="fr">好友名單 ${FR.list.length}</button></div>`;
   el.innerHTML=`<div class="achBox"><div class="achHead">${head}<button class="achX" aria-label="關閉">✕</button></div>${body}</div>`;
   el.querySelector('.achX').onclick=()=>{el.remove();renderPlayer();};
-  el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ACHV.tab=b.dataset.t;ACHV.sel=null;ACHV.pg=0;FRP.peek=null;FRP.msg='';renderAch();});
+  el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ACHV.tab=b.dataset.t;ACHV.sel=null;ACHV.pg=0;FRP.peek=null;FRP.msg='';FRP.found=null;renderAch();});
   el.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>frAccept(b.dataset.acc));el.querySelectorAll('[data-dec]').forEach(b=>b.onclick=()=>frDecline(b.dataset.dec));el.querySelectorAll('[data-can]').forEach(b=>b.onclick=()=>frCancel(b.dataset.can));
   el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{ACHV.sel=b.dataset.a;renderAch();});
   el.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{ACHV.pg+=+b.dataset.pg;ACHV.sel=null;renderAch();});
@@ -9572,7 +9645,7 @@ function renderAch(){const el=$('#achp');if(!el)return;const T=ACHV.tab;let body
   el.querySelectorAll('[data-invite]').forEach(b=>b.onclick=()=>ptInvite(b.dataset.invite));if(T==='fr')frOnWatch();
   {const bk=el.querySelector('.fpBack');if(bk)bk.onclick=()=>{FRP.peek=null;renderAch();};
    const cp=el.querySelector('.frCp');if(cp)cp.onclick=()=>{try{navigator.clipboard.writeText(FRP.code).then(()=>{cp.textContent='已複製';},()=>{});}catch(e){}};
-   const fm=el.querySelector('.frAddC');if(fm)fm.onsubmit=e=>{e.preventDefault();frAddCode(el.querySelector('#frIn').value);};}
+   const fm=el.querySelector('.frAddC');if(fm)fm.onsubmit=e=>{e.preventDefault();FRP.found=null;frAddCode(el.querySelector('#frIn').value);};const fs=el.querySelector('#frSend');if(fs)fs.onclick=frSendFound289;}
   el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const id=b.dataset.del;if(ACHV.sel!==id){ACHV.sel=id;renderAch();return;}frDel(id);ACHV.sel=null;renderAch();});
   el.querySelectorAll('[data-addr]').forEach(b=>b.onclick=()=>{const r=FR.recent.find(x=>x.id===b.dataset.addr);if(!r)return;if(!b.classList.contains('arm')){b.classList.add('arm');b.querySelector('em').textContent='再點一下申請 '+r.name;return;}frReqSend({id:r.id,code:frCode(r.id),n:r.name},m=>{FRP.msg=m;renderAch();});});}
 // ---- mirror to the signed-in player's private store ----
@@ -12808,7 +12881,7 @@ const PKEY='r6bg.profile';
 const ME=(()=>{let p=null;try{p=JSON.parse(localStorage.getItem(PKEY)||'null');}catch(e){}
   p=Object.assign({mode:'guest',guest:'訪客'+String(1000+Math.floor(Math.random()*9000)),nick:'',avatar:'recruit_a_rifle',usePhoto:false,lang:'zh'},p||{});
   p.acct=null;p.rating=null;p.w=0;p.l=0;return p;})();
-function saveMe(){gaPush();try{const {mode,guest,nick,avatar,usePhoto,lang}=ME;localStorage.setItem(PKEY,JSON.stringify({mode,guest,nick,avatar,usePhoto,lang}));}catch(e){}}
+function saveMe(){gaPush();try{const {mode,guest,nick,avatar,usePhoto,lang,cth}=ME;localStorage.setItem(PKEY,JSON.stringify({mode,guest,nick,avatar,usePhoto,lang,cth}));}catch(e){}}
 const meName=()=>ME.nick||(ME.mode==='account'&&ME.acct&&ME.acct.name)||ME.guest;
 const meAvatar=()=>ME.usePhoto&&ME.acct&&ME.acct.photo?ME.acct.photo:/^cop:/.test(ME.avatar||'')?(copAv(ME.avatar)||copAv('cop:0')).av:/^pic:/.test(ME.avatar||'')?opPic(ME.avatar.slice(4)):/^art:/.test(ME.avatar||'')?(opArt(ME.avatar.slice(4))||opIcon(ME.avatar.slice(4))):opIcon(ME.avatar);
 const TIERS=[[0,'紅銅','Copper','カッパー','#b5653a'],[1100,'青銅','Bronze','ブロンズ','#a8794a'],[1200,'白銀','Silver','シルバー','#b8c4cc'],[1350,'黃金','Gold','ゴールド','#e3aa3e'],[1500,'白金','Platinum','プラチナ','#5fc7c2'],[1700,'翡翠','Emerald','エメラルド','#3fbf75'],[1900,'鑽石','Diamond','ダイヤモンド','#9c7cf2'],[2100,'冠軍','Champion','チャンピオン','#e8574e']];
@@ -12888,27 +12961,76 @@ function openSettings(){let el=$('#psettings');if(!el){el=document.createElement
     el.addEventListener('click',e=>{if(e.target===el)closeSettings();});}
   el.hidden=false;renderSettings();{const bx=el.querySelector('.psbox');if(bx)bx.scrollTop=0;}}
 function closeSettings(){const el=$('#psettings');if(el)el.hidden=true;}
+// v289: player card. The settings panel opens on the card; background, title and avatar rows scroll sideways so the layout keeps its height.
+// The same card (prof/<code>.c) is shown when adding a friend by code, when tapping a friend, and when tapping the opponent after a match.
+const CTH289=[['','金'],['blue','防守藍'],['orange','進攻橙'],['black','黑曜']];
+const cthOk289=k=>k!=='black'||achCount()>=30;
+const PS289={edit:false};
+function avSrc289(k,ph){if(k==='__photo')return ph||'img/cop/f.webp';if(/^cop:/.test(k||''))return (copAv(k)||copAv('cop:0')).av;const b=String(k||'').replace(/^(art|pic):/,'');
+  if(!OPC[b])return 'img/av/cop_f.webp';if(/^pic:/.test(k))return opPic(b);if(/^art:/.test(k))return opArt(b)||opIcon(b);return opIcon(b);}
+function artSrc289(k,m){if(/^cop:/.test(k||'')){const c=copAv(k);if(c)return c.art;}const b=String(k||'').replace(/^(art|pic):/,'');
+  if(OPC[b]&&FACEM[artBase(b)])return 'img/face/'+artBase(b)+'.webp';const t=(m||[]).find(x=>OPC[x[0]]&&FACEM[artBase(x[0])]);return t?'img/face/'+artBase(t[0])+'.webp':COPART[0];}
+function mains289(){const n=new Set();return OPBASE.filter(b=>(ECO.mx[b]||0)>0&&OPC[b]).sort((a,b)=>(ECO.mx[b]||0)-(ECO.mx[a]||0)).filter(b=>!n.has(OPC[b].name)&&n.add(OPC[b].name)).slice(0,3).map(b=>[b,mxLv(ECO.mx[b]||0)]);}
+function ttl289(){return ECO.title&&OPC[ECO.title]&&mxLv(ECO.mx[ECO.title]||0)>=5?mxTitle(ECO.title):'';}
+function myCard289(){const ph=ME.usePhoto&&ME.acct&&ME.acct.photo?ME.acct.photo:'';
+  return {n:meName(),t:ttl289(),av:ph?'__photo':ME.avatar,ph,th:cthOk289(ME.cth||'')?(ME.cth||''):'',rn:Math.round(ECO.rn||0),a:achCount(),r:ME.mode==='account'?ME.rating:null,w:ME.w|0,l:ME.l|0,m:mains289()};}
+// someone on an older version only has a name and their best custom operator
+function oldCard289(d){const b=d&&d.best,i=b?b.i|0:0,w=b&&b.w?b.w:'';return {n:(d&&d.n)||'玩家',t:'',av:'cop:'+i+(w?':'+w:''),th:'',m:[],old:1};}
+// the card shows trophies (the ranked points), not a tier name
+const TROPHY289='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v5.5a5 5 0 0 1-10 0z" fill="#f1c255"/><path d="M7 5H4v1.5A3.5 3.5 0 0 0 7.5 10M17 5h3v1.5A3.5 3.5 0 0 1 16.5 10" fill="none" stroke="#f1c255" stroke-width="1.6"/><path d="M10.6 13.2h2.8l.6 4h-4z" fill="#f1c255"/><path d="M7.5 21h9l-.8-3.6H8.3z" fill="#f1c255"/></svg>';
+function cardHTML289(c,code){c=c||{};const th=['blue','orange','black'].includes(c.th)?c.th:'';
+  const no=String(code||'').split('').reduce((h,ch)=>(h*31+ch.charCodeAt(0))%10000,7),wl=(c.w|0)+(c.l|0);
+  const st=c.old?'':`<div class="pcSt"><div><b>${c.rn==null?'—':fmtN(c.rn)}</b><span>聲望</span></div><div><b>${wl?Math.round((c.w|0)/wl*100)+'%':'—'}</b><span>勝率</span></div><div><b>${c.a==null?'—':c.a}</b><span>成就</span></div></div>`;
+  return `<div class="pc289 ${th}"><div class="pcTex"></div><div class="pcBand"></div><div class="pcBand2"></div><img class="pcArt" src="${esc(artSrc289(c.av,c.m))}" alt=""><div class="pcShade"></div>
+  <div class="pcIn"><div class="pcTop"><div class="pcKick">OPERATOR CARD<span>No. ${String(no).padStart(4,'0')}</span></div><div class="pcRank">${TROPHY289}<b>${c.r==null?'—':fmtN(c.r)}</b><span>獎盃</span></div></div>
+  <div class="pcWho"><div class="pcAv"><img src="${esc(avSrc289(c.av,c.ph))}" alt=""></div><div class="pcNm">${c.t?`<span class="pcTtl">${esc(c.t)}</span>`:''}<b>${esc(c.n||'玩家')}</b></div></div>${st}</div>
+  ${code?`<div class="pcCode">FRIEND CODE<b>${esc(code)}</b><i>${'<u></u>'.repeat(16)}</i></div>`:''}<div class="pcHz"></div><div class="pcFoil"></div><div class="pcEdge"></div></div>`;}
+function mainsHTML289(m){m=(m||[]).filter(x=>OPC[x[0]]);if(!m.length)return '';
+  return `<div class="pcMains"><h4>常用幹員</h4><div>${m.map(([b,lv])=>`<span><img src="${FACEM[artBase(b)]?opPic(b):opIcon(b)}" alt=""><b>${esc(OPC[b].name)}</b><small>Lv${lv|0}</small></span>`).join('')}</div></div>`;}
+// tap the opponent's name after a match
+async function openCard289(id,name){if(!id)return;const code=frCode(id);let el=tsDlg('card289','玩家名片','<div class="psbox"><button class="tsX" aria-label="關閉">✕</button></div>');
+  const draw=d=>{const c=d&&d.c?d.c:oldCard289(d||{n:name}),fr=isFriend(id),out=frOut(id);
+    el.innerHTML=`<div class="psbox pcDlg"><div class="pshead"><div><b>對手名片</b></div><button class="tsX" aria-label="關閉">✕</button></div>${cardHTML289(c,code)}${mainsHTML289(c.m)}${d?'':'<p class="pshint">讀取中…</p>'}
+      <div class="pcBtns">${fr?'<button disabled>已經是好友</button>':out?'<button disabled>已送出好友申請</button>':`<button class="primary" id="pcAdd">＋ 加好友</button>`}</div><p class="pshint pcMsg"></p></div>`;
+    el.querySelector('.tsX').onclick=()=>{el.hidden=true;};const a=el.querySelector('#pcAdd');
+    if(a)a.onclick=()=>{a.disabled=true;frReqSend({id,code,n:(d&&d.n)||name},m=>{const p=el.querySelector('.pcMsg');if(p)p.textContent=m;});};};
+  el.hidden=false;draw(null);const d=await profGet(code);draw(d||{n:name});}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.anPN[data-oc]');if(b)openCard289(b.dataset.oc,b.textContent);});
+function volHTML289(id,ic,label,v){const n=Math.round(v*100);return `<div class="psVol"><div class="ln"><b>${ic} ${label}</b><output>${n}</output></div><div class="vb">${Array.from({length:12},(_,i)=>`<i class="${i<Math.round(n/100*12)?'f':''}" style="height:${30+i*6}%"></i>`).join('')}<input type="range" id="${id}" min="0" max="100" step="5" value="${n}" aria-label="${label}音量"></div></div>`;}
 function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;const acct=ME.mode==='account'&&ME.acct;const _rs=scrollSnap(el);
   const avl=[];OPBASE.forEach(b=>{const lv=mxLv(ECO.mx[b]||0);if(b.startsWith('recruit_')||lv>=1||ME.avatar===b)avl.push([b,opIcon(b),OPC[b].name]);if(lv>=3||ME.avatar==='art:'+b)avl.push(['art:'+b,opArt(b)||opIcon(b),OPC[b].name+' 半身像']);});
   {const wu=copWU();copAll().forEach((c,i)=>{avl.push(['cop:'+i,copAv('cop:'+i).av,`${COPN[i]} ${c.nm}`]);for(const w of WORD)if(wu.has(i+':'+w))avl.push([`cop:${i}:${w}`,copAv(`cop:${i}:${w}`).av,`${COPN[i]} ${WPN[w].t}`,w]);});}
   OPBASE.forEach(b=>{if(!b.startsWith('recruit_')&&FACEM[artBase(b)]&&(owned(b)||ME.avatar==='pic:'+b))avl.push(['pic:'+b,opPic(b),OPC[b].name+' 照片']);});
-  const avs=avl.map(([k,src,n,w])=>`<button class="avb ${!ME.usePhoto&&ME.avatar===k?'on':''} ${k.startsWith('art:')?'art':''} ${k.startsWith('cop:')?'cop':''} ${k.startsWith('pic:')?'pic':''}" data-av="${k}" title="${esc(n)}"><img src="${src}" alt="${esc(n)}">${w?`<i class="avW">${WPN[w].ic}</i>`:''}</button>`).join('');
-  const ttls=OPBASE.filter(b=>mxLv(ECO.mx[b]||0)>=5);
-  el.innerHTML=`<div class="psbox"><div class="pshead"><img class="pav" src="${meAvatar()}" alt=""><div><b>${esc(meName())}</b><span>${GA.u?'Google 帳號':acct?'線上身分':'訪客'}</span></div><button id="psClose" aria-label="關閉">✕</button></div>
-  <section><h4>名稱</h4><div class="psrow"><input id="psNick" maxlength="16" value="${esc(ME.nick)}" placeholder="${esc(acct&&ME.acct.name?ME.acct.name:ME.guest)}"><button id="psNickOk">儲存</button></div></section>
-  <section><h4>頭貼</h4><div class="avgrid">${acct&&ME.acct.photo?`<button class="avb ${ME.usePhoto?'on':''}" data-av="__photo" title="帳號照片"><img src="${ME.acct.photo}" alt="帳號照片"></button>`:''}${avs}</div><p class="pshint">幹員熟練度 Lv1 解鎖頭像、Lv3 解鎖半身像、Lv5 解鎖稱號。已擁有的幹員可用照片當頭像，培養幹員轉職過的職業也能當頭像。</p></section><section><h4>稱號</h4>${ttls.length?`<div class="psrow wrap"><button class="ttl ${!ECO.title?'on':''}" data-ttl="">不顯示</button>${ttls.map(b=>`<button class="ttl ${ECO.title===b?'on':''}" data-ttl="${b}">${esc(mxTitle(b))}</button>`).join('')}</div>`:'<p class="pshint">把任一名幹員練到熟練度 Lv5，就能拿到他的專屬稱號。</p>'}</section>
-  <section><h4>成就與好友</h4><div class="psrow"><button id="psAch">🏆 成就 ${achCount()}/${ACH.length}</button><button id="psFr">好友 ${FR.list.length} 人${frIncN()?`（${frIncN()} 個申請）`:''}</button></div></section>
-  <section><h4>登入資料</h4>${window.R6FB?gaHTML():acct?`<p class="pshint">已用 線上身分登入。</p><div class="psrow"><button id="psLogout">改用訪客身分</button></div>`:
-    `<p class="pshint">目前是訪客，所有模式都能玩。聲望、解鎖的幹員和熟練度存在這台裝置上。</p><div class="pslogin"><button class="primary" id="psLogin"><span class="lgico">C</span>啟用線上身分</button><button disabled title="Google 登入目前還沒開放"><span class="lgico g">G</span>Google 登入（此頁面不支援）</button><button class="on" disabled><span class="lgico">訪</span>訪客（目前）</button></div>`}${PMSG?`<p class="terr">${PMSG}</p>`:''}</section>
-  <section><h4>設定</h4><div class="psrow"><span>🌐 語言</span>${langSelect('psLang')}</div><div class="psrow pstg"><span>射擊特寫</span><button id="psCine">${CINE.on?'開':'關'}</button><span>音樂</span><button id="psMus">${SFX.mOn?'開':'關'}</button><span>音效</span><button id="psSfx">${SFX.on?'開':'關'}</button></div></section></div>`;
+  const avs=(acct&&ME.acct.photo?`<button class="avb ${ME.usePhoto?'on':''}" data-av="__photo" title="帳號照片"><img src="${ME.acct.photo}" alt="帳號照片"></button>`:'')+avl.map(([k,src,n,w])=>`<button class="avb ${!ME.usePhoto&&ME.avatar===k?'on':''} ${k.startsWith('art:')?'art':''} ${k.startsWith('cop:')?'cop':''} ${k.startsWith('pic:')?'pic':''}" data-av="${k}" title="${esc(n)}"><img src="${src}" alt="${esc(n)}">${w?`<i class="avW">${WPN[w].ic}</i>`:''}</button>`).join('');
+  // the two Recruits share one title text, so list each title once
+  const seen=new Set(),ttls=OPBASE.filter(b=>mxLv(ECO.mx[b]||0)>=5).filter(b=>{const t=mxTitle(b);if(seen.has(t))return false;seen.add(t);return true;}),curT=ttl289();
+  const ths=CTH289.map(([k,n])=>{const ok=cthOk289(k);return `<button class="pcTh ${k||'gold'} ${(ME.cth||'')===k?'on':''}" data-cth="${k}" ${ok?'':'disabled'} title="${ok?n:'成就達 30 個解鎖'}"><i></i>${n}${ok?'':' 🔒'}</button>`;}).join('');
+  const card=`<section class="psCard">${cardHTML289(myCard289(),FRP.code)}<div class="psEdit"><button id="psRen"><b>✎</b>改名</button><button id="psCode" ${FRP.code?'':'disabled'}><b>⧉</b>${FRP.code?'複製好友代碼':'好友代碼讀取中'}</button></div>
+    ${PS289.edit?`<div class="psrow psNm"><input id="psNick" maxlength="16" value="${esc(ME.nick)}" placeholder="${esc(acct&&ME.acct.name?ME.acct.name:ME.guest)}"><button id="psNickOk">儲存</button></div>`:''}</section>`;
+  const sBg=`<section><h4>名片背景</h4><div class="hs289 ths">${ths}</div>${cthOk289('black')?'':'<p class="pshint">黑曜：成就達 30 個解鎖</p>'}</section>`;
+  const sTt=`<section><h4>稱號</h4>${ttls.length?`<div class="hs289 tts"><button class="ttl ${!curT?'on':''}" data-ttl="">不顯示</button>${ttls.map(b=>`<button class="ttl ${curT===mxTitle(b)?'on':''}" data-ttl="${b}">${esc(mxTitle(b))}</button>`).join('')}</div>`:'<p class="pshint">幹員熟練度 Lv5 解鎖稱號。</p>'}</section>`;
+  const sAv=`<section><h4>頭像</h4><div class="hs289 avs">${avs}</div><p class="pshint">名片右邊的立繪跟著頭像的幹員。熟練度 Lv1 解鎖頭像、Lv3 半身像、Lv5 稱號；已擁有的幹員可用照片，培養幹員轉職過的職業也能當頭像。</p></section>`;
+  const sSnd=`<section><h4>聲音</h4><div class="psMix">${volHTML289('psMv','🎵','音樂',SFX.mOn?SFX.mvol:0)}${volHTML289('psSv','🔊','音效',SFX.on?SFX.vol:0)}</div></section>`;
+  const sGame=`<section><h4>遊戲</h4><div class="psOpts"><div><span>射擊特寫</span><button class="psTg ${CINE.on?'on':''}" id="psCine" aria-label="射擊特寫"></button></div><div><span>🌐</span>${langSelect('psLang')}</div></div></section>`;
+  const sAcc=`<section><h4>登入的帳號</h4><div class="psAcc">${window.R6FB?gaHTML():acct?`<p class="pshint">已用 線上身分登入。</p><div class="psrow"><button id="psLogout">改用訪客身分</button></div>`:
+    `<p class="pshint">目前是訪客，所有模式都能玩。聲望、解鎖的幹員和熟練度存在這台裝置上。</p><div class="pslogin"><button class="primary" id="psLogin"><span class="lgico">C</span>啟用線上身分</button><button disabled title="Google 登入目前還沒開放"><span class="lgico g">G</span>Google 登入（此頁面不支援）</button><button class="on" disabled><span class="lgico">訪</span>訪客（目前）</button></div>`}${PMSG?`<p class="terr">${PMSG}</p>`:''}</div>
+    <div class="psrow psAF"><button id="psAch">🏆 成就 ${achCount()}/${ACH.length}</button><button id="psFr">好友 ${FR.list.length} 人${frIncN()?`（${frIncN()} 個申請）`:''}</button></div></section>`;
+  el.innerHTML=`<div class="psbox ps289"><div class="pshead"><div><b>我的名片</b></div><button id="psClose" aria-label="關閉">✕</button></div><div class="psCols"><div class="psC1">${card}${sBg}</div><div class="psC2">${sTt}${sAv}${sSnd}${sGame}${sAcc}</div></div></div>`;
   _rs();
   $('#psClose').onclick=closeSettings;
-  $('#psNickOk').onclick=()=>{ME.nick=$('#psNick').value.trim().slice(0,16);saveMe();renderPlayer();renderSettings();};
-  el.querySelectorAll('[data-ttl]').forEach(b=>b.onclick=()=>{ECO.title=b.dataset.ttl;ecoSave();renderPlayer();renderSettings();});el.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{if(b.dataset.av==='__photo')ME.usePhoto=true;else{ME.usePhoto=false;ME.avatar=b.dataset.av;}saveMe();renderPlayer();renderSettings();});
+  $('#psRen').onclick=()=>{PS289.edit=!PS289.edit;renderSettings();const i=$('#psNick');if(i){i.focus();i.select();}};
+  const ok=$('#psNickOk');if(ok){const save=()=>{ME.nick=$('#psNick').value.trim().slice(0,16);PS289.edit=false;saveMe();renderPlayer();renderSettings();profPush();};ok.onclick=save;$('#psNick').onkeydown=e=>{if(e.key==='Enter')save();};}
+  $('#psCode').onclick=()=>{const b=$('#psCode');try{navigator.clipboard.writeText(FRP.code).then(()=>{b.innerHTML='<b>✓</b>已複製';},()=>{});}catch(e){}};
+  el.querySelectorAll('[data-cth]').forEach(b=>b.onclick=()=>{ME.cth=b.dataset.cth;saveMe();renderSettings();profPush();});
+  el.querySelectorAll('[data-ttl]').forEach(b=>b.onclick=()=>{ECO.title=b.dataset.ttl;ecoSave();renderPlayer();renderSettings();profPush();});
+  el.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{if(b.dataset.av==='__photo')ME.usePhoto=true;else{ME.usePhoto=false;ME.avatar=b.dataset.av;}saveMe();renderPlayer();renderSettings();profPush();});
   const li=$('#psLogin');if(li)li.onclick=acctLogin;gaBind();const lo=$('#psLogout');if(lo)lo.onclick=acctLogout;
   bindLang('psLang');$('#psAch').onclick=()=>{closeSettings();openAch('ach');};$('#psFr').onclick=()=>{closeSettings();openAch('fr');};
-  $('#psMus').onclick=()=>{SFX.toggleMusic();try{musicLevel();}catch(e){}renderSettings();};$('#psSfx').onclick=()=>{$('#sndBtn').click();renderSettings();};
+  const vol=(id,set)=>{const r=$('#'+id);if(!r)return;const w=r.closest('.psVol');r.oninput=()=>{const v=+r.value;w.querySelector('output').textContent=v;w.querySelectorAll('.vb i').forEach((x,i)=>x.classList.toggle('f',i<Math.round(v/100*12)));set(v/100);};};
+  vol('psMv',v=>{SFX.setMVol(v);if((v>0)!==SFX.mOn)SFX.toggleMusic();try{musicLevel();}catch(e){}});
+  vol('psSv',v=>{SFX.setVol(v);if((v>0)!==SFX.on){$('#sndBtn').click();}});
   $('#psCine').onclick=()=>{CINE.on=!CINE.on;const v=$('#view-cine');if(v)v.textContent='射擊特寫：'+(CINE.on?{tp:'肩後',fp:'第一人稱'}[CINE.mode]:'關');renderSettings();};
+  if(!FRP.code&&!renderSettings._p){renderSettings._p=1;profPush().then(()=>{renderSettings._p=0;if(FRP.code)renderSettings();});}
 }
 // ---------- language: the interface text is swapped in place; rules and card texts stay in Chinese ----------
 const LANGS=[['zh','中文'],['en','English'],['ja','日本語（翻訳中）']];
@@ -14819,6 +14941,7 @@ I18X['排行榜改為半身視窗，保留頭部與武器；任務改為覆蓋�
 Object.assign(I18X,{'存活場次':['Matches survived',''],'幹員資訊':['Operator information',''],'電腦版大廳改為沉浸式主選單：左側對戰入口、右側幹員與擊殺／存活場次，下方展示排行榜；保留愛心贊助與回報圖示。':['Cinematic desktop lobby: play menu on the left, operator with kills and matches survived on the right, leaderboard below; support and feedback icons retained.','']});
 I18X['電腦版戰術介面：左側小隊、右側行動／道具／情報，彩色攻擊骰數量、滾輪選角與完整鍵盤快捷操作；特殊按鈕改用 Z。']=['Desktop tactical workspace: squad rail, Action/Gear/Intel tabs, color-coded dice counts, wheel selection and keyboard shortcuts; Z for special controls.',''];
 NEWS[0].v='v265–v284';NEWS[0].i.unshift('手機主畫面換上金線棋盤圖示。遊戲畫面編輯器也有自己的圖示。');NEWS[0].i.unshift('修正刪掉手機桌面圖示重裝、重新登入後，培養幹員和學長姐不見的問題：現在以帳號雲端存檔為準；學長姐也會從排行榜的陣亡紀錄找回來。');
+NEWS.unshift({d:'2026-11-12',v:'v289',i:['玩家設定改成「我的名片」：名片上有立繪、獎盃數、稱號、聲望、勝率、成就和好友代碼，背景可選四種顏色（黑曜需成就 30 個）。名片背景、稱號、頭像都改成左右滑。','音樂和音效可以調音量。','輸入好友代碼會先看到對方名片再送出申請；點好友、或對戰結束後點對手名字，也能看名片。','修正名稱「儲存」按鈕被切掉、稱號 Recruit 專家重複出現。']});
 I18X['手機主畫面換上金線棋盤圖示。遊戲畫面編輯器也有自己的圖示。']=['The game has a new gold-grid home-screen icon, and the UI editor has its own icon.',''];
 // ---------- round clocks: each squad gets (time per Operator x Operators in play) per round, shared by its two activation phases ----------
 const CLK_SVG={A:'<svg viewBox="0 0 48 48"><path d="M8 6l3-2 15 15-3 3zM40 6l-3-2-15 15 3 3z" opacity=".0"/><path d="M6 4h6l18 18-3 3L6 10zM42 4h-6L18 22l3 3L42 10zM14 30l4 4-6 6 2 2-3 3-2-2-3 3-2-2 3-3-2-2 3-3 2 2zm20 0l-4 4 6 6-2 2 3 3 2-2 3 3 2-2-3-3 2-2-3-3-2 2zM16 26l6 6-3 3-6-6zm16 0l-6 6 3 3 6-6z"/></svg>',
