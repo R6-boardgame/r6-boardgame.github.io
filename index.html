@@ -2739,7 +2739,7 @@ html body button.tk:not(.done):hover,html body button.tk:not(.done):focus{border
 .pc289 .pcBand{position:absolute;left:44%;top:-20%;width:34%;height:150%;transform:skewX(-18deg);background:linear-gradient(180deg,color-mix(in srgb,var(--t1) 34%,transparent),color-mix(in srgb,var(--t1) 6%,transparent));z-index:-1}
 .pc289 .pcBand2{position:absolute;left:82%;top:-20%;width:5%;height:150%;transform:skewX(-18deg);background:var(--t1);opacity:.55;z-index:-1}
 .pc289 .pcHz{position:absolute;left:0;right:0;bottom:0;height:2.4cqw;background:repeating-linear-gradient(-45deg,var(--t1) 0 1.2cqw,transparent 1.2cqw 2.4cqw);opacity:.85;z-index:2}
-.pc289 .pcArt{position:absolute;right:-2%;bottom:2.4cqw;height:112%;max-width:70%;object-fit:contain;object-position:right bottom;filter:drop-shadow(0 0 3cqw color-mix(in srgb,var(--t1) 45%,transparent));z-index:0}
+/* v291: whole operator, head included */.pc289 .pcArt{position:absolute;right:1%;bottom:2.4cqw;height:calc(100% - 4cqw);max-width:62%;object-fit:contain;object-position:right bottom;filter:drop-shadow(0 0 3cqw color-mix(in srgb,var(--t1) 45%,transparent));z-index:0}
 .pc289 .pcShade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,9,12,.92) 0%,rgba(6,9,12,.55) 38%,transparent 62%),linear-gradient(0deg,rgba(6,9,12,.85) 0%,transparent 40%);z-index:0}
 .pc289 .pcFoil{position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.10) 42%,rgba(140,220,255,.08) 46%,rgba(255,200,120,.08) 50%,transparent 60%);mix-blend-mode:screen}
 .pc289 .pcEdge{position:absolute;inset:0;z-index:4;pointer-events:none;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--t1) 55%,transparent)}
@@ -14942,6 +14942,7 @@ I18X['電腦版戰術介面：左側小隊、右側行動／道具／情報，�
 NEWS[0].v='v265–v284';NEWS[0].i.unshift('手機主畫面換上金線棋盤圖示。遊戲畫面編輯器也有自己的圖示。');NEWS[0].i.unshift('修正刪掉手機桌面圖示重裝、重新登入後，培養幹員和學長姐不見的問題：現在以帳號雲端存檔為準；學長姐也會從排行榜的陣亡紀錄找回來。');
 NEWS.unshift({d:'2026-11-12',v:'v289',i:['玩家設定改成「我的名片」：名片上有立繪、獎盃數、稱號、聲望、勝率、成就和好友代碼，背景可選四種顏色（黑曜需成就 30 個）。名片背景、稱號、頭像都改成左右滑。','音樂和音效可以調音量。','輸入好友代碼會先看到對方名片再送出申請；點好友、或對戰結束後點對手名字，也能看名片。','修正名稱「儲存」按鈕被切掉、稱號 Recruit 專家重複出現。']});
 NEWS.unshift({d:'2026-11-12',v:'v290',i:['線上對戰改成獎盃制：拿掉段位，勝利 +30 獎盃、落敗 −20 獎盃（不會低於 0）。大廳「線上對戰」、配對 VS 畫面和結算都會顯示獎盃數。']});I18X['線上對戰改成獎盃制：拿掉段位，勝利 +30 獎盃、落敗 −20 獎盃（不會低於 0）。大廳「線上對戰」、配對 VS 畫面和結算都會顯示獎盃數。']=['Online matches now use trophies instead of ranks: win +30, lose −20 (never below 0). Trophies show on the lobby Online match button, the VS screen and the results.','オンライン対戦はランクの代わりにトロフィー制に：勝利 +30、敗北 −20（0 未満にならない）。ロビー、VS 画面、リザルトに表示。'];
+NEWS.unshift({d:'2026-11-12',v:'v291',i:['名片上的幹員立繪不再切到頭。']});
 I18X['手機主畫面換上金線棋盤圖示。遊戲畫面編輯器也有自己的圖示。']=['The game has a new gold-grid home-screen icon, and the UI editor has its own icon.',''];
 // ---------- round clocks: each squad gets (time per Operator x Operators in play) per round, shared by its two activation phases ----------
 const CLK_SVG={A:'<svg viewBox="0 0 48 48"><path d="M8 6l3-2 15 15-3 3zM40 6l-3-2-15 15 3 3z" opacity=".0"/><path d="M6 4h6l18 18-3 3L6 10zM42 4h-6L18 22l3 3L42 10zM14 30l4 4-6 6 2 2-3 3-2-2-3 3-2-2 3-3-2-2 3-3 2 2zm20 0l-4 4 6 6-2 2 3 3 2-2 3 3 2-2-3-3 2-2-3-3-2 2zM16 26l6 6-3 3-6-6zm16 0l-6 6 3 3 6-6z"/></svg>',
