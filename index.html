@@ -504,13 +504,14 @@ body:not([data-scr="game"]) #lvGoal{display:none}
 #tlob .m .lobSq.mini{padding:7px 0 6px;gap:0}
 #tlob .m .lobSq.mini>:not(.lb){display:none}
 #tlob .m .lobSq.mini .lb i{transform:rotate(180deg)}
-@media (max-width:760px){html body #title[data-s="title"] .tplayer{max-width:calc(100vw - 240px)}
-html body #title[data-s="title"] .pcard{gap:7px;padding:5px 9px 5px 5px;min-width:0;width:100%;overflow:hidden;clip-path:polygon(0 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%)}
-html body #title[data-s="title"] .pcard .pav{width:38px;height:38px;flex:none}
-html body #title[data-s="title"] .pinfo b{font-size:14px;max-width:100%}
-html body #title[data-s="title"] .ptag{gap:4px;font-size:12px;min-width:0}
-html body #title[data-s="title"] .ptag .rni{width:13px;height:13px}
-html body #title[data-s="title"] .ptag b{font-size:12.5px;letter-spacing:-.3px;overflow:visible}}
+/* v288: 作戰檔案、訓練、排行榜頁的左上錢包在手機上跟大廳同尺寸 */
+@media (max-width:760px){html body #title:is([data-s="title"],[data-s="lib"],[data-s="train"],[data-s="board"]) .tplayer{max-width:calc(100vw - 240px)}
+html body #title:is([data-s="title"],[data-s="lib"],[data-s="train"],[data-s="board"]) .pcard{gap:7px;padding:5px 9px 5px 5px;min-width:0;width:100%;overflow:hidden;clip-path:polygon(0 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%)}
+html body #title:is([data-s="title"],[data-s="lib"],[data-s="train"],[data-s="board"]) .pcard .pav{width:38px;height:38px;flex:none}
+html body #title:is([data-s="title"],[data-s="lib"],[data-s="train"],[data-s="board"]) .pinfo b{font-size:14px;max-width:100%}
+html body #title:is([data-s="title"],[data-s="lib"],[data-s="train"],[data-s="board"]) .ptag{gap:4px;font-size:12px;min-width:0}
+html body #title:is([data-s="title"],[data-s="lib"],[data-s="train"],[data-s="board"]) .ptag .rni{width:13px;height:13px}
+html body #title:is([data-s="title"],[data-s="lib"],[data-s="train"],[data-s="board"]) .ptag b{font-size:12.5px;letter-spacing:-.3px;overflow:visible}}
 #tlob .m .lobSq .x{font:700 11px/1 'Noto Sans TC',sans-serif;color:#ff9d93;background:none;border:1px solid rgba(255,120,110,.45);padding:5px 6px;cursor:pointer}
 </style>
 </head><body><div id="boot" class="login" aria-busy="true" aria-label="讀取中"><style>
@@ -3339,6 +3340,8 @@ html body #title[data-s=board] #tmenu{inset:78px 3% 3vh;max-width:none;width:aut
 @media(min-width:1000px) and (min-height:620px){
 #cop .cpDet .detailArt251{display:block}.briefStrip251{position:fixed;display:flex}
 #menuIdentity251:not([hidden]){position:fixed;right:2.5%;top:20px;z-index:214;display:flex;align-items:center;gap:12px;min-width:210px;padding:8px 18px 8px 8px;border:1px solid var(--edge251);background:var(--metal251);box-shadow:var(--shadow251);pointer-events:none}#menuIdentity251>img{width:38px;height:38px;border:1px solid #73859277;padding:3px;background:#0a141dbb}#menuIdentity251>span{display:flex;flex-direction:column;gap:3px}#menuIdentity251 b{font-size:17px;color:#f0f3f4}#menuIdentity251 small{display:flex;gap:7px;align-items:center;color:#f4cd69;font:700 14px var(--mono)}#menuIdentity251 .rni{width:18px;height:18px}
+/* v288: 電腦版作戰檔案／訓練／商店等頁的錢包跟大廳左上 .pcard 同比例 */
+#menuIdentity251:not([hidden]){min-width:20vw;gap:1vw;padding:.8vh 1.1vw .8vh .6vw;min-height:7.5vh;box-sizing:border-box}#menuIdentity251>img{width:3.2vw;height:3.2vw}#menuIdentity251 b{font-size:clamp(15px,1.25vw,27px)}#menuIdentity251 small{font-size:clamp(15px,1.25vw,27px)}#menuIdentity251 .rni{width:14px;height:14px}
 #title:is([data-s=train],[data-s=lib],[data-s=board]) .tside,#title:is([data-s=train],[data-s=lib],[data-s=board]) .ttopr{visibility:hidden}#shop .shBal{visibility:hidden}
 #cop:has(.cpFull)>.cpBox{visibility:hidden}
 #cop .cpFull{isolation:isolate}#cop .cpFull:before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,#08172160,#09192366),url(img/ui/menus-v251/skills.jpg) center/cover}

@@ -1,5 +1,6 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v288：作戰檔案／訓練（含排行榜）頁的錢包對齊大廳尺寸。手機：v276 那段 `≤760px` 的 `.pcard`／`.pinfo`／`.ptag` 縮小規則從 `#title[data-s="title"]` 擴成 `#title:is([data-s="title"],[data-s="lib"],[data-s="train"],[data-s="board"])`（原本這三頁錢包是 136×54，大廳 124×50）。電腦：右上 `#menuIdentity251` 改用大廳 `.pcard` 同樣的 vw 比例（寬 20vw、頭像 3.2vw、名字／聲望 `clamp(15px,1.25vw,27px)`、padding `.8vh 1.1vw`），1440 寬時 288×70 對大廳 290×68。
 - v287：首頁贊助清單先拿掉綠界（台灣玩家）連結，綠界還在審核中。`SPONSOR` 上方註解留有原本的項目，審核通過後放回陣列即可。
 - v286：Jackal（Eyenox 追蹤標記）與 Dokkaebi（邏輯炸彈）標記到防守方時，鏡頭特寫被標記的幹員約 1.7 秒再飛回原視角。技能裡 `await fxEv({k:'mark286',uid,side})`，`fxPlay` 轉給 `markCine286`（借用 `R3.cineSave`／`shotCamEnd`，正面偏 15° 看人，手機距離 3.4、電腦 2.6，`cineClear` 淡出擋住的牆，`R3.cineShow` 讓戰爭迷霧裡的目標畫出來；特寫中 `update3D` 不畫該幹員的紅色定位圖釘），連線對手也透過 `fxSync` 看到。教學、`CINE.on=false`、超過 15 秒的舊事件不觸發。Jackal 隔牆射擊已標記目標走原本射擊特寫。回歸：`tests/mark-closeup-v286.cjs`（無法連 jsdelivr 時設 `R6_THREE_DIR` 指向 three@0.147.0 套件）。
 
