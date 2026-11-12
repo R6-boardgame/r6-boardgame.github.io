@@ -1,5 +1,6 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v293：獎盃計分改成依表現。`trCalc(win,mine)` 回傳項目清單：勝利 +5、每名存活己方幹員 +1（`ecoGame` 的 `mine`）、完成任務 +2（`G._df` 我方阻止拆彈，或我方進攻且 `G._why` 是「炸彈已被拆除」／「人質已安全撤離」）；落敗 −3、`G._hk`（我方害死人質）再 −1；`G._ffn`（我方誤殺隊友數）每名 −1，勝敗都算。總數最低 0。`G._trd.L` 給結算 `#rkres` 的 `.trL` 逐項列出。配對機器人獎盃改在你上下 15 內。回歸：`tests/trophies-v290.cjs`。
 - v292：名片 `.pcSt` 第二格從勝率改成獎盃（`c.r`=`trN()`），拿掉右上 `.pcRank`。熟練度 `mxLvT(lv)`：Lv5（`MXT.length`）顯示 LvMax（名片常用幹員、商店、選角、升級提示）。解鎖：擁有（`owned(b)`）就有圖示頭像；Lv2 解鎖照片 `pic:` 與半身像 `art:`；Lv3 稱號（`ttl289`／`ecoTag`／設定列表）；LvMax 由 `skHas(k)` 讓培養幹員免費擁有該幹員技能（原本只有 `ECO.sk` 購買，`skBuy`／商店／`copSkOn` 都改用 `skHas`）。`MXREW` 更新。稱號可用 `TTLX[base]` 覆寫預設「名字 專家」，使用者會在 `/mnt/project-files/titles/幹員稱號.xlsx` 填好後回傳。
 - v291：名片立繪不切頭：`.pc289 .pcArt` 高度改成 `calc(100% - 4cqw)`、`max-width:62%`，整個人放在名片內（原本 112% 會超出上緣）。
 - v290：排名戰的段位（`TIERS`／`tierOf`／`rankBadge`／`ME.rating`、`players/<id>.rating`，`rankResult` 早已停用）拿掉，改成獎盃數。`ECO.tr` 是目前獎盃、`ECO.trMax` 最高紀錄，跟聲望一樣存本機並同步雲端。線上對戰（配對佇列，含 30 秒後的配對機器人，`ecoGame` 裡的 `quick`）勝 +30（`TR_WIN`）、敗 −20（`TR_LOSS`），最低 0；對戰電腦、自訂房間、組隊不影響。`trGame(win)` 每場只算一次（`G._trd`），結算 `#rkres` 用 `trResHTML` 顯示。大廳「線上對戰」副標顯示 `PVP · 獎盃 N`；`myProf().tr` 讓 VS 卡顯示雙方獎盃（`.mfTr`），配對機器人 `botProf` 的獎盃在你上下 60 內；`profPush` 寫 `prof/<code>.tr` 給名片／好友。回歸：`tests/trophies-v290.cjs`。
