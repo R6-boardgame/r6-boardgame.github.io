@@ -12824,7 +12824,8 @@ let PMSG='';
 // ---------- sponsor / feedback ----------
 const FB_TO='aesopfilmedit@gmail.com';
 // 贊助連結：填上網址就會變成可點的按鈕（url 空白時顯示「即將開放」）
-const SPONSOR=[{n:'Ko-fi（海外玩家）',url:'https://ko-fi.com/sonylin'},{n:'綠界（台灣玩家）',url:'https://p.ecpay.com.tw/4A93C47'}];
+// v287: ECPay is still under review, so it is hidden. To restore, move it back into SPONSOR: {n:'綠界（台灣玩家）',url:'https://p.ecpay.com.tw/4A93C47'}
+const SPONSOR=[{n:'Ko-fi（海外玩家）',url:'https://ko-fi.com/sonylin'}];
 function tsDlg(id,label,html){let el=$('#'+id);if(!el){el=document.createElement('div');el.id=id;el.className='psettings';el.setAttribute('role','dialog');el.setAttribute('aria-label',label);document.body.appendChild(el);
     el.addEventListener('click',e=>{if(e.target===el)el.hidden=true;});}
   el.hidden=false;el.innerHTML=html;el.querySelector('.tsX').onclick=()=>{el.hidden=true;};return el;}
