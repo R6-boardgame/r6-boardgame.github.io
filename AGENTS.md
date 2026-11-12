@@ -1,5 +1,7 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v286：Jackal（Eyenox 追蹤標記）與 Dokkaebi（邏輯炸彈）標記到防守方時，鏡頭特寫被標記的幹員約 1.7 秒再飛回原視角。技能裡 `await fxEv({k:'mark286',uid,side})`，`fxPlay` 轉給 `markCine286`（借用 `R3.cineSave`／`shotCamEnd`，正面偏 15° 看人，手機距離 3.4、電腦 2.6，`cineClear` 淡出擋住的牆，`R3.cineShow` 讓戰爭迷霧裡的目標畫出來；特寫中 `update3D` 不畫該幹員的紅色定位圖釘），連線對手也透過 `fxSync` 看到。教學、`CINE.on=false`、超過 15 秒的舊事件不觸發。Jackal 隔牆射擊已標記目標走原本射擊特寫。回歸：`tests/mark-closeup-v286.cjs`（無法連 jsdelivr 時設 `R6_THREE_DIR` 指向 three@0.147.0 套件）。
+
 - v285：重裝 PWA（刪桌面圖示）後重新登入，培養幹員 `ECO.cop` 和學長姐 `ECO.alum` 消失。原因：新裝置開機就因每日任務 `ecoSave()` 把空白 ECO 的 `ts` 設成現在，`gaMerge` 以為本機較新而保留空白，接著 `gaPush(true)` 把雲端蓋掉。現在第一次綁定（`r6bg.glink` 不符）一律以雲端為底；`cop` 每格用 `copPick285`：`gen` 大的勝，同 `gen` 取進度（k+sv+e）多的，同進度才看哪邊較新；`alum` 兩邊聯集（`alumMerge285`，鍵 ts_i）。登入後 `gaAlumRescue285` 從排行榜 `board/<uid>_fallen_*`（這些列不會被刪）補回學長姐（殺手名稱與評級沒有記在排行榜，顯示「陣亡」與 N）。回歸：`tests/reinstall-keeps-operators-v285.cjs`。Firestore `users/<uid>` 是整份覆寫，沒有歷史版本；雲端被蓋掉的現役幹員無法從伺服器救回，除非其他裝置（同帳號）還留著舊的本機存檔，該裝置下次開啟會依上面規則把它推回雲端。
 
 - v283：手機小隊欄 `#lobSq` 切換選單會閃：`lobHTML` 每次產生空的 `#lobSq`（`:empty` 隱藏），之前要等 `setInterval(ptUI,800)` 才填。現在 `lobRender` 結尾直接呼叫 `ptUI()`，同一幀就畫好。
