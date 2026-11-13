@@ -24,6 +24,6 @@ try{await page.goto(process.env.R6_TEST_URL||'http://127.0.0.1:8016/',{waitUntil
   assert.deepEqual([r.w.d,r.wObj.d,r.wDef.d,r.wHost.d,r.wFF.d,r.l.d,r.lHost.d],[9,12,12,12,6,-4,-6]);
   assert.deepEqual([r.floor.o,r.floor.n],[2,0]);assert.deepEqual([r.pve.o,r.pve.d],[0,8],'versus AI win +5 +3 alive');assert.equal(r.pveL.d,-3);assert.equal(r.lv,null,'training levels give no trophies');
   assert.equal(r.max,9+12+12+12+6);assert.match(r.html,/完成任務/);assert.match(r.html,/存活 3/);
-  assert.match(r.lobby||'',/獎盃 5/);assert.match(r.vs,/1,?234/);
-  assert.deepEqual(errors,[]);console.log('PASS: trophy scoring (win/survivors/objective/loss/hostage/teamkill, floor 0), lobby and VS show trophies; no page errors');
+  assert.equal(r.lobby,'PVP · 單人或組隊');assert.match(r.vs,/1,?234/);
+  assert.deepEqual(errors,[]);console.log('PASS: trophy scoring (win/survivors/objective/loss/hostage/teamkill, floor 0), lobby says solo or squad, VS shows trophies; no page errors');
 }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1});
