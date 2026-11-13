@@ -1,5 +1,6 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v298：大廳（手機 `.lobB#t-rank`、電腦 `entry('t-rank')`）「線上對戰」副標改回 `PVP · 單人或組隊`，不再顯示獎盃數。
 - v297：對戰電腦（單人與組隊對戰電腦）也計獎盃。`trGame(win,mine,pvp)`：線上配對（含配對機器人）`pvp=true` 勝 +7／敗 −4；其餘非自訂房間、非訓練關卡（`!G.lv`）、非教學的對局 `pvp=false` 勝 +5／敗 −3。存活 +1、任務 +2、人質 −1、誤殺隊友 −1 不變。對戰電腦結算的 `#banner` 也加了 `#rkres`。
 - v296：名片立繪調整範圍放寬（使用者回報往下不夠）：`axOk295` 改成 x −160～120、y −80～220（cqw）。因為縮放原點在右下，放大後要往下移很多才看得到頭。
 - v295：名片立繪讓玩家自己移動／縮放。設定頁 `#psAdj`（`PS289.adj`）開啟後 `adjBind295` 在 `.psCard .pc289` 上處理拖曳（pointer）、兩指縮放、滾輪、`#psAxS` 滑桿、`#psAxR` 重設；值存 `ME.cax[立繪網址]={x,y,s}`（x/y 是名片寬的 cqw，s 倍率，`saveMe` 存本機），每張立繪各自記。`myCard289().ax` 帶著目前立繪的值，`profPush` 送給好友；`cardHTML289` 用 `axCss295`（`axOk295` 夾住範圍：x ±80、y ±60、s 0.4–3）在 `.pcArt` 加 inline `translate/scale`，`transform-origin:right bottom`。關閉設定時自動結束調整。回歸：`tests/card-art-adjust-v295.cjs`。
