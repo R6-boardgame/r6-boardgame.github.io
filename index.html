@@ -12163,7 +12163,7 @@ function lobHTML(){const cs=copAll(),i=LOBI%2,c=cs[i],rk=copScore(c).rk,art=copA
   const nmB=`<b>${esc(lobNm(c,i))}<i style="color:${RKC[rk]}">${rk}</i></b><small>${lobCls(c)}</small>`;
   if(M)return `<div class="lob m"><div class="lobGlow"></div><div class="lobRing"></div><img class="lobHero" id="lobHero" src="${art}" alt="">
     <div class="lobOp"><button class="lobAr" data-lob="-1" aria-label="上一位">‹</button><div class="lobNm">${nmB}${lobKD(c.sv,c.k)}</div><button class="lobAr" data-lob="1" aria-label="下一位">›</button></div>
-    <div class="lobSide"><button class="lobEv ev" disabled aria-label="活動"><i class="pic" style="background-image:url(img/ui/event.webp)"><em>準備中</em></i><b>活動</b></button><button class="lobEv lb" id="t-board"><i>${lobIc('trophy')}</i><b>排行榜</b></button><div class="lobSq" id="lobSq"></div></div>
+    <div class="lobSide">${rkTile('lobEv rkT','t-rk')}<button class="lobEv ev" disabled aria-label="活動"><i class="pic" style="background-image:url(img/ui/event.webp)"><em>準備中</em></i><b>活動</b></button><button class="lobEv lb" id="t-board"><i>${lobIc('trophy')}</i><b>排行榜</b></button><div class="lobSq" id="lobSq"></div></div>
     <div class="lobPlay"><button class="lobB" id="t-pve"><b>對戰電腦</b><small>PVE · 單人或組隊</small></button><button class="lobB play" id="t-rank"><b>線上對戰</b><small>PVP · 單人或組隊</small></button></div>
 </div>`;
   lbLoad();const L=lbRows().slice(0,3);
@@ -12929,8 +12929,9 @@ function rkTitle(k){const i=RKTT[k];return i!=null&&rkClaimed().includes(i)?RKRW
 function rkClaim(i){if(!rkCan(i))return;ECO.trClaim=[...rkClaimed(),i];const w=RKRW[i];ecoAdd(w.rn);ecoSave();renderPlayer();try{SFX.ui&&SFX.ui();}catch(e){}rkRender();}
 function rkNext(t){const i=rkIdx(t),n=RKS[i+1];return n?{r:n,need:n[2]-(t|0),pct:Math.max(0,Math.min(100,100*((t|0)-RKS[i][2])/(n[2]-RKS[i][2])))}:{r:null,need:0,pct:100};}
 // wallet: rank badge + name + exp bar under the player name
-function rkWallet(){const t=trN(),r=rkOf(t),nx=rkNext(t),c=rkCanN();
-  return `<span class="prk" id="prk" role="button" tabindex="0" aria-label="獎盃段位 ${r[1]}，${t} 獎盃"><img src="${rkImg(r[0])}" alt=""><span class="prkT"><span class="prkL"><i>${r[1]}</i><em>${fmtN(t)}</em></span><s><u style="width:${nx.pct.toFixed(1)}%"></u></s></span>${c?`<b class="prkN" aria-label="${c} 個獎勵可領取"></b>`:''}</span>`;}
+// v300: the rank lives in its own lobby tile (same size as the Events tile on phone, beside the wallet on desktop): badge + progress bar, no text
+function rkTile(cls,id){const t=trN(),r=rkOf(t),nx=rkNext(t),c=rkCanN();
+  return `<button class="${cls}" id="${id}" aria-label="獎盃段位 ${r[1]}，${t} 獎盃" title="${r[1]} · ${t}"><i class="rkTi"><img src="${rkImg(r[0])}" alt="">${c?'<b class="prkN"></b>':''}</i><s class="rkTb"><u style="width:${nx.pct.toFixed(1)}%"></u></s></button>`;}
 // trophy page: progress ring + stats, then one road line through every rank node with its reward
 function rkRoad(){const t=trN(),cur=rkIdx(t),mx=ECO.trMax|0;let prev='';
   // fill: whole nodes reached, plus the part of the way to the next node
@@ -12955,18 +12956,22 @@ function rkBind(el,sc){el.querySelector('#rkBk').onclick=rkClose;el.querySelecto
 function rkOpen(){let el=$('#rkPage');if(!el){el=document.createElement('div');el.id='rkPage';el.className='rkPage';el.setAttribute('role','dialog');el.setAttribute('aria-label','獎盃段位');document.body.appendChild(el);
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!el.hidden)rkClose();});}
   el.hidden=false;el.innerHTML=rkHTML();rkBind(el);}
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#t-rk,#t-rkd'))rkOpen();});
 function rkClose(){const el=$('#rkPage');if(el)el.hidden=true;}
 document.head.insertAdjacentHTML('beforeend',`<style id="rk299">
-.prk{display:flex;align-items:center;gap:6px;min-width:0;margin:1px 0 1px -2px;cursor:pointer;position:relative}
-.prk>img{width:22px;height:24px;object-fit:contain;flex:none;filter:drop-shadow(0 1px 2px #000a)}
-.prkT{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}.prkL{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
-.prkL i{font:800 12.5px/1 var(--display);font-style:normal;color:#f2f5f7;letter-spacing:.02em}.prkL em{font:800 11.5px/1 var(--display);font-style:normal;color:#f6d27a}
-.prk s{display:block;height:3px;background:#ffffff22;text-decoration:none;overflow:hidden}.prk s u{display:block;height:100%;background:linear-gradient(90deg,#d99a2b,#ffe08a);text-decoration:none}
-.prkN{position:absolute;left:15px;top:-3px;width:9px;height:9px;border-radius:50%;background:#e8433a;box-shadow:0 0 0 2px #0c1218}
-#tlob .lob.m .lobSide{transform:translateY(24px)}
-@media(min-width:761px){html body #title[data-s="title"] .pinfo{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:.8vw;row-gap:.5vh}html body #title[data-s="title"] .pinfo>.prk{grid-column:1/-1;grid-row:2}html body #title[data-s="title"] .pinfo>.prank{grid-column:2;grid-row:1}html body #title[data-s="title"] .prk>img{width:2.7vw;height:2.9vw}html body #title[data-s="title"] .prkL i{font-size:clamp(14px,1.2vw,26px)}html body #title[data-s="title"] .prkL em{font-size:clamp(13px,1.05vw,23px)}html body #title[data-s="title"] .prk s{height:max(4px,.35vw)}html body #title[data-s="title"] .prkN{left:1.6vw}}
-html body #title[data-s="title"] .lob.d .prkL i,html body #title[data-s="title"] .prkL i{font-size:clamp(12.5px,.95vw,20px)}html body #title[data-s="title"] .prkL em{font-size:clamp(11.5px,.85vw,18px)}
-@media(min-width:761px){html body #title[data-s="title"] .prk s{height:max(3px,.3vw)}}
+.prkN{position:absolute;right:-3px;top:-3px;width:9px;height:9px;border-radius:50%;background:#e8433a;box-shadow:0 0 0 2px #0c1218}
+#tlob .lobEv.rkT{cursor:pointer}#tlob .lobEv.rkT .rkTb{margin:7px 0}
+#tlob .lobEv.rkT .rkTi{position:relative;display:grid;place-items:center;background:radial-gradient(circle at 50% 45%,#2c3947,#10161d 75%);border:1px solid rgba(227,170,62,.5)}
+#tlob .lobEv.rkT .rkTi img{width:44px;height:46px;object-fit:contain;margin-top:-4px;filter:drop-shadow(0 2px 4px #000c)}
+.rkTb{display:block;width:52px;height:5px;background:#ffffff22;text-decoration:none;overflow:hidden;border:1px solid #0006;box-sizing:border-box}.rkTb u{display:block;height:100%;background:linear-gradient(90deg,#d99a2b,#ffe08a);text-decoration:none}
+@media(max-width:760px){#tlob .lobEv.rkT{height:auto}}
+.prkTile{display:none}
+@media(min-width:761px){html body #title[data-s="title"] .tplayer{grid-template-columns:minmax(0,1fr) auto}
+ html body #title[data-s="title"] .prkTile{grid-column:2;grid-row:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6vh;width:calc(var(--lcU,1vw)*4.8);min-width:60px;padding:.5vh .5vw;box-sizing:border-box;background:linear-gradient(180deg,#0c161de8,#0d1921aa);border:1px solid #c2d6de33;border-top:2px solid #e3aa3e;cursor:pointer}
+ html body #title[data-s="title"] .prkTile:hover{border-color:#e3aa3e;box-shadow:0 0 18px rgba(227,170,62,.3)}
+ html body #title[data-s="title"] .prkTile .rkTi{position:relative;display:block;flex:1 1 0;min-height:0;width:100%}
+ html body #title[data-s="title"] .prkTile .rkTi img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 4px #000c)}
+ html body #title[data-s="title"] .prkTile .rkTb{width:86%;height:max(5px,.4vw)}}
 .rkPage{position:fixed;inset:0;z-index:420;background:radial-gradient(120% 70% at 30% 0%,#26333f 0%,#0e141a 60%,#07090c 100%);color:#eef2f5;overflow:hidden}
 .rkPage[hidden]{display:none}.rkPage::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,#ffffff05 0 1px,transparent 1px 4px);pointer-events:none}
 .rkBox{position:relative;display:flex;flex-direction:column;height:100%;max-width:1600px;margin:0 auto}
@@ -13075,9 +13080,10 @@ function openFeedback(){const el=tsDlg('feedback','回報',`<div class="psbox"><
     catch(e){msg.className='fbmsg err';msg.textContent=(e&&e.m)||'送出失敗，請檢查網路後再試一次。';bt.disabled=false;bt.textContent='發送';}};}
 {const s=$('#tside'),a=$('#t-love'),b=$('#t-fb');let n=$('#t-news');if(s&&!n){n=document.createElement('button');n.id='t-news';n.className='tsb news';n.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 10v4a1 1 0 0 0 1 1h1.6l1.3 4.3a1 1 0 0 0 1 .7h1.3a.7.7 0 0 0 .7-.9L8.2 15H9l9.5 4.6V4.4L9 9H3.5a1 1 0 0 0-1 1Z" fill="currentColor"/><path d="M21 10v4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';n.setAttribute('aria-label','版本公告');n.title='版本公告';s.insertBefore(n,a);}if(n){n.onclick=openNews;newsBadge();}{let f=$('#t-fr');if(s&&!f){f=document.createElement('button');f.id='t-fr';f.className='tsb';f.innerHTML=SVG_FR.add;f.setAttribute('aria-label','好友');f.title='好友';s.insertBefore(f,n||a);}if(f){f.onclick=()=>openAch('fr');frBadge();}}if(a)a.onclick=openSponsor;if(b)b.onclick=openFeedback;}
 function renderPlayer(){const el=$('#tplayer');if(!el)return;const acct=ME.mode==='account';
-  el.innerHTML=`<button class="pcard" id="pcard" aria-label="玩家資料與設定"><img class="pav" src="${meAvatar()}" alt=""><span class="pinfo"><b>${esc(meName())}</b>${rkWallet()}<span class="prank">${ecoTag()}</span></span></button>`;
+  el.innerHTML=`<button class="pcard" id="pcard" aria-label="玩家資料與設定"><img class="pav" src="${meAvatar()}" alt=""><span class="pinfo"><b>${esc(meName())}</b><span class="prank">${ecoTag()}</span></span></button>`;
   el.insertAdjacentHTML('beforeend',`<button class="pach" id="pach" aria-label="成就"><i>🏆</i><b>${achCount()}/${ACH.length}</b></button>`);$('#pach').onclick=()=>openAch();{const n=tkClaimable(),sd=$('#tside');let t=$('#t-task');if(sd&&!t){t=document.createElement('button');t.id='t-task';t.className='tsb task';t.setAttribute('aria-label','任務');t.title='任務';sd.insertBefore(t,sd.firstChild);}if(t){t.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2.5h6a1 1 0 0 1 1 1V5h2.5A1.5 1.5 0 0 1 20 6.5v14a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20.5v-14A1.5 1.5 0 0 1 5.5 5H8V3.5a1 1 0 0 1 1-1Z" fill="currentColor"/><path d="M7.5 12l1.6 1.6 2.9-3M7.5 17.2l1.6 1.6 2.9-3M14 12.2h3M14 17.4h3" fill="none" stroke="#11161b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'+(n?`<em>${n}</em>`:'');t.onclick=()=>{if(typeof G!=='undefined'&&G&&!G.over&&SCREEN!=='title'&&SCREEN!=='task')return;SCREEN='task';NETMSG='';renderTitle();};}}
-  $('#pcard').onclick=e=>{if(e.target.closest('#prk'))return rkOpen();openSettings();};}
+  el.insertAdjacentHTML('beforeend',rkTile('prkTile','t-rkd'));
+  $('#pcard').onclick=openSettings;{const l=$('#t-rk');if(l)l.outerHTML=rkTile('lobEv rkT','t-rk');}}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function openSettings(){let el=$('#psettings');if(!el){el=document.createElement('div');el.id='psettings';el.className='psettings';el.setAttribute('role','dialog');el.setAttribute('aria-label','玩家設定');document.body.appendChild(el);
     el.addEventListener('click',e=>{if(e.target===el)closeSettings();});}
@@ -15094,6 +15100,7 @@ NEWS.unshift({d:'2026-11-12',v:'v293',i:['線上對戰獎盃改成：勝利 +5�
 NEWS.unshift({d:'2026-11-13',v:'v297',i:['對戰電腦（單人或組隊）也會得到獎盃：勝利 +5、落敗 −3；線上對戰玩家改成勝利 +7、落敗 −4。存活、任務、人質、誤殺隊友的加減分不變。']});I18X['對戰電腦（單人或組隊）也會得到獎盃：勝利 +5、落敗 −3；線上對戰玩家改成勝利 +7、落敗 −4。存活、任務、人質、誤殺隊友的加減分不變。']=['Versus AI (solo or squad) now gives trophies too: win +5, loss −3. Online matches are now win +7, loss −4. Survivor, objective, hostage and teamkill adjustments are unchanged.',''];
 NEWS[0].v='v297–v298';NEWS[0].i.unshift('大廳「線上對戰」按鈕底下改回「PVP · 單人或組隊」，獎盃數改在名片和結算看。');I18X['大廳「線上對戰」按鈕底下改回「PVP · 單人或組隊」，獎盃數改在名片和結算看。']=['The lobby Online match button reads "PVP · solo or squad" again; trophies show on the player card and results.',''];
 NEWS.unshift({d:'2026-11-13',v:'v299',i:['獎盃段位上線：紅銅、青銅、白銀、黃金各四段，白金三段，最後是冠軍，共 20 段。錢包名字下方顯示段位和經驗條，點它打開段位頁：上面是圓形進度，下面是「段位之路」，每升一段都能領聲望，白銀以上送稱號。獎盃不會掉到目前顏色的第一段以下。']});I18X['獎盃段位上線：紅銅、青銅、白銀、黃金各四段，白金三段，最後是冠軍，共 20 段。錢包名字下方顯示段位和經驗條，點它打開段位頁：上面是圓形進度，下面是「段位之路」，每升一段都能領聲望，白銀以上送稱號。獎盃不會掉到目前顏色的第一段以下。']=['Trophy ranks are here: Copper, Bronze, Silver and Gold have four ranks each, Platinum three, then Champion (20 in all). Your rank and progress bar sit under your name in the wallet; tap it for the rank page with a progress ring and the Rank Road, where every rank gives renown and Silver and up give titles. Trophies never drop below the first rank of your current colour.',''];
+NEWS[0].v='v299–v300';NEWS[0].i.unshift('大廳的段位改成獨立方塊：手機在左欄最上面（跟「活動」一樣大，活動往下移），電腦在名片右邊，只顯示段位徽章和經驗條，點了打開段位頁。名片恢復只有名字和聲望。');I18X['大廳的段位改成獨立方塊：手機在左欄最上面（跟「活動」一樣大，活動往下移），電腦在名片右邊，只顯示段位徽章和經驗條，點了打開段位頁。名片恢復只有名字和聲望。']=['The lobby rank is now its own tile: top of the left column on phone (same size as Events, which moves down) and beside the wallet on desktop, showing just the badge and progress bar; tap it for the rank page. The wallet shows only your name and renown again.',''];
 NEWS.unshift({d:'2026-11-12',v:'v291',i:['名片上的幹員立繪不再切到頭。']});
 NEWS.unshift({d:'2026-11-13',v:'v296',i:['調整名片立繪時可以往下（和左右）移得更遠，放大後也能把頭拉進名片裡。']});
 NEWS.unshift({d:'2026-11-13',v:'v295',i:['名片右側的立繪可以自己調整：在「我的名片」按「調整立繪」，拖曳移動、滑桿或兩指縮放，按「重設」回原本位置。每張立繪各自記住，好友看你的名片也會照這樣顯示。']});
