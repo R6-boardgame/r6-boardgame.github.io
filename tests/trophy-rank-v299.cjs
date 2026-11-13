@@ -1,4 +1,4 @@
-// v299: trophy ranks (20 badges), floor at the first rank of your colour, rank road rewards, wallet rank row, rank titles.
+// v299/v300 (rank tile beside the wallet / above Events): trophy ranks (20 badges), floor at the first rank of your colour, rank road rewards, wallet rank row, rank titles.
 // Run: python3 -m http.server 8016 & node tests/trophy-rank-v299.cjs   (R6_CHROME / R6_PLAYWRIGHT / R6_TEST_URL optional)
 const {chromium}=require(process.env.R6_PLAYWRIGHT||'playwright'),assert=require('node:assert/strict');
 (async()=>{const browser=await chromium.launch(process.env.R6_CHROME?{executablePath:process.env.R6_CHROME}:{});const errors=[];
@@ -10,9 +10,9 @@ try{for(const [w,h] of [[390,844],[1440,810]]){const page=await browser.newPage(
     o.flLoss=play(false,601);o.flLoss2=play(false,620);o.copper=play(false,2);
     ECO.tr=642;ECO.trMax=688;ECO.trClaim=[];const rn0=ECO.rn|0;o.can=rkCanN();rkClaim(12);o.rn=(ECO.rn|0)-rn0;o.claimed=rkClaimed().slice();rkClaim(12);o.rn2=(ECO.rn|0)-rn0;rkClaim(13);o.no13=!rkClaimed().includes(13);
     o.title=rkTitle('rk:gold');ECO.title='rk:gold';o.ttl=ttl289();
-    SCREEN='title';renderTitle();renderPlayer();const prk=document.querySelector('#pcard #prk');o.wallet=prk&&prk.textContent.replace(/\s+/g,' ').trim();
+    SCREEN='title';renderTitle();renderPlayer();const prk=document.querySelector(innerWidth<=760?'#t-rk':'#t-rkd');o.wallet=prk&&prk.getAttribute('aria-label');o.noRankInWallet=!document.querySelector('#pcard .prk,#pcard .rkTi');o.tileVis=!!prk&&prk.getBoundingClientRect().width>40;const ev=document.querySelector('.lobEv.ev');o.sameSize=innerWidth>760||(Math.abs(prk.getBoundingClientRect().width-ev.getBoundingClientRect().width)<1&&Math.abs(prk.getBoundingClientRect().height-ev.getBoundingClientRect().height)<2&&prk.getBoundingClientRect().bottom<=ev.getBoundingClientRect().top);o.noText=!prk.textContent.trim();
     const pc=document.querySelector('#pcard').getBoundingClientRect(),btn=document.querySelector('#t-rank').getBoundingClientRect(),side=document.querySelector('.lobSide');
-    o.noOverlap=pc.bottom<=btn.top+1&&(!side||!side.offsetParent||side.getBoundingClientRect().top>=pc.bottom-1);
+    o.noOverlap=pc.bottom<=btn.top+1&&(!side||!side.offsetParent||side.getBoundingClientRect().top>=pc.bottom-1)&&prk.getBoundingClientRect().bottom<=btn.top+1;
     prk.click();await new Promise(r=>setTimeout(r,400));const pg=document.querySelector('#rkPage');o.open=!!pg&&!pg.hidden;o.nodes=pg.querySelectorAll('.rkNd').length;o.cur=pg.querySelector('.rkNd.cur b').textContent;
     const rd=pg.querySelector('#rkRoad'),cur=pg.querySelector('.rkNd.cur').getBoundingClientRect(),rr=rd.getBoundingClientRect();o.curVisible=cur.left>=rr.left-1&&cur.right<=rr.right+1;
     const dot=pg.querySelector('.rkNd .rkDot').getBoundingClientRect(),tr=pg.querySelector('.rkTrack').getBoundingClientRect();o.trackOnDots=Math.abs((dot.top+dot.height/2)-(tr.top+tr.height/2))<3;
@@ -21,7 +21,7 @@ try{for(const [w,h] of [[390,844],[1440,810]]){const page=await browser.newPage(
   assert.equal(r.n,20);assert.deepEqual(r.idx,['紅銅 IV','紅銅 IV','紅銅 III','紅銅 ★','青銅 IV','白銀 ★','黃金 IV','黃金 IV','黃金 ★','白金 III','白金 ★','冠軍','冠軍']);
   assert.deepEqual(r.floor,[0,0,100,600,1000,2000]);assert.equal(r.flLoss,600,'loss keeps gold floor');assert.equal(r.flLoss2,616);assert.equal(r.copper,0);
   assert.equal(r.can,12);assert.equal(r.rn,3000);assert.deepEqual(r.claimed,[12]);assert.equal(r.rn2,3000,'no double claim');assert(r.no13,'cannot claim unreached rank');
-  assert.equal(r.title,'黃金幹員');assert.equal(r.ttl,'黃金幹員');assert.match(r.wallet,/黃金 IV/);assert(r.noOverlap,'wallet does not cover the lobby');
+  assert.equal(r.title,'黃金幹員');assert.equal(r.ttl,'黃金幹員');assert.match(r.wallet,/黃金 IV/);assert(r.noOverlap,'wallet/tile do not cover the lobby');assert(r.noRankInWallet,'wallet has no rank');assert(r.tileVis);assert(r.sameSize,'phone tile same size as Events and above it');assert(r.noText,'tile shows only badge and bar');
   assert(r.open);assert.equal(r.nodes,20);assert.equal(r.cur,'黃金 IV');assert(r.curVisible,'road scrolled to current rank');assert(r.trackOnDots,'road line passes through the nodes');assert(r.wide);assert(r.closed);
   await page.close();}
   assert.deepEqual(errors,[]);console.log('PASS: 20 ranks, colour floor, road rewards claim once, rank titles, wallet rank row, rank page on phone and desktop; no page errors');
