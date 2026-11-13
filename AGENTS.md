@@ -1,5 +1,6 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v294：名片新兵頭像改用新兵圖。`avN294(k)` 把舊的新兵圖示鍵（`recruit_a_*`→`cop:0` 女、`recruit_d_*`→`cop:1` 男）轉成培養幹員頭像，`ME` 載入時、`avSrc289`／`artSrc289`／`profArt` 都先過它（好友舊資料也一樣）；預設頭像改 `cop:0`。頭像清單拿掉 `recruit_` 圖示，最前面是兩名新兵和他們轉職過的職業（`copWU`）。`copAv` 的 `av` 一律用 `img/av/cop_<f|m>[_職業].webp`，新增 hs／sh 四張頭像（從 `img/cop/*_hs/_sh.webp` 裁頭部）。回歸：`tests/card-recruit-avatar-v294.cjs`。
 - v293：獎盃計分改成依表現。`trCalc(win,mine)` 回傳項目清單：勝利 +5、每名存活己方幹員 +1（`ecoGame` 的 `mine`）、完成任務 +2（`G._df` 我方阻止拆彈，或我方進攻且 `G._why` 是「炸彈已被拆除」／「人質已安全撤離」）；落敗 −3、`G._hk`（我方害死人質）再 −1；`G._ffn`（我方誤殺隊友數）每名 −1，勝敗都算。總數最低 0。`G._trd.L` 給結算 `#rkres` 的 `.trL` 逐項列出。配對機器人獎盃改在你上下 15 內。回歸：`tests/trophies-v290.cjs`。
 - v292：名片 `.pcSt` 第二格從勝率改成獎盃（`c.r`=`trN()`），拿掉右上 `.pcRank`。熟練度 `mxLvT(lv)`：Lv5（`MXT.length`）顯示 LvMax（名片常用幹員、商店、選角、升級提示）。解鎖：擁有（`owned(b)`）就有圖示頭像；Lv2 解鎖照片 `pic:` 與半身像 `art:`；Lv3 稱號（`ttl289`／`ecoTag`／設定列表）；LvMax 由 `skHas(k)` 讓培養幹員免費擁有該幹員技能（原本只有 `ECO.sk` 購買，`skBuy`／商店／`copSkOn` 都改用 `skHas`）。`MXREW` 更新。稱號可用 `TTLX[base]` 覆寫預設「名字 專家」，使用者會在 `/mnt/project-files/titles/幹員稱號.xlsx` 填好後回傳。
 - v291：名片立繪不切頭：`.pc289 .pcArt` 高度改成 `calc(100% - 4cqw)`、`max-width:62%`，整個人放在名片內（原本 112% 會超出上緣）。

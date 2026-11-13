@@ -12879,8 +12879,10 @@ const LOBBY={"plateY":"data:image/webp;base64,UklGRjxmAABXRUJQVlA4WAoAAAAQAAAA9w
   const t=$('#title');if(t){const s=t.querySelector('img.six'),r6=t.querySelector('img.r6');if(s)s.src=LOBBY.logo;if(r6)r6.src=LOBBY.r6;}})();
 // per-viewer profile: a convenience kept in this browser; ranked results live in the shared store
 const PKEY='r6bg.profile';
+// v294: the old recruit emblem avatars (recruit_a_* / recruit_d_*) now mean the recruit art: cop:0 (female) / cop:1 (male)
+function avN294(k){const m=/^(?:art:|pic:)?recruit_([ad])_/.exec(k||'');return m?(m[1]==='a'?'cop:0':'cop:1'):k;}
 const ME=(()=>{let p=null;try{p=JSON.parse(localStorage.getItem(PKEY)||'null');}catch(e){}
-  p=Object.assign({mode:'guest',guest:'訪客'+String(1000+Math.floor(Math.random()*9000)),nick:'',avatar:'recruit_a_rifle',usePhoto:false,lang:'zh'},p||{});
+  p=Object.assign({mode:'guest',guest:'訪客'+String(1000+Math.floor(Math.random()*9000)),nick:'',avatar:'cop:0',usePhoto:false,lang:'zh'},p||{});p.avatar=avN294(p.avatar);
   p.acct=null;p.w=0;p.l=0;return p;})();
 function saveMe(){gaPush();try{const {mode,guest,nick,avatar,usePhoto,lang,cth}=ME;localStorage.setItem(PKEY,JSON.stringify({mode,guest,nick,avatar,usePhoto,lang,cth}));}catch(e){}}
 const meName=()=>ME.nick||(ME.mode==='account'&&ME.acct&&ME.acct.name)||ME.guest;
@@ -12976,9 +12978,9 @@ function closeSettings(){const el=$('#psettings');if(el)el.hidden=true;}
 const CTH289=[['','金'],['blue','防守藍'],['orange','進攻橙'],['black','黑曜']];
 const cthOk289=k=>k!=='black'||achCount()>=30;
 const PS289={edit:false};
-function avSrc289(k,ph){if(k==='__photo')return ph||'img/cop/f.webp';if(/^cop:/.test(k||''))return (copAv(k)||copAv('cop:0')).av;const b=String(k||'').replace(/^(art|pic):/,'');
+function avSrc289(k,ph){k=avN294(k);if(k==='__photo')return ph||'img/cop/f.webp';if(/^cop:/.test(k||''))return (copAv(k)||copAv('cop:0')).av;const b=String(k||'').replace(/^(art|pic):/,'');
   if(!OPC[b])return 'img/av/cop_f.webp';if(/^pic:/.test(k))return opPic(b);if(/^art:/.test(k))return opArt(b)||opIcon(b);return opIcon(b);}
-function artSrc289(k,m){if(/^cop:/.test(k||'')){const c=copAv(k);if(c)return c.art;}const b=String(k||'').replace(/^(art|pic):/,'');
+function artSrc289(k,m){k=avN294(k);if(/^cop:/.test(k||'')){const c=copAv(k);if(c)return c.art;}const b=String(k||'').replace(/^(art|pic):/,'');
   if(OPC[b]&&FACEM[artBase(b)])return 'img/face/'+artBase(b)+'.webp';const t=(m||[]).find(x=>OPC[x[0]]&&FACEM[artBase(x[0])]);return t?'img/face/'+artBase(t[0])+'.webp':COPART[0];}
 function mains289(){const n=new Set();return OPBASE.filter(b=>(ECO.mx[b]||0)>0&&OPC[b]).sort((a,b)=>(ECO.mx[b]||0)-(ECO.mx[a]||0)).filter(b=>!n.has(OPC[b].name)&&n.add(OPC[b].name)).slice(0,3).map(b=>[b,mxLv(ECO.mx[b]||0)]);}
 function ttl289(){return ECO.title&&OPC[ECO.title]&&mxLv(ECO.mx[ECO.title]||0)>=3?mxTitle(ECO.title):'';}
@@ -13008,8 +13010,8 @@ async function openCard289(id,name){if(!id)return;const code=frCode(id);let el=t
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.anPN[data-oc]');if(b)openCard289(b.dataset.oc,b.textContent);});
 function volHTML289(id,ic,label,v){const n=Math.round(v*100);return `<div class="psVol"><div class="ln"><b>${ic} ${label}</b><output>${n}</output></div><div class="vb">${Array.from({length:12},(_,i)=>`<i class="${i<Math.round(n/100*12)?'f':''}" style="height:${30+i*6}%"></i>`).join('')}<input type="range" id="${id}" min="0" max="100" step="5" value="${n}" aria-label="${label}音量"></div></div>`;}
 function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;const acct=ME.mode==='account'&&ME.acct;const _rs=scrollSnap(el);
-  const avl=[];OPBASE.forEach(b=>{const lv=mxLv(ECO.mx[b]||0);if(b.startsWith('recruit_')||owned(b)||lv>=1||ME.avatar===b)avl.push([b,opIcon(b),OPC[b].name]);if(lv>=2||ME.avatar==='art:'+b)avl.push(['art:'+b,opArt(b)||opIcon(b),OPC[b].name+' 半身像']);});
-  {const wu=copWU();copAll().forEach((c,i)=>{avl.push(['cop:'+i,copAv('cop:'+i).av,`${COPN[i]} ${c.nm}`]);for(const w of WORD)if(wu.has(i+':'+w))avl.push([`cop:${i}:${w}`,copAv(`cop:${i}:${w}`).av,`${COPN[i]} ${WPN[w].t}`,w]);});}
+  const avl=[];{const wu=copWU();copAll().forEach((c,i)=>{avl.push(['cop:'+i,copAv('cop:'+i).av,`${COPN[i]} ${c.nm}`]);for(const w of WORD)if(wu.has(i+':'+w))avl.push([`cop:${i}:${w}`,copAv(`cop:${i}:${w}`).av,`${COPN[i]} ${WPN[w].t}`,w]);});}
+  OPBASE.forEach(b=>{if(b.startsWith('recruit_'))return;const lv=mxLv(ECO.mx[b]||0);if(owned(b)||lv>=1||ME.avatar===b)avl.push([b,opIcon(b),OPC[b].name]);if(lv>=2||ME.avatar==='art:'+b)avl.push(['art:'+b,opArt(b)||opIcon(b),OPC[b].name+' 半身像']);});
   OPBASE.forEach(b=>{if(!b.startsWith('recruit_')&&FACEM[artBase(b)]&&(mxLv(ECO.mx[b]||0)>=2||ME.avatar==='pic:'+b))avl.push(['pic:'+b,opPic(b),OPC[b].name+' 照片']);});
   const avs=(acct&&ME.acct.photo?`<button class="avb ${ME.usePhoto?'on':''}" data-av="__photo" title="帳號照片"><img src="${ME.acct.photo}" alt="帳號照片"></button>`:'')+avl.map(([k,src,n,w])=>`<button class="avb ${!ME.usePhoto&&ME.avatar===k?'on':''} ${k.startsWith('art:')?'art':''} ${k.startsWith('cop:')?'cop':''} ${k.startsWith('pic:')?'pic':''}" data-av="${k}" title="${esc(n)}"><img src="${src}" alt="${esc(n)}">${w?`<i class="avW">${WPN[w].ic}</i>`:''}</button>`).join('');
   // the two Recruits share one title text, so list each title once
@@ -13311,14 +13313,14 @@ const MFT=45,MFMIS={bomb:'炸彈',hostage:'人質'};
 let MF=null;
 const ign=()=>ME.nick||ME.guest; // the in-game name, never the Google account name
 // custom operator avatars: cop:<slot> is the recruit art, cop:<slot>:<class> a class the player has unlocked (ECO.wu keeps them after a death)
-function copAv(k){const m=/^cop:([01])(?::(\w+))?$/.exec(k||'');if(!m)return null;const i=+m[1],w=m[2]&&WPN[m[2]]?m[2]:null,art=copArt({w},i);return {i,w,art,av:['hs','sh'].includes(w)?art:`img/av/cop_${i?'m':'f'}${w&&WART[w]?'_'+w:''}.webp`};}
+function copAv(k){const m=/^cop:([01])(?::(\w+))?$/.exec(k||'');if(!m)return null;const i=+m[1],w=m[2]&&WPN[m[2]]?m[2]:null,art=copArt({w},i);return {i,w,art,av:`img/av/cop_${i?'m':'f'}${w&&WART[w]?'_'+w:''}.webp`};}
 // v116: pic:<op> = chest-up photo crop of an owned operator (img/av/<op>.webp, made from img/face/)
 const opPic=b=>'img/av/'+artBase(b)+'.webp';
 function copWU(){const s=new Set(Array.isArray(ECO.wu)?ECO.wu:[]);copAll().forEach((c,i)=>{if(c.w)s.add(i+':'+c.w);});return s;}
 function copWUAdd(i,w){const s=copWU();s.add(i+':'+w);ECO.wu=[...s];}
 function myProf(){const p={n:ign(),av:ME.avatar||'',st:ECO.streak|0,tr:trN()};if(ME.usePhoto&&ME.acct&&ME.acct.photo)p.ph=ME.acct.photo;
   const a=!p.ph&&copAv(p.av);if(a){const c=copAll()[a.i];p.cop={nm:c.nm,k:c.k|0,sv:c.sv|0};}return p;}
-function profArt(p){if(p&&p.ph)return p.ph;const a=copAv(p&&p.av);if(a)return a.art;const pk=/^pic:/.test((p&&p.av)||''),k=String((p&&p.av)||'').replace(/^(art|pic):/,'');return OPC[k]?(pk?opFace(k):(opArt(k)||opIcon(k))):opArt('ash')||opIcon('ash');}
+function profArt(p){if(p&&p.ph)return p.ph;if(p&&p.av)p=Object.assign({},p,{av:avN294(p.av)});const a=copAv(p&&p.av);if(a)return a.art;const pk=/^pic:/.test((p&&p.av)||''),k=String((p&&p.av)||'').replace(/^(art|pic):/,'');return OPC[k]?(pk?opFace(k):(opArt(k)||opIcon(k))):opArt('ash')||opIcon('ash');}
 function botProf(name){const ops=OPBASE.filter(k=>SCRIPTED.has(k)&&!copSlot(k)&&opArt(k));return {n:name,av:'art:'+ops[Math.floor(Math.random()*ops.length)],st:Math.random()<.6?0:2+Math.floor(Math.random()*5),tr:Math.max(0,trN()+Math.round((Math.random()-.5)*30))};}
 const mfPool=(side,mine)=>{const seen=new Set(),o=[];for(const k of OPBASE){if(OPC[k].side!==side||!opPlayable(k)||(mine&&!owned(k))||seen.has(OPC[k].base))continue;seen.add(OPC[k].base);
     if(copSlot(k)!=null)o.push(...OPCARDS.filter(c=>c.base===k&&copSlot(c.id)!=null).map(c=>c.id));else o.push(k);}return o;};
@@ -13492,7 +13494,7 @@ function gaMerge(d,first){let e=d.eco||{};if(d.ecoJ)try{e=JSON.parse(d.ecoJ)||{}
 // signing out, or signing in with a different account, wipes it and reloads so nothing carries over to the next account.
 const GA_KEYS=['r6bg.eco','r6bg.ach','r6bg.social','r6bg.copRc','r6bg.glink'];
 function gaWipe(){clearTimeout(gaT);try{GA_KEYS.forEach(k=>localStorage.removeItem(k));
-  localStorage.setItem(PKEY,JSON.stringify({mode:'guest',guest:ME.guest,nick:'',avatar:'recruit_a_rifle',usePhoto:false,lang:ME.lang}));}catch(x){}}
+  localStorage.setItem(PKEY,JSON.stringify({mode:'guest',guest:ME.guest,nick:'',avatar:'cop:0',usePhoto:false,lang:ME.lang}));}catch(x){}}
 const gaOwner=u=>String((u&&u.email)||'').toLowerCase()==='aesopfilmedit@gmail.com';
 async function gaOn(u){const prev=GA.u;GA.u=u;GA.ok=false;GA.err='';
   const re=()=>{renderPlayer();renderSettings();lgState();};
@@ -14957,6 +14959,7 @@ NEWS.unshift({d:'2026-11-12',v:'v289',i:['玩家設定改成「我的名片」�
 NEWS.unshift({d:'2026-11-12',v:'v290',i:['線上對戰改成獎盃制：拿掉段位，勝利 +30 獎盃、落敗 −20 獎盃（不會低於 0）。大廳「線上對戰」、配對 VS 畫面和結算都會顯示獎盃數。']});I18X['線上對戰改成獎盃制：拿掉段位，勝利 +30 獎盃、落敗 −20 獎盃（不會低於 0）。大廳「線上對戰」、配對 VS 畫面和結算都會顯示獎盃數。']=['Online matches now use trophies instead of ranks: win +30, lose −20 (never below 0). Trophies show on the lobby Online match button, the VS screen and the results.','オンライン対戦はランクの代わりにトロフィー制に：勝利 +30、敗北 −20（0 未満にならない）。ロビー、VS 画面、リザルトに表示。'];
 NEWS.unshift({d:'2026-11-12',v:'v293',i:['線上對戰獎盃改成：勝利 +5，每名存活幹員再 +1，完成任務（拆除炸彈、阻止拆彈、救出人質）再 +2；落敗 −3，殺害人質再 −1；誤殺隊友每名 −1。獎盃不會低於 0，結算會列出每一項。']});I18X['線上對戰獎盃改成：勝利 +5，每名存活幹員再 +1，完成任務（拆除炸彈、阻止拆彈、救出人質）再 +2；落敗 −3，殺害人質再 −1；誤殺隊友每名 −1。獎盃不會低於 0，結算會列出每一項。']=['Online trophies: win +5, +1 per surviving operator, +2 for the objective (bomb disarmed, defuse stopped, hostage extracted); loss −3, −1 more for killing the hostage; −1 per teammate you killed. Never below 0; the results list each item.',''];
 NEWS.unshift({d:'2026-11-12',v:'v291',i:['名片上的幹員立繪不再切到頭。']});
+NEWS.unshift({d:'2026-11-13',v:'v294',i:['名片的新兵頭像改成新兵本人的圖（不再是圖示）；培養幹員轉職過的職業會出現在頭像清單，可以換成該職業頭像。']});
 NEWS.unshift({d:'2026-11-12',v:'v292',i:['名片上的「勝率」改成獎盃數，右上角不再另外顯示獎盃。','熟練度滿級顯示 LvMax。解鎖改成：擁有幹員就有圖示頭像、Lv2 解鎖頭像與半身像、Lv3 解鎖稱號、LvMax 解鎖該幹員技能給培養幹員裝備（不用再花聲望買）。']});
 I18X['手機主畫面換上金線棋盤圖示。遊戲畫面編輯器也有自己的圖示。']=['The game has a new gold-grid home-screen icon, and the UI editor has its own icon.',''];
 // ---------- round clocks: each squad gets (time per Operator x Operators in play) per round, shared by its two activation phases ----------
