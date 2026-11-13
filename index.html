@@ -2776,6 +2776,11 @@ html body button.tk:not(.done):hover,html body button.tk:not(.done):focus{border
 .psbox.ps289{width:min(560px,100%);gap:16px}
 .ps289 .psCols,.ps289 .psC1,.ps289 .psC2{display:flex;flex-direction:column;gap:18px;min-width:0}
 .ps289 section{min-width:0}
+.ps289 .psEdit button.on{border-color:var(--accent);color:var(--accent)}
+.ps289 .psEdit button,.psAdj295 button{white-space:nowrap}@media (max-width:420px){.ps289 .psEdit{gap:6px}.ps289 .psEdit button{padding:9px 4px;font-size:12px}.ps289 .psEdit b{margin-right:3px}}
+.pc289.adj295{cursor:grab;touch-action:none;outline:2px dashed var(--accent);outline-offset:-4px}.pc289.adj295:active{cursor:grabbing}.pc289.adj295 .pcArt{transform-origin:right bottom}
+.pc289 .pcArt{transform-origin:right bottom}
+.psAdj295{margin-top:8px}.psAdj295 .psrow{display:flex;align-items:center;gap:8px}.psAdj295 input[type=range]{flex:1;min-width:0}.psAdj295 output{width:44px;text-align:right;font-size:13px}.psAdj295 button{border:1px solid #33475a;background:#111920;padding:7px 12px;font-size:13px}
 .ps289 .psEdit{display:flex;gap:8px;margin-top:10px}.ps289 .psEdit button{flex:1;border:1px solid #33475a;background:#111920;padding:9px;font-size:13px}.ps289 .psEdit b{color:var(--accent);margin-right:5px}
 .ps289 .psNm{margin:10px 0 0}.ps289 .psNm input{min-width:0;font-size:16px}.ps289 .psNm button{flex:none;white-space:nowrap;padding:8px 16px}
 .hs289{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;touch-action:pan-x pan-y;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:2px 2px 6px;scrollbar-width:thin}
@@ -12884,7 +12889,7 @@ function avN294(k){const m=/^(?:art:|pic:)?recruit_([ad])_/.exec(k||'');return m
 const ME=(()=>{let p=null;try{p=JSON.parse(localStorage.getItem(PKEY)||'null');}catch(e){}
   p=Object.assign({mode:'guest',guest:'訪客'+String(1000+Math.floor(Math.random()*9000)),nick:'',avatar:'cop:0',usePhoto:false,lang:'zh'},p||{});p.avatar=avN294(p.avatar);
   p.acct=null;p.w=0;p.l=0;return p;})();
-function saveMe(){gaPush();try{const {mode,guest,nick,avatar,usePhoto,lang,cth}=ME;localStorage.setItem(PKEY,JSON.stringify({mode,guest,nick,avatar,usePhoto,lang,cth}));}catch(e){}}
+function saveMe(){gaPush();try{const {mode,guest,nick,avatar,usePhoto,lang,cth,cax}=ME;localStorage.setItem(PKEY,JSON.stringify({mode,guest,nick,avatar,usePhoto,lang,cth,cax}));}catch(e){}}
 const meName=()=>ME.nick||(ME.mode==='account'&&ME.acct&&ME.acct.name)||ME.guest;
 const meAvatar=()=>ME.usePhoto&&ME.acct&&ME.acct.photo?ME.acct.photo:/^cop:/.test(ME.avatar||'')?(copAv(ME.avatar)||copAv('cop:0')).av:/^pic:/.test(ME.avatar||'')?opPic(ME.avatar.slice(4)):/^art:/.test(ME.avatar||'')?(opArt(ME.avatar.slice(4))||opIcon(ME.avatar.slice(4))):opIcon(ME.avatar);
 // v290: trophies replace the old ranked tiers; only online matches (the match queue, including the bot it falls back to) count. Kept in ECO.tr (best in ECO.trMax), synced like renown.
@@ -12972,7 +12977,22 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 function openSettings(){let el=$('#psettings');if(!el){el=document.createElement('div');el.id='psettings';el.className='psettings';el.setAttribute('role','dialog');el.setAttribute('aria-label','玩家設定');document.body.appendChild(el);
     el.addEventListener('click',e=>{if(e.target===el)closeSettings();});}
   el.hidden=false;renderSettings();{const bx=el.querySelector('.psbox');if(bx)bx.scrollTop=0;}}
-function closeSettings(){const el=$('#psettings');if(el)el.hidden=true;}
+function adjBind295(el){const card=el.querySelector('.psCard .pc289'),img=card&&card.querySelector('.pcArt');if(!img)return;card.classList.add('adj295');
+  const src=artSrc289(myCard289().av,mains289()),cur=()=>Object.assign({x:0,y:0,s:1},(ME.cax||{})[src]||{}),put=v=>{v=axOk295(v);ME.cax=Object.assign({},ME.cax,{[src]:v});
+    img.style.translate=`${v.x.toFixed(2)}cqw ${v.y.toFixed(2)}cqw`;img.style.scale=v.s.toFixed(3);const r=$('#psAxS');if(r){r.value=Math.round(v.s*100);r.nextElementSibling.textContent=Math.round(v.s*100)+'%';}},
+    done=()=>{saveMe();clearTimeout(adjBind295.t);adjBind295.t=setTimeout(profPush,800);},cq=()=>card.getBoundingClientRect().width/100;
+  const pts=new Map();let st=null;
+  card.addEventListener('pointerdown',e=>{e.preventDefault();card.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);st={v:cur(),p:[...pts.values()].map(a=>a.slice())};});
+  card.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId)||!st)return;pts.set(e.pointerId,[e.clientX,e.clientY]);const p=[...pts.values()],k=cq();
+    if(p.length>=2&&st.p.length>=2){const d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]),m=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2],m0=m(st.p[0],st.p[1]),m1=m(p[0],p[1]);
+      put({x:st.v.x+(m1[0]-m0[0])/k,y:st.v.y+(m1[1]-m0[1])/k,s:st.v.s*d(p[0],p[1])/Math.max(1,d(st.p[0],st.p[1]))});}
+    else put({x:st.v.x+(p[0][0]-st.p[0][0])/k,y:st.v.y+(p[0][1]-st.p[0][1])/k,s:st.v.s});});
+  const up=e=>{if(!pts.delete(e.pointerId))return;st=pts.size?{v:cur(),p:[...pts.values()].map(a=>a.slice())}:null;done();};
+  card.addEventListener('pointerup',up);card.addEventListener('pointercancel',up);
+  card.addEventListener('wheel',e=>{e.preventDefault();const v=cur();put(Object.assign(v,{s:v.s*Math.exp(-e.deltaY*.0015)}));done();},{passive:false});
+  const r=$('#psAxS');if(r)r.oninput=()=>{put(Object.assign(cur(),{s:r.value/100}));done();};
+  const z=$('#psAxR');if(z)z.onclick=()=>{const c=Object.assign({},ME.cax);delete c[src];ME.cax=c;img.style.translate='';img.style.scale='';if(r){r.value=100;r.nextElementSibling.textContent='100%';}done();};}
+function closeSettings(){PS289.adj=false;const el=$('#psettings');if(el)el.hidden=true;}
 // v289: player card. The settings panel opens on the card; background, title and avatar rows scroll sideways so the layout keeps its height.
 // The same card (prof/<code>.c) is shown when adding a friend by code, when tapping a friend, and when tapping the opponent after a match.
 const CTH289=[['','金'],['blue','防守藍'],['orange','進攻橙'],['black','黑曜']];
@@ -12982,10 +13002,14 @@ function avSrc289(k,ph){k=avN294(k);if(k==='__photo')return ph||'img/cop/f.webp'
   if(!OPC[b])return 'img/av/cop_f.webp';if(/^pic:/.test(k))return opPic(b);if(/^art:/.test(k))return opArt(b)||opIcon(b);return opIcon(b);}
 function artSrc289(k,m){k=avN294(k);if(/^cop:/.test(k||'')){const c=copAv(k);if(c)return c.art;}const b=String(k||'').replace(/^(art|pic):/,'');
   if(OPC[b]&&FACEM[artBase(b)])return 'img/face/'+artBase(b)+'.webp';const t=(m||[]).find(x=>OPC[x[0]]&&FACEM[artBase(x[0])]);return t?'img/face/'+artBase(t[0])+'.webp':COPART[0];}
+// v295: the player moves / zooms the card art themselves. Kept per art image in ME.cax[src]={x,y,s} (x,y in cqw of the card, s = scale), sent with the card as c.ax.
+function cax295(src){const v=ME.cax&&ME.cax[src];return v&&(v.x||v.y||v.s!==1)?{x:+v.x||0,y:+v.y||0,s:+v.s||1}:null;}
+function axOk295(a){if(!a||typeof a!=='object')return null;const c=(v,lo,hi,d)=>Number.isFinite(+v)?Math.min(hi,Math.max(lo,+v)):d;return {x:c(a.x,-80,80,0),y:c(a.y,-60,60,0),s:c(a.s,.4,3,1)};}
+function axCss295(a){a=axOk295(a);return a?` style="translate:${a.x.toFixed(2)}cqw ${a.y.toFixed(2)}cqw;scale:${a.s.toFixed(3)}"`:'';}
 function mains289(){const n=new Set();return OPBASE.filter(b=>(ECO.mx[b]||0)>0&&OPC[b]).sort((a,b)=>(ECO.mx[b]||0)-(ECO.mx[a]||0)).filter(b=>!n.has(OPC[b].name)&&n.add(OPC[b].name)).slice(0,3).map(b=>[b,mxLv(ECO.mx[b]||0)]);}
 function ttl289(){return ECO.title&&OPC[ECO.title]&&mxLv(ECO.mx[ECO.title]||0)>=3?mxTitle(ECO.title):'';}
-function myCard289(){const ph=ME.usePhoto&&ME.acct&&ME.acct.photo?ME.acct.photo:'';
-  return {n:meName(),t:ttl289(),av:ph?'__photo':ME.avatar,ph,th:cthOk289(ME.cth||'')?(ME.cth||''):'',rn:Math.round(ECO.rn||0),a:achCount(),r:trN(),w:ME.w|0,l:ME.l|0,m:mains289()};}
+function myCard289(){const ph=ME.usePhoto&&ME.acct&&ME.acct.photo?ME.acct.photo:'';const av=ph?'__photo':ME.avatar,ax=cax295(artSrc289(av,mains289()));
+  return {ax,n:meName(),t:ttl289(),av:ph?'__photo':ME.avatar,ph,th:cthOk289(ME.cth||'')?(ME.cth||''):'',rn:Math.round(ECO.rn||0),a:achCount(),r:trN(),w:ME.w|0,l:ME.l|0,m:mains289()};}
 // someone on an older version only has a name and their best custom operator
 function oldCard289(d){const b=d&&d.best,i=b?b.i|0:0,w=b&&b.w?b.w:'';return {n:(d&&d.n)||'玩家',t:'',av:'cop:'+i+(w?':'+w:''),th:'',m:[],old:1};}
 // the card shows trophies (the ranked points), not a tier name
@@ -12993,7 +13017,7 @@ const TROPHY289='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v5.
 function cardHTML289(c,code){c=c||{};const th=['blue','orange','black'].includes(c.th)?c.th:'';
   const no=String(code||'').split('').reduce((h,ch)=>(h*31+ch.charCodeAt(0))%10000,7),wl=(c.w|0)+(c.l|0);
   const st=c.old?'':`<div class="pcSt"><div><b>${c.rn==null?'—':fmtN(c.rn)}</b><span>聲望</span></div><div><b>${c.r==null?'—':fmtN(c.r)}</b><span>獎盃</span></div><div><b>${c.a==null?'—':c.a}</b><span>成就</span></div></div>`;
-  return `<div class="pc289 ${th}"><div class="pcTex"></div><div class="pcBand"></div><div class="pcBand2"></div><img class="pcArt" src="${esc(artSrc289(c.av,c.m))}" alt=""><div class="pcShade"></div>
+  return `<div class="pc289 ${th}"><div class="pcTex"></div><div class="pcBand"></div><div class="pcBand2"></div><img class="pcArt" src="${esc(artSrc289(c.av,c.m))}" alt=""${axCss295(c.ax)}><div class="pcShade"></div>
   <div class="pcIn"><div class="pcTop"><div class="pcKick">OPERATOR CARD<span>No. ${String(no).padStart(4,'0')}</span></div></div>
   <div class="pcWho"><div class="pcAv"><img src="${esc(avSrc289(c.av,c.ph))}" alt=""></div><div class="pcNm">${c.t?`<span class="pcTtl">${esc(c.t)}</span>`:''}<b>${esc(c.n||'玩家')}</b></div></div>${st}</div>
   ${code?`<div class="pcCode">FRIEND CODE<b>${esc(code)}</b><i>${'<u></u>'.repeat(16)}</i></div>`:''}<div class="pcHz"></div><div class="pcFoil"></div><div class="pcEdge"></div></div>`;}
@@ -13017,7 +13041,8 @@ function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;cons
   // the two Recruits share one title text, so list each title once
   const seen=new Set(),ttls=OPBASE.filter(b=>mxLv(ECO.mx[b]||0)>=3).filter(b=>{const t=mxTitle(b);if(seen.has(t))return false;seen.add(t);return true;}),curT=ttl289();
   const ths=CTH289.map(([k,n])=>{const ok=cthOk289(k);return `<button class="pcTh ${k||'gold'} ${(ME.cth||'')===k?'on':''}" data-cth="${k}" ${ok?'':'disabled'} title="${ok?n:'成就達 30 個解鎖'}"><i></i>${n}${ok?'':' 🔒'}</button>`;}).join('');
-  const card=`<section class="psCard">${cardHTML289(myCard289(),FRP.code)}<div class="psEdit"><button id="psRen"><b>✎</b>改名</button><button id="psCode" ${FRP.code?'':'disabled'}><b>⧉</b>${FRP.code?'複製好友代碼':'好友代碼讀取中'}</button></div>
+  const card=`<section class="psCard">${cardHTML289(myCard289(),FRP.code)}<div class="psEdit"><button id="psRen"><b>✎</b>改名</button><button id="psCode" ${FRP.code?'':'disabled'}><b>⧉</b>${FRP.code?'複製好友代碼':'好友代碼讀取中'}</button><button id="psAdj" class="${PS289.adj?'on':''}"><b>⤢</b>${PS289.adj?'完成':'調整立繪'}</button></div>
+    ${PS289.adj?`<div class="psAdj295"><p class="pshint">在名片上拖曳立繪移動；滑桿或滾輪、兩指縮放。</p><div class="psrow"><span>大小</span><input type="range" id="psAxS" min="40" max="300" step="1" value="${Math.round(((cax295(artSrc289(myCard289().av,mains289()))||{}).s||1)*100)}"><output>${Math.round(((cax295(artSrc289(myCard289().av,mains289()))||{}).s||1)*100)}%</output><button id="psAxR">重設</button></div></div>`:''}
     ${PS289.edit?`<div class="psrow psNm"><input id="psNick" maxlength="16" value="${esc(ME.nick)}" placeholder="${esc(acct&&ME.acct.name?ME.acct.name:ME.guest)}"><button id="psNickOk">儲存</button></div>`:''}</section>`;
   const sBg=`<section><h4>名片背景</h4><div class="hs289 ths">${ths}</div>${cthOk289('black')?'':'<p class="pshint">黑曜：成就達 30 個解鎖</p>'}</section>`;
   const sTt=`<section><h4>稱號</h4>${ttls.length?`<div class="hs289 tts"><button class="ttl ${!curT?'on':''}" data-ttl="">不顯示</button>${ttls.map(b=>`<button class="ttl ${curT===mxTitle(b)?'on':''}" data-ttl="${b}">${esc(mxTitle(b))}</button>`).join('')}</div>`:'<p class="pshint">幹員熟練度 Lv3 解鎖稱號。</p>'}</section>`;
@@ -13032,6 +13057,8 @@ function renderSettings(){const el=$('#psettings');if(!el||el.hidden)return;cons
   $('#psClose').onclick=closeSettings;
   $('#psRen').onclick=()=>{PS289.edit=!PS289.edit;renderSettings();const i=$('#psNick');if(i){i.focus();i.select();}};
   const ok=$('#psNickOk');if(ok){const save=()=>{ME.nick=$('#psNick').value.trim().slice(0,16);PS289.edit=false;saveMe();renderPlayer();renderSettings();profPush();};ok.onclick=save;$('#psNick').onkeydown=e=>{if(e.key==='Enter')save();};}
+  $('#psAdj').onclick=()=>{PS289.adj=!PS289.adj;if(!PS289.adj)profPush();renderSettings();};
+  if(PS289.adj)adjBind295(el);
   $('#psCode').onclick=()=>{const b=$('#psCode');try{navigator.clipboard.writeText(FRP.code).then(()=>{b.innerHTML='<b>✓</b>已複製';},()=>{});}catch(e){}};
   el.querySelectorAll('[data-cth]').forEach(b=>b.onclick=()=>{ME.cth=b.dataset.cth;saveMe();renderSettings();profPush();});
   el.querySelectorAll('[data-ttl]').forEach(b=>b.onclick=()=>{ECO.title=b.dataset.ttl;ecoSave();renderPlayer();renderSettings();profPush();});
@@ -14959,6 +14986,7 @@ NEWS.unshift({d:'2026-11-12',v:'v289',i:['玩家設定改成「我的名片」�
 NEWS.unshift({d:'2026-11-12',v:'v290',i:['線上對戰改成獎盃制：拿掉段位，勝利 +30 獎盃、落敗 −20 獎盃（不會低於 0）。大廳「線上對戰」、配對 VS 畫面和結算都會顯示獎盃數。']});I18X['線上對戰改成獎盃制：拿掉段位，勝利 +30 獎盃、落敗 −20 獎盃（不會低於 0）。大廳「線上對戰」、配對 VS 畫面和結算都會顯示獎盃數。']=['Online matches now use trophies instead of ranks: win +30, lose −20 (never below 0). Trophies show on the lobby Online match button, the VS screen and the results.','オンライン対戦はランクの代わりにトロフィー制に：勝利 +30、敗北 −20（0 未満にならない）。ロビー、VS 画面、リザルトに表示。'];
 NEWS.unshift({d:'2026-11-12',v:'v293',i:['線上對戰獎盃改成：勝利 +5，每名存活幹員再 +1，完成任務（拆除炸彈、阻止拆彈、救出人質）再 +2；落敗 −3，殺害人質再 −1；誤殺隊友每名 −1。獎盃不會低於 0，結算會列出每一項。']});I18X['線上對戰獎盃改成：勝利 +5，每名存活幹員再 +1，完成任務（拆除炸彈、阻止拆彈、救出人質）再 +2；落敗 −3，殺害人質再 −1；誤殺隊友每名 −1。獎盃不會低於 0，結算會列出每一項。']=['Online trophies: win +5, +1 per surviving operator, +2 for the objective (bomb disarmed, defuse stopped, hostage extracted); loss −3, −1 more for killing the hostage; −1 per teammate you killed. Never below 0; the results list each item.',''];
 NEWS.unshift({d:'2026-11-12',v:'v291',i:['名片上的幹員立繪不再切到頭。']});
+NEWS.unshift({d:'2026-11-13',v:'v295',i:['名片右側的立繪可以自己調整：在「我的名片」按「調整立繪」，拖曳移動、滑桿或兩指縮放，按「重設」回原本位置。每張立繪各自記住，好友看你的名片也會照這樣顯示。']});
 NEWS.unshift({d:'2026-11-13',v:'v294',i:['名片的新兵頭像改成新兵本人的圖（不再是圖示）；培養幹員轉職過的職業會出現在頭像清單，可以換成該職業頭像。']});
 NEWS.unshift({d:'2026-11-12',v:'v292',i:['名片上的「勝率」改成獎盃數，右上角不再另外顯示獎盃。','熟練度滿級顯示 LvMax。解鎖改成：擁有幹員就有圖示頭像、Lv2 解鎖頭像與半身像、Lv3 解鎖稱號、LvMax 解鎖該幹員技能給培養幹員裝備（不用再花聲望買）。']});
 I18X['手機主畫面換上金線棋盤圖示。遊戲畫面編輯器也有自己的圖示。']=['The game has a new gold-grid home-screen icon, and the UI editor has its own icon.',''];
