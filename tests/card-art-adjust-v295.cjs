@@ -23,7 +23,10 @@ try{for(const [w,h,tag] of [[390,844,'phone'],[1440,900,'desktop']]){
   const fr=await p.evaluate(c=>{const d=document.createElement('div');d.style.width='300px';d.innerHTML=cardHTML289(c,'ABC');document.body.appendChild(d);const i=d.querySelector('.pcArt');return [i.style.scale,i.style.translate];},await p.evaluate(()=>myCard289()));
   assert.equal(+fr[0],1.5);
   // junk from someone else's card is clamped
-  assert.equal(await p.evaluate(()=>cardHTML289({av:'cop:0',ax:{x:'<b>',y:999,s:50}}).match(/style="[^"]*"/)[0]),'style="translate:0.00cqw 60.00cqw;scale:3.000"');
+  assert.equal(await p.evaluate(()=>cardHTML289({av:'cop:0',ax:{x:'<b>',y:999,s:50}}).match(/style="[^"]*"/)[0]),'style="translate:0.00cqw 220.00cqw;scale:3.000"');
+  // v296: a long drag down is not stopped at the old 60cqw limit
+  {await p.click('#psAdj');const bx=await (await p.$('.psCard .pc289')).boundingBox();await p.mouse.move(bx.x+bx.width*.8,bx.y+5);await p.mouse.down();await p.mouse.move(bx.x+bx.width*.8,bx.y+bx.height*2.2,{steps:8});await p.mouse.up();
+   const y=await p.evaluate(()=>myCard289().ax.y);assert(y>120,'drag down reaches '+y);await p.click('#psAdj');}
   // reset
   await p.click('#psAdj');await p.click('#psAxR');assert.equal((await art()).s,'');assert.equal(await p.evaluate(()=>myCard289().ax),null);
   // other avatar keeps its own framing
