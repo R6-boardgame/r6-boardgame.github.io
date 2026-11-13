@@ -13004,7 +13004,7 @@ function artSrc289(k,m){k=avN294(k);if(/^cop:/.test(k||'')){const c=copAv(k);if(
   if(OPC[b]&&FACEM[artBase(b)])return 'img/face/'+artBase(b)+'.webp';const t=(m||[]).find(x=>OPC[x[0]]&&FACEM[artBase(x[0])]);return t?'img/face/'+artBase(t[0])+'.webp':COPART[0];}
 // v295: the player moves / zooms the card art themselves. Kept per art image in ME.cax[src]={x,y,s} (x,y in cqw of the card, s = scale), sent with the card as c.ax.
 function cax295(src){const v=ME.cax&&ME.cax[src];return v&&(v.x||v.y||v.s!==1)?{x:+v.x||0,y:+v.y||0,s:+v.s||1}:null;}
-function axOk295(a){if(!a||typeof a!=='object')return null;const c=(v,lo,hi,d)=>Number.isFinite(+v)?Math.min(hi,Math.max(lo,+v)):d;return {x:c(a.x,-80,80,0),y:c(a.y,-60,60,0),s:c(a.s,.4,3,1)};}
+function axOk295(a){if(!a||typeof a!=='object')return null;const c=(v,lo,hi,d)=>Number.isFinite(+v)?Math.min(hi,Math.max(lo,+v)):d;return {x:c(a.x,-160,120,0),y:c(a.y,-80,220,0),s:c(a.s,.4,3,1)};}
 function axCss295(a){a=axOk295(a);return a?` style="translate:${a.x.toFixed(2)}cqw ${a.y.toFixed(2)}cqw;scale:${a.s.toFixed(3)}"`:'';}
 function mains289(){const n=new Set();return OPBASE.filter(b=>(ECO.mx[b]||0)>0&&OPC[b]).sort((a,b)=>(ECO.mx[b]||0)-(ECO.mx[a]||0)).filter(b=>!n.has(OPC[b].name)&&n.add(OPC[b].name)).slice(0,3).map(b=>[b,mxLv(ECO.mx[b]||0)]);}
 function ttl289(){return ECO.title&&OPC[ECO.title]&&mxLv(ECO.mx[ECO.title]||0)>=3?mxTitle(ECO.title):'';}
@@ -14986,6 +14986,7 @@ NEWS.unshift({d:'2026-11-12',v:'v289',i:['玩家設定改成「我的名片」�
 NEWS.unshift({d:'2026-11-12',v:'v290',i:['線上對戰改成獎盃制：拿掉段位，勝利 +30 獎盃、落敗 −20 獎盃（不會低於 0）。大廳「線上對戰」、配對 VS 畫面和結算都會顯示獎盃數。']});I18X['線上對戰改成獎盃制：拿掉段位，勝利 +30 獎盃、落敗 −20 獎盃（不會低於 0）。大廳「線上對戰」、配對 VS 畫面和結算都會顯示獎盃數。']=['Online matches now use trophies instead of ranks: win +30, lose −20 (never below 0). Trophies show on the lobby Online match button, the VS screen and the results.','オンライン対戦はランクの代わりにトロフィー制に：勝利 +30、敗北 −20（0 未満にならない）。ロビー、VS 画面、リザルトに表示。'];
 NEWS.unshift({d:'2026-11-12',v:'v293',i:['線上對戰獎盃改成：勝利 +5，每名存活幹員再 +1，完成任務（拆除炸彈、阻止拆彈、救出人質）再 +2；落敗 −3，殺害人質再 −1；誤殺隊友每名 −1。獎盃不會低於 0，結算會列出每一項。']});I18X['線上對戰獎盃改成：勝利 +5，每名存活幹員再 +1，完成任務（拆除炸彈、阻止拆彈、救出人質）再 +2；落敗 −3，殺害人質再 −1；誤殺隊友每名 −1。獎盃不會低於 0，結算會列出每一項。']=['Online trophies: win +5, +1 per surviving operator, +2 for the objective (bomb disarmed, defuse stopped, hostage extracted); loss −3, −1 more for killing the hostage; −1 per teammate you killed. Never below 0; the results list each item.',''];
 NEWS.unshift({d:'2026-11-12',v:'v291',i:['名片上的幹員立繪不再切到頭。']});
+NEWS.unshift({d:'2026-11-13',v:'v296',i:['調整名片立繪時可以往下（和左右）移得更遠，放大後也能把頭拉進名片裡。']});
 NEWS.unshift({d:'2026-11-13',v:'v295',i:['名片右側的立繪可以自己調整：在「我的名片」按「調整立繪」，拖曳移動、滑桿或兩指縮放，按「重設」回原本位置。每張立繪各自記住，好友看你的名片也會照這樣顯示。']});
 NEWS.unshift({d:'2026-11-13',v:'v294',i:['名片的新兵頭像改成新兵本人的圖（不再是圖示）；培養幹員轉職過的職業會出現在頭像清單，可以換成該職業頭像。']});
 NEWS.unshift({d:'2026-11-12',v:'v292',i:['名片上的「勝率」改成獎盃數，右上角不再另外顯示獎盃。','熟練度滿級顯示 LvMax。解鎖改成：擁有幹員就有圖示頭像、Lv2 解鎖頭像與半身像、Lv3 解鎖稱號、LvMax 解鎖該幹員技能給培養幹員裝備（不用再花聲望買）。']});

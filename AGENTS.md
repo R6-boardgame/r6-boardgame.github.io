@@ -1,5 +1,6 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v296：名片立繪調整範圍放寬（使用者回報往下不夠）：`axOk295` 改成 x −160～120、y −80～220（cqw）。因為縮放原點在右下，放大後要往下移很多才看得到頭。
 - v295：名片立繪讓玩家自己移動／縮放。設定頁 `#psAdj`（`PS289.adj`）開啟後 `adjBind295` 在 `.psCard .pc289` 上處理拖曳（pointer）、兩指縮放、滾輪、`#psAxS` 滑桿、`#psAxR` 重設；值存 `ME.cax[立繪網址]={x,y,s}`（x/y 是名片寬的 cqw，s 倍率，`saveMe` 存本機），每張立繪各自記。`myCard289().ax` 帶著目前立繪的值，`profPush` 送給好友；`cardHTML289` 用 `axCss295`（`axOk295` 夾住範圍：x ±80、y ±60、s 0.4–3）在 `.pcArt` 加 inline `translate/scale`，`transform-origin:right bottom`。關閉設定時自動結束調整。回歸：`tests/card-art-adjust-v295.cjs`。
 - v294：名片新兵頭像改用新兵圖。`avN294(k)` 把舊的新兵圖示鍵（`recruit_a_*`→`cop:0` 女、`recruit_d_*`→`cop:1` 男）轉成培養幹員頭像，`ME` 載入時、`avSrc289`／`artSrc289`／`profArt` 都先過它（好友舊資料也一樣）；預設頭像改 `cop:0`。頭像清單拿掉 `recruit_` 圖示，最前面是兩名新兵和他們轉職過的職業（`copWU`）。`copAv` 的 `av` 一律用 `img/av/cop_<f|m>[_職業].webp`，新增 hs／sh 四張頭像（從 `img/cop/*_hs/_sh.webp` 裁頭部）。回歸：`tests/card-recruit-avatar-v294.cjs`。
 - v293：獎盃計分改成依表現。`trCalc(win,mine)` 回傳項目清單：勝利 +5、每名存活己方幹員 +1（`ecoGame` 的 `mine`）、完成任務 +2（`G._df` 我方阻止拆彈，或我方進攻且 `G._why` 是「炸彈已被拆除」／「人質已安全撤離」）；落敗 −3、`G._hk`（我方害死人質）再 −1；`G._ffn`（我方誤殺隊友數）每名 −1，勝敗都算。總數最低 0。`G._trd.L` 給結算 `#rkres` 的 `.trL` 逐項列出。配對機器人獎盃改在你上下 15 內。回歸：`tests/trophies-v290.cjs`。
