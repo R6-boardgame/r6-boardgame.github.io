@@ -1,5 +1,6 @@
 # 交接說明：虹彩六號 戰術桌遊（網頁版）
 
+- v301：成就名稱全部改成能當稱號的名字（`ACH[].n`、`data/achievements.csv` 的「成就名稱」欄、`I18X` 英日翻譯同步；**改名要三處一起改**，因為 `achApply` 會用 CSV 蓋掉 `ACH`）。解鎖的成就就是名片稱號：`ECO.title='ach:<id>'`，`achTtl`／`ttlK289` 取名稱與稀有度，`achTier(a)`：`ACHLEG` 名單＝`l` 傳說（金紅、名片上流動光），刁鑽 `x:1`＝`x` 紫，長期目標＝`g` 藍，其餘＝`c` 銅。`atCls(k)` 加 `.at .at-<k>`（CSS 變數 `--ac/--ac2`），用在名片 `.pcTtl`、錢包 `.ptag em`、設定稱號列（兩列 grid，成就稱號依稀有度排在最前）與成就頁詳情。`myCard289().tk` 帶稀有度給好友／對手名片。解鎖提示改成「獲得 X 稱號，可到名片換上」。回歸：`tests/ach-titles-v301.cjs`。
 - v300：段位從錢包拆出來。`rkTile(cls,id)`（徽章＋經驗條，沒有文字，可領獎勵時紅點）：手機 `.lobSide` 第一格 `#t-rk`（`.lobEv.rkT`，跟活動同尺寸，活動往下），`renderPlayer` 會同步更新它；電腦 `#tplayer` 第二欄 `#t-rkd`（`.prkTile`，只在 `#title[data-s=title]` ≥761px 顯示）。點擊用 document 委派開 `rkOpen`。錢包 `.pinfo` 回到名字＋聲望。
 - v299：獎盃段位。`RKS`（20 段：key、名稱、門檻，徽章 `img/rank/<key>.webp` 由使用者提供的段位圖切出）、`rkOf`／`rkIdx`／`rkFloor`（保底＝目前顏色第一段，`trGame` 輸了不會低於它）、`RKRW` 每段一次性獎勵（聲望；白銀 IV、黃金 IV、白金 III、冠軍另送稱號 `rk:<顏色>`），`ECO.trClaim` 記已領的節點，`ECO.trMax` 到過就能領。錢包 `.pinfo` 名字下方 `rkWallet()`（徽章＋段位名＋獎盃＋經驗條，有可領獎勵時紅點）；電腦大廳 `.pinfo` 改 grid，聲望移到名字右邊。點 `#prk` 開 `#rkPage`（`rkOpen`）：手機上方圓形進度＋三格數據，下方「段位之路」橫向捲動；≥1000px 左圓右路。路線 `.rkTrack` 對齊 `.rkDot`，`--fill` 是走到第幾個節點（含小數）。稱號：`ttl289`／`ecoTag` 認得 `rk:` 稱號，名片設定稱號列加上已領的段位稱號。名片獎盃格前面加段位徽章（`.pcRk`）。回歸：`tests/trophy-rank-v299.cjs`。
 - v298：大廳（手機 `.lobB#t-rank`、電腦 `entry('t-rank')`）「線上對戰」副標改回 `PVP · 單人或組隊`，不再顯示獎盃數。
