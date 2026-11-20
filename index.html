@@ -15186,8 +15186,8 @@ const MINI302=(()=>{try{const q=new URLSearchParams(location.search).get('mini')
 function miniSky302(){const c=document.createElement('canvas');c.width=4;c.height=256;const g=c.getContext('2d'),gr=g.createLinearGradient(0,0,0,256);gr.addColorStop(0,'#c9ced3');gr.addColorStop(.55,'#dfe2e4');gr.addColorStop(1,'#bfc2c4');g.fillStyle=gr;g.fillRect(0,0,4,256);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t;}
 function miniLook302(){if(!MINI302||!R3)return;const S=R3.scene;
   S.background=R3.miniSky302||(R3.miniSky302=miniSky302());S.fog.color.set(0xd6d9dc);if(R3.env)S.environment=R3.env;
-  S.traverse(o=>{if(o.isHemisphereLight){o.color.set(0xeef3f8);o.groundColor.set(0x5a5650);o.intensity=.38;}if(o.isDirectionalLight&&o!==R3.sun){o.color.set(0xbcd0e6);o.intensity=.25;}});
-  R3.sun.color.set(0xfff3e2);R3.sun.intensity=2.6;
+  S.traverse(o=>{if(o.isHemisphereLight){o.color.set(0xeef3f8);o.groundColor.set(0x5a5650);o.intensity=.3;}if(o.isDirectionalLight&&o!==R3.sun){o.color.set(0xbcd0e6);o.intensity=.25;}});
+  R3.sun.color.set(0xffefd9);R3.sun.intensity=1.75;
   const gd=document.querySelector('#frame .grade');if(gd)gd.style.display='none';
   if(R3.bar){if(R3.bar.g)R3.bar.g.visible=false;if(R3.bar.sky)R3.bar.sky.visible=false;}}
 function miniPlinth302(m){if(!MINI302||!R3||!m||!m.rows)return;const W=m.rows[0].length,H=m.rows.length,k=W+'x'+H;if(R3.plinth302&&R3.plinth302.userData.k===k)return;
@@ -15226,6 +15226,44 @@ if(MINI302){
   {const _sv=setView;setView=function(){const r=_sv.apply(this,arguments);if(R3&&R3.scene.fog){R3.scene.fog.near*=1.6;R3.scene.fog.far*=1.6;}return r;};}
   (function loop(){try{if(R3&&!R3.tilt302)miniPost302();if(R3&&R3.bar&&R3.bar.m)miniPlinth302(R3.bar.m);}catch(e){}try{miniGlow302();if(R3&&R3.bar&&R3.bar.ready&&(R3.bar.sky&&R3.bar.sky.visible||R3.bar.g&&R3.bar.g.visible))miniLook302();}catch(e){}requestAnimationFrame(loop);})();
 }
+/* v303: smooth, soft "miniature" surfaces in mini mode: walls become clean matte concrete (no photo grain / bump noise),
+   top edges get a rounded bevel done in the shader (per-box half size + which sides to round, so joins between wall pieces stay seamless),
+   soft dirt at the foot of every wall, and soft-edged sun shadows. */
+const SMG303={};
+function smoothMat303(base,dark){const m=new THREE.MeshStandardMaterial({color:base,roughness:.88,metalness:0,envMapIntensity:.1});
+  m.onBeforeCompile=s=>{
+    s.vertexShader=s.vertexShader.replace('#include <common>','#include <common>\nattribute vec3 hs;attribute vec4 bv;varying vec3 vOP,vHS,vWP3,vAX,vAY,vAZ,vON;varying vec4 vBV;')
+      .replace('#include <begin_vertex>','#include <begin_vertex>\nvON=normal;vOP=position;vHS=hs;vBV=bv;vWP3=(modelMatrix*vec4(position,1.)).xyz;vAX=normalize(normalMatrix*vec3(1.,0.,0.));vAY=normalize(normalMatrix*vec3(0.,1.,0.));vAZ=normalize(normalMatrix*vec3(0.,0.,1.));');
+    s.fragmentShader=s.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vOP,vHS,vWP3,vAX,vAY,vAZ,vON;varying vec4 vBV;\nfloat h303(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}\nfloat n303(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h303(i),h303(i+vec2(1,0)),f.x),mix(h303(i+vec2(0,1)),h303(i+vec2(1,1)),f.x),f.y);}')
+      .replace('#include <color_fragment>','#include <color_fragment>\n{float lf=n303(vWP3.xz*.35+vWP3.y*.2);diffuseColor.rgb*=.96+.06*lf;'+
+        'float foot=1.-smoothstep(0.,.32,vWP3.y);diffuseColor.rgb*=1.-foot*'+(dark?'.22':'.3')+';'+
+        '}')
+      .replace('#include <normal_fragment_maps>','#include <normal_fragment_maps>\n{vec3 d=vHS-abs(vOP);vec3 sg=sign(vOP);const float R=.06;vec3 n=vec3(0.);'+
+        'if(vON.y>.5){n.y=1.;float ex=(sg.x<0.?vBV.x:vBV.y),ez=(sg.z<0.?vBV.z:vBV.w);if(ex>.5&&d.x<R){float t=1.-d.x/R;n.x+=sg.x*t*t*1.6;}if(ez>.5&&d.z<R){float t=1.-d.z/R;n.z+=sg.z*t*t*1.6;}}'+
+        'else if(abs(vON.x)>.5){float e=(sg.x<0.?vBV.x:vBV.y);n.x=sg.x;if(e>.5&&d.y<R&&vOP.y>0.){float t=1.-d.y/R;n.y+=t*t*1.6;}}'+
+        'else if(abs(vON.z)>.5){float e=(sg.z<0.?vBV.z:vBV.w);n.z=sg.z;if(e>.5&&d.y<R&&vOP.y>0.){float t=1.-d.y/R;n.y+=t*t*1.6;}}'+
+        'if(dot(n,n)>.5)normal=normalize(n.x*vAX+n.y*vAY+n.z*vAZ);}');
+  };m.customProgramCacheKey=()=>'smooth303'+(dark?'d':'');return m;}
+const plainW303=n=>!!n&&['hard','soft','reinf'].includes(n.t)&&!n.hole&&!n.curve&&!n.mirror&&!(n.panel&&n.t==='reinf');// a neighbour that builds a plain arm back toward us
+function smoothWalls303(){if(!MINI302||!R3||!G)return;const M=R3.mats;if(!M)return;
+  if(!R3.smat303)R3.smat303={hard:smoothMat303(0xbdb8b0),soft:smoothMat303(0xc8c4bc),reinf:smoothMat303(0x7f8386,1)};
+  const set=new Map();for(const k of ['hard','soft','reinf'])for(const a of [M[k],k==='reinf'?null:M[k+'B'],k==='reinf'?null:M[k+'K']])if(a)set.set(a,k);
+  R3.staticG.traverse(o=>{if(!o.isMesh||!o.userData.cell||!set.has(o.material)||!o.geometry.parameters||o.rotation.x||o.rotation.y||o.rotation.z)return;
+    const k=set.get(o.material),[cx,cy]=o.userData.cell,p=o.geometry.parameters,th={hard:.4,soft:.18,reinf:.42}[cell(cx,cy).t]||Math.min(p.width,p.depth),sy=p.height;let sx=p.width,sz=p.depth,bv;
+    // wall arms are built a few mm thinner than the post so their faces don't z-fight; here they get the post's exact thickness so the run reads as one smooth piece
+    const ox=Math.abs(o.position.x-(cx+.5)),oz=Math.abs(o.position.z-(cy+.5));// arms sit off the cell centre along their run (hard-wall arms are shorter than they are thick, so size alone can't tell)
+    // arms also get 3cm longer so neighbouring pieces overlap and no hairline cracks show at the joins
+    if(ox>.01&&oz<.01){bv=[0,0,1,1];if(Math.abs(sz-th)<.012)sz=th;sx+=.03;}else if(oz>.01&&ox<.01){bv=[1,1,0,0];if(Math.abs(sx-th)<.012)sx=th;sz+=.03;}else bv=[+!wj(cell(cx-1,cy)),+!wj(cell(cx+1,cy)),+!wj(cell(cx,cy-1)),+!wj(cell(cx,cy+1))];
+    const key=[sx,sy,sz].map(v=>v.toFixed(3)).join()+bv.join('');let g=SMG303[key];
+    if(!g){g=new THREE.BoxGeometry(sx,sy,sz);const n=g.attributes.position.count,h=new Float32Array(n*3),b=new Float32Array(n*4);for(let i=0;i<n;i++){h.set([sx/2,sy/2,sz/2],i*3);b.set(bv,i*4);}g.setAttribute('hs',new THREE.BufferAttribute(h,3));g.setAttribute('bv',new THREE.BufferAttribute(b,4));SMG303[key]=g;}
+    // faces buried inside a joining piece are dropped; otherwise their edges flicker through the coplanar outer faces as dark hairlines
+    const mt=R3.smat303[k],no=R3.none303||(R3.none303=new THREE.MeshBasicMaterial({visible:false})),F=[mt,mt,mt,mt,mt,mt];
+    if(ox>.01&&oz<.01){const sg=Math.sign(o.position.x-(cx+.5));F[sg>0?1:0]=no;if(plainW303(cell(cx+sg,cy)))F[sg>0?0:1]=no;}
+    else if(oz>.01&&ox<.01){const sg=Math.sign(o.position.z-(cy+.5));F[sg>0?5:4]=no;if(plainW303(cell(cx,cy+sg)))F[sg>0?4:5]=no;}
+    else{if(wj(cell(cx+1,cy)))F[0]=no;if(wj(cell(cx-1,cy)))F[1]=no;if(wj(cell(cx,cy+1)))F[4]=no;if(wj(cell(cx,cy-1)))F[5]=no;}
+    o.geometry=g;o.material=F;});}
+function softShadow303(){if(!MINI302||!R3||R3.soft303)return;R3.soft303=1;R3.renderer.shadowMap.type=THREE.PCFShadowMap;R3.sun.shadow.radius=7;R3.sun.shadow.blurSamples=16;if(R3.sun.shadow.map){R3.sun.shadow.map.dispose();R3.sun.shadow.map=null;}}
+if(MINI302){const _bs=buildStatic;buildStatic=function(){const r=_bs.apply(this,arguments);try{smoothWalls303();softShadow303();}catch(e){console.warn('mini303',e);}return r;};}
 </script>
 <script src="pve257.js?v=269"></script>
 </body></html>
