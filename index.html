@@ -15178,5 +15178,54 @@ render();loadPBR();loadModels();loadWallImg();loadC3D();
 {const _pl=plant;plant=function(u){const r=_pl(u);if(G&&G.lv&&G.lv.goal==='plant'&&u.side===G.player&&!G.over)setTimeout(()=>{if(G&&G.lv&&!G.over)finish('A','拆彈器已安裝');},900);return r;};}
 {const _fn=finish;finish=function(w,why){if(G&&G.lv)return lvFinish(w,why);return _fn(w,why);};}
 </script>
+<script id="mini302">
+/* v302: miniature-diorama look (opt-in, ?mini=1 or localStorage r6mini302=1), after Miniopolis-style tilt-shift dioramas:
+   pale studio sky instead of the bar, the board on a thick bevelled concrete plinth, neutral low sun with long crisp shadows,
+   tilt-shift blur (sharp band through the focus point, blurred top/bottom), and a glowing yellow frame on the destructible wall under the cursor. */
+const MINI302=(()=>{try{const q=new URLSearchParams(location.search).get('mini');if(q!==null)localStorage.setItem('r6mini302',q==='0'?'0':'1');return localStorage.getItem('r6mini302')==='1';}catch(e){return /[?&]mini=1/.test(location.search);}})();
+function miniSky302(){const c=document.createElement('canvas');c.width=4;c.height=256;const g=c.getContext('2d'),gr=g.createLinearGradient(0,0,0,256);gr.addColorStop(0,'#c9ced3');gr.addColorStop(.55,'#dfe2e4');gr.addColorStop(1,'#bfc2c4');g.fillStyle=gr;g.fillRect(0,0,4,256);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t;}
+function miniLook302(){if(!MINI302||!R3)return;const S=R3.scene;
+  S.background=R3.miniSky302||(R3.miniSky302=miniSky302());S.fog.color.set(0xd6d9dc);if(R3.env)S.environment=R3.env;
+  S.traverse(o=>{if(o.isHemisphereLight){o.color.set(0xeef3f8);o.groundColor.set(0x5a5650);o.intensity=.38;}if(o.isDirectionalLight&&o!==R3.sun){o.color.set(0xbcd0e6);o.intensity=.25;}});
+  R3.sun.color.set(0xfff3e2);R3.sun.intensity=2.6;
+  const gd=document.querySelector('#frame .grade');if(gd)gd.style.display='none';
+  if(R3.bar){if(R3.bar.g)R3.bar.g.visible=false;if(R3.bar.sky)R3.bar.sky.visible=false;}}
+function miniPlinth302(m){if(!MINI302||!R3||!m||!m.rows)return;const W=m.rows[0].length,H=m.rows.length,k=W+'x'+H;if(R3.plinth302&&R3.plinth302.userData.k===k)return;
+  if(R3.plinth302){R3.scene.remove(R3.plinth302);R3.plinth302.traverse(o=>{if(o.geometry)o.geometry.dispose();});}
+  // a stepped concrete base: the upper block has no top face (the board's floor is its top, so nothing z-fights in the 16-bit depth buffer), the lower lip is bevelled
+  const T=THREE,p=new T.Group(),mat=new T.MeshStandardMaterial({color:0x8d8b87,roughness:.92,metalness:0,envMapIntensity:.35}),none=new T.MeshBasicMaterial({visible:false});
+  const up=new T.Mesh(new T.BoxGeometry(W+2.02,.5,H+2.02),[mat,mat,none,mat,mat,mat]);up.position.set(W/2,-.25,H/2);up.receiveShadow=true;p.add(up);
+  const lo=new T.Mesh(T.RoundedBoxGeometry?new T.RoundedBoxGeometry(W+3.2,.5,H+3.2,3,.1):new T.BoxGeometry(W+3.2,.5,H+3.2),mat);lo.position.set(W/2,-.62,H/2);lo.receiveShadow=true;p.add(lo);
+  p.userData.k=k;R3.scene.add(p);R3.plinth302=p;
+  // the sun's shadow box follows the board so the long shadows aren't clipped
+  R3.sun.target.position.set(W/2,0,H/2);R3.sun.position.set(W/2-16,10,H/2+10);Object.assign(R3.sun.shadow.camera,{left:-W*.8,right:W*.8,top:H*.9+4,bottom:-H*.9-4,near:1,far:70});R3.sun.shadow.bias=-.0008;R3.sun.shadow.normalBias=.03;R3.sun.shadow.camera.updateProjectionMatrix();}
+const TILT302={uniforms:{tDiffuse:{value:null},res:{value:new (window.THREE?THREE.Vector2:Object)(1,1)},focus:{value:.5},band:{value:.16},amt:{value:1}},
+  vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+  fragmentShader:'uniform sampler2D tDiffuse;uniform vec2 res;uniform float focus,band,amt;varying vec2 vUv;\n'+
+  'void main(){float d=abs(vUv.y-focus);float r=smoothstep(band,band+.32,d)*amt*9.;vec4 s=texture2D(tDiffuse,vUv);if(r<.05){gl_FragColor=s;return;}\n'+
+  'vec4 acc=s;float w=1.;for(int i=0;i<24;i++){float a=float(i)*2.39996;float rr=sqrt(float(i)+.5)/sqrt(24.)*r;vec2 o=vec2(cos(a),sin(a))*rr/res;acc+=texture2D(tDiffuse,vUv+o);w+=1.;}gl_FragColor=acc/w;}'};
+function miniPost302(){if(!MINI302||!R3||!R3.comp||R3.tilt302||!THREE.ShaderPass)return;const ps=R3.comp.passes,i=ps.findIndex(p=>p.uniforms&&p.uniforms.exposure);
+  const t=new THREE.ShaderPass(TILT302);t.material.toneMapped=false;R3.tilt302=t;R3.comp.insertPass(t,i<0?ps.length:i);miniSize302();}
+function miniSize302(){if(!R3||!R3.tilt302)return;const s=R3.renderer.getDrawingBufferSize(new THREE.Vector2());R3.tilt302.uniforms.res.value.set(s.x,s.y);R3.tilt302.uniforms.amt.value=Math.min(1.6,s.y/900);}
+// glowing destructible-wall frame (the yellow outline in the reference)
+function miniGlow302(){if(!MINI302||!R3)return;if(!R3.glow302){// 12 thin HDR-yellow bars on the edges of a box around the wall, so the bloom pass gives them a soft halo
+    const g=new THREE.Group(),m=new THREE.MeshBasicMaterial({color:new THREE.Color(2.2,1.15,.03),toneMapped:false,fog:false,transparent:true,opacity:1});g.userData.m=m;
+    for(const ax of [0,1,2])for(const a of [-.5,.5])for(const b of [-.5,.5]){const e=new THREE.Mesh(BOX3||new THREE.BoxGeometry(1,1,1),m);e.userData.ax=ax;e.userData.ab=[a,b];g.add(e);}
+    g.visible=false;g.renderOrder=8;R3.scene.add(g);R3.glow302=g;}
+  const g=R3.glow302,c=R3.hoverCell||R3.miniPin,cl=c&&G&&cell(c[0],c[1]);g.userData.m.opacity=.8+.2*Math.sin(performance.now()/250);
+  if(!cl||!(cl.t==='soft'||cl.t==='reinf')){g.visible=false;return;}
+  const WH=WALLH[R3.wall],th={soft:.18,reinf:.42}[cl.t]+.06,hz=isWallC(cell(c[0]-1,c[1]))||isWallC(cell(c[0]+1,c[1])),S=[hz?1.01:th,WH+.03,hz?th:1.01],w=.05;
+  g.position.set(cwx(c[0],c[1]),WH/2,cwz(c[0],c[1]));
+  for(const e of g.children){const ax=e.userData.ax,[a,b]=e.userData.ab,o=[0,1,2].filter(i=>i!==ax),p=[0,0,0],sc=[w,w,w];sc[ax]=S[ax]+w;p[o[0]]=a*S[o[0]];p[o[1]]=b*S[o[1]];e.position.set(...p);e.scale.set(...sc);}
+  g.visible=true;}
+if(MINI302){
+  {const _bi=barInit;barInit=function(){const r=_bi.apply(this,arguments);miniLook302();return r;};}
+  {const _bb=barBuild;barBuild=function(m){const r=_bb.apply(this,arguments);miniLook302();miniPlinth302(m);return r;};}
+  {const _sp=setupPost;setupPost=function(){const r=_sp.apply(this,arguments);miniPost302();return r;};}
+  {const _sz=size3D;size3D=function(){const r=_sz.apply(this,arguments);miniSize302();return r;};}
+  {const _sv=setView;setView=function(){const r=_sv.apply(this,arguments);if(R3&&R3.scene.fog){R3.scene.fog.near*=1.6;R3.scene.fog.far*=1.6;}return r;};}
+  (function loop(){try{if(R3&&!R3.tilt302)miniPost302();if(R3&&R3.bar&&R3.bar.m)miniPlinth302(R3.bar.m);}catch(e){}try{miniGlow302();if(R3&&R3.bar&&R3.bar.ready&&(R3.bar.sky&&R3.bar.sky.visible||R3.bar.g&&R3.bar.g.visible))miniLook302();}catch(e){}requestAnimationFrame(loop);})();
+}
+</script>
 <script src="pve257.js?v=269"></script>
 </body></html>
